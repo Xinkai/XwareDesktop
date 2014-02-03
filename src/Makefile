@@ -2,6 +2,7 @@ all: libmounthelper.so
 	make -C frontend
 
 libmounthelper.so: libmounthelper.c
+	mkdir build
 	gcc libmounthelper.c -m32 -o build/libmounthelper.so -fPIC -shared -ldl
 
 clean:
