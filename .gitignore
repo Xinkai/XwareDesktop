@@ -1,0 +1,13 @@
+__pycache__/
+*.py[cod]
+
+.cproject
+.project
+
+*.so
+
+# Arch package
+*.pkg.tar.xz
+
+ui_*.py
+*_rc.py

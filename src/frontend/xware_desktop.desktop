@@ -1,0 +1,21 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Xware Desktop
+Comment=桌面化迅雷固件
+TryExec=/opt/xware_desktop/frontend/launcher.py
+Exec=/opt/xware_desktop/frontend/launcher.py %F
+Categories=Network;
+Terminal=false
+Icon=/opt/xware_desktop/frontend/thunder.ico
+#MimeType=image/x-foo;
+#Actions=Gallery;Create;
+
+#[Desktop Action Gallery]
+#Exec=fooview --gallery
+#Name=Browse Gallery
+
+#[Desktop Action Create]
+#Exec=fooview --create-new
+#Name=Create a new Foo!
+#Icon=fooview-new

@@ -1,0 +1,14 @@
+[Unit]
+Description=Xware Service
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/xware_desktop/xware/lib
+User=xware
+Group=xware
+Environment="LD_PRELOAD=/opt/xware_desktop/libmounthelper.so"
+ExecStart=/opt/xware_desktop/xware/lib/EmbedThunderManager --verbose
+
+[Install]
+WantedBy=multi-user.target
