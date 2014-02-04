@@ -1,12 +1,7 @@
 #define _GNU_SOURCE
 
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-// #include <fcntl.h>
+#include <string.h>
 #include <dlfcn.h>
-#include <stdarg.h>
-#include <stdlib.h>
 
 const char* PROCMOUNTS = "/proc/mounts";
 const char* XWARE_CONF_PATH = "/opt/xware_desktop/mounts";

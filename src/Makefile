@@ -2,8 +2,11 @@ all: libmounthelper.so
 	make -C frontend
 
 libmounthelper.so: libmounthelper.c
-	mkdir build
-	gcc libmounthelper.c -m32 -o build/libmounthelper.so -fPIC -shared -ldl
+	mkdir -p build
+	gcc -m32 -o build/libmounthelper.so -fPIC -shared -ldl libmounthelper.c
+
+daemon: daemon.c
+	gcc -o build/daemon daemon.c
 
 clean:
 	rm -f EmbedThunderManager
