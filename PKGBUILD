@@ -32,6 +32,8 @@ package() {
   # copy systemd service
   install -D xware.service                   ${pkgdir}/usr/lib/systemd/system/xware.service
 
+  install -D build/daemon                    ${pkgdir}/opt/xware_desktop/daemon
+
   # install frontend
   cp -R frontend                             ${pkgdir}/opt/xware_desktop/frontend
 
