@@ -8,6 +8,11 @@ __pycache__/
 
 # Arch package
 *.pkg.tar.xz
+pkg/
 
+# pyqt generated
 ui_*.py
 *_rc.py
+
+# coffeescript generated
+xwarejs.js

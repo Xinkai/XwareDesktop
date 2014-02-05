@@ -27,6 +27,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.lineEdit_loginUsername.setText(settingsAccessor.get("account", "username"))
         self.lineEdit_loginPassword.setText(settingsAccessor.get("account", "password"))
+        self.checkBox_autoLogin.setChecked(settingsAccessor.get("account", "autologin", "True") == "True")
 
         self.rejected.connect(lambda: self.close())
         self.accepted.connect(self.writeSettings)
@@ -34,6 +35,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
     def writeSettings(self):
         settingsAccessor.set("account", "username", self.lineEdit_loginUsername.text())
         settingsAccessor.set("account", "password", self.lineEdit_loginPassword.text())
+        settingsAccessor.set("account", "autologin", "True" if self.checkBox_autoLogin.isChecked() else "False")
 
         settingsAccessor.save()
 
