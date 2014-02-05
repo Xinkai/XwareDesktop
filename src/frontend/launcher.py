@@ -77,8 +77,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
             print(bytes(cookie.name()).decode('utf-8'), bytes(cookie.value()).decode('utf-8'))
 
 if __name__ == "__main__":
-    import settings
+    import os
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+    import settings
     settingsAccessor = settings.settingsAccessor = settings.SettingAccessor()
 
 
