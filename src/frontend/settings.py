@@ -24,6 +24,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.loadMountsSymLinks()
 
         self.lineEdit_loginUsername.setText(settingsAccessor.get("account", "username"))
         self.lineEdit_loginPassword.setText(settingsAccessor.get("account", "password"))
@@ -38,5 +39,15 @@ class SettingsDialog(QDialog, Ui_Dialog):
         settingsAccessor.set("account", "autologin", "True" if self.checkBox_autoLogin.isChecked() else "False")
 
         settingsAccessor.save()
+
+    def loadMountsSymLinks(self):
+        import os
+        from PyQt5.QtWidgets import QTableWidgetItem
+        for i, drive in enumerate(os.listdir("/tmp/thunder/volumes")):
+            print(i, drive, os.path.realpath("/tmp/thunder/volumes/" + drive))
+            self.table_mounts.insertRow(i)
+            self.table_mounts.setItem(i, 0, QTableWidgetItem(os.path.realpath("/tmp/thunder/volumes/" + drive)))
+            self.table_mounts.setItem(i, 1, QTableWidgetItem(drive))
+            self.table_mounts.setItem(i, 2, QTableWidgetItem("TODO"))
 
 settingsAccessor = None

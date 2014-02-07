@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <author>Xinkai Chen</author>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
+    <width>1008</width>
     <height>737</height>
    </rect>
   </property>
@@ -53,12 +54,12 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>1000</width>
-        <height>714</height>
+        <width>1008</width>
+        <height>715</height>
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: white</string>
+       <string notr="true">background-color: white;</string>
       </property>
       <property name="url">
        <url>
@@ -74,7 +75,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1000</width>
+     <width>1008</width>
      <height>22</height>
     </rect>
    </property>
@@ -87,7 +88,6 @@
     <addaction name="separator"/>
     <addaction name="action_setting"/>
     <addaction name="separator"/>
-    <addaction name="action"/>
     <addaction name="action_exit"/>
    </widget>
    <widget class="QMenu" name="menu_2">
@@ -96,8 +96,25 @@
     </property>
     <addaction name="action_showAbout"/>
    </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>后端</string>
+    </property>
+    <addaction name="action_ETMstop"/>
+    <addaction name="action_ETMstart"/>
+    <addaction name="action_ETMrestart"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_3"/>
    <addaction name="menu_2"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar">
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color: skyblue;</string>
+   </property>
   </widget>
   <action name="action_showAbout">
    <property name="text">
@@ -141,6 +158,21 @@
    </property>
    <property name="shortcut">
     <string>F5, Ctrl+R</string>
+   </property>
+  </action>
+  <action name="action_ETMstop">
+   <property name="text">
+    <string>停止</string>
+   </property>
+  </action>
+  <action name="action_ETMstart">
+   <property name="text">
+    <string>开启</string>
+   </property>
+  </action>
+  <action name="action_ETMrestart">
+   <property name="text">
+    <string>重启</string>
    </property>
   </action>
  </widget>

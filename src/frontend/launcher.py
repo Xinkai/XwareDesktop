@@ -16,11 +16,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.setupUi(self)
         self.setupSystray()
 
-        # hold a reference to setting
-        self.setting = settingsAccessor
 
-        # setup Webkit Bridge
-        self.xdpy = XwarePy(self)
+        self.setting = settingsAccessor # hold a reference to setting
+
+        self.xdpy = XwarePy(self) # setup Webkit Bridge
         self.setupWebkit()
         self.connectUI()
         self.connectXwarePy()
@@ -104,13 +103,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
 
         self.login()
 
-    def login(self):
-        with open("login.js") as file:
-            js = file.read().replace("{username}", settingsAccessor.get("account", "username")) \
-                            .replace("{password}", settingsAccessor.get("account", "password"))
-        # print(js)
-        self.webView.page().mainFrame().evaluateJavaScript(js)
-
     def slotSetting(self):
         from settings import SettingsDialog
         settingsDialog = SettingsDialog()
@@ -126,6 +118,22 @@ if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+    tasks = sys.argv[1:]
+    import fcntl
+    fd = os.open(constants.FRONTEND_PID, os.O_RDWR | os.O_CREAT, mode = 0o666)
+
+    import ipc
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except BlockingIOError:
+        if len(tasks) == 0:
+            print("You already have an Xware Desktop instance running.")
+            exit(-1)
+        else:
+            print(tasks)
+            ipc.FrontendCommunicationClient(tasks)
+            exit(0)
+
     import settings
     settingsAccessor = settings.settingsAccessor = settings.SettingAccessor()
 
@@ -134,6 +142,7 @@ if __name__ == "__main__":
     window = MainWindow()
     window.show()
 
+    ipcListener = ipc.FrontendCommunicationListener(window)
 
     sys.exit(app.exec())
 

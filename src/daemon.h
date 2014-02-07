@@ -16,7 +16,7 @@ int fdPid = -1;
 
 // allow the frontend to communicate with daemon
 #define SOCKET_PATH "/tmp/xware_socket"
-#define SOCKET_BUFFER_LENGTH 10
+#define SOCKET_BUFFER_LENGTH 16
 void setupSocketServer();
 void* threadListener();
 int sd = -1;

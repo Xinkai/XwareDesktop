@@ -20,11 +20,14 @@ class XwarePy(QObject):
         self.jsLoaded = True
         print("xdjs loaded.")
 
-        from urllib import parse
-        if parse.urldefrag(self.window.url)[0] == constants.LOGIN_PAGE and \
-            (self.window.setting.get("account", "autologin", "True") == "True"):
-            self.sigLogin.emit(self.window.setting.get("account", "username"),
-                               self.window.setting.get("account", "password"))
+        username = self.window.setting.get("account", "username", None)
+        password = self.window.setting.get("account", "password", None)
+
+        if username and password:
+            from urllib import parse
+            if parse.urldefrag(self.window.url)[0] == constants.LOGIN_PAGE and \
+                (self.window.setting.get("account", "autologin", "True") == "True"):
+                self.sigLogin.emit(username, password)
 
     @pyqtSlot()
     def requestFocus(self):

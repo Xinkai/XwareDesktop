@@ -38,12 +38,12 @@
         <rect>
          <x>10</x>
          <y>80</y>
-         <width>82</width>
+         <width>101</width>
          <height>23</height>
         </rect>
        </property>
        <property name="text">
-        <string>自动登录</string>
+        <string>自动登录前端</string>
        </property>
        <property name="checked">
         <bool>true</bool>
@@ -94,6 +94,42 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="layoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>208</width>
+         <height>86</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QRadioButton" name="radio_backendStartWhen1">
+          <property name="text">
+           <string>开机后总是自动启用后端</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radio_backendStartWhen2">
+          <property name="text">
+           <string>开机后后端保持上次关机时的状态</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radio_backendStartWhen3">
+          <property name="text">
+           <string>只在前端运行时启用后端</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_frontend">
       <attribute name="title">
@@ -125,6 +161,19 @@
         <string>*.exe</string>
        </property>
       </widget>
+      <widget class="QCheckBox" name="checkBox_enableDevelopersTools">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>570</y>
+         <width>251</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>在网页中启用 Webkit 开发者工具</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -136,12 +185,33 @@
          <x>10</x>
          <y>10</y>
          <width>801</width>
-         <height>227</height>
+         <height>221</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <item>
-         <widget class="QTableWidget" name="tableWidget">
+         <widget class="QTableWidget" name="table_mounts">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <attribute name="horizontalHeaderCascadingSectionResizes">
+           <bool>false</bool>
+          </attribute>
+          <attribute name="horizontalHeaderDefaultSectionSize">
+           <number>300</number>
+          </attribute>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+          <attribute name="verticalHeaderVisible">
+           <bool>false</bool>
+          </attribute>
           <column>
            <property name="text">
             <string>Unix路径</string>
@@ -163,6 +233,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QPushButton" name="pushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>添加</string>
             </property>
@@ -170,6 +243,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="pushButton_2">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>删除</string>
             </property>
@@ -193,6 +269,24 @@
          </layout>
         </item>
        </layout>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>260</y>
+         <width>611</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>22</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>本页功能没做好，请到项目主页查看设置方法。</string>
+       </property>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_backend">
@@ -253,6 +347,24 @@
         </item>
        </layout>
       </widget>
+      <widget class="QLabel" name="label">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>170</y>
+         <width>611</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>22</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>本页功能没做好，请到项目主页查看设置方法。</string>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>
@@ -275,7 +387,7 @@
   <tabstop>lineEdit_loginPassword</tabstop>
   <tabstop>lineEdit_loginUsername</tabstop>
   <tabstop>checkBox_autoLogin</tabstop>
-  <tabstop>tableWidget</tabstop>
+  <tabstop>table_mounts</tabstop>
   <tabstop>pushButton</tabstop>
   <tabstop>pushButton_2</tabstop>
  </tabstops>

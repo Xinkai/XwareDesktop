@@ -18,7 +18,6 @@ class XwareJS
         xdpy.requestFocus()
 
     slotLogin: (username, password) ->
-        console.log "slotLogin?????"
         $("#login-input-username").val(username).blur()
         $("#login-input-password").val(password)
 
