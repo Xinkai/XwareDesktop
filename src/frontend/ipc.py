@@ -24,7 +24,10 @@ from multiprocessing.connection import Listener, Client
 class FrontendCommunicationListener(object):
     def __init__(self, window):
         self.window = window
-        os.remove(constants.FRONTEND_SOCKET[0])
+        try:
+            os.remove(constants.FRONTEND_SOCKET[0])
+        except FileNotFoundError:
+            pass
         t = threading.Thread(target = self.startListenerThread, daemon = True)
         t.start()
 
