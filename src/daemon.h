@@ -10,24 +10,26 @@
 #include <pthread.h>
 #include <sys/stat.h>
 
-// pid of this program
-#define PID_PATH "/tmp/xware_daemon.pid"
-int fdPid = -1;
+// lock of this program
+#define LOCK_PATH "/tmp/xware_daemon.lock"
+int fdLock = -1;
 
 // allow the frontend to communicate with daemon
-#define SOCKET_PATH "/tmp/xware_socket"
+#define SOCKET_PATH "/tmp/xware_daemon.socket"
 #define SOCKET_BUFFER_LENGTH 16
 void setupSocketServer();
 void* threadListener();
 int sd = -1;
 #define ETM_STOP "ETM_STOP"
 #define ETM_START "ETM_START"
+#define ETM_RESTART "ETM_RESTART"
 
-// pid of EmbedThunderManager
-int etmPid = -1;
+#define ETM_LOCK_PATH "/tmp/xware_ETM.lock"
+int fdETMLock = -1;
+int etmPid = -1; // pid of EmbedThunderManager
 int runETM();
 int watchETM();
-int endETM();
+void endETM(const int restart);
 int autoReviveETM = 1; // when endETM() is called, set this to 0.
 pthread_mutex_t etmMutex = PTHREAD_MUTEX_INITIALIZER;
 const char* etmWorkingDir = "/opt/xware_desktop/xware/lib";

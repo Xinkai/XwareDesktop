@@ -2,7 +2,12 @@
 
 LOGIN_PAGE = "http://yuancheng.xunlei.com/login.html"
 
-DAEMON_SOCKET = "/tmp/xware_socket"
+DAEMON_LOCK = "/tmp/xware_daemon.lock"
+DAEMON_SOCKET = "/tmp/xware_daemon.socket"
 
-FRONTEND_PID = "/tmp/xware_desktop.pid"
+ETM_LOCK = "/tmp/xware_ETM.lock"
+
+FRONTEND_LOCK = "/tmp/xware_frontend.lock"
 FRONTEND_SOCKET = ("/tmp/xware_frontend.socket", "AF_UNIX")
+
+CONFIG_FILE = "/opt/xware_desktop/settings.ini"

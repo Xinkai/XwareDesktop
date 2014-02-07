@@ -3,10 +3,11 @@
 
 import sys
 from PyQt5.QtCore import QUrl, pyqtSlot
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel
 from ui_main import Ui_MainWindow
 from systemtray import Ui_SystemTray
 from xwarepy import XwarePy
+import threading
 import constants
 log = print
 
@@ -23,6 +24,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.setupWebkit()
         self.connectUI()
         self.connectXwarePy()
+        self.setupStatusBar()
 
 
     # initialization
@@ -41,6 +43,21 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
 
     def connectXwarePy(self):
         self.action_createTask.triggered.connect(self.slotPrepareTaskCreation)
+
+    def setupStatusBar(self):
+        ETMstatus = QLabel(self.statusBar)
+        ETMstatus.setObjectName("label_ETMstatus")
+        self.statusBar.ETMstatus = ETMstatus
+        self.statusBar.addPermanentWidget(ETMstatus)
+
+        daemonStatus = QLabel(self.statusBar)
+        daemonStatus.setObjectName("label_daemonStatus")
+        self.statusBar.daemonStatus = daemonStatus
+        self.statusBar.addPermanentWidget(daemonStatus)
+
+        t = threading.Thread(target = self.startStatusBarThread, daemon = True)
+        t.start()
+
     # initialization ends
 
     # shorthand
@@ -114,13 +131,44 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         for cookie in cookieJar.cookiesForUrl(QUrl("http://yuancheng.xunlei.com/")):
             print(bytes(cookie.name()).decode('utf-8'), bytes(cookie.value()).decode('utf-8'))
 
+    def startStatusBarThread(self):
+        import time, fcntl
+        while True:
+            try:
+                daemonLockFile = open(constants.DAEMON_LOCK)
+                try:
+                    daemonLock = fcntl.flock(daemonLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    daemonStatus = "Daemon未启用"
+                    fcntl.flock(daemonLockFile, fcntl.LOCK_UN)
+                except BlockingIOError:
+                    daemonStatus = "Daemon运行中"
+                daemonLockFile.close()
+            except FileNotFoundError:
+                daemonStatus = "Daemon未启用"
+            self.statusBar.daemonStatus.setText(daemonStatus)
+
+            try:
+                etmLockFile = open(constants.ETM_LOCK)
+                try:
+                    etmLock = fcntl.flock(etmLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    etmStatus = "ETM未启用"
+                    fcntl.flock(etmLockFile, fcntl.LOCK_UN)
+                except BlockingIOError:
+                    etmStatus = "ETM运行中"
+                etmLockFile.close()
+            except FileNotFoundError:
+                etmStatus = "ETM未启用"
+            self.statusBar.ETMstatus.setText(etmStatus)
+
+            time.sleep(1)
+
 if __name__ == "__main__":
     import os
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
     tasks = sys.argv[1:]
     import fcntl
-    fd = os.open(constants.FRONTEND_PID, os.O_RDWR | os.O_CREAT, mode = 0o666)
+    fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT, mode = 0o666)
 
     import ipc
     try:

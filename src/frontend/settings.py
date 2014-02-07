@@ -2,13 +2,13 @@
 
 from PyQt5.QtWidgets import QDialog
 from ui_settings import Ui_Dialog
+import constants
 
 class SettingAccessor(object):
-    __config_file__ = "/opt/xware_desktop/settings"
     def __init__(self):
         import configparser
         self.config = configparser.ConfigParser()
-        self.config.read(self.__class__.__config_file__)
+        self.config.read(constants.CONFIG_FILE)
 
     def get(self, section, key, fallback = None):
         return self.config.get(section, key, fallback = fallback)
@@ -17,7 +17,7 @@ class SettingAccessor(object):
         self.config.set(section, key, value)
 
     def save(self):
-        with open(self.__class__.__config_file__, 'w') as configfile:
+        with open(constants.CONFIG_FILE, 'w') as configfile:
             self.config.write(configfile)
 
 class SettingsDialog(QDialog, Ui_Dialog):
@@ -29,6 +29,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.lineEdit_loginUsername.setText(settingsAccessor.get("account", "username"))
         self.lineEdit_loginPassword.setText(settingsAccessor.get("account", "password"))
         self.checkBox_autoLogin.setChecked(settingsAccessor.get("account", "autologin", "True") == "True")
+        self.checkBox_enableDevelopersTools.setChecked(
+            settingsAccessor.get("frontend", "enableDevelopersTools", "False") == "True")
 
         self.rejected.connect(lambda: self.close())
         self.accepted.connect(self.writeSettings)
@@ -37,6 +39,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         settingsAccessor.set("account", "username", self.lineEdit_loginUsername.text())
         settingsAccessor.set("account", "password", self.lineEdit_loginPassword.text())
         settingsAccessor.set("account", "autologin", "True" if self.checkBox_autoLogin.isChecked() else "False")
+        settingsAccessor.set("frontend", "enableDevelopersTools",
+                                "True" if self.checkBox_enableDevelopersTools.isChecked() else "False")
 
         settingsAccessor.save()
 
