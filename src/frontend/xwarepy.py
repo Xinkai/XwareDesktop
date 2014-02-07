@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl
 import constants
 
 # Together with xwarejs.js, exchange information with the browser
@@ -32,3 +32,10 @@ class XwarePy(QObject):
     @pyqtSlot()
     def requestFocus(self):
         self.window.frame.setFocus()
+
+    @pyqtSlot(str)
+    def systemOpen(self, url):
+        from PyQt5.QtGui import QDesktopServices
+        qurl = QUrl(url)
+        qurl.setScheme("file")
+        QDesktopServices.openUrl(qurl)

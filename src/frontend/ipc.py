@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import socket
 import constants
 
@@ -23,6 +24,7 @@ from multiprocessing.connection import Listener, Client
 class FrontendCommunicationListener(object):
     def __init__(self, window):
         self.window = window
+        os.remove(constants.FRONTEND_SOCKET[0])
         t = threading.Thread(target = self.startListenerThread, daemon = True)
         t.start()
 
