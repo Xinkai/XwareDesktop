@@ -94,8 +94,8 @@
     <property name="title">
      <string>后端</string>
     </property>
-    <addaction name="action_ETMstop"/>
     <addaction name="action_ETMstart"/>
+    <addaction name="action_ETMstop"/>
     <addaction name="action_ETMrestart"/>
    </widget>
    <addaction name="menu"/>

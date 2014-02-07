@@ -24,7 +24,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.setupWebkit()
         self.connectUI()
         self.connectXwarePy()
-        self.setupStatusBar()
+        self.setupStatusBarActions()
 
 
     # initialization
@@ -44,16 +44,23 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
     def connectXwarePy(self):
         self.action_createTask.triggered.connect(self.slotPrepareTaskCreation)
 
-    def setupStatusBar(self):
+    def setupStatusBarActions(self):
         ETMstatus = QLabel(self.statusBar)
         ETMstatus.setObjectName("label_ETMstatus")
+        ETMstatus.setText("<font color=''></font>")
         self.statusBar.ETMstatus = ETMstatus
         self.statusBar.addPermanentWidget(ETMstatus)
 
         daemonStatus = QLabel(self.statusBar)
         daemonStatus.setObjectName("label_daemonStatus")
+        daemonStatus.setText("<font color=''></font>")
         self.statusBar.daemonStatus = daemonStatus
         self.statusBar.addPermanentWidget(daemonStatus)
+
+        import ipc
+        self.action_ETMstart.triggered.connect(lambda: ipc.DaemonCommunication().startETM())
+        self.action_ETMstop.triggered.connect(lambda: ipc.DaemonCommunication().stopETM())
+        self.action_ETMrestart.triggered.connect(lambda: ipc.DaemonCommunication().restartETM())
 
         t = threading.Thread(target = self.startStatusBarThread, daemon = True)
         t.start()
@@ -138,27 +145,48 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
                 daemonLockFile = open(constants.DAEMON_LOCK)
                 try:
                     daemonLock = fcntl.flock(daemonLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    daemonStatus = "Daemon未启用"
+                    daemonStatus = False
                     fcntl.flock(daemonLockFile, fcntl.LOCK_UN)
                 except BlockingIOError:
-                    daemonStatus = "Daemon运行中"
+                    daemonStatus = True
                 daemonLockFile.close()
             except FileNotFoundError:
-                daemonStatus = "Daemon未启用"
-            self.statusBar.daemonStatus.setText(daemonStatus)
+                daemonStatus = False
+            if daemonStatus:
+                self.statusBar.daemonStatus.setText("<font color='green'>Daemon运行中</font>")
+            else:
+                self.statusBar.daemonStatus.setText("<font color='red'>Daemon未启动</font>")
+
 
             try:
                 etmLockFile = open(constants.ETM_LOCK)
                 try:
                     etmLock = fcntl.flock(etmLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    etmStatus = "ETM未启用"
+                    etmStatus = False
                     fcntl.flock(etmLockFile, fcntl.LOCK_UN)
                 except BlockingIOError:
-                    etmStatus = "ETM运行中"
+                    etmStatus = True
                 etmLockFile.close()
             except FileNotFoundError:
-                etmStatus = "ETM未启用"
-            self.statusBar.ETMstatus.setText(etmStatus)
+                etmStatus = False
+            if etmStatus:
+                self.statusBar.ETMstatus.setText("<font color='green'>ETM运行中</font>")
+            else:
+                self.statusBar.ETMstatus.setText("<font color='red'>ETM未启动</font>")
+
+            if not daemonStatus:
+                self.action_ETMstart.setEnabled(False)
+                self.action_ETMstop.setEnabled(False)
+                self.action_ETMrestart.setEnabled(False)
+            else:
+                if etmStatus:
+                    self.action_ETMstart.setEnabled(False)
+                    self.action_ETMstop.setEnabled(True)
+                    self.action_ETMrestart.setEnabled(True)
+                else:
+                    self.action_ETMstart.setEnabled(True)
+                    self.action_ETMstop.setEnabled(False)
+                    self.action_ETMrestart.setEnabled(False)
 
             time.sleep(1)
 
