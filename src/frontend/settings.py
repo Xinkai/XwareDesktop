@@ -2,11 +2,12 @@
 
 from PyQt5.QtWidgets import QDialog
 from ui_settings import Ui_Dialog
+import configparser
 import constants
 
 class SettingAccessor(object):
     def __init__(self):
-        import configparser
+
         self.config = configparser.ConfigParser()
         self.config.read(constants.CONFIG_FILE)
 
@@ -14,7 +15,11 @@ class SettingAccessor(object):
         return self.config.get(section, key, fallback = fallback)
 
     def set(self, section, key, value):
-        self.config.set(section, key, value)
+        try:
+            self.config.set(section, key, value)
+        except configparser.NoSectionError:
+            self.config.add_section(section)
+            self.config.set(section, key, value)
 
     def save(self):
         with open(constants.CONFIG_FILE, 'w') as configfile:
