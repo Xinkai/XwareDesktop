@@ -33,7 +33,6 @@ pthread_mutex_t etmMutex = PTHREAD_MUTEX_INITIALIZER;
 const char* etmWorkingDir = "/opt/xware_desktop/xware/lib";
 char* etmArgv[] = {"/opt/xware_desktop/xware/lib/EmbedThunderManager", "--verbose", NULL};
 //char* etmArgv[] = {"//usr/bin/sleep", "1", NULL};
-// save the environment variables.
 
 #define LIBMOUNTHELPER_PATH "/opt/xware_desktop/libmounthelper.so"
 
