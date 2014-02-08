@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>843</width>
-    <height>677</height>
+    <width>894</width>
+    <height>683</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -184,7 +184,7 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>801</width>
+         <width>853</width>
          <height>221</height>
         </rect>
        </property>
@@ -192,13 +192,19 @@
         <item>
          <widget class="QTableWidget" name="table_mounts">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::SingleSelection</enum>
+          </property>
+          <property name="selectionBehavior">
+           <enum>QAbstractItemView::SelectRows</enum>
           </property>
           <attribute name="horizontalHeaderCascadingSectionResizes">
            <bool>false</bool>
@@ -219,12 +225,12 @@
           </column>
           <column>
            <property name="text">
-            <string>Windows路径</string>
+            <string>应对应Windows路径</string>
            </property>
           </column>
           <column>
            <property name="text">
-            <string>容量</string>
+            <string>实对应Windows路径</string>
            </property>
           </column>
          </widget>
@@ -232,9 +238,9 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="btn_addMount">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>添加</string>
@@ -242,9 +248,9 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton_2">
+           <widget class="QPushButton" name="btn_removeMount">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
              <string>删除</string>
@@ -252,7 +258,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_noLibmounthelperWarning">
+           <widget class="QLabel" name="label_mountMappingError">
             <property name="font">
              <font>
               <pointsize>12</pointsize>
@@ -269,24 +275,6 @@
          </layout>
         </item>
        </layout>
-      </widget>
-      <widget class="QLabel" name="label_2">
-       <property name="geometry">
-        <rect>
-         <x>100</x>
-         <y>260</y>
-         <width>611</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>22</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>本页功能没做好，请到项目主页查看设置方法。</string>
-       </property>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_backend">
@@ -388,8 +376,8 @@
   <tabstop>lineEdit_loginUsername</tabstop>
   <tabstop>checkBox_autoLogin</tabstop>
   <tabstop>table_mounts</tabstop>
-  <tabstop>pushButton</tabstop>
-  <tabstop>pushButton_2</tabstop>
+  <tabstop>btn_addMount</tabstop>
+  <tabstop>btn_removeMount</tabstop>
  </tabstops>
  <resources>
   <include location="rc/resource.qrc"/>

@@ -9,6 +9,7 @@ from systemtray import Ui_SystemTray
 from xwarepy import XwarePy
 import threading
 import constants
+import mounts
 log = print
 
 class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
@@ -25,6 +26,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.connectUI()
         self.connectXwarePy()
         self.setupStatusBarActions()
+        self.mountsFaker = mounts.MountsFaker()
 
 
     # initialization
@@ -129,7 +131,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
 
     def slotSetting(self):
         from settings import SettingsDialog
-        settingsDialog = SettingsDialog()
+        settingsDialog = SettingsDialog(self)
         settingsDialog.exec()
 
     def _printDomainCookies(self):
