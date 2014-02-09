@@ -50,7 +50,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         mountsMapping = self.window.mountsFaker.getMountsMapping()
         for i, item in enumerate(self.window.mountsFaker.mounts):
-            # items = { "C:" : "/path/to/C", ... }
             self.table_mounts.insertRow(i)
             self.table_mounts.setItem(i, 0, QTableWidgetItem(item))
             self.table_mounts.setItem(i, 1, QTableWidgetItem(chr(ord('C') + i) + ":"))

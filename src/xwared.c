@@ -1,19 +1,18 @@
 #include "xwared.h"
 
-int watchETM() {
+void watchETM() {
 	int status;
 	waitpid(etmPid, &status, 0);
 	printf("waitpid: %d\n", status);
-	while (autoReviveETM == 0) {
-		sleep(1);
-	} // loop until the frontend restarts ETM
-
-	return 0;
 }
 
-int runETM() {
+void runETM() {
+	while (toRunETM == 0) {
+		sleep(1);
+	} // if toRunETM is 0, then hold
+
 	pthread_mutex_lock(&etmMutex);
-	autoReviveETM = 1;
+	toRunETM = 1; // if ETM crashes, auto restart
 	etmPid = fork();
 	pthread_mutex_unlock(&etmMutex);
 
@@ -34,7 +33,6 @@ int runETM() {
 		printf("parent: pid(%u) cpid(%u)\n", getpid(), etmPid);
 		watchETM();
 	}
-	return 0;
 }
 
 void endETM(const int restart) {
@@ -46,7 +44,7 @@ void endETM(const int restart) {
 			printf("ETM not running, ignore ETM_RESTART.\n");
 		}
 	} else {
-		autoReviveETM = restart;
+		toRunETM = restart;
 		if (kill(etmPid, SIGTERM) == 0) {
 			// successful
 			etmPid = -1;
@@ -79,7 +77,7 @@ void* threadListener() {
 			if (etmPid != -1) {
 				printf("ETM running, ignore ETM_START");
 			} else {
-				autoReviveETM = 1;
+				toRunETM = 1;
 			}
 			pthread_mutex_unlock(&etmMutex);
 		} else if (strncmp(&buffer, ETM_RESTART, SOCKET_BUFFER_LENGTH) == 0) {
@@ -206,7 +204,24 @@ int main(const int argc, const char* argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 
-        while(autoReviveETM == 1) {
+		// Check if ETM should run at start
+		GKeyFile* configFile = g_key_file_new();
+		if (g_key_file_load_from_file(configFile, CONFIG_PATH, G_KEY_FILE_NONE, NULL) == 0) {
+			fprintf(stderr, "xwared: cannot load settings.ini, use default value\n");
+		}
+		GError* gErr = NULL;
+		gboolean etmStart = g_key_file_get_boolean(configFile, "xwared", "startETM", &gErr);
+		if (gErr == NULL) {
+			if (etmStart == FALSE) {
+				toRunETM = 0;
+			}
+		} else {
+			fprintf(stderr, "xwared: %s, use default value\n", gErr->message);
+			g_error_free(gErr);
+		}
+		g_key_file_free(configFile);
+
+        while(1) {
         	runETM();
         }
 

@@ -9,6 +9,9 @@
 #include <string.h>
 #include <pthread.h>
 #include <sys/stat.h>
+#include <glib.h>
+
+#define CONFIG_PATH "/opt/xware_desktop/settings.ini"
 
 // lock of this program
 #define LOCK_PATH "/tmp/xware_xwared.lock"
@@ -27,10 +30,10 @@ int sd = -1;
 #define ETM_LOCK_PATH "/tmp/xware_ETM.lock"
 int fdETMLock = -1;
 int etmPid = -1; // pid of EmbedThunderManager
-int runETM();
-int watchETM();
+void runETM();
+void watchETM();
 void endETM(const int restart);
-int autoReviveETM = 1; // when endETM() is called, set this to 0.
+int toRunETM = 1; // when endETM() is called, set this to 0.
 pthread_mutex_t etmMutex = PTHREAD_MUTEX_INITIALIZER;
 const char* etmWorkingDir = "/opt/xware_desktop/xware/lib";
 char* etmArgv[] = {"/opt/xware_desktop/xware/lib/EmbedThunderManager", "--verbose", NULL};

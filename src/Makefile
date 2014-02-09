@@ -6,7 +6,7 @@ libmounthelper.so: libmounthelper.c
 	gcc -m32 -o build/libmounthelper.so -fPIC -shared -ldl -Wall libmounthelper.c
 
 xwared: xwared.c xwared.h
-	gcc -m32 -o build/xwared -pthread -Wall xwared.c
+	gcc -m32 `pkg-config --cflags --libs glib-2.0` -o build/xwared -pthread -Wall xwared.c
 
 clean:
 	rm -f EmbedThunderManager

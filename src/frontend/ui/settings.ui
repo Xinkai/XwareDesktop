@@ -38,15 +38,18 @@
         <rect>
          <x>10</x>
          <y>120</y>
-         <width>208</width>
+         <width>256</width>
          <height>86</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
          <widget class="QRadioButton" name="radio_backendStartWhen1">
+          <property name="toolTip">
+           <string>Xware开机后即上线开始下载。适用于长期挂机的用户。</string>
+          </property>
           <property name="text">
-           <string>开机后总是自动启用后端</string>
+           <string>后端随xwared启动</string>
           </property>
           <property name="checked">
            <bool>true</bool>
@@ -55,21 +58,27 @@
         </item>
         <item>
          <widget class="QRadioButton" name="radio_backendStartWhen2">
+          <property name="toolTip">
+           <string>后端开启与否由前端控制。做出的选项重启电脑后依然保持。</string>
+          </property>
           <property name="text">
-           <string>开机后后端保持上次关机时的状态</string>
+           <string>后端启动状态维持手动设定</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QRadioButton" name="radio_backendStartWhen3">
+          <property name="toolTip">
+           <string>这是Windows上的迅雷的标准行为。图形界面关闭后停止下载。</string>
+          </property>
           <property name="text">
-           <string>只在前端运行时启用后端</string>
+           <string>后端随前端启动而启动，随前端退出而退出</string>
           </property>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -149,13 +158,13 @@
         <string>在网页中启用 Webkit 开发者工具</string>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>10</y>
          <width>851</width>
-         <height>91</height>
+         <height>101</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_6">

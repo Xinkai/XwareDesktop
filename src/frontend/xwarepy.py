@@ -12,13 +12,13 @@ class XwarePy(QObject):
         super().__init__()
         self.jsLoaded = False
         self.window = window
-        print("XwarePy instance born!")
+        print("xdpy loaded")
 
     ################################### SLOTS ######################################
     @pyqtSlot()
     def xdjsLoaded(self):
         self.jsLoaded = True
-        print("xdjs loaded.")
+        print("xdjs loaded")
 
         username = self.window.setting.get("account", "username", None)
         password = self.window.setting.get("account", "password", None)

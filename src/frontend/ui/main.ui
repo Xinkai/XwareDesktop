@@ -88,6 +88,7 @@
     <property name="title">
      <string>帮助</string>
     </property>
+    <addaction name="action_2"/>
     <addaction name="action_showAbout"/>
    </widget>
    <widget class="QMenu" name="menu_3">
@@ -167,6 +168,11 @@
   <action name="action_ETMrestart">
    <property name="text">
     <string>重启</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>激活设备</string>
    </property>
   </action>
  </widget>
