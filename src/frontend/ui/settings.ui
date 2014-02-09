@@ -23,77 +23,16 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QTabWidget" name="tabWidget">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tab_general">
       <attribute name="title">
        <string>一般</string>
       </attribute>
-      <widget class="QCheckBox" name="checkBox_autoLogin">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>80</y>
-         <width>101</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>自动登录前端</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>241</width>
-         <height>58</height>
-        </rect>
-       </property>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_loginUsername">
-          <property name="text">
-           <string>用户名</string>
-          </property>
-          <property name="buddy">
-           <cstring>lineEdit_loginUsername</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit_loginUsername"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_loginPassword">
-          <property name="text">
-           <string>密码</string>
-          </property>
-          <property name="buddy">
-           <cstring>lineEdit_loginPassword</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_loginPassword">
-          <property name="inputMask">
-           <string/>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="layoutWidget_2">
        <property name="geometry">
         <rect>
@@ -130,37 +69,73 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>261</width>
+         <height>89</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_loginUsername">
+            <property name="text">
+             <string>用户名</string>
+            </property>
+            <property name="buddy">
+             <cstring>lineEdit_loginUsername</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_loginUsername"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_loginPassword">
+            <property name="text">
+             <string>密码</string>
+            </property>
+            <property name="buddy">
+             <cstring>lineEdit_loginPassword</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_loginPassword">
+            <property name="inputMask">
+             <string/>
+            </property>
+            <property name="echoMode">
+             <enum>QLineEdit::Password</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_autoLogin">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>自动登录前端</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_frontend">
       <attribute name="title">
        <string>前端</string>
       </attribute>
-      <widget class="QCheckBox" name="checkBox">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
-         <width>82</width>
-         <height>23</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>监视剪切板</string>
-       </property>
-      </widget>
-      <widget class="QPlainTextEdit" name="plainTextEdit">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>801</width>
-         <height>81</height>
-        </rect>
-       </property>
-       <property name="plainText">
-        <string>*.exe</string>
-       </property>
-      </widget>
       <widget class="QCheckBox" name="checkBox_enableDevelopersTools">
        <property name="geometry">
         <rect>
@@ -174,8 +149,34 @@
         <string>在网页中启用 Webkit 开发者工具</string>
        </property>
       </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>851</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QCheckBox" name="checkBox">
+          <property name="text">
+           <string>监视剪切板</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="plainTextEdit">
+          <property name="plainText">
+           <string>*.exe</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_mount">
       <attribute name="title">
        <string>挂载</string>
       </attribute>
@@ -258,19 +259,24 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_mountMappingError">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-             </font>
-            </property>
+           <widget class="QPushButton" name="btn_refreshMount">
             <property name="text">
-             <string>&lt;font color=&quot;red&quot;&gt;警告：Xware后台没有加载libmounthelper.so。迅雷将会自主使用所有已挂载的卷。&lt;/font&gt;</string>
-            </property>
-            <property name="textFormat">
-             <enum>Qt::RichText</enum>
+             <string>刷新</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
          </layout>
         </item>
@@ -278,6 +284,9 @@
       </widget>
      </widget>
      <widget class="QWidget" name="tab_backend">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
       <attribute name="title">
        <string>后端</string>
       </attribute>
@@ -335,24 +344,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>170</y>
-         <width>611</width>
-         <height>41</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>22</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>本页功能没做好，请到项目主页查看设置方法。</string>
-       </property>
-      </widget>
      </widget>
     </widget>
    </item>
@@ -376,8 +367,6 @@
   <tabstop>lineEdit_loginUsername</tabstop>
   <tabstop>checkBox_autoLogin</tabstop>
   <tabstop>table_mounts</tabstop>
-  <tabstop>btn_addMount</tabstop>
-  <tabstop>btn_removeMount</tabstop>
  </tabstops>
  <resources>
   <include location="rc/resource.qrc"/>

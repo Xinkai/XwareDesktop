@@ -22,6 +22,7 @@ class XwareJS
         App._binder._bindings["dialogs.createTask.show"][0](true)
 
         $createTaskUrl = $("#d-create-task-url")
+        tasks = tasks.join("\n")
         taskUrl = $createTaskUrl.val()
         $createTaskUrl.val(tasks + "\n" + taskUrl)
         $createTaskUrl.keyup()

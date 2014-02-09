@@ -45,7 +45,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.action_refreshPage.triggered.connect(self.slotRefreshPage)
 
     def connectXwarePy(self):
-        self.action_createTask.triggered.connect(self.slotPrepareTaskCreation)
+        self.action_createTask.triggered.connect(self.slotPrepareTasksCreation)
 
     def setupStatusBarActions(self):
         ETMstatus = QLabel(self.statusBar)
@@ -93,9 +93,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
 
     @pyqtSlot()
     @pyqtSlot(str)
-    def slotPrepareTaskCreation(self, task = None):
-        if task is None:
-            self.xdpy.sigCreateTasks.emit([""])
+    @pyqtSlot(list)
+    def slotPrepareTasksCreation(self, tasks = None):
+        if tasks is None:
+            self.xdpy.sigCreateTasks.emit(["foo"])
+        else:
+            if type(tasks) is str:
+                self.xdpy.sigCreateTasks.emit([tasks])
+            else:
+                self.xdpy.sigCreateTasks.emit(tasks)
 
     def slotUrlChanged(self):
         log("webView urlChanged:", self.url)

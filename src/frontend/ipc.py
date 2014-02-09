@@ -35,9 +35,9 @@ class FrontendCommunicationListener(object):
         with Listener(*constants.FRONTEND_SOCKET) as listener:
             while True:
                 with listener.accept() as conn:
-                    result = conn.recv()
-                    self.window.emit(self.window.action_createTask)
-                    print("payload", result)
+                    payload = conn.recv()
+                    self.window.slotPrepareTasksCreation(payload)
+                    print("payload", payload)
 
 class FrontendCommunicationClient(object):
     def __init__(self, payload):

@@ -5,7 +5,7 @@ import constants
 
 # Together with xwarejs.js, exchange information with the browser
 class XwarePy(QObject):
-    sigCreateTasks = pyqtSignal(list)
+    sigCreateTasks = pyqtSignal("QStringList")
     sigLogin = pyqtSignal(str, str)
 
     def __init__(self, window):
