@@ -11,11 +11,11 @@
 #include <sys/stat.h>
 
 // lock of this program
-#define LOCK_PATH "/tmp/xware_daemon.lock"
+#define LOCK_PATH "/tmp/xware_xwared.lock"
 int fdLock = -1;
 
-// allow the frontend to communicate with daemon
-#define SOCKET_PATH "/tmp/xware_daemon.socket"
+// allow the frontend to communicate with xwared
+#define SOCKET_PATH "/tmp/xware_xwared.socket"
 #define SOCKET_BUFFER_LENGTH 16
 void setupSocketServer();
 void* threadListener();

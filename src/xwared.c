@@ -1,4 +1,4 @@
-#include "daemon.h"
+#include "xwared.h"
 
 int watchETM() {
 	int status;
@@ -199,7 +199,7 @@ int main(const int argc, const char* argv[]) {
     int rc = flock(fdLock, LOCK_EX | LOCK_NB);
     if (rc == 0) {
         // success
-        puts("Xware daemon: unlocked.");
+        puts("xwared: unlocked.");
         fdETMLock = open(ETM_LOCK_PATH, O_CREAT | O_RDWR, 0666);
 		if (fdETMLock == -1) {
 			perror("Open ETM lock file");
@@ -212,7 +212,7 @@ int main(const int argc, const char* argv[]) {
 
     } else {
         if (errno == EWOULDBLOCK) {
-            puts("Xware daemon: locked.");
+            puts("xwared: locked.");
             exit(EXIT_FAILURE);
         }
         perror("flock");

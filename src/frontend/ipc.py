@@ -4,10 +4,10 @@ import os
 import socket
 import constants
 
-class DaemonCommunication(object):
+class XwaredCommunication(object):
     def __init__(self):
         self.sd = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
-        self.sd.connect(constants.DAEMON_SOCKET)
+        self.sd.connect(constants.XWARED_SOCKET)
 
     def stopETM(self):
         self.sd.sendall(b"ETM_STOP\0")

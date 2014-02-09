@@ -53,16 +53,16 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.statusBar.ETMstatus = ETMstatus
         self.statusBar.addPermanentWidget(ETMstatus)
 
-        daemonStatus = QLabel(self.statusBar)
-        daemonStatus.setObjectName("label_daemonStatus")
-        daemonStatus.setText("<font color=''></font>")
-        self.statusBar.daemonStatus = daemonStatus
-        self.statusBar.addPermanentWidget(daemonStatus)
+        xwaredStatus = QLabel(self.statusBar)
+        xwaredStatus.setObjectName("label_xwaredStatus")
+        xwaredStatus.setText("<font color=''></font>")
+        self.statusBar.xwaredStatus = xwaredStatus
+        self.statusBar.addPermanentWidget(xwaredStatus)
 
         import ipc
-        self.action_ETMstart.triggered.connect(lambda: ipc.DaemonCommunication().startETM())
-        self.action_ETMstop.triggered.connect(lambda: ipc.DaemonCommunication().stopETM())
-        self.action_ETMrestart.triggered.connect(lambda: ipc.DaemonCommunication().restartETM())
+        self.action_ETMstart.triggered.connect(lambda: ipc.XwaredCommunication().startETM())
+        self.action_ETMstop.triggered.connect(lambda: ipc.XwaredCommunication().stopETM())
+        self.action_ETMrestart.triggered.connect(lambda: ipc.XwaredCommunication().restartETM())
 
         t = threading.Thread(target = self.startStatusBarThread, daemon = True)
         t.start()
@@ -144,20 +144,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         import time, fcntl
         while True:
             try:
-                daemonLockFile = open(constants.DAEMON_LOCK)
+                xwaredLockFile = open(constants.XWARED_LOCK)
                 try:
-                    daemonLock = fcntl.flock(daemonLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    daemonStatus = False
-                    fcntl.flock(daemonLockFile, fcntl.LOCK_UN)
+                    xwaredLock = fcntl.flock(xwaredLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    xwaredStatus = False
+                    fcntl.flock(xwaredLockFile, fcntl.LOCK_UN)
                 except BlockingIOError:
-                    daemonStatus = True
-                daemonLockFile.close()
+                    xwaredStatus = True
+                xwaredLockFile.close()
             except FileNotFoundError:
-                daemonStatus = False
-            if daemonStatus:
-                self.statusBar.daemonStatus.setText("<font color='green'>Daemon运行中</font>")
+                xwaredStatus = False
+            if xwaredStatus:
+                self.statusBar.xwaredStatus.setText("<font color='green'>xwared运行中</font>")
             else:
-                self.statusBar.daemonStatus.setText("<font color='red'>Daemon未启动</font>")
+                self.statusBar.xwaredStatus.setText("<font color='red'>xwared未启动</font>")
 
 
             try:
@@ -176,7 +176,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
             else:
                 self.statusBar.ETMstatus.setText("<font color='red'>ETM未启动</font>")
 
-            if not daemonStatus:
+            if not xwaredStatus:
                 self.action_ETMstart.setEnabled(False)
                 self.action_ETMstop.setEnabled(False)
                 self.action_ETMrestart.setEnabled(False)

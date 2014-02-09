@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 User=xware
 Group=xware
-ExecStart=/opt/xware_desktop/daemon
+ExecStart=/opt/xware_desktop/xwared
 
 [Install]
 WantedBy=multi-user.target

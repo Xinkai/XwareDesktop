@@ -2,8 +2,8 @@
 
 LOGIN_PAGE = "http://yuancheng.xunlei.com/login.html"
 
-DAEMON_LOCK = "/tmp/xware_daemon.lock"
-DAEMON_SOCKET = "/tmp/xware_daemon.socket"
+XWARED_LOCK = "/tmp/xware_xwared.lock"
+XWARED_SOCKET = "/tmp/xware_xwared.socket"
 
 ETM_LOCK = "/tmp/xware_ETM.lock"
 

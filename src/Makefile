@@ -1,12 +1,12 @@
-all: libmounthelper.so daemon
+all: libmounthelper.so xwared
 	make -C frontend
 
 libmounthelper.so: libmounthelper.c
 	mkdir -p build
 	gcc -m32 -o build/libmounthelper.so -fPIC -shared -ldl -Wall libmounthelper.c
 
-daemon: daemon.c
-	gcc -m32 -o build/daemon -pthread -Wall daemon.c
+xwared: xwared.c xwared.h
+	gcc -m32 -o build/xwared -pthread -Wall xwared.c
 
 clean:
 	rm -f EmbedThunderManager
