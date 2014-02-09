@@ -11,10 +11,12 @@ class XwareJS
     bindOpenFile: () ->
         $("#task-list").on "dblclick", "div.rw_unit", (event) ->
             tid = $(@).attr("data-tid")
-            xdpy.systemOpen(Data.task.all[tid].path + Data.task.all[tid].name)
-            event.preventDefault()
-            event.stopImmediatePropagation()
-            event.stopPropagation()
+            task = Data.task.all[tid]
+            if task.stateText is "已完成"
+                xdpy.systemOpen(task.path + task.name)
+                event.preventDefault()
+                event.stopImmediatePropagation()
+                event.stopPropagation()
 
     slotCreateTasks: (tasks) ->
         App._binder._bindings["dialogs.createTask.show"][0](true)
