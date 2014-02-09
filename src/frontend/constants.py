@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 LOGIN_PAGE = "http://yuancheng.xunlei.com/login.html"
+V2_PAGE = "http://yuancheng.xunlei.com/"
+V3_PAGE = "http://yuancheng.xunlei.com/3/"
 
 XWARED_LOCK = "/tmp/xware_xwared.lock"
 XWARED_SOCKET = "/tmp/xware_xwared.socket"

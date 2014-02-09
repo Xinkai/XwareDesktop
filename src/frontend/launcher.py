@@ -104,21 +104,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
                 self.xdpy.sigCreateTasks.emit(tasks)
 
     def slotUrlChanged(self):
-        log("webView urlChanged:", self.url)
-        if self.url == constants.LOGIN_PAGE:
-            log("url to login page.")
-
-        elif self.url == "http://yuancheng.xunlei.com/":
+        from urllib import parse
+        url = parse.urldefrag(self.url)[0]
+        log("webView urlChanged:", url)
+        if url == constants.V2_PAGE:
             log("webView: redirect to V3.")
             self.webView.stop()
-            self.webView.load(QUrl("http://yuancheng.xunlei.com/3"))
-        elif self.url == "http://yuancheng.xunlei.com/3/":
+            self.webView.load(QUrl(constants.V3_PAGE))
+        elif url in (constants.V3_PAGE, constants.LOGIN_PAGE):
             pass
         else:
-            log("Unable to handle this URL", self.url)
+            log("Unable to handle this URL", url)
 
     def slotRefreshPage(self):
-        self.webView.load(QUrl("http://yuancheng.xunlei.com/3"))
+        self.webView.load(QUrl(constants.V3_PAGE))
 
     @pyqtSlot()
     def slotExit(self):
