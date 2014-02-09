@@ -32,7 +32,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
     # initialization
     def setupWebkit(self):
         from PyQt5.QtWebKit import QWebSettings
-        self.webView.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
+        if self.setting.get("frontend", "enableDevelopersTools", "False") == "True":
+            self.webView.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, True)
         self.webView.loadFinished.connect(self.injectXwareJS)
         self.frame.javaScriptWindowObjectCleared.connect(self.slotAddJSObject)
         self.webView.urlChanged.connect(self.slotUrlChanged)
