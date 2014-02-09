@@ -30,7 +30,7 @@ package() {
   install -D build/libmounthelper.so         ${pkgdir}/opt/xware_desktop/libmounthelper.so
   
   # copy systemd service
-  install -D xware.service                   ${pkgdir}/usr/lib/systemd/system/xware.service
+  install -D xwared.service                   ${pkgdir}/usr/lib/systemd/system/xwared.service
 
   install -D build/xwared                    ${pkgdir}/opt/xware_desktop/xwared
 
