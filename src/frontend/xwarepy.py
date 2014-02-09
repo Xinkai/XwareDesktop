@@ -36,6 +36,7 @@ class XwarePy(QObject):
     @pyqtSlot(str)
     def systemOpen(self, url):
         from PyQt5.QtGui import QDesktopServices
+        url = self.window.mountsFaker.convertToNativePath(url)
         qurl = QUrl(url)
         qurl.setScheme("file")
         QDesktopServices.openUrl(qurl)

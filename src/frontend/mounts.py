@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import constants
-import collections
 import os
 import uuid
 
@@ -37,8 +36,8 @@ class MountsFaker(object):
 
         path = path[len(constants.ETM_MOUNTS_DIR):]
         parts = path.split("/")
-        drive = parts[0]
-        return os.path.join(self.mapping[drive], *parts[1:])
+        drive = parts[0][:-1] # "C:" -> "C"
+        return os.path.join(self.mounts[ord(drive)-ord("C")], *parts[1:])
 
     def writeMounts(self):
         buffer = []
