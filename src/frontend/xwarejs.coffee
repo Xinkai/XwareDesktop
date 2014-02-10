@@ -19,7 +19,7 @@ class XwareJS
                 event.stopPropagation()
 
     slotCreateTasks: (tasks) ->
-        App._binder._bindings["dialogs.createTask.show"][0](true)
+        App.set("dialogs.createTask.show", true)
 
         $createTaskUrl = $("#d-create-task-url")
         tasks = tasks.join("\n")
@@ -38,5 +38,7 @@ class XwareJS
             $("#login-button").click()
         , 1500)
 
+    slotToggleFlashAvailability: (available) ->
+        App.set("system.flash", available)
 $ ->
     window.xdjs = new XwareJS()
