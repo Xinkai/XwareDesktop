@@ -33,112 +33,140 @@
       <attribute name="title">
        <string>一般</string>
       </attribute>
-      <widget class="QWidget" name="layoutWidget_2">
+      <widget class="QGroupBox" name="group_etmStartWhen">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>120</y>
-         <width>256</width>
-         <height>86</height>
+         <y>150</y>
+         <width>311</width>
+         <height>131</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <widget class="QRadioButton" name="radio_backendStartWhen1">
-          <property name="toolTip">
-           <string>Xware开机后即上线开始下载。适用于长期挂机的用户。</string>
-          </property>
-          <property name="text">
-           <string>后端随xwared启动</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radio_backendStartWhen2">
-          <property name="toolTip">
-           <string>后端开启与否由前端控制。做出的选项重启电脑后依然保持。</string>
-          </property>
-          <property name="text">
-           <string>后端启动状态维持手动设定</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radio_backendStartWhen3">
-          <property name="toolTip">
-           <string>这是Windows上的迅雷的标准行为。图形界面关闭后停止下载。</string>
-          </property>
-          <property name="text">
-           <string>后端随前端启动而启动，随前端退出而退出</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <property name="title">
+        <string>后端什么时候启动</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="layoutWidget_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>256</width>
+          <height>86</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <item>
+          <widget class="QRadioButton" name="radio_backendStartWhen1">
+           <property name="toolTip">
+            <string>Xware开机后即上线开始下载。适用于长期挂机的用户。</string>
+           </property>
+           <property name="text">
+            <string>后端随xwared启动</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_backendStartWhen2">
+           <property name="toolTip">
+            <string>后端开启与否由前端控制。做出的选项重启电脑后依然保持。</string>
+           </property>
+           <property name="text">
+            <string>后端启动状态维持手动设定</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_backendStartWhen3">
+           <property name="toolTip">
+            <string>这是Windows上的迅雷的标准行为。图形界面关闭后停止下载。</string>
+           </property>
+           <property name="text">
+            <string>后端随前端启动而启动，随前端退出而退出</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QGroupBox" name="groupBox_2">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>20</y>
-         <width>261</width>
-         <height>89</height>
+         <y>10</y>
+         <width>311</width>
+         <height>131</height>
         </rect>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_loginUsername">
-            <property name="text">
-             <string>用户名</string>
-            </property>
-            <property name="buddy">
-             <cstring>lineEdit_loginUsername</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit_loginUsername"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_loginPassword">
-            <property name="text">
-             <string>密码</string>
-            </property>
-            <property name="buddy">
-             <cstring>lineEdit_loginPassword</cstring>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="lineEdit_loginPassword">
-            <property name="inputMask">
-             <string/>
-            </property>
-            <property name="echoMode">
-             <enum>QLineEdit::Password</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBox_autoLogin">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string>自动登录前端</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <property name="title">
+        <string>前端登录</string>
+       </property>
+       <property name="flat">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>11</x>
+          <y>32</y>
+          <width>211</width>
+          <height>87</height>
+         </rect>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_loginUsername">
+           <property name="text">
+            <string>用户名</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineEdit_loginUsername</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="lineEdit_loginUsername"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_loginPassword">
+           <property name="text">
+            <string>密码</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineEdit_loginPassword</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="lineEdit_loginPassword">
+           <property name="inputMask">
+            <string/>
+           </property>
+           <property name="echoMode">
+            <enum>QLineEdit::Password</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0" colspan="2">
+          <widget class="QCheckBox" name="checkBox_autoLogin">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>自动登录前端</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
       </widget>
      </widget>
      <widget class="QWidget" name="tab_frontend">
@@ -362,7 +390,10 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -372,9 +403,6 @@
   <tabstop>checkBox</tabstop>
   <tabstop>plainTextEdit</tabstop>
   <tabstop>buttonBox</tabstop>
-  <tabstop>lineEdit_loginPassword</tabstop>
-  <tabstop>lineEdit_loginUsername</tabstop>
-  <tabstop>checkBox_autoLogin</tabstop>
   <tabstop>table_mounts</tabstop>
  </tabstops>
  <resources>

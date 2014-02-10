@@ -38,6 +38,13 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_enableDevelopersTools.setChecked(
             settingsAccessor.get("frontend", "enableDevelopersTools", "False") == "True")
 
+        from PyQt5.QtWidgets import QButtonGroup
+        self.btngrp_etmStartWhen = QButtonGroup()
+        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen1, 1)
+        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
+        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
+        self.btngrp_etmStartWhen.button(int(settingsAccessor.get("xwared", "startETMWhen", "1"))).setChecked(True)
+
         self.rejected.connect(lambda: self.close())
         self.accepted.connect(self.writeSettings)
 
@@ -88,7 +95,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         settingsAccessor.set("account", "autologin", "True" if self.checkBox_autoLogin.isChecked() else "False")
         settingsAccessor.set("frontend", "enableDevelopersTools",
                                 "True" if self.checkBox_enableDevelopersTools.isChecked() else "False")
-
+        settingsAccessor.set("xwared", "startETMWhen", self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton()))
         settingsAccessor.save()
 
         self.window.mountsFaker.setMounts(self.newMounts)
