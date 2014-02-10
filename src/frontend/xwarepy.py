@@ -7,6 +7,8 @@ import constants
 class XwarePy(QObject):
     sigCreateTasks = pyqtSignal("QStringList")
     sigLogin = pyqtSignal(str, str)
+    sigToggleFlashAvailability = pyqtSignal(bool)
+    sigActivateDevice = pyqtSignal()
 
     def __init__(self, window):
         super().__init__()

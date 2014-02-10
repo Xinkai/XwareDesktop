@@ -4,6 +4,7 @@ class XwareJS
     constructor: () ->
         xdpy.sigCreateTasks.connect(@, @slotCreateTasks)
         xdpy.sigLogin.connect(@, @slotLogin)
+        xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
         xdpy.xdjsLoaded()
 
         @bindOpenFile()
@@ -40,5 +41,9 @@ class XwareJS
 
     slotToggleFlashAvailability: (available) ->
         App.set("system.flash", available)
+
+    slotActivateDevice: () ->
+        App.set("dialogs.addDownloader.show", true)
+
 $ ->
     window.xdjs = new XwareJS()

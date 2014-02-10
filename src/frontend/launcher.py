@@ -46,6 +46,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
 
     def connectXwarePy(self):
         self.action_createTask.triggered.connect(self.slotPrepareTasksCreation)
+        self.action_activateDevice.triggered.connect(lambda: self.xdpy.sigActivateDevice.emit())
 
     def setupStatusBarActions(self):
         ETMstatus = QLabel(self.statusBar)
