@@ -5,6 +5,7 @@ class XwareJS
         xdpy.sigCreateTasks.connect(@, @slotCreateTasks)
         xdpy.sigLogin.connect(@, @slotLogin)
         xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
+        xdpy.sigToggleFlashAvailability.connect(@, @slotToggleFlashAvailability)
         xdpy.xdjsLoaded()
 
         @bindOpenFile()

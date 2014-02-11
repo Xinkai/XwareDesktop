@@ -40,11 +40,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
 
     def setupWebkit(self):
         self.settings.applySettings.connect(self.toggleDevelopersTools)
+        self.settings.applySettings.connect(self.toggleFlash)
 
         self.frame.loadFinished.connect(self.injectXwareJS)
         self.frame.javaScriptWindowObjectCleared.connect(self.slotAddJSObject)
         self.webView.urlChanged.connect(self.slotUrlChanged)
 
+    @pyqtSlot()
     def toggleDevelopersTools(self):
         from PyQt5.QtWebKit import QWebSettings
         from PyQt5.Qt import Qt
@@ -55,6 +57,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
             self.webView.setContextMenuPolicy(Qt.DefaultContextMenu)
         else:
             self.webView.setContextMenuPolicy(Qt.NoContextMenu)
+
+    @pyqtSlot()
+    def toggleFlash(self):
+        from PyQt5.QtWebKit import QWebSettings
+
+        allowed = self.settings.get("frontend", "allowflash", "1") == "1"
+        self.webView.settings().setAttribute(QWebSettings.PluginsEnabled, allowed)
+        self.xdpy.sigToggleFlashAvailability.emit(allowed)
 
 
     def connectUI(self):

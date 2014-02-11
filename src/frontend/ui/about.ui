@@ -27,7 +27,7 @@
    <locale language="Chinese" country="China"/>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -87,7 +87,7 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -137,7 +137,7 @@
         </font>
        </property>
        <property name="text">
-        <string>&lt;font color=&quot;grey&quot;&gt;与迅雷固件1.07配套&lt;/font&gt;</string>
+        <string>&lt;font color=&quot;grey&quot;&gt;与迅雷固件1.0.7配套&lt;/font&gt;</string>
        </property>
        <property name="textFormat">
         <enum>Qt::RichText</enum>

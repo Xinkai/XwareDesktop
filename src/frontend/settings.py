@@ -40,6 +40,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_autoLogin.setChecked(self.settings.get("account", "autologin", "1") == "1")
         self.checkBox_enableDevelopersTools.setChecked(
             self.settings.get("frontend", "enabledeveloperstools", "0") == "1")
+        self.checkBox_allowFlash.setChecked(self.settings.get("frontend", "allowflash", "1") == "1")
 
         from PyQt5.QtWidgets import QButtonGroup
         self.btngrp_etmStartWhen = QButtonGroup()
@@ -98,6 +99,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.settings.set("account", "autologin", "1" if self.checkBox_autoLogin.isChecked() else "0")
         self.settings.set("frontend", "enabledeveloperstools",
                                 "1" if self.checkBox_enableDevelopersTools.isChecked() else "0")
+        self.settings.set("frontend", "allowflash",
+                                "1" if self.checkBox_allowFlash.isChecked() else "0")
+
         self.settings.set("xwared", "startetmwhen",
                           str(self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton())))
 
