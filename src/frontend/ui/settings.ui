@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>374</width>
+    <width>930</width>
     <height>374</height>
    </rect>
   </property>
@@ -17,12 +17,6 @@
    </sizepolicy>
   </property>
   <property name="minimumSize">
-   <size>
-    <width>374</width>
-    <height>374</height>
-   </size>
-  </property>
-  <property name="maximumSize">
    <size>
     <width>374</width>
     <height>374</height>
@@ -304,7 +298,7 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>331</width>
+         <width>891</width>
          <height>241</height>
         </rect>
        </property>
@@ -313,6 +307,12 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::NoContextMenu</enum>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">Q</string>
        </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
@@ -323,10 +323,19 @@
        <property name="selectionBehavior">
         <enum>QAbstractItemView::SelectRows</enum>
        </property>
+       <attribute name="horizontalHeaderHighlightSections">
+        <bool>false</bool>
+       </attribute>
        <attribute name="horizontalHeaderStretchLastSection">
         <bool>true</bool>
        </attribute>
        <attribute name="verticalHeaderVisible">
+        <bool>false</bool>
+       </attribute>
+       <attribute name="verticalHeaderDefaultSectionSize">
+        <number>50</number>
+       </attribute>
+       <attribute name="verticalHeaderHighlightSections">
         <bool>false</bool>
        </attribute>
        <column>
@@ -336,12 +345,12 @@
        </column>
        <column>
         <property name="text">
-         <string>应对应盘符</string>
+         <string>对应盘符</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string>实对应盘符</string>
+         <string>状态检查</string>
         </property>
        </column>
       </widget>

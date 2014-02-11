@@ -60,11 +60,41 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)
 
         mountsMapping = self.mainWin.mountsFaker.getMountsMapping()
-        for i, item in enumerate(self.mainWin.mountsFaker.mounts):
+        for i, mount in enumerate(self.mainWin.mountsFaker.mounts):
+            # mounts = ['/path/to/1', 'path/to/2', ...]
             self.table_mounts.insertRow(i)
-            self.table_mounts.setItem(i, 0, QTableWidgetItem(item))
-            self.table_mounts.setItem(i, 1, QTableWidgetItem(chr(ord('C') + i) + ":"))
-            self.table_mounts.setItem(i, 2, QTableWidgetItem(mountsMapping.get(item, "无")))
+            self.table_mounts.setItem(i, 0, QTableWidgetItem(mount))
+            drive1 = chr(ord('C') + i) + ":" # the drive letter it should map to, by alphabetical order
+            self.table_mounts.setItem(i, 1, QTableWidgetItem(drive1))
+            drive2 = mountsMapping.get(mount, "无") # the drive letter it actually is assigned to
+
+            errors = []
+            # check 1: owned by xware group?
+            import os, grp
+            statinfo = os.stat(mount) #.st_gid
+            ownergrp = grp.getgrgid(statinfo.st_gid)[0] # 0: gr_name, 3: all members
+            if ownergrp != "xware":
+                errors.append("警告：{unixpath}的所有组不是'xware'，请修正后重启后端。".format(unixpath = mount))
+
+            # check 2: mounting
+            if drive1 != drive2:
+                errors.append("警告：盘符映射在'{actual}'，而不是'{should}'。".format(actual = drive2, should = drive1))
+
+            from PyQt5.Qt import Qt
+            from PyQt5.QtGui import QBrush
+
+            brush = QBrush()
+            if errors:
+                brush.setColor(Qt.red)
+                errString = "\n".join(errors)
+            else:
+                brush.setColor(Qt.darkGreen)
+                errString = "正常"
+            errWidget = QTableWidgetItem(errString)
+            errWidget.setForeground(brush)
+
+            self.table_mounts.setItem(i, 2, errWidget)
+            self.table_mounts.resizeColumnsToContents()
 
     @pyqtSlot()
     def slotAddMount(self):
