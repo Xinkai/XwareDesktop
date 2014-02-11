@@ -39,6 +39,7 @@ package() {
   rm -rf ${pkgdir}/opt/xware_desktop/frontend/__pycache__
   rm -rf ${pkgdir}/opt/xware_desktop/frontend/ui
   rm -f  ${pkgdir}/opt/xware_desktop/frontend/xwarejs.coffee
+  rm -f  ${pkgdir}/opt/xware_desktop/Makefile
 
   # install desktop entry
   install -D frontend/ui/rc/thunder.ico      ${pkgdir}/opt/xware_desktop/frontend/thunder.ico
