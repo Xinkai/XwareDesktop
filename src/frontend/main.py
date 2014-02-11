@@ -83,6 +83,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.xwaredpy.sigXwaredStatusChanged.connect(self.slotXwaredStatusChanged)
         self.xwaredpy.sigETMStatusChanged.connect(self.slotETMStatusChanged)
 
+        self.action_showAbout.triggered.connect(self.slotShowAbout)
+
     def setupStatusBar(self):
         ETMstatus = QLabel(self.statusBar)
         ETMstatus.setObjectName("label_ETMstatus")
@@ -190,5 +192,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
             self.statusBar.ETMstatus.setText("<font color='green'>ETM运行中</font>")
         else:
             self.statusBar.ETMstatus.setText("<font color='red'>ETM未启动</font>")
+
+    @pyqtSlot()
+    def slotShowAbout(self):
+        from about import AboutDialog
+        aboutDialog = AboutDialog(self)
+        aboutDialog.exec()
 
 
