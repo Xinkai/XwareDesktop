@@ -47,3 +47,14 @@ class XwarePy(QObject):
         qurl = QUrl(url)
         qurl.setScheme("file")
         QDesktopServices.openUrl(qurl)
+
+    @pyqtSlot(str, str)
+    def saveCredentials(self, username, password):
+        self.window.settings.set("account", "username", username)
+        self.window.settings.set("account", "password", password)
+        self.window.settings.set("account", "autologin", "1")
+        self.window.settings.save()
+
+    @pyqtSlot(str)
+    def log(self, *args):
+        print("xdjs:", *args)
