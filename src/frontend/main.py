@@ -51,7 +51,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         from PyQt5.QtWebKit import QWebSettings
         from PyQt5.Qt import Qt
 
-        devToolsOn = self.settings.get("frontend", "enabledeveloperstools", "0") == "1"
+        devToolsOn = self.settings.getbool("frontend", "enabledeveloperstools")
         self.webView.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, devToolsOn)
         if devToolsOn:
             self.webView.setContextMenuPolicy(Qt.DefaultContextMenu)
@@ -62,7 +62,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
     def toggleFlash(self):
         from PyQt5.QtWebKit import QWebSettings
 
-        allowed = self.settings.get("frontend", "allowflash", "1") == "1"
+        allowed = self.settings.getbool("frontend", "allowflash")
         self.webView.settings().setAttribute(QWebSettings.PluginsEnabled, allowed)
         self.xdpy.sigToggleFlashAvailability.emit(allowed)
 

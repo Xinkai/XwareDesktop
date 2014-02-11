@@ -6,7 +6,23 @@ from ui_settings import Ui_Dialog
 import configparser
 import constants
 
-class SettingAccessor(QObject):
+DEFAULT_SETTINGS = {
+    "account": {
+        "username": None,
+        "password": None,
+        "autologin": True
+    },
+    "frontend": {
+        "enabledeveloperstools": False,
+        "allowflash": True
+    },
+    "xwared": {
+        "startetm": True,
+        "startetmwhen": 1
+    }
+}
+
+class SettingsAccessor(QObject):
     applySettings = pyqtSignal()
 
     def __init__(self):
@@ -14,8 +30,8 @@ class SettingAccessor(QObject):
         self.config = configparser.ConfigParser()
         self.config.read(constants.CONFIG_FILE)
 
-    def get(self, section, key, fallback = None):
-        return self.config.get(section, key, fallback = fallback)
+    def get(self, section, key):
+        return self.config.get(section, key, fallback = DEFAULT_SETTINGS[section][key])
 
     def set(self, section, key, value):
         try:
@@ -23,6 +39,20 @@ class SettingAccessor(QObject):
         except configparser.NoSectionError:
             self.config.add_section(section)
             self.config.set(section, key, value)
+
+    def getint(self, section, key):
+        return int(self.get(section, key))
+
+    def setint(self, section, key, value):
+        assert type(value) is int
+        self.set(section, key, str(value))
+
+    def getbool(self, section, key):
+        return True if self.get(section, key) == "1" else False
+
+    def setbool(self, section, key, value):
+        assert type(value) is bool
+        self.set(section, key, "1" if value else "0")
 
     def save(self):
         with open(constants.CONFIG_FILE, 'w') as configfile:
@@ -37,17 +67,17 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.lineEdit_loginUsername.setText(self.settings.get("account", "username"))
         self.lineEdit_loginPassword.setText(self.settings.get("account", "password"))
-        self.checkBox_autoLogin.setChecked(self.settings.get("account", "autologin", "1") == "1")
+        self.checkBox_autoLogin.setChecked(self.settings.getbool("account", "autologin"))
         self.checkBox_enableDevelopersTools.setChecked(
-            self.settings.get("frontend", "enabledeveloperstools", "0") == "1")
-        self.checkBox_allowFlash.setChecked(self.settings.get("frontend", "allowflash", "1") == "1")
+            self.settings.getbool("frontend", "enabledeveloperstools"))
+        self.checkBox_allowFlash.setChecked(self.settings.getbool("frontend", "allowflash"))
 
         from PyQt5.QtWidgets import QButtonGroup
         self.btngrp_etmStartWhen = QButtonGroup()
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen1, 1)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
-        self.btngrp_etmStartWhen.button(int(self.settings.get("xwared", "startetmwhen", "1"))).setChecked(True)
+        self.btngrp_etmStartWhen.button(self.settings.getint("xwared", "startetmwhen")).setChecked(True)
 
         self.rejected.connect(lambda: self.close())
         self.accepted.connect(self.writeSettings)
@@ -126,18 +156,18 @@ class SettingsDialog(QDialog, Ui_Dialog):
     def writeSettings(self):
         self.settings.set("account", "username", self.lineEdit_loginUsername.text())
         self.settings.set("account", "password", self.lineEdit_loginPassword.text())
-        self.settings.set("account", "autologin", "1" if self.checkBox_autoLogin.isChecked() else "0")
-        self.settings.set("frontend", "enabledeveloperstools",
-                                "1" if self.checkBox_enableDevelopersTools.isChecked() else "0")
-        self.settings.set("frontend", "allowflash",
-                                "1" if self.checkBox_allowFlash.isChecked() else "0")
+        self.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
+        self.settings.setbool("frontend", "enabledeveloperstools",
+                                self.checkBox_enableDevelopersTools.isChecked())
+        self.settings.setbool("frontend", "allowflash",
+                                self.checkBox_allowFlash.isChecked())
 
-        self.settings.set("xwared", "startetmwhen",
-                          str(self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton())))
+        self.settings.setint("xwared", "startetmwhen",
+                          self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton()))
 
-        startETMWhen = int(self.settings.get("xwared", "startetmwhen", "1"))
+        startETMWhen = self.settings.getint("xwared", "startetmwhen")
         if startETMWhen == 1:
-            self.settings.set("xwared", "startetm", "1")
+            self.settings.setbool("xwared", "startetm", True)
 
         self.settings.save()
 

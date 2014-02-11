@@ -18,14 +18,14 @@ class XwarePy(QObject):
         print("xdpy loaded")
 
     def tryLogin(self):
-        autologin = self.window.settings.get("account", "autologin", "1") == "1"
+        autologin = self.window.settings.getbool("account", "autologin")
         if autologin:
-            username = self.window.settings.get("account", "username", None)
-            password = self.window.settings.get("account", "password", None)
+            username = self.window.settings.get("account", "username")
+            password = self.window.settings.get("account", "password")
             if username and password:
                 from urllib import parse
                 if parse.urldefrag(self.window.url)[0] == constants.LOGIN_PAGE and \
-                    (self.window.settings.get("account", "autologin", "1") == "1"):
+                    self.window.settings.getbool("account", "autologin"):
                     self.sigLogin.emit(username, password)
 
     ################################### SLOTS ######################################
@@ -52,7 +52,7 @@ class XwarePy(QObject):
     def saveCredentials(self, username, password):
         self.window.settings.set("account", "username", username)
         self.window.settings.set("account", "password", password)
-        self.window.settings.set("account", "autologin", "1")
+        self.window.settings.setbool("account", "autologin", True)
         self.window.settings.save()
 
     @pyqtSlot(str)

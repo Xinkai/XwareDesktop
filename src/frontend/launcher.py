@@ -12,7 +12,7 @@ class XwareDesktop(QApplication):
     def __init__(self, *args):
         super().__init__(*args)
         import settings
-        self.settings = settings.SettingAccessor()
+        self.settings = settings.SettingsAccessor()
         self.lastWindowClosed.connect(self.cleanUp)
 
         self.mainWindow = main.MainWindow(self)
