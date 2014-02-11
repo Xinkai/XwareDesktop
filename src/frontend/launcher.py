@@ -16,7 +16,23 @@ class XwareDesktop(QApplication):
         self.lastWindowClosed.connect(self.cleanUp)
 
         self.mainWindow = main.MainWindow(self)
+        self.checkUsergroup()
         self.mainWindow.show()
+
+    def checkUsergroup(self):
+        from PyQt5.QtWidgets import QMessageBox
+        import grp, getpass
+        try:
+            xwareGrp = grp.getgrnam("xware")
+        except KeyError:
+            return QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "未在本机上找到xware用户组，需要重新安装。",
+                                       QMessageBox.Ok, QMessageBox.Ok)
+
+        xwareMembers = xwareGrp[3]
+        if getpass.getuser() not in xwareMembers:
+            return QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "当前用户不在xware用户组。",
+                                       QMessageBox.Ok, QMessageBox.Ok)
+
 
     @pyqtSlot()
     def cleanUp(self):
