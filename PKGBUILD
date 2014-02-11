@@ -36,6 +36,9 @@ package() {
 
   # install frontend
   cp -R frontend                             ${pkgdir}/opt/xware_desktop/frontend
+  rm -rf ${pkgdir}/opt/xware_desktop/frontend/__pycache__
+  rm -rf ${pkgdir}/opt/xware_desktop/frontend/ui
+  rm -f  ${pkgdir}/opt/xware_desktop/frontend/xwarejs.coffee
 
   # install desktop entry
   install -D frontend/ui/rc/thunder.ico      ${pkgdir}/opt/xware_desktop/frontend/thunder.ico
