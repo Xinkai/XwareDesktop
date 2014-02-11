@@ -4,10 +4,6 @@ import constants
 import os
 import uuid
 
-# TODO: accept user input Download folder
-# TODO: generate fstab
-# TODO: make it mount!
-
 class MountsFaker(object):
     def __init__(self):
         self.mounts = []

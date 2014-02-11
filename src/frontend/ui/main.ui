@@ -91,7 +91,7 @@
     <addaction name="action_activateDevice"/>
     <addaction name="action_showAbout"/>
    </widget>
-   <widget class="QMenu" name="menu_3">
+   <widget class="QMenu" name="menu_backend">
     <property name="title">
      <string>后端</string>
     </property>
@@ -100,7 +100,7 @@
     <addaction name="action_ETMrestart"/>
    </widget>
    <addaction name="menu"/>
-   <addaction name="menu_3"/>
+   <addaction name="menu_backend"/>
    <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">

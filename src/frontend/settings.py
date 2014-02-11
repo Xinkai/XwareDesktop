@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem
 from ui_settings import Ui_Dialog
 import configparser
 import constants
 
-class SettingAccessor(object):
-    def __init__(self):
+class SettingAccessor(QObject):
+    applySettings = pyqtSignal()
 
+    def __init__(self):
+        super().__init__()
         self.config = configparser.ConfigParser()
         self.config.read(constants.CONFIG_FILE)
 
@@ -29,21 +31,22 @@ class SettingAccessor(object):
 class SettingsDialog(QDialog, Ui_Dialog):
     def __init__(self, parent):
         super().__init__(parent)
-        self.window = parent
+        self.mainWin = parent
+        self.settings = self.mainWin.settings # shorthand
         self.setupUi(self)
 
-        self.lineEdit_loginUsername.setText(settingsAccessor.get("account", "username"))
-        self.lineEdit_loginPassword.setText(settingsAccessor.get("account", "password"))
-        self.checkBox_autoLogin.setChecked(settingsAccessor.get("account", "autologin", "True") == "True")
+        self.lineEdit_loginUsername.setText(self.settings.get("account", "username"))
+        self.lineEdit_loginPassword.setText(self.settings.get("account", "password"))
+        self.checkBox_autoLogin.setChecked(self.settings.get("account", "autologin", "1") == "1")
         self.checkBox_enableDevelopersTools.setChecked(
-            settingsAccessor.get("frontend", "enableDevelopersTools", "False") == "True")
+            self.settings.get("frontend", "enabledeveloperstools", "0") == "1")
 
         from PyQt5.QtWidgets import QButtonGroup
         self.btngrp_etmStartWhen = QButtonGroup()
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen1, 1)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
-        self.btngrp_etmStartWhen.button(int(settingsAccessor.get("xwared", "startETMWhen", "1"))).setChecked(True)
+        self.btngrp_etmStartWhen.button(int(self.settings.get("xwared", "startetmwhen", "1"))).setChecked(True)
 
         self.rejected.connect(lambda: self.close())
         self.accepted.connect(self.writeSettings)
@@ -55,8 +58,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.btn_addMount.clicked.connect(self.slotAddMount)
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)
 
-        mountsMapping = self.window.mountsFaker.getMountsMapping()
-        for i, item in enumerate(self.window.mountsFaker.mounts):
+        mountsMapping = self.mainWin.mountsFaker.getMountsMapping()
+        for i, item in enumerate(self.mainWin.mountsFaker.mounts):
             self.table_mounts.insertRow(i)
             self.table_mounts.setItem(i, 0, QTableWidgetItem(item))
             self.table_mounts.setItem(i, 1, QTableWidgetItem(chr(ord('C') + i) + ":"))
@@ -90,18 +93,25 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot()
     def writeSettings(self):
-        settingsAccessor.set("account", "username", self.lineEdit_loginUsername.text())
-        settingsAccessor.set("account", "password", self.lineEdit_loginPassword.text())
-        settingsAccessor.set("account", "autologin", "True" if self.checkBox_autoLogin.isChecked() else "False")
-        settingsAccessor.set("frontend", "enableDevelopersTools",
-                                "True" if self.checkBox_enableDevelopersTools.isChecked() else "False")
-        settingsAccessor.set("xwared", "startETMWhen", self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton()))
-        settingsAccessor.save()
+        self.settings.set("account", "username", self.lineEdit_loginUsername.text())
+        self.settings.set("account", "password", self.lineEdit_loginPassword.text())
+        self.settings.set("account", "autologin", "1" if self.checkBox_autoLogin.isChecked() else "0")
+        self.settings.set("frontend", "enabledeveloperstools",
+                                "1" if self.checkBox_enableDevelopersTools.isChecked() else "0")
+        self.settings.set("xwared", "startetmwhen",
+                          str(self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton())))
 
-        self.window.mountsFaker.setMounts(self.newMounts)
+        startETMWhen = int(self.settings.get("xwared", "startetmwhen", "1"))
+        if startETMWhen == 1:
+            self.settings.set("xwared", "startetm", "1")
+
+        self.settings.save()
+
+        self.mainWin.mountsFaker.setMounts(self.newMounts)
+        self.settings.applySettings.emit()
 
     @property
     def newMounts(self):
         return list(map(lambda row: self.table_mounts.item(row, 0).text(),
                         range(self.table_mounts.rowCount())))
-settingsAccessor = None
+

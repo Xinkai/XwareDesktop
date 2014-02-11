@@ -210,7 +210,7 @@ int main(const int argc, const char* argv[]) {
 			fprintf(stderr, "xwared: cannot load settings.ini, use default value\n");
 		}
 		GError* gErr = NULL;
-		gboolean etmStart = g_key_file_get_boolean(configFile, "xwared", "startETM", &gErr);
+		gboolean etmStart = g_key_file_get_boolean(configFile, "xwared", "startetm", &gErr);
 		if (gErr == NULL) {
 			if (etmStart == FALSE) {
 				toRunETM = 0;

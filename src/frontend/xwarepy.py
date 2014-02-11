@@ -11,10 +11,22 @@ class XwarePy(QObject):
     sigActivateDevice = pyqtSignal()
 
     def __init__(self, window):
-        super().__init__()
+        super().__init__(window)
         self.jsLoaded = False
         self.window = window
+        self.window.settings.applySettings.connect(self.tryLogin)
         print("xdpy loaded")
+
+    def tryLogin(self):
+        autologin = self.window.settings.get("account", "autologin", "1") == "1"
+        if autologin:
+            username = self.window.settings.get("account", "username", None)
+            password = self.window.settings.get("account", "password", None)
+            if username and password:
+                from urllib import parse
+                if parse.urldefrag(self.window.url)[0] == constants.LOGIN_PAGE and \
+                    (self.window.settings.get("account", "autologin", "1") == "1"):
+                    self.sigLogin.emit(username, password)
 
     ################################### SLOTS ######################################
     @pyqtSlot()
@@ -22,14 +34,7 @@ class XwarePy(QObject):
         self.jsLoaded = True
         print("xdjs loaded")
 
-        username = self.window.setting.get("account", "username", None)
-        password = self.window.setting.get("account", "password", None)
-
-        if username and password:
-            from urllib import parse
-            if parse.urldefrag(self.window.url)[0] == constants.LOGIN_PAGE and \
-                (self.window.setting.get("account", "autologin", "True") == "True"):
-                self.sigLogin.emit(username, password)
+        self.tryLogin()
 
     @pyqtSlot()
     def requestFocus(self):
