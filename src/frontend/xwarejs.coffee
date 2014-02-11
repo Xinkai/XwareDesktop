@@ -33,13 +33,20 @@ class XwareJS
         xdpy.requestFocus()
 
     slotLogin: (username, password) ->
-        if $("#login-input-username").length > 0
-            $("#login-input-username").val(username).blur()
-            $("#login-input-password").val(password)
+        $username = $("#login-input-username")
+        $password = $("#login-input-password")
+        if $username.length > 0
+            $username.val(username).blur()
+            $password.val(password)
 
-            setTimeout( ->
+            interval_id = setInterval( ->
+                if Login.login.username isnt undefined and \
+                    Login.login.username is $("#login-input-username").val() and \
+                    Login.login.verifyCode isnt undefined
+                    Login.login.verifyCode.length > 0
                 $("#login-button").click()
-            , 1500)
+                clearInterval interval_id
+            , 200)
 
     slotToggleFlashAvailability: (available) ->
         App.set("system.flash", available)
