@@ -125,6 +125,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
             self.table_mounts.setItem(i, 2, errWidget)
             self.table_mounts.resizeColumnsToContents()
+            del brush, errWidget
 
     @pyqtSlot()
     def slotAddMount(self):

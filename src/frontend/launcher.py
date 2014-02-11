@@ -36,6 +36,7 @@ class XwareDesktop(QApplication):
 
     @pyqtSlot()
     def cleanUp(self):
+        self.mainWindow.xwaredpy.stopXware()
         print("cleanup")
 
 if __name__ == "__main__":

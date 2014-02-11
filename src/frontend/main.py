@@ -91,12 +91,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         ETMstatus.setText("<font color=''></font>")
         self.statusBar.ETMstatus = ETMstatus
         self.statusBar.addPermanentWidget(ETMstatus)
+        del ETMstatus
 
         xwaredStatus = QLabel(self.statusBar)
         xwaredStatus.setObjectName("label_xwaredStatus")
         xwaredStatus.setText("<font color=''></font>")
         self.statusBar.xwaredStatus = xwaredStatus
         self.statusBar.addPermanentWidget(xwaredStatus)
+        del xwaredStatus
 
 
     # shorthand
@@ -165,8 +167,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
     @pyqtSlot()
     def slotSetting(self):
         from settings import SettingsDialog
-        settingsDialog = SettingsDialog(self)
-        settingsDialog.exec()
+        self.settingsDialog = SettingsDialog(self)
+        self.settingsDialog.exec()
+        del self.settingsDialog
 
     # def _printDomainCookies(self):
     #     from PyQt5.QtCore import QUrl
@@ -196,7 +199,8 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
     @pyqtSlot()
     def slotShowAbout(self):
         from about import AboutDialog
-        aboutDialog = AboutDialog(self)
-        aboutDialog.exec()
+        self.aboutDialog = AboutDialog(self)
+        self.aboutDialog.exec()
+        del self.aboutDialog
 
 

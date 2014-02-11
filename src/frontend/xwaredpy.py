@@ -12,10 +12,26 @@ class XwaredPy(QObject):
     sigETMStatusChanged = pyqtSignal(bool)
 
     def __init__(self, window):
-        super().__init__(window)
+        self.window = window
+        super().__init__(self.window)
+        self.startXware()
         self.xwaredStatus = None
         self.etmStatus = None
-        window.UiSetupFinished.connect(self.watch)
+        self.window.UiSetupFinished.connect(self.watch)
+        self.window.app.lastWindowClosed.connect(self.stopXware)
+
+    def startXware(self):
+        if self.window.settings.getint("xwared", "startetmwhen") == 3:
+            self.slotStartETM()
+            self.window.settings.setbool("xwared", "startetm", True)
+            self.window.settings.save()
+
+    def stopXware(self):
+        # this method is called by XwareDesktop::cleanUp
+        if self.window.settings.getint("xwared", "startetmwhen") == 3:
+            self.slotStopETM()
+            self.window.settings.setbool("xwared", "startetm", True)
+            self.window.settings.save()
 
     def watch(self):
         self.t = threading.Thread(target = self._watcherThread, daemon = True)
@@ -61,18 +77,27 @@ class XwaredPy(QObject):
         sd = self.prepareSocket()
         sd.sendall(b"ETM_START\0")
         sd.close()
+        if self.window.settings.getint("xwared", "startetmwhen") == 2:
+            self.window.settings.setbool("xwared", "startetm", True)
+            self.window.settings.save()
 
     @pyqtSlot()
     def slotStopETM(self):
         sd = self.prepareSocket()
         sd.sendall(b"ETM_STOP\0")
         sd.close()
+        if self.window.settings.getint("xwared", "startetmwhen") == 2:
+            self.window.settings.setbool("xwared", "startetm", False)
+            self.window.settings.save()
 
     @pyqtSlot()
     def slotRestartETM(self):
         sd = self.prepareSocket()
         sd.sendall(b"ETM_RESTART\0")
         sd.close()
+        if self.window.settings.getint("xwared", "startetmwhen") == 2:
+            self.window.settings.setbool("xwared", "startetm", True)
+            self.window.settings.save()
 
     @staticmethod
     def prepareSocket():
