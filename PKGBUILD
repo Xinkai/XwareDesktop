@@ -32,7 +32,11 @@ install=xware_desktop.install
 prepare() {
   if [ ! -f ${srcdir}/../.localdev ]; then
     cp -R ${srcdir}/XwareDesktop/src/* ${srcdir}
+    mkdir -p ${srcdir}/xware
+    cp -R ${srcdir}/XwareDesktop/xware/* ${srcdir}/xware
     rm -rf ${srcdir}/XwareDesktop
+  else
+    ln -s ${srcdir}/../xware ${srcdir}
   fi
 }
 
@@ -42,9 +46,9 @@ build() {
 
 package() {
   # copy xware to /opt/xware_desktop/xware
-  install -D ../xware/ETMDaemon              ${pkgdir}/opt/xware_desktop/xware/lib/ETMDaemon
-  install -D ../xware/EmbedThunderManager    ${pkgdir}/opt/xware_desktop/xware/lib/EmbedThunderManager
-  install -D ../xware/portal                 ${pkgdir}/opt/xware_desktop/xware/portal
+  install -D xware/ETMDaemon                 ${pkgdir}/opt/xware_desktop/xware/lib/ETMDaemon
+  install -D xware/EmbedThunderManager       ${pkgdir}/opt/xware_desktop/xware/lib/EmbedThunderManager
+  install -D xware/portal                    ${pkgdir}/opt/xware_desktop/xware/portal
   
   # copy libmounthelper
   install -D build/libmounthelper.so         ${pkgdir}/opt/xware_desktop/libmounthelper.so
