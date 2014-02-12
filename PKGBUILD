@@ -8,7 +8,7 @@ arch=("i686" "x86_64")
 pkgrel=2
 license=("GPL")
 
-makedepends=("git" "python-pyqt5")
+makedepends=("git" "python-pyqt5" "coffee-script")
 if test "$CARCH" == x86_64; then
     makedepends+=("lib32-glib2")
 else
