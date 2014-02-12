@@ -22,10 +22,19 @@ else
     depends+=("glibc" "zlib" "glib2")
 fi
 
-source=("Xware1.0.7_x86_32_glibc.zip")
-md5sums=("34e522b8248919d7ee4284b8b369de27")
+if [ ! -f .localdev ]; then
+    source=("git+https://github.com/Xinkai/XwareDesktop.git")
+    md5sums=('SKIP')
+fi
 
-install=.install
+install=xware_desktop.install
+
+prepare() {
+  if [ ! -f ${srcdir}/../.localdev ]; then
+    cp -R ${srcdir}/XwareDesktop/src/* ${srcdir}
+    rm -rf ${srcdir}/XwareDesktop
+  fi
+}
 
 build() {
   make all
@@ -33,9 +42,9 @@ build() {
 
 package() {
   # copy xware to /opt/xware_desktop/xware
-  install -D ETMDaemon                       ${pkgdir}/opt/xware_desktop/xware/lib/ETMDaemon
-  install -D EmbedThunderManager             ${pkgdir}/opt/xware_desktop/xware/lib/EmbedThunderManager
-  install -D portal                          ${pkgdir}/opt/xware_desktop/xware/portal
+  install -D ../xware/ETMDaemon              ${pkgdir}/opt/xware_desktop/xware/lib/ETMDaemon
+  install -D ../xware/EmbedThunderManager    ${pkgdir}/opt/xware_desktop/xware/lib/EmbedThunderManager
+  install -D ../xware/portal                 ${pkgdir}/opt/xware_desktop/xware/portal
   
   # copy libmounthelper
   install -D build/libmounthelper.so         ${pkgdir}/opt/xware_desktop/libmounthelper.so

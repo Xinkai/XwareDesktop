@@ -16,3 +16,5 @@ ui_*.py
 
 # coffeescript generated
 xwarejs.js
+
+.localdev
