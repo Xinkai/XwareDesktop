@@ -8,8 +8,19 @@ arch=("i686" "x86_64")
 pkgrel=2
 license=("GPL")
 
-makedepends=("git" "python-pyqt5" "lib32-glib2")
-depends=("lib32-glibc" "lib32-zlib" "python-pyqt5" "qt5-webkit" "lib32-glib2")
+makedepends=("git" "python-pyqt5")
+if test "$CARCH" == x86_64; then
+    makedepends+=("lib32-glib2")
+else
+    makedepends+=("glib2")
+fi
+
+depends=("python-pyqt5" "qt5-webkit")
+if test "$CARCH" == x86_64; then
+    depends+=("lib32-glibc" "lib32-zlib" "lib32-glib2")
+else
+    depends+=("glibc" "zlib" "glib2")
+fi
 
 source=("Xware1.0.7_x86_32_glibc.zip")
 md5sums=("34e522b8248919d7ee4284b8b369de27")
