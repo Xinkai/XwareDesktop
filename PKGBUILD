@@ -1,5 +1,5 @@
 
-pkgdesc="An attemp to bring Xware (Xunlei on routers) to desktop Linux."
+pkgdesc="An attempt to bring Xware (Xunlei on routers) to desktop Linux."
 url="http://www.cuoan.net/xware_desktop"
 
 pkgname="xware_desktop"
@@ -10,9 +10,9 @@ license=("GPL")
 
 makedepends=("git" "python-pyqt5" "coffee-script")
 if test "$CARCH" == x86_64; then
-    makedepends+=("lib32-glib2")
+    makedepends+=("lib32-glib2" "gcc-multilib")
 else
-    makedepends+=("glib2")
+    makedepends+=("glib2" "gcc")
 fi
 
 depends=("python-pyqt5" "qt5-webkit")
