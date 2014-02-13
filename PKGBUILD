@@ -15,7 +15,7 @@ else
     makedepends+=("glib2" "gcc")
 fi
 
-depends=("python-pyqt5" "qt5-webkit")
+depends=("python-pyqt5" "qt5-webkit" "libcap")
 if test "$CARCH" == x86_64; then
     depends+=("lib32-glibc" "lib32-zlib" "lib32-glib2")
 else
@@ -36,7 +36,7 @@ prepare() {
     cp -R ${srcdir}/XwareDesktop/xware/* ${srcdir}/xware
     rm -rf ${srcdir}/XwareDesktop
   else
-    ln -s ${srcdir}/../xware ${srcdir}
+    ln -sf ${srcdir}/../xware ${srcdir}
   fi
 }
 
@@ -52,6 +52,7 @@ package() {
   
   # copy libmounthelper
   install -D build/libmounthelper.so         ${pkgdir}/opt/xware_desktop/libmounthelper.so
+  install -D build/permissioncheck           ${pkgdir}/opt/xware_desktop/permissioncheck
   
   # copy systemd service
   install -D xwared.service                  ${pkgdir}/usr/lib/systemd/system/xwared.service

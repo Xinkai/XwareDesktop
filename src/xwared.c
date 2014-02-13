@@ -22,7 +22,7 @@ void runETM() {
 	} else if (etmPid == 0) {
 		// child
 		hookLibmounthelper();
-		printf("child: pid(%u) ppid(%u)\n", getpid(), getppid());
+		printf("child: pid(%d) ppid(%d)\n", getpid(), getppid());
 		flock(fdETMLock, LOCK_EX | LOCK_NB);
 		execv(etmArgv[0], etmArgv);
 		flock(fdETMLock, LOCK_UN);
@@ -30,7 +30,7 @@ void runETM() {
 		exit(EXIT_FAILURE);
 	} else {
 		// parent
-		printf("parent: pid(%u) cpid(%u)\n", getpid(), etmPid);
+		printf("parent: pid(%d) cpid(%d)\n", getpid(), etmPid);
 		watchETM();
 	}
 }

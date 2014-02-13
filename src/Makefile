@@ -1,4 +1,4 @@
-all: libmounthelper.so xwared
+all: libmounthelper.so xwared permissioncheck
 	make -C frontend
 
 libmounthelper.so: libmounthelper.c
@@ -8,9 +8,10 @@ libmounthelper.so: libmounthelper.c
 xwared: xwared.c xwared.h
 	gcc -m32 `pkg-config --cflags --libs glib-2.0` -o build/xwared -pthread -Wall -O3 xwared.c
 
+permissioncheck: permissioncheck.c
+	mkdir -p build
+	gcc -lmount -o build/permissioncheck -Wall -O3 permissioncheck.c
+
 clean:
-	rm -f EmbedThunderManager
-	rm -f ETMDaemon
-	rm -f portal
-	rm -f *.zip
+	rm -rf build
 	make -C frontend clean
