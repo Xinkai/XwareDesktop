@@ -15,6 +15,9 @@ post_install() {
     touch /opt/xware_desktop/settings.ini
     touch /opt/xware_desktop/mounts
 
+    chmod g+rw /opt/xware_desktop/settings.ini
+    chmod g+rw /opt/xware_desktop/mounts
+
     chown -R xware:xware /opt/xware_desktop
 
     chmod ug+s /opt/xware_desktop/xware/lib/ETMDaemon
