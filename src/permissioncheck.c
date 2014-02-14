@@ -39,9 +39,9 @@ int checkWritePermission(const char* path) {
     int fd = open(probepath, O_CREAT | O_RDWR, 0660);
     if (fd == -1) {
         if (errno == EACCES) {
-            fprintf(stderr, "%s无法读写文件。xware用户对路径没有读写权限。%s\n", RED, NOSTYLE);
+            printf("%s无法读写文件。xware用户对路径没有读写权限。%s\n", RED, NOSTYLE);
         } else {
-            fprintf(stderr, "%s无法读写文件。错误码：%u。%s\n", RED, errno, NOSTYLE);
+            printf("%s无法读写文件。错误码：%u。%s\n", RED, errno, NOSTYLE);
         }
         return 0;
     } else {
@@ -66,9 +66,9 @@ int checkDirPermission(const char* dirpath) {
                 return 1;
             } else {
                 if (errno == EACCES) {
-                    fprintf(stderr, "%s无法打开文件夹%s。检查文件夹x权限。%s\n", RED, dirpath, NOSTYLE);
+                    printf("%s无法打开文件夹%s。检查文件夹x权限。%s\n", RED, dirpath, NOSTYLE);
                 } else {
-                    fprintf(stderr, "%s无法打开文件夹%s。错误码：%u。%s\n", RED, dirpath, errno, NOSTYLE);
+                    printf("%s无法打开文件夹%s。错误码：%u。%s\n", RED, dirpath, errno, NOSTYLE);
                 }
                 return 0;
             }
