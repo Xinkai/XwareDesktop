@@ -82,12 +82,53 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.rejected.connect(lambda: self.close())
         self.accepted.connect(self.writeSettings)
 
+        self.btn_addMount.clicked.connect(self.slotAddMount)
+        self.btn_removeMount.clicked.connect(self.slotRemoveMount)
+        self.btn_refreshMount.clicked.connect(self.setupMounts)
+
         # Mounts
         self.setupMounts()
 
+    @staticmethod
+    def permissionCheck():
+        import re
+        ansiEscape = re.compile(r'\x1b[^m]*m')
+
+        import subprocess
+        with subprocess.Popen([constants.PERMISSIONCHECK], stdout = subprocess.PIPE, stderr = subprocess.PIPE) as proc:
+            output = proc.stdout.read().decode("utf-8")
+            output = ansiEscape.sub('', output)
+            lines = output.split("\n")
+
+        prevLine = None
+        currMount = None
+        result = {}
+        for line in lines:
+            if len(line.strip()) == 0:
+                continue
+
+            if all(map(lambda c: c == '=', line)):
+                if currMount:
+                    result[currMount] = result[currMount][:-1]
+
+                result[prevLine] = []
+                currMount = prevLine
+                continue
+
+            if currMount:
+                if line != "正常。":
+                    result[currMount].append(line)
+
+            prevLine = line
+
+        return result
+
+    @pyqtSlot()
     def setupMounts(self):
-        self.btn_addMount.clicked.connect(self.slotAddMount)
-        self.btn_removeMount.clicked.connect(self.slotRemoveMount)
+        self.table_mounts.setRowCount(0)
+        self.table_mounts.clearContents()
+
+        PermissionError = self.permissionCheck()
 
         mountsMapping = self.mainWin.mountsFaker.getMountsMapping()
         for i, mount in enumerate(self.mainWin.mountsFaker.mounts):
@@ -98,17 +139,12 @@ class SettingsDialog(QDialog, Ui_Dialog):
             self.table_mounts.setItem(i, 1, QTableWidgetItem(drive1))
             drive2 = mountsMapping.get(mount, "无") # the drive letter it actually is assigned to
 
-            errors = []
-            # check 1: owned by xware group?
-            import os, grp
-            statinfo = os.stat(mount) #.st_gid
-            ownergrp = grp.getgrgid(statinfo.st_gid)[0] # 0: gr_name, 3: all members
-            if ownergrp != "xware":
-                errors.append("警告：{unixpath}的所有组不是'xware'，请修正后重启后端。".format(unixpath = mount))
+            # check 1: permission
+            errors = PermissionError.get(mount, ["无法获得检测权限。运行/opt/xware_desktop/permissioncheck查看原因。"])
 
-            # check 2: mounting
+            # check 2: mapping
             if drive1 != drive2:
-                errors.append("警告：盘符映射在'{actual}'，而不是'{should}'。".format(actual = drive2, should = drive1))
+                errors.append("警告：盘符映射在'{actual}'，而不是'{should}'。需要重启后端修复。".format(actual = drive2, should = drive1))
 
             from PyQt5.Qt import Qt
             from PyQt5.QtGui import QBrush
@@ -124,8 +160,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
             errWidget.setForeground(brush)
 
             self.table_mounts.setItem(i, 2, errWidget)
-            self.table_mounts.resizeColumnsToContents()
             del brush, errWidget
+
+        self.table_mounts.resizeColumnsToContents()
 
     @pyqtSlot()
     def slotAddMount(self):

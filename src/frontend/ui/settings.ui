@@ -359,7 +359,7 @@
         <rect>
          <x>10</x>
          <y>260</y>
-         <width>254</width>
+         <width>255</width>
          <height>27</height>
         </rect>
        </property>
@@ -386,11 +386,8 @@
         </item>
         <item>
          <widget class="QPushButton" name="btn_refreshMount">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="text">
-           <string>刷新</string>
+           <string>再次状态检查</string>
           </property>
          </widget>
         </item>
