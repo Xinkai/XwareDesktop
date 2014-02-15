@@ -181,7 +181,7 @@ int main(const int argc, const char* argv[]) {
     setbuf(stdout, NULL);
     setbuf(stderr, NULL);
     chdir(etmWorkingDir);
-    umask(002);
+    umask(006);
     cleanPreviousRun();
     registerSignalHandlers();
 
