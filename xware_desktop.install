@@ -1,12 +1,11 @@
 pre_install() {
     useradd --no-create-home --user-group --shell /bin/false --system xware
+    rm -rf /tmp/thunder
 }
 
 post_install() {
     echo "欢迎使用Xware Desktop。"
-    echo "sudo usermod -G xware -a <用户名>"
-    echo "以上操作把<用户名>加入到xware用户组。只有这个用户组的成员能够正常使用本程序。"
-    echo "加入用户组操作需要用户注销后再登录才能生效。"
+    echo "设置方法和注意事项见项目主页。"
     echo "项目主页 http://cuoan.net/xware_desktop"
     echo "Github https://github.com/Xinkai/XwareDesktop"
 
@@ -35,7 +34,7 @@ post_upgrade() {
 
 post_remove() {
     userdel xware
-    group xware
+    groupdel xware
     echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware_desktop内所有内容。"
     rm -rf /opt/xware_desktop/frontend/__pycache__
 }

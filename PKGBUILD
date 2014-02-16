@@ -2,11 +2,12 @@
 pkgdesc="An attempt to bring Xware (Xunlei on routers) to desktop Linux."
 url="http://www.cuoan.net/xware_desktop"
 
-pkgname="xware_desktop"
-pkgver="0.1"
+pkgname="xware_desktop-git"
+pkgver="20140216"
 arch=("i686" "x86_64")
-pkgrel=2
-license=("GPL")
+conflicts=("xware_desktop")
+pkgrel=1
+license=("GPL" "custom")
 
 makedepends=("git" "python-pyqt5" "coffee-script")
 if test "$CARCH" == x86_64; then
@@ -15,7 +16,7 @@ else
     makedepends+=("glib2" "gcc")
 fi
 
-depends=("python-pyqt5" "qt5-webkit" "libcap")
+depends=("python-pyqt5" "qt5-webkit" "libcap" "python-requests")
 if test "$CARCH" == x86_64; then
     depends+=("lib32-glibc" "lib32-zlib" "lib32-glib2")
 else
