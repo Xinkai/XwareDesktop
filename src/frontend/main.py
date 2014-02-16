@@ -6,6 +6,7 @@ from ui_main import Ui_MainWindow
 from systemtray import Ui_SystemTray
 from xwaredpy import XwaredPy
 from xwarepy import XwarePy
+from etmpy import EtmPy
 import constants
 import mounts
 import ipc
@@ -24,6 +25,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         # components
         self.xdpy = XwarePy(self) # setup Webkit Bridge
         self.xwaredpy = XwaredPy(self)
+        self.etmpy = EtmPy(self)
 
         # UI
         self.setupUi(self)

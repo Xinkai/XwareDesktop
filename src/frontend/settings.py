@@ -89,6 +89,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
         # Mounts
         self.setupMounts()
 
+        # backend setting is a different thing!
+        self.setupETM()
+
     @staticmethod
     def permissionCheck():
         import re
@@ -217,3 +220,26 @@ class SettingsDialog(QDialog, Ui_Dialog):
         return list(map(lambda row: self.table_mounts.item(row, 0).text(),
                         range(self.table_mounts.rowCount())))
 
+    @pyqtSlot()
+    def setupETM(self):
+        # connect signals
+        self.accepted.connect(self.saveETM)
+
+        etmpy = self.mainWin.etmpy
+        etmSettings = etmpy.getSettings()
+
+        # fill values
+        self.lineEdit_rcport.setText(str(self.mainWin.etmpy.rcport))
+        self.spinBox_dSpeedLimit.setValue(etmSettings.dLimit)
+        self.spinBox_uSpeedLimit.setValue(etmSettings.uLimit)
+        self.spinBox_maxRunningTasksNum.setValue(etmSettings.maxRunningTasksNum)
+
+    @pyqtSlot()
+    def saveETM(self):
+        import etmpy
+
+        newsettings = etmpy.EtmSetting(dLimit = self.spinBox_dSpeedLimit.value(),
+                                       uLimit = self.spinBox_uSpeedLimit.value(),
+                                       maxRunningTasksNum = self.spinBox_maxRunningTasksNum.value())
+
+        self.mainWin.etmpy.saveSettings(newsettings)

@@ -65,7 +65,7 @@
          <rect>
           <x>10</x>
           <y>30</y>
-          <width>256</width>
+          <width>311</width>
           <height>86</height>
          </rect>
         </property>
@@ -396,7 +396,7 @@
      </widget>
      <widget class="QWidget" name="tab_backend">
       <property name="enabled">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <attribute name="title">
        <string>后端</string>
@@ -412,15 +412,19 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="1" column="0">
-         <widget class="QSpinBox" name="spinBox"/>
+         <widget class="QSpinBox" name="spinBox_maxRunningTasksNum">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+         </widget>
         </item>
         <item row="0" column="0">
-         <widget class="QLabel" name="label_numMaxRunningTasks">
+         <widget class="QLabel" name="label_maxRunningTasksNum">
           <property name="text">
            <string>最多可同时下载任务数</string>
           </property>
           <property name="buddy">
-           <cstring>spinBox</cstring>
+           <cstring>spinBox_maxRunningTasksNum</cstring>
           </property>
          </widget>
         </item>
@@ -430,7 +434,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>70</y>
+         <y>190</y>
          <width>241</width>
          <height>50</height>
         </rect>
@@ -438,6 +442,9 @@
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
          <widget class="QLabel" name="label_defaultDownloadPath">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>默认下载路径</string>
           </property>
@@ -448,8 +455,128 @@
         </item>
         <item>
          <widget class="QLineEdit" name="lineEdit_defaultDownloadPath">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="placeholderText">
            <string>填写使用&quot;/&quot;作为分隔符的 Windows 路径</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>130</y>
+         <width>181</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_uSpeedLimit">
+          <property name="text">
+           <string>上传限速</string>
+          </property>
+          <property name="buddy">
+           <cstring>spinBox_uSpeedLimit</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBox_uSpeedLimit">
+          <property name="toolTip">
+           <string>无限制设置为-1</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+          <property name="singleStep">
+           <number>5</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>181</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <widget class="QLabel" name="label_dSpeedLimit">
+          <property name="text">
+           <string>下载限速</string>
+          </property>
+          <property name="buddy">
+           <cstring>spinBox_dSpeedLimit</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBox_dSpeedLimit">
+          <property name="toolTip">
+           <string>无限制设置为-1</string>
+          </property>
+          <property name="minimum">
+           <number>-1</number>
+          </property>
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+          <property name="singleStep">
+           <number>10</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>730</x>
+         <y>10</y>
+         <width>164</width>
+         <height>27</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_rcport">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>控制端口</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::PlainText</enum>
+          </property>
+          <property name="buddy">
+           <cstring>lineEdit_rcport</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="lineEdit_rcport">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="maxLength">
+           <number>5</number>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
