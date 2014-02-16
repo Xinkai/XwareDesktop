@@ -6,7 +6,7 @@ pkgname="xware_desktop-git"
 pkgver="20140216"
 arch=("i686" "x86_64")
 conflicts=("xware_desktop")
-pkgrel=1
+pkgrel=2
 license=("GPL" "custom")
 
 makedepends=("git" "python-pyqt5" "coffee-script")
