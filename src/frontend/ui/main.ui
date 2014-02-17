@@ -103,7 +103,7 @@
    <addaction name="menu_backend"/>
    <addaction name="menu_2"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar">
+  <widget class="QStatusBar" name="statusBar_main">
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
@@ -117,6 +117,9 @@
    </property>
   </action>
   <action name="action_exit">
+   <property name="icon">
+    <iconset theme="application-exit"/>
+   </property>
    <property name="text">
     <string>退出</string>
    </property>
@@ -148,6 +151,10 @@
    </property>
   </action>
   <action name="action_refreshPage">
+   <property name="icon">
+    <iconset resource="rc/resource.qrc">
+     <normaloff>:/image/refresh.png</normaloff>:/image/refresh.png</iconset>
+   </property>
    <property name="text">
     <string>刷新页面</string>
    </property>

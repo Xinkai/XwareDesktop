@@ -1,5 +1,14 @@
 <RCC>
   <qresource prefix="image">
+    <file>attention.png</file>
+    <file>check.png</file>
+    <file>connected.png</file>
+    <file>clock.png</file>
+    <file>plus.png</file>
+    <file>refresh.png</file>
+    <file>up.png</file>
+    <file>down.png</file>
+    <file>disconnect.png</file>
     <file>thunder.ico</file>
   </qresource>
 </RCC>

@@ -372,6 +372,11 @@
           <property name="text">
            <string>添加</string>
           </property>
+          <property name="icon">
+           <iconset theme="list-add">
+            <normaloff/>
+           </iconset>
+          </property>
          </widget>
         </item>
         <item>
@@ -381,6 +386,11 @@
           </property>
           <property name="text">
            <string>删除</string>
+          </property>
+          <property name="icon">
+           <iconset theme="list-remove">
+            <normaloff/>
+           </iconset>
           </property>
          </widget>
         </item>
@@ -465,7 +475,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -503,7 +513,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -541,7 +551,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>730</x>
@@ -552,7 +562,7 @@
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QLabel" name="label_rcport">
+         <widget class="QLabel" name="label_lcport">
           <property name="enabled">
            <bool>false</bool>
           </property>
@@ -563,12 +573,12 @@
            <enum>Qt::PlainText</enum>
           </property>
           <property name="buddy">
-           <cstring>lineEdit_rcport</cstring>
+           <cstring>lineEdit_lcport</cstring>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_rcport">
+         <widget class="QLineEdit" name="lineEdit_lcport">
           <property name="enabled">
            <bool>false</bool>
           </property>

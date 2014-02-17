@@ -229,7 +229,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         etmSettings = etmpy.getSettings()
 
         # fill values
-        self.lineEdit_rcport.setText(str(self.mainWin.etmpy.rcport))
+        self.lineEdit_lcport.setText(str(self.mainWin.etmpy.lcport))
         self.spinBox_dSpeedLimit.setValue(etmSettings.dLimit)
         self.spinBox_uSpeedLimit.setValue(etmSettings.uLimit)
         self.spinBox_maxRunningTasksNum.setValue(etmSettings.maxRunningTasksNum)

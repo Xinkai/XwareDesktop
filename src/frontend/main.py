@@ -2,6 +2,7 @@
 
 from PyQt5.QtCore import QUrl, pyqtSignal, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QLabel
+from PyQt5.Qt import Qt
 from ui_main import Ui_MainWindow
 from systemtray import Ui_SystemTray
 from xwaredpy import XwaredPy
@@ -82,26 +83,41 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.action_ETMstop.triggered.connect(self.xwaredpy.slotStopETM)
         self.action_ETMrestart.triggered.connect(self.xwaredpy.slotRestartETM)
 
-        self.xwaredpy.sigXwaredStatusChanged.connect(self.slotXwaredStatusChanged)
-        self.xwaredpy.sigETMStatusChanged.connect(self.slotETMStatusChanged)
-
         self.action_showAbout.triggered.connect(self.slotShowAbout)
 
     def setupStatusBar(self):
-        ETMstatus = QLabel(self.statusBar)
-        ETMstatus.setObjectName("label_ETMstatus")
-        ETMstatus.setText("<font color=''></font>")
-        self.statusBar.ETMstatus = ETMstatus
-        self.statusBar.addPermanentWidget(ETMstatus)
-        del ETMstatus
-
-        xwaredStatus = QLabel(self.statusBar)
+        xwaredStatus = QLabel(self.statusBar_main)
         xwaredStatus.setObjectName("label_xwaredStatus")
         xwaredStatus.setText("<font color=''></font>")
-        self.statusBar.xwaredStatus = xwaredStatus
-        self.statusBar.addPermanentWidget(xwaredStatus)
+        self.statusBar_main.xwaredStatus = xwaredStatus
+        self.statusBar_main.addPermanentWidget(xwaredStatus)
         del xwaredStatus
 
+        ETMstatus = QLabel(self.statusBar_main)
+        ETMstatus.setObjectName("label_ETMstatus")
+        ETMstatus.setText("<font color=''></font>")
+        self.statusBar_main.ETMstatus = ETMstatus
+        self.statusBar_main.addPermanentWidget(ETMstatus, 1)
+        del ETMstatus
+
+        dlStatus = QLabel(self.statusBar_main)
+        dlStatus.setObjectName("label_dlStatus")
+        dlStatus.setTextFormat(Qt.RichText)
+        self.statusBar_main.dlStatus = dlStatus
+        self.statusBar_main.addPermanentWidget(dlStatus)
+        del dlStatus
+
+        ulStatus = QLabel(self.statusBar_main)
+        ulStatus.setObjectName("label_ulStatus")
+        ulStatus.setTextFormat(Qt.RichText)
+        self.statusBar_main.ulStatus = ulStatus
+        self.statusBar_main.addPermanentWidget(ulStatus)
+        del ulStatus
+
+        self.xwaredpy.sigXwaredStatusChanged.connect(self.slotXwaredStatusChanged)
+        self.xwaredpy.sigETMStatusChanged.connect(self.slotETMStatusChanged)
+        self.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
+        self.etmpy.sigTasksSummaryUpdated[dict].connect(self.slotTasksSummaryUpdated)
 
     # shorthand
     @property
@@ -183,9 +199,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
     def slotXwaredStatusChanged(self, enabled):
         self.menu_backend.setEnabled(enabled)
         if enabled:
-            self.statusBar.xwaredStatus.setText("<font color='green'>xwared运行中</font>")
+            self.statusBar_main.xwaredStatus.setText(
+                "<img src=':/image/check.png' width=14 height=14><font color='green'>xwared</font>")
+            self.statusBar_main.xwaredStatus.setToolTip("xwared运行中")
         else:
-            self.statusBar.xwaredStatus.setText("<font color='red'>xwared未启动</font>")
+            self.statusBar_main.xwaredStatus.setText(
+                "<img src=':/image/attention.png' width=14 height=14><font color='red'>xwared</font>")
+            self.statusBar_main.xwaredStatus.setToolTip("xwared未启动")
 
     @pyqtSlot(bool)
     def slotETMStatusChanged(self, enabled):
@@ -194,9 +214,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.action_ETMrestart.setEnabled(enabled)
 
         if enabled:
-            self.statusBar.ETMstatus.setText("<font color='green'>ETM运行中</font>")
+            self.statusBar_main.ETMstatus.setText(
+                "<img src=':/image/check.png' width=14 height=14><font color='green'>ETM</font>")
+            self.statusBar_main.ETMstatus.setToolTip("ETM运行中")
         else:
-            self.statusBar.ETMstatus.setText("<font color='red'>ETM未启动</font>")
+            self.statusBar_main.ETMstatus.setText(
+                "<img src=':/image/attention.png' width=14 height=14><font color='red'>ETM</font>")
+            self.statusBar_main.ETMstatus.setToolTip("ETM未启动")
 
     @pyqtSlot()
     def slotShowAbout(self):
@@ -205,4 +229,25 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.aboutDialog.exec()
         del self.aboutDialog
 
+    @pyqtSlot(bool)
+    @pyqtSlot(dict)
+    def slotTasksSummaryUpdated(self, summary):
+        import misc
+        if not summary:
+            self.statusBar_main.dlStatus.setText(
+                "<img src=':/image/down.png' height=14 width=14>获取下载状态失败"
+            )
+            self.statusBar_main.dlStatus.setToolTip("")
+            self.statusBar_main.ulStatus.setText(
+                "<img src=':/image/up.png' height=14 width=14>获取上传状态失败"
+            )
+            return
+
+        self.statusBar_main.dlStatus.setText(
+            "<img src=':/image/down.png' height=14 width=14>{}/s".format(
+                                        misc.getHumanBytesNumber(summary["dlSpeed"])))
+        self.statusBar_main.dlStatus.setToolTip("{}任务下载中".format(summary["dlNum"]))
+        self.statusBar_main.ulStatus.setText(
+            "<img src=':/image/up.png' height=14 width=14>{}/s".format(misc.getHumanBytesNumber(summary["upSpeed"]))
+        )
 
