@@ -6,7 +6,8 @@ class XwareJS
         xdpy.sigLogin.connect(@, @slotLogin)
         xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
         xdpy.sigToggleFlashAvailability.connect(@, @slotToggleFlashAvailability)
-        @bindOpenFile()
+        @bindDblclick()
+        @bindContextMenu()
         @bindSaveCredentials()
         xdpy.xdjsLoaded()
 
@@ -20,7 +21,6 @@ class XwareJS
             interval_id = setInterval(
                 () ->
                     if (Login.login.username is $username.val()) and (Login.login.verifyCode?.length > 0)
-                        xdpy.log "tried to click"
                         $("#login-button").click()
                         clearInterval interval_id
                 , 1000)
@@ -42,7 +42,7 @@ class XwareJS
             password = $password.val()
             xdpy.saveCredentials(username, password)
 
-    bindOpenFile: () ->
+    bindDblclick: () ->
         $("#task-list").on "dblclick", "div.rw_unit", (event) ->
             tid = $(@).attr("data-tid")
             task = Data.task.all[tid]
@@ -51,6 +51,24 @@ class XwareJS
                 event.preventDefault()
                 event.stopImmediatePropagation()
                 event.stopPropagation()
+
+    bindContextMenu: () ->
+        $("#task-list").on "contextmenu", "div.rw_unit", (event) ->
+            tid = $(@).attr("data-tid")
+            task = Data.task.all[tid]
+
+            $openDir = $("<li><a href='javascript:void(0)'>打开所在文件夹</a></li>")
+            $openDir.on "click", () ->
+                xdpy.systemOpen(task.path)
+
+            $cmenu = $("div#cmenu.flo_wrap > ul.flo_ul")
+            $cmenu.prepend($openDir)
+
+            if task.stateText is "已完成"
+                $open = $("<li><a href='javascript:void(0)'>打开</a></li>")
+                $open.on "click", () ->
+                    xdpy.systemOpen(task.path + task.name)
+                $cmenu.prepend($open)
 
     slotCreateTasks: (tasks) ->
         App.set("dialogs.createTask.show", true)
