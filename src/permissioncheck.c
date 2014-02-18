@@ -12,8 +12,8 @@
 
 #define NOSTYLE       "\033[0m"
 #define BOLD          "\033[1;38m"
-#define RED            "\033[0;31m"
-#define GREEN       "\033[0;32m"
+#define RED           "\033[0;31m"
+#define GREEN         "\033[0;32m"
 
 // global variables
 const char* PROBENAME = "XwareDesktopPermissionProbe";
