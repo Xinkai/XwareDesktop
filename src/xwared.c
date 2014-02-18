@@ -66,15 +66,16 @@ void* threadListener() {
             exit(EXIT_FAILURE);
         }
 
-        char buffer[SOCKET_BUFFER_LENGTH];
-        if (read(sdAccept, &buffer, SOCKET_BUFFER_LENGTH) == -1) {
+        char* buffer;
+        buffer = malloc(sizeof(char) * SOCKET_BUFFER_LENGTH);
+        if (read(sdAccept, buffer, SOCKET_BUFFER_LENGTH) == -1) {
             perror("read failed");
         }
 
         // dispatch
-        if (strncmp(ETM_STOP, &buffer, SOCKET_BUFFER_LENGTH) == 0) {
+        if (strncmp(ETM_STOP, buffer, SOCKET_BUFFER_LENGTH) == 0) {
             endETM(0);
-        } else if (strncmp(&buffer, ETM_START, SOCKET_BUFFER_LENGTH) == 0){
+        } else if (strncmp(buffer, ETM_START, SOCKET_BUFFER_LENGTH) == 0){
             pthread_mutex_lock(&etmMutex);
             if (etmPid != -1) {
                 printf("ETM running, ignore ETM_START");
@@ -82,11 +83,12 @@ void* threadListener() {
                 toRunETM = 1;
             }
             pthread_mutex_unlock(&etmMutex);
-        } else if (strncmp(&buffer, ETM_RESTART, SOCKET_BUFFER_LENGTH) == 0) {
+        } else if (strncmp(buffer, ETM_RESTART, SOCKET_BUFFER_LENGTH) == 0) {
             endETM(1);
         } else {
-            printf("socket received the unknown: %s\n", &buffer);
+            printf("socket received the unknown: %s\n", buffer);
         }
+        free(buffer);
     }
 }
 
