@@ -94,6 +94,7 @@ class XwareJS
         maskon = false
         if not mask
             return
+        xdpy.slotMaskOnOffChanged(false)
 
         observer = new MutationObserver () ->
             maskon_new = "hidden" not in mask.classList
