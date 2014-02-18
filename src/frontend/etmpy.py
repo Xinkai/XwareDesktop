@@ -14,6 +14,7 @@ class EtmPy(QObject):
         super().__init__(mainWin)
         self.mainWin = mainWin
         self.lcport = int(self.readRawETMConfigFile("etm.cfg", "local_control.listen_port"))
+        self.peerid = self.readRawETMConfigFile("etm.cfg", "rc.peerid")
         self.t = threading.Thread(target = self.getCurrentTasksSummary, daemon = True)
         self.t.start()
 
