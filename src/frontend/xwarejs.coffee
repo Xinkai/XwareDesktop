@@ -9,6 +9,7 @@ class XwareJS
         @bindDblclick()
         @bindContextMenu()
         @bindSaveCredentials()
+        @bindMaskObserver()
         xdpy.xdjsLoaded()
 
     slotLogin: (username, password) ->
@@ -82,13 +83,35 @@ class XwareJS
         $createTaskUrl.get(0).focus()
         xdpy.requestFocus()
 
-
-
     slotToggleFlashAvailability: (available) ->
         App.set("system.flash", available)
 
     slotActivateDevice: () ->
         App.set("dialogs.addDownloader.show", true)
+
+    bindMaskObserver: () ->
+        mask = document.getElementById("mask")
+        maskon = false
+        if not mask
+            return
+
+        observer = new MutationObserver () ->
+            maskon_new = "hidden" not in mask.classList
+            if maskon_new isnt maskon
+                maskon = maskon_new
+                xdpy.slotMaskOnOffChanged(maskon)
+
+        observer.observe(mask, {
+            "childList": false
+            "attributes": true
+            "characterData": false
+            "subtree": false
+            "attributeOldValue": false
+            "characterDataOldValue": false
+            "aattributeFilter": ["class"]
+        })
+
+
 
 $ ->
     window.xdjs = new XwareJS()

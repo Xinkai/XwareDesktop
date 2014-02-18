@@ -9,14 +9,21 @@ class XwarePy(QObject):
     sigLogin = pyqtSignal(str, str)
     sigToggleFlashAvailability = pyqtSignal(bool)
     sigActivateDevice = pyqtSignal()
+    sigMaskOnOffChanged = pyqtSignal(bool)
 
     def __init__(self, window):
         super().__init__(window)
-        self.jsLoaded = False
         self.window = window
         self.window.settings.applySettings.connect(self.tryLogin)
+
+        self.page_maskon = None
+        self.page_device_online = None
+
+
         print("xdpy loaded")
 
+    ################################### SLOTS ######################################
+    @pyqtSlot()
     def tryLogin(self):
         autologin = self.window.settings.getbool("account", "autologin")
         if autologin:
@@ -28,12 +35,9 @@ class XwarePy(QObject):
                     self.window.settings.getbool("account", "autologin"):
                     self.sigLogin.emit(username, password)
 
-    ################################### SLOTS ######################################
     @pyqtSlot()
     def xdjsLoaded(self):
-        self.jsLoaded = True
         print("xdjs loaded")
-
         self.tryLogin()
 
     @pyqtSlot()
@@ -58,3 +62,9 @@ class XwarePy(QObject):
     @pyqtSlot(str)
     def log(self, *args):
         print("xdjs:", *args)
+
+    @pyqtSlot(bool)
+    def slotMaskOnOffChanged(self, val):
+        self.page_mask_on = val
+        self.sigMaskOnOffChanged.emit(val)
+
