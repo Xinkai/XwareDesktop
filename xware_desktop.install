@@ -14,8 +14,14 @@ post_install() {
     touch /opt/xware_desktop/settings.ini
     touch /opt/xware_desktop/mounts
 
-    chmod g+rw /opt/xware_desktop/settings.ini
-    chmod g+rw /opt/xware_desktop/mounts
+    chmod ug+rw /opt/xware_desktop/{settings.ini,mounts}
+    chmod -x    /opt/xware_desktop/{settings.ini,mounts}
+    chmod -x    /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+    chmod o-w   /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+
+    rm -rf          /opt/xware_desktop/frontend/__pycache__
+    mkdir -p -m 775 /opt/xware_desktop/frontend/__pycache__
+    chmod g+s        /opt/xware_desktop/frontend/__pycache__
 
     chown -R xware:xware /opt/xware_desktop
 
@@ -29,7 +35,6 @@ post_install() {
 
 post_upgrade() {
     post_install
-    rm -rf /opt/xware_desktop/frontend/__pycache__
 }
 
 post_remove() {

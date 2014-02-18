@@ -3,10 +3,10 @@ pkgdesc="An attempt to bring Xware (Xunlei on routers) to desktop Linux."
 url="http://www.cuoan.net/xware_desktop"
 
 pkgname="xware_desktop-git"
-pkgver="20140216"
+pkgver="20140218"
 arch=("i686" "x86_64")
 conflicts=("xware_desktop")
-pkgrel=2
+pkgrel=1
 license=("GPL" "custom")
 
 makedepends=("git" "python-pyqt5" "coffee-script")
@@ -46,31 +46,6 @@ build() {
 }
 
 package() {
-  # copy xware to /opt/xware_desktop/xware
-  install -D xware/ETMDaemon                 ${pkgdir}/opt/xware_desktop/xware/lib/ETMDaemon
-  install -D xware/EmbedThunderManager       ${pkgdir}/opt/xware_desktop/xware/lib/EmbedThunderManager
-  install -D xware/portal                    ${pkgdir}/opt/xware_desktop/xware/portal
-  
-  # copy libmounthelper
-  install -D build/libmounthelper.so         ${pkgdir}/opt/xware_desktop/libmounthelper.so
-  install -D build/permissioncheck           ${pkgdir}/opt/xware_desktop/permissioncheck
-  
-  # copy systemd service
-  install -D xwared.service                  ${pkgdir}/usr/lib/systemd/system/xwared.service
-
-  install -D build/xwared                    ${pkgdir}/opt/xware_desktop/xwared
-
-  # install frontend
-  cp -R frontend                             ${pkgdir}/opt/xware_desktop/frontend
-  rm -rf ${pkgdir}/opt/xware_desktop/frontend/__pycache__
-  rm -rf ${pkgdir}/opt/xware_desktop/frontend/ui
-  rm -f  ${pkgdir}/opt/xware_desktop/frontend/xwarejs.coffee
-  rm -f  ${pkgdir}/opt/xware_desktop/frontend/Makefile
-
-  # install desktop entry
-  install -D frontend/ui/rc/thunder.ico      ${pkgdir}/opt/xware_desktop/frontend/thunder.ico
-  install -D frontend/xware_desktop.desktop  ${pkgdir}/usr/share/applications/xware_desktop.desktop
-
-  chmod -R 775 ${pkgdir}/opt/xware_desktop
+  make DEST_DIR=$pkgdir install
 }
 
