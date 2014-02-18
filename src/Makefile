@@ -12,12 +12,13 @@ libmounthelper.so: libmounthelper.c
 	$(CC) $(FLAGS) -m32 -o build/libmounthelper.so -fPIC -shared -ldl libmounthelper.c
 
 xwared: xwared.c xwared.h
-	$(CC) $(FLAGS) -m32 `pkg-config --cflags --libs glib-2.0` -o build/xwared -pthread \
-	    xwared.c -Xlinker `pkg-config --cflags --libs glib-2.0`
+	$(CC) $(FLAGS) -m32 `pkg-config --cflags --libs glib-2.0` -o build/xwared -pthread xwared.c \
+	    -Xlinker `pkg-config --cflags --libs glib-2.0`
 
 permissioncheck: permissioncheck.c
 	mkdir -p build
-	$(CC) $(FLAGS) -lmount -o build/permissioncheck permissioncheck.c
+	$(CC) $(FLAGS) -lmount -o build/permissioncheck permissioncheck.c \
+	    -Xlinker -lmount
 
 clean:
 	rm -rf build
