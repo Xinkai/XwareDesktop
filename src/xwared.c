@@ -66,8 +66,10 @@ void* threadListener() {
             exit(EXIT_FAILURE);
         }
 
-        char buffer;
-        read(sdAccept, &buffer, SOCKET_BUFFER_LENGTH);
+        char buffer[SOCKET_BUFFER_LENGTH];
+        if (read(sdAccept, &buffer, SOCKET_BUFFER_LENGTH) == -1) {
+            perror("read failed");
+        }
 
         // dispatch
         if (strncmp(ETM_STOP, &buffer, SOCKET_BUFFER_LENGTH) == 0) {
@@ -180,7 +182,10 @@ void hookLibmounthelper() {
 int main(const int argc, const char* argv[]) {
     setbuf(stdout, NULL);
     setbuf(stderr, NULL);
-    chdir(etmWorkingDir);
+    if (chdir(etmWorkingDir) == -1) {
+        perror("chdir");
+        exit(EXIT_FAILURE);
+    }
     umask(006);
     cleanPreviousRun();
     registerSignalHandlers();
