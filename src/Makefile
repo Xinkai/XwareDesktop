@@ -37,8 +37,11 @@ install: all
 	$(install_exe) build/* $(DEST_DIR)$(PREFIX)
 
 	cp -R frontend $(DEST_DIR)$(PREFIX)
-	rm -rf         $(DEST_DIR)$(PREFIX)/frontend/{__pycache__,ui,xwarejs.coffee,Makefile}
-	chmod -R 664   $(DEST_DIR)$(PREFIX)/frontend/*
+	rm -rf         $(DEST_DIR)$(PREFIX)/frontend/__pycache__
+	rm -rf         $(DEST_DIR)$(PREFIX)/frontend/ui
+	rm -f          $(DEST_DIR)$(PREFIX)/frontend/xwarejs.coffee
+	rm -f          $(DEST_DIR)$(PREFIX)/frontend/Makefile
+	chmod 664      $(DEST_DIR)$(PREFIX)/frontend/*
 	chmod +x       $(DEST_DIR)$(PREFIX)/frontend/launcher.py
 
 	install -D     xwared.service                   $(DEST_DIR)/usr/lib/systemd/system/xwared.service
