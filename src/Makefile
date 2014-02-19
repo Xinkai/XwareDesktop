@@ -30,9 +30,9 @@ install: all
 	install -d -m 775                               $(DEST_DIR)$(PREFIX)/xware/lib
 	install -d -m 775                               $(DEST_DIR)$(PREFIX)/frontend
 
-	$(install_exe) -D ../xware/ETMDaemon            $(DEST_DIR)$(PREFIX)/xware/lib/ETMDaemon
-	$(install_exe) -D ../xware/EmbedThunderManager  $(DEST_DIR)$(PREFIX)/xware/lib/EmbedThunderManager
-	$(install_exe) ../xware/portal                  $(DEST_DIR)$(PREFIX)/xware/portal
+	$(install_exe) -D ./xware/ETMDaemon             $(DEST_DIR)$(PREFIX)/xware/lib/ETMDaemon
+	$(install_exe) -D ./xware/EmbedThunderManager   $(DEST_DIR)$(PREFIX)/xware/lib/EmbedThunderManager
+	$(install_exe) ./xware/portal                   $(DEST_DIR)$(PREFIX)/xware/portal
 
 	$(install_exe) build/* $(DEST_DIR)$(PREFIX)
 
