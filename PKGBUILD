@@ -46,6 +46,6 @@ build() {
 }
 
 package() {
-  make DEST_DIR=$pkgdir install
+  make DEST_DIR=${pkgdir} install
 }
 

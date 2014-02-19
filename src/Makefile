@@ -13,7 +13,7 @@ libmounthelper.so: libmounthelper.c
 
 xwared: xwared.c xwared.h
 	$(CC) $(FLAGS) -m32 `pkg-config --cflags --libs glib-2.0` -o build/xwared -pthread xwared.c \
-	    -Xlinker `pkg-config --cflags --libs glib-2.0`
+	    -Xlinker -lglib-2.0
 
 permissioncheck: permissioncheck.c
 	mkdir -p build
