@@ -1,12 +1,13 @@
 
 pkgdesc="An attempt to bring Xware (Xunlei on routers) to desktop Linux."
 url="http://www.cuoan.net/xware_desktop"
+_reponame="XwareDesktop"
 
 pkgname="xware_desktop-git"
-pkgver="20140219"
+pkgver="20140220"
 arch=("i686" "x86_64")
 conflicts=("xware_desktop")
-pkgrel=4
+pkgrel=1
 license=("GPL" "custom")
 
 makedepends=("git" "python-pyqt5" "coffee-script")
@@ -26,26 +27,22 @@ fi
 if [ ! -f .localdev ]; then
     source=("git+https://github.com/Xinkai/XwareDesktop.git")
     md5sums=('SKIP')
+    _local=1
 fi
 
 install=xware_desktop.install
 
-prepare() {
-  if [ ! -f ${srcdir}/../.localdev ]; then
-    cp -R ${srcdir}/XwareDesktop/src/* ${srcdir}
-    mkdir -p ${srcdir}/xware
-    cp -R ${srcdir}/XwareDesktop/xware/* ${srcdir}/xware
-    rm -rf ${srcdir}/XwareDesktop
-  else
-    ln -sf ${srcdir}/../xware ${srcdir}
-  fi
-}
-
 build() {
-  make all
+    if test $_local; then
+        cd ${_reponame}/src
+    fi
+    make all
 }
 
 package() {
-  make DEST_DIR=${pkgdir} install
+    if test $_local; then
+        cd ${_reponame}/src
+    fi
+    make DEST_DIR=${pkgdir} install
 }
 
