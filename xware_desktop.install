@@ -13,6 +13,8 @@ post_install() {
 
     touch /opt/xware_desktop/settings.ini
     touch /opt/xware_desktop/mounts
+    mkdir -p /opt/xware_desktop/xware/cfg
+    touch /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
 
     chmod ug+rw /opt/xware_desktop/{settings.ini,mounts}
     chmod -x    /opt/xware_desktop/{settings.ini,mounts}
