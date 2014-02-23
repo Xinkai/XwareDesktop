@@ -231,13 +231,20 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.accepted.connect(self.saveETM)
 
         etmpy = self.mainWin.etmpy
-        etmSettings = etmpy.getSettings()
 
         # fill values
-        self.lineEdit_lcport.setText(str(self.mainWin.etmpy.lcport))
-        self.spinBox_dSpeedLimit.setValue(etmSettings.dLimit)
-        self.spinBox_uSpeedLimit.setValue(etmSettings.uLimit)
-        self.spinBox_maxRunningTasksNum.setValue(etmSettings.maxRunningTasksNum)
+        if etmpy.lcport:
+            self.lineEdit_lcport.setText(str(etmpy.lcport))
+
+        etmSettings = etmpy.getSettings()
+        if etmSettings:
+            self.spinBox_dSpeedLimit.setValue(etmSettings.dLimit)
+            self.spinBox_uSpeedLimit.setValue(etmSettings.uLimit)
+            self.spinBox_maxRunningTasksNum.setValue(etmSettings.maxRunningTasksNum)
+        else:
+            self.spinBox_dSpeedLimit.setEnabled(False)
+            self.spinBox_uSpeedLimit.setEnabled(False)
+            self.spinBox_maxRunningTasksNum.setEnabled(False)
 
     @pyqtSlot()
     def saveETM(self):

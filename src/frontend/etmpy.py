@@ -13,7 +13,13 @@ class EtmPy(QObject):
     def __init__(self, app):
         super().__init__(app)
         self.app = app
-        self.lcport = int(self.readRawETMConfigFile("etm.cfg", "local_control.listen_port"))
+
+        lcport = self.readRawETMConfigFile("etm.cfg", "local_control.listen_port")
+        try:
+            self.lcport = int(lcport)
+        except ValueError:
+            self.lcport = None
+
         self.peerid = self.readRawETMConfigFile("etm.cfg", "rc.peerid")
         self.t = threading.Thread(target = self.getCurrentTasksSummary, daemon = True)
         self.t.start()
@@ -23,14 +29,18 @@ class EtmPy(QObject):
         return "http://127.0.0.1:{0}/".format(self.lcport)
 
     def getSettings(self):
-        req = requests.get(self.lcontrol + "getspeedlimit")
-        limits = req.json()[1:] # not sure about what first element means, ignore for now
+        from requests.exceptions import ConnectionError
+        try:
+            req = requests.get(self.lcontrol + "getspeedlimit")
+            limits = req.json()[1:] # not sure about what first element means, ignore for now
 
-        req = requests.get(self.lcontrol + "getrunningtaskslimit")
-        maxRunningTasksNum = req.json()[1]
+            req = requests.get(self.lcontrol + "getrunningtaskslimit")
+            maxRunningTasksNum = req.json()[1]
 
-        return EtmSetting(dLimit = limits[0], uLimit = limits[1],
-                          maxRunningTasksNum = maxRunningTasksNum)
+            return EtmSetting(dLimit = limits[0], uLimit = limits[1],
+                              maxRunningTasksNum = maxRunningTasksNum)
+        except ConnectionError:
+            return False
 
     def saveSettings(self, newsettings):
         requests.post(self.lcontrol + \
@@ -59,7 +69,7 @@ class EtmPy(QObject):
             v = line[(eq+1):]
             pairs[k] = v
 
-        return pairs[key]
+        return pairs.get(key, None)
 
     def getActivationStatus(self):
         req = requests.get(self.lcontrol + "getsysinfo")
