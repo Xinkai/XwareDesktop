@@ -2,22 +2,31 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
-import main, constants
+import main, constants, settings
+from xwaredpy import XwaredPy
+from etmpy import EtmPy
+import mounts
 
 log = print
 
 class XwareDesktop(QApplication):
+    sigFrontendUiSetupFinished = pyqtSignal()
+
     def __init__(self, *args):
         super().__init__(*args)
-        import settings
         self.settings = settings.SettingsAccessor()
         self.lastWindowClosed.connect(self.cleanUp)
 
-        self.mainWindow = main.MainWindow(self)
+        # components
+        self.xwaredpy = XwaredPy(self)
+        self.etmpy = EtmPy(self)
+        self.mountsFaker = mounts.MountsFaker()
+
+        self.mainWin = main.MainWindow(self)
         self.checkUsergroup()
-        self.mainWindow.show()
+        self.mainWin.show()
 
     def checkUsergroup(self):
         from PyQt5.QtWidgets import QMessageBox
@@ -36,7 +45,7 @@ class XwareDesktop(QApplication):
 
     @pyqtSlot()
     def cleanUp(self):
-        self.mainWindow.xwaredpy.stopXware()
+        self.xwaredpy.stopXware()
         print("cleanup")
 
 if __name__ == "__main__":

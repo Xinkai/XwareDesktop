@@ -62,7 +62,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
     def __init__(self, parent):
         super().__init__(parent)
         self.mainWin = parent
-        self.settings = self.mainWin.settings # shorthand
         self.setupUi(self)
 
         self.lineEdit_loginUsername.setText(self.settings.get("account", "username"))
@@ -91,6 +90,12 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         # backend setting is a different thing!
         self.setupETM()
+
+    # shorthand
+    @property
+    def settings(self):
+        return self.mainWin.settings
+    # shorthand ends
 
     @staticmethod
     def permissionCheck():

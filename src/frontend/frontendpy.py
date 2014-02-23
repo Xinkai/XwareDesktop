@@ -4,35 +4,35 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl
 import constants
 
 # Together with xwarejs.js, exchange information with the browser
-class XwarePy(QObject):
+class FrontendPy(QObject):
     sigCreateTasks = pyqtSignal("QStringList")
     sigLogin = pyqtSignal(str, str)
     sigToggleFlashAvailability = pyqtSignal(bool)
     sigActivateDevice = pyqtSignal()
     sigMaskOnOffChanged = pyqtSignal(bool)
 
-    def __init__(self, window):
-        super().__init__(window)
-        self.window = window
-        self.window.settings.applySettings.connect(self.tryLogin)
+    def __init__(self, mainWin):
+        super().__init__(mainWin)
+        self.mainWin = mainWin
+        self.mainWin.settings.applySettings.connect(self.tryLogin)
 
         self.page_maskon = None
         self.page_device_online = None
 
 
-        print("xdpy loaded")
+        print("frontendpy loaded")
 
     ################################### SLOTS ######################################
     @pyqtSlot()
     def tryLogin(self):
-        autologin = self.window.settings.getbool("account", "autologin")
+        autologin = self.mainWin.settings.getbool("account", "autologin")
         if autologin:
-            username = self.window.settings.get("account", "username")
-            password = self.window.settings.get("account", "password")
+            username = self.mainWin.settings.get("account", "username")
+            password = self.mainWin.settings.get("account", "password")
             if username and password:
                 from urllib import parse
-                if parse.urldefrag(self.window.url)[0] == constants.LOGIN_PAGE and \
-                    self.window.settings.getbool("account", "autologin"):
+                if parse.urldefrag(self.mainWin.url)[0] == constants.LOGIN_PAGE and \
+                    self.mainWin.settings.getbool("account", "autologin"):
                     self.sigLogin.emit(username, password)
 
     @pyqtSlot()
@@ -42,22 +42,22 @@ class XwarePy(QObject):
 
     @pyqtSlot()
     def requestFocus(self):
-        self.window.frame.setFocus()
+        self.mainWin.frame.setFocus()
 
     @pyqtSlot(str)
     def systemOpen(self, url):
         from PyQt5.QtGui import QDesktopServices
-        url = self.window.mountsFaker.convertToNativePath(url)
+        url = self.mainWin.mountsFaker.convertToNativePath(url)
         qurl = QUrl(url)
         qurl.setScheme("file")
         QDesktopServices.openUrl(qurl)
 
     @pyqtSlot(str, str)
     def saveCredentials(self, username, password):
-        self.window.settings.set("account", "username", username)
-        self.window.settings.set("account", "password", password)
-        self.window.settings.setbool("account", "autologin", True)
-        self.window.settings.save()
+        self.mainWin.settings.set("account", "username", username)
+        self.mainWin.settings.set("account", "password", password)
+        self.mainWin.settings.setbool("account", "autologin", True)
+        self.mainWin.settings.save()
 
     @pyqtSlot(str)
     def log(self, *args):

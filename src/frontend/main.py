@@ -1,42 +1,31 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import QUrl, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QUrl, pyqtSlot
 from PyQt5.QtWidgets import QMainWindow, QLabel
 from PyQt5.Qt import Qt
 from ui_main import Ui_MainWindow
 from systemtray import Ui_SystemTray
-from xwaredpy import XwaredPy
-from xwarepy import XwarePy
-from etmpy import EtmPy
+from frontendpy import FrontendPy
 import constants
-import mounts
 import ipc
 
 log = print
 
 class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
-    UiSetupFinished = pyqtSignal()
-
     def __init__(self, app):
         super().__init__()
-        ipc.FrontendCommunicationListener(self)
         self.app = app
-        self.settings = self.app.settings
+        ipc.FrontendCommunicationListener(self)
 
-        # components
-        self.xdpy = XwarePy(self) # setup Webkit Bridge
-        self.xwaredpy = XwaredPy(self)
-        self.etmpy = EtmPy(self)
-
+        self.frontendpy = FrontendPy(self) # setup Webkit Bridge
         # UI
         self.setupUi(self)
         self.setupSystray()
         self.setupStatusBar()
         self.connectUI()
-        self.UiSetupFinished.emit()
+        self.app.sigFrontendUiSetupFinished.emit()
 
         self.setupWebkit()
-        self.mountsFaker = mounts.MountsFaker()
 
         # Load settings
         self.settings.applySettings.emit()
@@ -67,7 +56,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
 
         allowed = self.settings.getbool("frontend", "allowflash")
         self.webView.settings().setAttribute(QWebSettings.PluginsEnabled, allowed)
-        self.xdpy.sigToggleFlashAvailability.emit(allowed)
+        self.frontendpy.sigToggleFlashAvailability.emit(allowed)
 
 
     def connectUI(self):
@@ -77,7 +66,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
 
         self.action_createTask.triggered.connect(self.slotPrepareTasksCreation)
         self.action_refreshPage.triggered.connect(self.slotRefreshPage)
-        self.action_activateDevice.triggered.connect(lambda: self.xdpy.sigActivateDevice.emit())
+        self.action_activateDevice.triggered.connect(lambda: self.frontendpy.sigActivateDevice.emit())
 
         self.action_ETMstart.triggered.connect(self.xwaredpy.slotStartETM)
         self.action_ETMstop.triggered.connect(self.xwaredpy.slotStopETM)
@@ -135,23 +124,39 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
     @property
     def url(self):
         return self.qurl.url()
+
+    @property
+    def settings(self):
+        return self.app.settings
+
+    @property
+    def xwaredpy(self):
+        return self.app.xwaredpy
+
+    @property
+    def etmpy(self):
+        return self.app.etmpy
+
+    @property
+    def mountsFaker(self):
+        return self.app.mountsFaker
     # shorthand ends
 
     @pyqtSlot()
     def slotAddJSObject(self):
-        self.frame.addToJavaScriptWindowObject("xdpy", self.xdpy)
+        self.frame.addToJavaScriptWindowObject("xdpy", self.frontendpy)
 
     @pyqtSlot()
     @pyqtSlot(str)
     @pyqtSlot(list)
     def slotPrepareTasksCreation(self, tasks = None):
         if tasks is None:
-            self.xdpy.sigCreateTasks.emit([""])
+            self.frontendpy.sigCreateTasks.emit([""])
         else:
             if type(tasks) is str:
-                self.xdpy.sigCreateTasks.emit([tasks])
+                self.frontendpy.sigCreateTasks.emit([tasks])
             else:
-                self.xdpy.sigCreateTasks.emit(tasks)
+                self.frontendpy.sigCreateTasks.emit(tasks)
 
     @pyqtSlot()
     def slotUrlChanged(self):
