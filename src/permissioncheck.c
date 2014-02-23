@@ -130,6 +130,9 @@ void prepare() {
     if (strcmp(usrInfo->pw_name, "xware") == 0) {
         xware_uid = usrInfo->pw_uid;
         xware_gid = usrInfo->pw_gid;
+    } else {
+        fprintf(stderr, "User 'xware' not found.\n");
+        exit(EXIT_FAILURE);
     }
 }
 
