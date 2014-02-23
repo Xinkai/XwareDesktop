@@ -17,7 +17,7 @@ class EtmPy(QObject):
         lcport = self.readRawETMConfigFile("etm.cfg", "local_control.listen_port")
         try:
             self.lcport = int(lcport)
-        except ValueError:
+        except (TypeError, ValueError):
             self.lcport = None
 
         self.peerid = self.readRawETMConfigFile("etm.cfg", "rc.peerid")

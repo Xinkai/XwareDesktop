@@ -4,7 +4,7 @@ url="http://www.cuoan.net/xware_desktop"
 _reponame="XwareDesktop"
 
 pkgname="xware_desktop-git"
-pkgver="20140223"
+pkgver="20140224"
 arch=("i686" "x86_64")
 conflicts=("xware_desktop")
 pkgrel=1
