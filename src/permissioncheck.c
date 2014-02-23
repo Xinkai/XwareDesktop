@@ -127,13 +127,12 @@ void selfCheck() {
 void prepare() {
     // get uid, gid of 'xware'
     struct passwd* usrInfo = getpwnam("xware");
-    if (strcmp(usrInfo->pw_name, "xware") == 0) {
-        xware_uid = usrInfo->pw_uid;
-        xware_gid = usrInfo->pw_gid;
-    } else {
-        fprintf(stderr, "User 'xware' not found.\n");
+    if (usrInfo == NULL) {
+        perror("getpwnam");
         exit(EXIT_FAILURE);
     }
+    xware_uid = usrInfo->pw_uid;
+    xware_gid = usrInfo->pw_gid;
 }
 
 
