@@ -10,9 +10,9 @@ EtmSetting = collections.namedtuple("EtmSetting", ["dLimit", "uLimit", "maxRunni
 class EtmPy(QObject):
     sigTasksSummaryUpdated = pyqtSignal([bool], [dict])
 
-    def __init__(self, mainWin):
-        super().__init__(mainWin)
-        self.mainWin = mainWin
+    def __init__(self, app):
+        super().__init__(app)
+        self.app = app
         self.lcport = int(self.readRawETMConfigFile("etm.cfg", "local_control.listen_port"))
         self.peerid = self.readRawETMConfigFile("etm.cfg", "rc.peerid")
         self.t = threading.Thread(target = self.getCurrentTasksSummary, daemon = True)
