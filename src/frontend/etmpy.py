@@ -60,3 +60,10 @@ class EtmPy(QObject):
             pairs[k] = v
 
         return pairs[key]
+
+    def getActivationStatus(self):
+        req = requests.get(self.lcontrol + "getsysinfo")
+        code = req.json()[4] # activation code if not activated, empty string if activated
+
+        if code:
+            raise NotImplementedError
