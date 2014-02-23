@@ -23,7 +23,7 @@ post_install() {
 
     rm -rf          /opt/xware_desktop/frontend/__pycache__
     mkdir -p -m 775 /opt/xware_desktop/frontend/__pycache__
-    chmod g+s        /opt/xware_desktop/frontend/__pycache__
+    chmod g+s       /opt/xware_desktop/frontend/__pycache__
 
     chown -R xware:xware /opt/xware_desktop
 
