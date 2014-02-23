@@ -227,9 +227,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot()
     def setupETM(self):
-        # connect signals
-        self.accepted.connect(self.saveETM)
-
         etmpy = self.mainWin.etmpy
 
         # fill values
@@ -241,6 +238,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
             self.spinBox_dSpeedLimit.setValue(etmSettings.dLimit)
             self.spinBox_uSpeedLimit.setValue(etmSettings.uLimit)
             self.spinBox_maxRunningTasksNum.setValue(etmSettings.maxRunningTasksNum)
+
+            # connect signals
+            self.accepted.connect(self.saveETM)
         else:
             self.spinBox_dSpeedLimit.setEnabled(False)
             self.spinBox_uSpeedLimit.setEnabled(False)
