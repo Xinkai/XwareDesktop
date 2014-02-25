@@ -28,6 +28,8 @@ def debounce(wait, instant_first = True):
                 debounced.t.cancel()
 
             debounced.t = Timer(wait, call)
+            debounced.t.daemon = True
+            debounced.t.name = "debounced {}".format(func.__name__)
             debounced.t.start()
         return debounced
     return debouncer

@@ -4,10 +4,10 @@ url="http://www.cuoan.net/xware_desktop"
 _reponame="XwareDesktop"
 
 pkgname="xware_desktop-git"
-pkgver="20140225"
+pkgver="20140226"
 arch=("i686" "x86_64")
 conflicts=("xware_desktop")
-pkgrel=2
+pkgrel=1
 license=("GPL" "custom")
 
 makedepends=("git" "python-pyqt5" "coffee-script")
