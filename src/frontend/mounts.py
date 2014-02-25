@@ -47,6 +47,8 @@ class MountsFaker(object):
         for path in self.mounts:
             buffer.append(produceLine(path))
 
+        buffer.append("")
+
         with open(constants.MOUNTS_FILE, "w") as mountFile:
             mountFile.writelines("\n".join(buffer))
 
