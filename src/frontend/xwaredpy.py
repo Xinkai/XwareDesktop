@@ -35,7 +35,8 @@ class XwaredPy(QObject):
             self.app.settings.save()
 
     def watch(self):
-        self.t = threading.Thread(target = self._watcherThread, daemon = True)
+        self.t = threading.Thread(target = self._watcherThread, daemon = True,
+                                  name = "xwared/etm watch thread")
         self.t.start()
 
     def _watcherThread(self):

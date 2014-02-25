@@ -12,7 +12,8 @@ class FrontendCommunicationListener(object):
             os.remove(constants.FRONTEND_SOCKET[0])
         except FileNotFoundError:
             pass
-        t = threading.Thread(target = self.startListenerThread, daemon = True)
+        t = threading.Thread(target = self.startListenerThread, daemon = True,
+                             name = "frontend communication listener")
         t.start()
 
     def startListenerThread(self):

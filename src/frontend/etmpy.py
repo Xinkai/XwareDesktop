@@ -26,12 +26,15 @@ class EtmPy(QObject):
         self.watchManager = pyinotify.WatchManager()
         self.notifier = pyinotify.ThreadedNotifier(self.watchManager,
                                                    self.dispatcher)
+        self.notifier.name = "etmpy inotifier"
+        self.notifier.daemon = True
         self.notifier.start()
         self.app.lastWindowClosed.connect(lambda: self.notifier.stop())
         self.onEtmCfgChanged()
         self.watchManager.add_watch(constants.ETM_CFG_DIR, pyinotify.ALL_EVENTS)
 
-        self.t = threading.Thread(target = self.getCurrentTasksSummary, daemon = True)
+        self.t = threading.Thread(target = self.getCurrentTasksSummary, daemon = True,
+                                  name = "tasks summary polling")
         self.t.start()
 
     @debounce(0.5, instant_first=True)
