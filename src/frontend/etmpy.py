@@ -4,6 +4,15 @@ from PyQt5.QtCore import QObject, pyqtSignal
 import threading, time
 import requests
 import collections
+import pyinotify
+from requests.exceptions import ConnectionError
+
+import constants
+from misc import debounce
+log = print
+
+class LocalCtrlNotAvailableError(BaseException):
+    pass
 
 EtmSetting = collections.namedtuple("EtmSetting", ["dLimit", "uLimit", "maxRunningTasksNum"])
 
@@ -14,22 +23,49 @@ class EtmPy(QObject):
         super().__init__(app)
         self.app = app
 
-        lcport = self.readRawETMConfigFile("etm.cfg", "local_control.listen_port")
-        try:
-            self.lcport = int(lcport)
-        except (TypeError, ValueError):
-            self.lcport = None
+        self.watchManager = pyinotify.WatchManager()
+        self.notifier = pyinotify.ThreadedNotifier(self.watchManager,
+                                                   self.dispatcher)
+        self.notifier.start()
+        self.app.lastWindowClosed.connect(lambda: self.notifier.stop())
+        self.onEtmCfgChanged()
+        self.watchManager.add_watch(constants.ETM_CFG_DIR, pyinotify.ALL_EVENTS)
 
-        self.peerid = self.readRawETMConfigFile("etm.cfg", "rc.peerid")
         self.t = threading.Thread(target = self.getCurrentTasksSummary, daemon = True)
         self.t.start()
 
+    @debounce(0.5, instant_first=True)
+    def onEtmCfgChanged(self):
+        with open(constants.ETM_CFG_FILE, 'r') as file:
+            lines = file.readlines()
+
+        pairs = {}
+        for line in lines:
+            eq = line.index("=")
+            k = line[:eq]
+            v = line[(eq+1):].strip()
+            pairs[k] = v
+        self.cfg = pairs
+
+    def dispatcher(self, event):
+        if event.maskname != "IN_CLOSE_WRITE":
+            return
+
+        if event.pathname == constants.ETM_CFG_FILE:
+            self.onEtmCfgChanged()
+
     @property
     def lcontrol(self):
-        return "http://127.0.0.1:{0}/".format(self.lcport)
+        lcport = self.cfg.get("local_control.listen_port", None)
+
+        try:
+            lcport = int(lcport)
+        except (ValueError, TypeError):
+            raise LocalCtrlNotAvailableError
+
+        return "http://127.0.0.1:{}/".format(lcport)
 
     def getSettings(self):
-        from requests.exceptions import ConnectionError
         try:
             req = requests.get(self.lcontrol + "getspeedlimit")
             limits = req.json()[1:] # not sure about what first element means, ignore for now
@@ -39,7 +75,7 @@ class EtmPy(QObject):
 
             return EtmSetting(dLimit = limits[0], uLimit = limits[1],
                               maxRunningTasksNum = maxRunningTasksNum)
-        except ConnectionError:
+        except (ConnectionError, LocalCtrlNotAvailableError):
             return False
 
     def saveSettings(self, newsettings):
@@ -47,29 +83,14 @@ class EtmPy(QObject):
                       "settings?downloadSpeedLimit={}&uploadSpeedLimit={}&maxRunTaskNumber={}".format(*newsettings))
 
     def getCurrentTasksSummary(self):
-        from requests.exceptions import ConnectionError
         while True:
             try:
                 req = requests.get(self.lcontrol + "list?v=2&type=1&pos=0&number=0&needUrl=1")
                 res = req.json()
                 self.sigTasksSummaryUpdated[dict].emit(res)
-            except ConnectionError:
+            except (ConnectionError, LocalCtrlNotAvailableError):
                 self.sigTasksSummaryUpdated[bool].emit(False)
             time.sleep(2)
-
-    @staticmethod
-    def readRawETMConfigFile(filename, key):
-        with open("/opt/xware_desktop/xware/cfg/{}".format(filename), 'r') as file:
-            lines = file.readlines()
-
-        pairs = {}
-        for line in lines:
-            eq = line.index("=")
-            k = line[:eq]
-            v = line[(eq+1):]
-            pairs[k] = v
-
-        return pairs.get(key, None)
 
     def getActivationStatus(self):
         req = requests.get(self.lcontrol + "getsysinfo")

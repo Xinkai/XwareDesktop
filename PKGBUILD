@@ -17,7 +17,7 @@ else
     makedepends+=("glib2" "gcc")
 fi
 
-depends=("python-pyqt5" "qt5-webkit" "libcap" "python-requests")
+depends=("python-pyqt5" "qt5-webkit" "libcap" "python-requests" "python-pyinofity")
 if test "$CARCH" == x86_64; then
     depends+=("lib32-glibc" "lib32-zlib" "lib32-glib2")
 else

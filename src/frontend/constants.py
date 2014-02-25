@@ -7,7 +7,9 @@ V3_PAGE = "http://yuancheng.xunlei.com/3/"
 XWARED_LOCK = "/tmp/xware_xwared.lock"
 XWARED_SOCKET = "/tmp/xware_xwared.socket"
 
+ETM_CFG_DIR = "/opt/xware_desktop/xware/cfg"
 ETM_LOCK = "/tmp/xware_ETM.lock"
+ETM_CFG_FILE = "/opt/xware_desktop/xware/cfg/etm.cfg"
 
 FRONTEND_LOCK = "/tmp/xware_frontend.lock"
 FRONTEND_SOCKET = ("/tmp/xware_frontend.socket", "AF_UNIX")

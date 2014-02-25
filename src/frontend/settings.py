@@ -230,8 +230,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         etmpy = self.mainWin.etmpy
 
         # fill values
-        if etmpy.lcport:
-            self.lineEdit_lcport.setText(str(etmpy.lcport))
+        self.lineEdit_lcport.setText(etmpy.cfg.get("local_control.listen_port", "不可用"))
 
         etmSettings = etmpy.getSettings()
         if etmSettings:
