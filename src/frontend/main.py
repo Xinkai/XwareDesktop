@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtCore import QUrl, pyqtSlot
-from PyQt5.QtWidgets import QMainWindow, QLabel
+from PyQt5.QtWidgets import QMainWindow, QLabel, QSystemTrayIcon, QMenu
+from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.Qt import Qt
-from ui_main import Ui_MainWindow
-from systemtray import Ui_SystemTray
+
 from frontendpy import FrontendPy
 import constants
 import ipc
+from ui_main import Ui_MainWindow
 
 log = print
 
-class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
+class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app):
         super().__init__()
         self.app = app
@@ -73,6 +74,20 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.action_ETMrestart.triggered.connect(self.xwaredpy.slotRestartETM)
 
         self.action_showAbout.triggered.connect(self.slotShowAbout)
+
+    def setupSystray(self):
+        self.trayIconMenu = QMenu(self)
+
+        icon = QIcon()
+        icon.addPixmap(QPixmap(":/image/thunder.ico"), QIcon.Normal, QIcon.Off)
+        self.trayIconMenu.addAction(self.action_exit)
+
+        self.trayIcon = QSystemTrayIcon(self)
+        self.trayIcon.setIcon(icon)
+        self.trayIcon.setContextMenu(self.trayIconMenu)
+        self.trayIcon.setVisible(True)
+
+        self.trayIcon.activated.connect(self.slotActivateSystrayContextMenu)
 
     def setupStatusBar(self):
         xwaredStatus = QLabel(self.statusBar_main)
@@ -255,4 +270,18 @@ class MainWindow(QMainWindow, Ui_MainWindow, Ui_SystemTray):
         self.statusBar_main.ulStatus.setText(
             "<img src=':/image/up.png' height=14 width=14>{}/s".format(misc.getHumanBytesNumber(summary["upSpeed"]))
         )
+
+    @pyqtSlot()
+    def slotActivateSystrayContextMenu(self, reason):
+        if reason == QSystemTrayIcon.Context: # right
+            pass
+        elif reason == QSystemTrayIcon.MiddleClick: # middle
+            pass
+        elif reason == QSystemTrayIcon.DoubleClick: # double click
+            pass
+        elif reason == QSystemTrayIcon.Trigger: # left
+            if self.isHidden():
+                self.show()
+            else:
+                self.hide()
 
