@@ -271,7 +271,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "<img src=':/image/up.png' height=14 width=14>{}/s".format(misc.getHumanBytesNumber(summary["upSpeed"]))
         )
 
-    @pyqtSlot()
+    @pyqtSlot(QSystemTrayIcon.ActivationReason)
     def slotActivateSystrayContextMenu(self, reason):
         if reason == QSystemTrayIcon.Context: # right
             pass
