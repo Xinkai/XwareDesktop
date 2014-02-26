@@ -154,7 +154,7 @@
        </font>
       </property>
       <property name="text">
-       <string>&lt;font color=&quot;grey&quot;&gt;与迅雷固件1.0.8配套&lt;/font&gt;</string>
+       <string>&lt;font color=&quot;grey&quot;&gt;与迅雷固件1.0.9配套&lt;/font&gt;</string>
       </property>
       <property name="textFormat">
        <enum>Qt::RichText</enum>
