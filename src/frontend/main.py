@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import QUrl, pyqtSlot
+from PyQt5.QtCore import QUrl, pyqtSlot, QEvent
 from PyQt5.QtWidgets import QMainWindow, QLabel, QSystemTrayIcon, QMenu
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.Qt import Qt
@@ -13,6 +13,9 @@ from ui_main import Ui_MainWindow
 log = print
 
 class MainWindow(QMainWindow, Ui_MainWindow):
+    app = None
+    savedWindowState = Qt.WindowNoState
+
     def __init__(self, app):
         super().__init__()
         self.app = app
@@ -88,6 +91,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.trayIcon.setVisible(True)
 
         self.trayIcon.activated.connect(self.slotActivateSystrayContextMenu)
+
+        # self.visibilityChanged.connect(self.slotVisibilityChanged)
 
     def setupStatusBar(self):
         xwaredStatus = QLabel(self.statusBar_main)
@@ -280,8 +285,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         elif reason == QSystemTrayIcon.DoubleClick: # double click
             pass
         elif reason == QSystemTrayIcon.Trigger: # left
-            if self.isHidden():
-                self.show()
+            if self.settings.getbool("frontend", "minimizetosystray"):
+                if self.isVisible():
+                    self.setWindowState(Qt.WindowMinimized)
+                else:
+                    self.setVisible(True)
+                    self.setWindowState(self.savedWindowState)
             else:
-                self.hide()
+                if self.isMinimized():
+                    self.setWindowState(self.savedWindowState)
+                else:
+                    self.setWindowState(Qt.WindowMinimized)
 
+    def changeEvent(self, qEvent):
+        if qEvent.type() == QEvent.WindowStateChange:
+            if self.windowState() & Qt.WindowMinimized:
+                if self.settings.getbool("frontend", "minimizetosystray"):
+                    self.setVisible(False)
+                self.savedWindowState = qEvent.oldState()

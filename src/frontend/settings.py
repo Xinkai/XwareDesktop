@@ -14,7 +14,9 @@ DEFAULT_SETTINGS = {
     },
     "frontend": {
         "enabledeveloperstools": False,
-        "allowflash": True
+        "allowflash": True,
+        "minimizetosystray": True,
+        "closetominimize": True,
     },
     "xwared": {
         "startetm": True,
@@ -67,9 +69,12 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.lineEdit_loginUsername.setText(self.settings.get("account", "username"))
         self.lineEdit_loginPassword.setText(self.settings.get("account", "password"))
         self.checkBox_autoLogin.setChecked(self.settings.getbool("account", "autologin"))
+
         self.checkBox_enableDevelopersTools.setChecked(
             self.settings.getbool("frontend", "enabledeveloperstools"))
         self.checkBox_allowFlash.setChecked(self.settings.getbool("frontend", "allowflash"))
+        self.checkBox_minimizeToSystray.setChecked(self.settings.getbool("frontend", "minimizetosystray"))
+        self.checkBox_closeToMinimize.setChecked(self.settings.getbool("frontend", "closetominimize"))
 
         from PyQt5.QtWidgets import QButtonGroup
         self.btngrp_etmStartWhen = QButtonGroup()
@@ -203,10 +208,15 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.settings.set("account", "username", self.lineEdit_loginUsername.text())
         self.settings.set("account", "password", self.lineEdit_loginPassword.text())
         self.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
+
         self.settings.setbool("frontend", "enabledeveloperstools",
                                 self.checkBox_enableDevelopersTools.isChecked())
         self.settings.setbool("frontend", "allowflash",
                                 self.checkBox_allowFlash.isChecked())
+        self.settings.setbool("frontend", "minimizetosystray",
+                                self.checkBox_minimizeToSystray.isChecked())
+        self.settings.setbool("frontend", "closetominimize",
+                                self.checkBox_closeToMinimize.isChecked())
 
         self.settings.setint("xwared", "startetmwhen",
                           self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton()))

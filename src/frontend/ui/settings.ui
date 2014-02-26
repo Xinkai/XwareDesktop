@@ -256,7 +256,7 @@
         <item>
          <widget class="QCheckBox" name="checkBox_minimizeToSystray">
           <property name="enabled">
-           <bool>false</bool>
+           <bool>true</bool>
           </property>
           <property name="text">
            <string>最小化到托盘</string>
@@ -264,12 +264,12 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBox_closeToSystray">
+         <widget class="QCheckBox" name="checkBox_closeToMinimize">
           <property name="enabled">
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>关闭到托盘</string>
+           <string>关闭窗口时最小化</string>
           </property>
          </widget>
         </item>
