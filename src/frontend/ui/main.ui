@@ -108,7 +108,12 @@
     <bool>false</bool>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: skyblue;</string>
+    <string notr="true">QStatusBar {
+	background-color: skyblue;
+}
+::item {
+	border: none !important;
+}</string>
    </property>
   </widget>
   <action name="action_showAbout">
