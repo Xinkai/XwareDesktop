@@ -2,7 +2,7 @@
 
 from PyQt5.QtCore import QUrl, pyqtSlot, QEvent
 from PyQt5.QtWidgets import QMainWindow, QLabel, QSystemTrayIcon, QMenu
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QWindowStateChangeEvent
 from PyQt5.Qt import Qt
 
 from frontendpy import FrontendPy
@@ -286,20 +286,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             pass
         elif reason == QSystemTrayIcon.Trigger: # left
             if self.settings.getbool("frontend", "minimizetosystray"):
-                if self.isVisible():
-                    self.setWindowState(Qt.WindowMinimized)
-                else:
+                if self.isHidden():
                     self.setVisible(True)
                     self.setWindowState(self.savedWindowState)
+                else:
+                    self.setWindowState(Qt.WindowMinimized)
             else:
                 if self.isMinimized():
                     self.setWindowState(self.savedWindowState)
                 else:
                     self.setWindowState(Qt.WindowMinimized)
 
+    @pyqtSlot(QWindowStateChangeEvent)
     def changeEvent(self, qEvent):
         if qEvent.type() == QEvent.WindowStateChange:
             if self.windowState() & Qt.WindowMinimized:
                 if self.settings.getbool("frontend", "minimizetosystray"):
                     self.setVisible(False)
-                self.savedWindowState = qEvent.oldState()
+            else:
+                # the following two lines should not be necessary.
+                # without these lines, restoring from minimized can be problematic.
+                # treat it as a workaround.
+                if int(qEvent.oldState()) == Qt.WindowMinimized:
+                    return
+                self.savedWindowState = self.windowState()
