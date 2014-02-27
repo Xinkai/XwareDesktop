@@ -4,13 +4,13 @@ url="http://www.cuoan.net/xware_desktop"
 _reponame="XwareDesktop"
 
 pkgname="xware_desktop-git"
-pkgver="20140227"
+pkgver="20140228"
 arch=("i686" "x86_64")
 conflicts=("xware_desktop")
-pkgrel=2
+pkgrel=1
 license=("GPL" "custom")
 
-makedepends=("git" "python-pyqt5" "coffee-script")
+makedepends=("python-pyqt5" "coffee-script")
 if test "$CARCH" == x86_64; then
     makedepends+=("lib32-glib2" "gcc-multilib")
 else
