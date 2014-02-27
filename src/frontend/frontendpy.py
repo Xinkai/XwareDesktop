@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl
 import constants
 
@@ -19,6 +20,10 @@ class FrontendPy(QObject):
         self.page_maskon = None
         self.page_device_online = None
 
+        styleSheet = QUrl(os.path.join(os.getcwd(), "style.css"))
+        styleSheet.setScheme("file")
+        self.mainWin.app.sigFrontendUiSetupFinished.connect(lambda: \
+            self.mainWin.webView.settings().setUserStyleSheetUrl(styleSheet))
 
         print("frontendpy loaded")
 

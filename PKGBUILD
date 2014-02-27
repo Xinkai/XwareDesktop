@@ -4,10 +4,10 @@ url="http://www.cuoan.net/xware_desktop"
 _reponame="XwareDesktop"
 
 pkgname="xware_desktop-git"
-pkgver="20140226"
+pkgver="20140227"
 arch=("i686" "x86_64")
 conflicts=("xware_desktop")
-pkgrel=1
+pkgrel=2
 license=("GPL" "custom")
 
 makedepends=("git" "python-pyqt5" "coffee-script")
@@ -25,7 +25,7 @@ else
 fi
 
 if [ ! -f .localdev ]; then
-    source=("git+https://github.com/Xinkai/XwareDesktop.git")
+    source=("https://api.github.com/repos/Xinkai/XwareDesktop/tarball")
     md5sums=('SKIP')
     _local=1
 fi
