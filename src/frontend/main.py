@@ -92,8 +92,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.trayIcon.activated.connect(self.slotActivateSystrayContextMenu)
 
-        # self.visibilityChanged.connect(self.slotVisibilityChanged)
-
     def setupStatusBar(self):
         xwaredStatus = QLabel(self.statusBar_main)
         xwaredStatus.setObjectName("label_xwaredStatus")
