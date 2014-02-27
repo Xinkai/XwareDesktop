@@ -89,6 +89,18 @@ class XwareJS
     slotActivateDevice: () ->
         App.set("dialogs.addDownloader.show", true)
 
+        $types = $("#d-add-downloader-types > li")
+        # choose NAS
+        $("> a[title$='NAS']", $types).click()
+        # hide other types
+        $types.not(":has(a[title$='NAS'])").hide()
+
+        $panel = $("#d-add-downloader-panels > div.pop_addd_unit:not(.hidden)")
+        # replace text
+        $("> p", $panel).html("您需要激活后使用Xware Desktop。<br />激活码已经试着自动为您获取并填写，点击激活后稍等片刻即可。")
+        # focus code input
+        $("input.sel_inptxt", $panel).get(0).focus()
+
     bindMaskObserver: () ->
         mask = document.getElementById("mask")
         maskon = false
