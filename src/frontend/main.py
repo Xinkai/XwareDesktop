@@ -70,7 +70,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.action_createTask.triggered.connect(self.slotPrepareTasksCreation)
         self.action_refreshPage.triggered.connect(self.slotRefreshPage)
-        self.action_activateDevice.triggered.connect(lambda: self.frontendpy.sigActivateDevice.emit())
 
         self.action_ETMstart.triggered.connect(self.xwaredpy.slotStartETM)
         self.action_ETMstop.triggered.connect(self.xwaredpy.slotStopETM)

@@ -10,7 +10,15 @@ class XwareJS
         @bindContextMenu()
         @bindSaveCredentials()
         @bindMaskObserver()
-        xdpy.xdjsLoaded()
+
+        result = {}
+        if Data?
+            result.peerids = (peerid for peerid of Data.downloader.all)
+            result.userid = Data.session.userId
+        else
+            result.peerids = []
+            result.userid = null
+        xdpy.xdjsLoaded(result)
 
     slotLogin: (username, password) ->
         $username = $("#login-input-username")
@@ -86,7 +94,7 @@ class XwareJS
     slotToggleFlashAvailability: (available) ->
         App.set("system.flash", available)
 
-    slotActivateDevice: () ->
+    slotActivateDevice: (code) ->
         App.set("dialogs.addDownloader.show", true)
 
         $types = $("#d-add-downloader-types > li")
@@ -99,7 +107,9 @@ class XwareJS
         # replace text
         $("> p", $panel).html("您需要激活后使用Xware Desktop。<br />激活码已经试着自动为您获取并填写，点击激活后稍等片刻即可。")
         # focus code input
-        $("input.sel_inptxt", $panel).get(0).focus()
+        input = $("input.sel_inptxt", $panel).get(0)
+        $(input).val(code).blur().trigger('input')
+        input.focus()
 
     bindMaskObserver: () ->
         mask = document.getElementById("mask")

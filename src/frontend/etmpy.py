@@ -15,9 +15,13 @@ class LocalCtrlNotAvailableError(BaseException):
     pass
 
 EtmSetting = collections.namedtuple("EtmSetting", ["dLimit", "uLimit", "maxRunningTasksNum"])
+ActivationStatus = collections.namedtuple("ActivationStatus", ["userid", "status", "code", "peerid"])
 
 class EtmPy(QObject):
     sigTasksSummaryUpdated = pyqtSignal([bool], [dict])
+    sigCfgChanged = pyqtSignal()
+
+    cfg = {}
 
     def __init__(self, app):
         super().__init__(app)
@@ -96,8 +100,22 @@ class EtmPy(QObject):
             time.sleep(2)
 
     def getActivationStatus(self):
-        req = requests.get(self.lcontrol + "getsysinfo")
-        code = req.json()[4] # activation code if not activated, empty string if activated
+        try:
+            req = requests.get(self.lcontrol + "getsysinfo")
+            res = req.json()
+            status = res[3]
+            code = res[4]
+        except (ConnectionError, LocalCtrlNotAvailableError):
+            status = -1 # error
+            code = None
 
-        if code:
-            raise NotImplementedError
+        userid = self.cfg.get("userid", 0)
+        try:
+            userid = int(userid)
+        except ValueError:
+            userid = 0 # unbound -> 0
+
+        peerid = self.cfg.get("rc.peerid", "")
+
+        result = ActivationStatus(userid, status, code, peerid)
+        return result

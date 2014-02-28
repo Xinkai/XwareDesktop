@@ -73,7 +73,7 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menu">
+   <widget class="QMenu" name="menu_file">
     <property name="title">
      <string>文件</string>
     </property>
@@ -84,11 +84,10 @@
     <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
-   <widget class="QMenu" name="menu_2">
+   <widget class="QMenu" name="menu_help">
     <property name="title">
      <string>帮助</string>
     </property>
-    <addaction name="action_activateDevice"/>
     <addaction name="action_showAbout"/>
    </widget>
    <widget class="QMenu" name="menu_backend">
@@ -99,9 +98,9 @@
     <addaction name="action_ETMstop"/>
     <addaction name="action_ETMrestart"/>
    </widget>
-   <addaction name="menu"/>
+   <addaction name="menu_file"/>
    <addaction name="menu_backend"/>
-   <addaction name="menu_2"/>
+   <addaction name="menu_help"/>
   </widget>
   <widget class="QStatusBar" name="statusBar_main">
    <property name="autoFillBackground">
@@ -123,7 +122,9 @@
   </action>
   <action name="action_exit">
    <property name="icon">
-    <iconset theme="application-exit"/>
+    <iconset theme="application-exit">
+     <normaloff/>
+    </iconset>
    </property>
    <property name="text">
     <string>退出</string>
@@ -180,11 +181,6 @@
   <action name="action_ETMrestart">
    <property name="text">
     <string>重启</string>
-   </property>
-  </action>
-  <action name="action_activateDevice">
-   <property name="text">
-    <string>激活设备</string>
    </property>
   </action>
  </widget>

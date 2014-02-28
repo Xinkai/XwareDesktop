@@ -2,7 +2,8 @@
 
 import os
 from urllib import parse
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl
+from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
 import constants
 
 # Together with xwarejs.js, exchange information with the browser
@@ -10,7 +11,7 @@ class FrontendPy(QObject):
     sigCreateTasks = pyqtSignal("QStringList")
     sigLogin = pyqtSignal(str, str)
     sigToggleFlashAvailability = pyqtSignal(bool)
-    sigActivateDevice = pyqtSignal()
+    sigActivateDevice = pyqtSignal(str)
     sigMaskOnOffChanged = pyqtSignal(bool)
 
     def __init__(self, mainWin):
@@ -42,10 +43,47 @@ class FrontendPy(QObject):
                 if username and password:
                     self.sigLogin.emit(username, password)
 
-    @pyqtSlot()
-    def xdjsLoaded(self):
+    def tryActivate(self, payload):
+        if not self.urlMatch(constants.V3_PAGE):
+            return # not v3 page
+
+        if not payload["userid"]:
+            return # not logged in
+
+        userid, status, code, peerid = self.mainWin.etmpy.getActivationStatus()
+
+        if userid == 0:
+            # unbound
+            if status == -1:
+                QMessageBox.warning(self.mainWin, "Xware Desktop 警告", "ETM未启用，无法激活。需要启动ETM后，刷新页面。",
+                                    QMessageBox.Ok, QMessageBox.Ok)
+                return
+
+            elif status == 0 and code:
+                self.sigActivateDevice.emit(code) # to activate
+                return
+
+        else:
+            if status == 0 and code:
+                # re-activate
+                self.sigActivateDevice.emit(code)
+                return
+
+            elif userid != int(payload["userid"]):
+                QMessageBox.warning(self.mainWin, "Xware Desktop 警告", "登录的迅雷账户不是绑定的迅雷账户。",
+                                    QMessageBox.Ok, QMessageBox.Ok)
+                return
+
+            elif peerid not in payload["peerids"]:
+                QMessageBox.warning(self.mainWin, "Xware Desktop 警告", "前端尚未出现绑定的设备，请稍侯刷新。",
+                                    QMessageBox.Ok, QMessageBox.Ok)
+                return
+
+    @pyqtSlot(QVariant)
+    def xdjsLoaded(self, payload):
         print("xdjs loaded")
         self.tryLogin()
+        self.tryActivate(payload)
 
     @pyqtSlot()
     def requestFocus(self):
