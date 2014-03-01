@@ -8,6 +8,8 @@
     -webkit-user-select: none;
     cursor: pointer;
 }
+textarea,
+input[type='email'],
 input[type='text'],
 input[type='password'],
 input.sel_inptxt {
