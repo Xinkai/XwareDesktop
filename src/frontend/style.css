@@ -3,3 +3,14 @@
 /* 隐藏 返回旧版 */
 .topnav > ul:nth-child(1) > li:nth-child(5) { display: none !important }
 
+/* make everything not user-selectable except for inputs by default */
+* {
+    -webkit-user-select: none;
+    cursor: pointer;
+}
+input[type='text'],
+input[type='password'],
+input.sel_inptxt {
+    -webkit-user-select: text;
+    cursor: text;
+}
