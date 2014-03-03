@@ -33,33 +33,27 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settings.applySettings.emit()
 
     def setupWebkit(self):
-        self.settings.applySettings.connect(self.toggleDevelopersTools)
-        self.settings.applySettings.connect(self.toggleFlash)
+        self.settings.applySettings.connect(self.applySettingsToWebView)
 
         self.frame.loadFinished.connect(self.injectXwareJS)
         self.frame.javaScriptWindowObjectCleared.connect(self.slotAddJSObject)
         self.webView.urlChanged.connect(self.slotUrlChanged)
 
     @pyqtSlot()
-    def toggleDevelopersTools(self):
+    def applySettingsToWebView(self):
         from PyQt5.QtWebKit import QWebSettings
         from PyQt5.Qt import Qt
 
-        devToolsOn = self.settings.getbool("frontend", "enabledeveloperstools")
-        self.webView.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, devToolsOn)
-        if devToolsOn:
+        isDevToolsAllowed = self.settings.getbool("frontend", "enabledeveloperstools")
+        self.webView.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, isDevToolsAllowed)
+        if isDevToolsAllowed:
             self.webView.setContextMenuPolicy(Qt.DefaultContextMenu)
         else:
             self.webView.setContextMenuPolicy(Qt.NoContextMenu)
 
-    @pyqtSlot()
-    def toggleFlash(self):
-        from PyQt5.QtWebKit import QWebSettings
-
-        allowed = self.settings.getbool("frontend", "allowflash")
-        self.webView.settings().setAttribute(QWebSettings.PluginsEnabled, allowed)
-        self.frontendpy.sigToggleFlashAvailability.emit(allowed)
-
+        pluginsAllowed = self.settings.getbool("frontend", "allowflash")
+        self.webView.settings().setAttribute(QWebSettings.PluginsEnabled, pluginsAllowed)
+        self.frontendpy.sigToggleFlashAvailability.emit(pluginsAllowed)
 
     def connectUI(self):
         # connect UI related signal/slot
