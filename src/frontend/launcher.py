@@ -17,6 +17,9 @@ class XwareDesktop(QApplication):
 
     def __init__(self, *args):
         super().__init__(*args)
+        self.setApplicationName("XwareDesktop")
+        self.setApplicationVersion("0.1")
+
         self.checkUsergroup()
 
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
