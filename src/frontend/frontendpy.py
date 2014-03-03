@@ -115,3 +115,14 @@ class FrontendPy(QObject):
         self.page_mask_on = val
         self.sigMaskOnOffChanged.emit(val)
 
+    @pyqtSlot()
+    @pyqtSlot(str)
+    @pyqtSlot(list)
+    def slotPrepareTasksCreation(self, tasks = None):
+        if tasks is None:
+            self.sigCreateTasks.emit([""])
+        else:
+            if type(tasks) is str:
+                self.sigCreateTasks.emit([tasks])
+            else:
+                self.sigCreateTasks.emit(tasks)

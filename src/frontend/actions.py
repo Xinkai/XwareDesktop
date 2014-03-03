@@ -44,7 +44,7 @@ class FrontendActionsQueue(QObject):
             while True:
                 with listener.accept() as conn:
                     payload = conn.recv()
-                    self.frontendpy.mainWin.slotPrepareTasksCreation(payload)
+                    self.frontendpy.slotPrepareTasksCreation(payload)
                     print("payload", payload)
 
 class FrontendCommunicationClient(object):

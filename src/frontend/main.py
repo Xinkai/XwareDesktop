@@ -60,7 +60,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_exit.triggered.connect(self.slotExit)
         self.action_setting.triggered.connect(self.slotSetting)
 
-        self.action_createTask.triggered.connect(self.slotPrepareTasksCreation)
+        self.action_createTask.triggered.connect(self.frontendpy.slotPrepareTasksCreation)
         self.action_refreshPage.triggered.connect(self.slotRefreshPage)
 
         self.action_ETMstart.triggered.connect(self.xwaredpy.slotStartETM)
@@ -154,18 +154,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     @pyqtSlot()
     def slotAddJSObject(self):
         self.frame.addToJavaScriptWindowObject("xdpy", self.frontendpy)
-
-    @pyqtSlot()
-    @pyqtSlot(str)
-    @pyqtSlot(list)
-    def slotPrepareTasksCreation(self, tasks = None):
-        if tasks is None:
-            self.frontendpy.sigCreateTasks.emit([""])
-        else:
-            if type(tasks) is str:
-                self.frontendpy.sigCreateTasks.emit([tasks])
-            else:
-                self.frontendpy.sigCreateTasks.emit(tasks)
 
     @pyqtSlot()
     def slotUrlChanged(self):
