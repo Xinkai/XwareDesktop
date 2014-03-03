@@ -7,7 +7,6 @@ from PyQt5.Qt import Qt
 
 from frontendpy import FrontendPy
 import constants
-import ipc
 from ui_main import Ui_MainWindow
 
 log = print
@@ -19,7 +18,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, app):
         super().__init__()
         self.app = app
-        ipc.FrontendCommunicationListener(self)
 
         self.frontendpy = FrontendPy(self) # setup Webkit Bridge
         # UI

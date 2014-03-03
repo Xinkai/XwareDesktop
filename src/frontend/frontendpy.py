@@ -5,6 +5,7 @@ from urllib import parse
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
 import constants
+from actions import FrontendActionsQueue
 
 # Together with xwarejs.js, exchange information with the browser
 class FrontendPy(QObject):
@@ -16,6 +17,7 @@ class FrontendPy(QObject):
 
     def __init__(self, mainWin):
         super().__init__(mainWin)
+        self.queue = FrontendActionsQueue(self)
         self.mainWin = mainWin
         self.mainWin.settings.applySettings.connect(self.tryLogin)
 

@@ -41,7 +41,7 @@ class XwareDesktop(QApplication):
 
         fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT, mode = 0o666)
 
-        import ipc
+        import actions
         try:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
@@ -50,7 +50,7 @@ class XwareDesktop(QApplication):
                 sys.exit(-1)
             else:
                 print(tasks)
-                ipc.FrontendCommunicationClient(tasks)
+                actions.FrontendCommunicationClient(tasks)
                 sys.exit(0)
 
     def checkUsergroup(self):
