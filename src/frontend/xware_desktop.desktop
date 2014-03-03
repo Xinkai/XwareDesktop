@@ -4,11 +4,11 @@ Type=Application
 Name=Xware Desktop
 Comment=桌面化迅雷固件
 TryExec=/opt/xware_desktop/frontend/launcher.py
-Exec=/opt/xware_desktop/frontend/launcher.py %F
+Exec=/opt/xware_desktop/frontend/launcher.py %U
 Categories=Network;
 Terminal=false
 Icon=/opt/xware_desktop/frontend/thunder.ico
-#MimeType=image/x-foo;
+MimeType=application/x-bittorrent;x-scheme-handler/magnet;x-scheme-handler/ed2k
 #Actions=Gallery;Create;
 
 #[Desktop Action Gallery]
