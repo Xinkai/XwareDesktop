@@ -37,8 +37,8 @@ def debounce(wait, instant_first = True):
 
 def decodePrivateLink(link):
     # try to return the real link behind thunder:// flashget:// qqdl://
-    if "\n" in link and \
-        "\t" in link and \
+    if "\n" in link or \
+        "\t" in link or \
         "\r" in link:
         raise Exception("decodePrivateLink Failed. Maybe passed in multiple private links? {}".format(link))
 
