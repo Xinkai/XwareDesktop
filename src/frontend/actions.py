@@ -90,7 +90,8 @@ class FrontendActionsQueue(QObject):
             tasks = [self._newTask()]
             tasks_localtorrent = []
 
-        self.queueAction(CreateTasksAction(tasks))
+        if tasks:
+            self.queueAction(CreateTasksAction(tasks))
         for task_bt in tasks_localtorrent: # because only 1 bt-task can be added once.
             self.queueAction(CreateTasksAction([task_bt]))
 
