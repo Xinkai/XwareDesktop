@@ -3,7 +3,7 @@
 from PyQt5.QtCore import QObject, pyqtSlot
 
 from collections import deque
-import threading, os
+import threading, os, sys
 
 from multiprocessing.connection import Listener, Client
 
@@ -53,6 +53,10 @@ class FrontendActionsQueue(QObject):
                                           name = "frontend communication listener")
         self._listener.start()
 
+        tasks = sys.argv[1:]
+        if tasks:
+            self.createTasksAction(tasks)
+
     def listenerThread(self):
         # clean if previous run crashes
         try:
@@ -68,7 +72,7 @@ class FrontendActionsQueue(QObject):
 
     def queueAction(self, action):
         self._queue.append(action)
-        self.frontendpy.consumeAction()
+        self.frontendpy.consumeAction("action newly queued")
 
     def dequeueAction(self):
         return self._queue.popleft()

@@ -6,6 +6,7 @@ class XwareJS
         xdpy.sigLogin.connect(@, @slotLogin)
         xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
         xdpy.sigToggleFlashAvailability.connect(@, @slotToggleFlashAvailability)
+        xdpy.sigNotifyPeerId.connect(@, @slotBindDeviceObserver)
         @bindDblclick()
         @bindContextMenu()
         @bindSaveCredentials()
@@ -134,7 +135,34 @@ class XwareJS
             "aattributeFilter": ["class"]
         })
 
+    slotBindDeviceObserver: (boundPeerId) ->
+        _online = Data.downloader.all[boundPeerId].online
+        _logined = Data.downloader.all[boundPeerId].logined
+        if Data?.downloader?
+            Object.defineProperty(Data.downloader.all[boundPeerId], "online", {
+                get: () ->
+                    return _online
+                set: (v) ->
+                    _online = v
+                    xdpy.slotSetOnline(v)
 
+                    xdpy.log "set online", v
+                    console.log("set online", v)
+            })
+
+            Object.defineProperty(Data.downloader.all[boundPeerId], "logined", {
+                get: () ->
+                    return _logined
+                set: (v) ->
+                    _logined = v
+                    xdpy.slotSetLogined(v)
+
+                    xdpy.log("set logined", v)
+                    console.log("set logined", v)
+            })
+
+            xdpy.slotSetOnline(_online)
+            xdpy.slotSetLogined(_logined)
 
 $ ->
     window.xdjs = new XwareJS()

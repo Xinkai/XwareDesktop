@@ -176,8 +176,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def slotFrameLoadStarted(self):
-        self.frontendpy.page_device_online = None
-        self.frontendpy.page_mask_on = None
+        self.frontendpy.isPageMaskOn = None
+        self.frontendpy.isPageOnline = None
+        self.frontendpy.isPageLogined = None
         self.frontendpy.isXdjsLoaded = None
 
     @pyqtSlot()

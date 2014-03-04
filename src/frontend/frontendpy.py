@@ -13,12 +13,13 @@ class FrontendPy(QObject):
     sigLogin = pyqtSignal(str, str)
     sigToggleFlashAvailability = pyqtSignal(bool)
     sigActivateDevice = pyqtSignal(str)
-    sigMaskOnOffChanged = pyqtSignal(bool)
+    sigNotifyPeerId = pyqtSignal(str) # let xdjs knows peerid
 
     queue = None
     mainWin = None
-    page_mask_on = None
-    page_device_online = None
+    isPageMaskOn = None
+    isPageOnline = None
+    isPageLogined = None
     isXdjsLoaded = None
 
     def __init__(self, mainWin):
@@ -83,6 +84,8 @@ class FrontendPy(QObject):
                 QMessageBox.warning(self.mainWin, "Xware Desktop 警告", "前端尚未出现绑定的设备，请稍侯刷新。",
                                     QMessageBox.Ok, QMessageBox.Ok)
                 return
+            else:
+                self.sigNotifyPeerId.emit(peerid)
 
     @pyqtSlot(QVariant)
     def xdjsLoaded(self, payload):
@@ -90,6 +93,7 @@ class FrontendPy(QObject):
         self.isXdjsLoaded = True
         self.tryLogin()
         self.tryActivate(payload)
+        self.consumeAction("xdjs loaded")
 
     @pyqtSlot()
     def requestFocus(self):
@@ -116,22 +120,42 @@ class FrontendPy(QObject):
 
     @pyqtSlot(bool)
     def slotMaskOnOffChanged(self, val):
-        self.page_mask_on = val
-        self.sigMaskOnOffChanged.emit(val)
-        self.consumeAction()
+        self.isPageMaskOn = val
+        if not val:
+            self.consumeAction("action acted")
         print("Mask on", val)
 
+    @pyqtSlot(bool)
+    def slotSetOnline(self, online):
+        self.isPageOnline = online
+
+    @pyqtSlot(bool)
+    def slotSetLogined(self, logined):
+        self.isPageLogined = logined
+
     @pyqtSlot()
-    def consumeAction(self):
-        if self.page_mask_on:
+    def consumeAction(self, reason):
+        print("Try to consume, because {}.".format(reason))
+        if not self.isPageOnline:
+            print("Xdjs says device not online, no consuming")
+            return
+
+        if self.isPageMaskOn:
+            print("Mask on, no consuming")
             return
 
         if not self.isXdjsLoaded:
+            print("Xdjs not ready, no consuming")
+            return
+
+        if not self.isPageLogined:
+            print("page not logined, no consuming")
             return
 
         try:
             action = self.queue.dequeueAction()
         except IndexError:
+            print("Nothing to consume")
             # no actions
             return
 
