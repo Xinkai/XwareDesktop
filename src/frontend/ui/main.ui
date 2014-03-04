@@ -55,11 +55,6 @@
       <property name="styleSheet">
        <string notr="true">background-color: white;</string>
       </property>
-      <property name="url">
-       <url>
-        <string>http://yuancheng.xunlei.com/login.html</string>
-       </url>
-      </property>
      </widget>
     </item>
    </layout>

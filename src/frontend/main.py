@@ -35,9 +35,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def setupWebkit(self):
         self.settings.applySettings.connect(self.applySettingsToWebView)
 
-        self.frame.loadFinished.connect(self.injectXwareJS)
-        self.frame.javaScriptWindowObjectCleared.connect(self.slotAddJSObject)
-        self.webView.urlChanged.connect(self.slotUrlChanged)
+        self.frame.loadStarted.connect(self.slotFrameLoadStarted)
+        self.frame.urlChanged.connect(self.slotUrlChanged)
+        self.frame.loadFinished.connect(self.injectXwareDesktop)
+        self.webView.load(QUrl(constants.LOGIN_PAGE))
 
     @pyqtSlot()
     def applySettingsToWebView(self):
@@ -152,10 +153,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # shorthand ends
 
     @pyqtSlot()
-    def slotAddJSObject(self):
-        self.frame.addToJavaScriptWindowObject("xdpy", self.frontendpy)
-
-    @pyqtSlot()
     def slotUrlChanged(self):
         from urllib import parse
         url = parse.urldefrag(self.url)[0]
@@ -178,10 +175,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.app.quit()
 
     @pyqtSlot()
-    def injectXwareJS(self):
+    def slotFrameLoadStarted(self):
+        self.frontendpy.page_device_online = None
+        self.frontendpy.page_mask_on = None
+
+    @pyqtSlot()
+    def injectXwareDesktop(self):
+        # inject xdpy object
+        self.frame.addToJavaScriptWindowObject("xdpy", self.frontendpy)
+
+        # inject xdjs script
         with open("xwarejs.js") as file:
             js = file.read()
-
         self.frame.evaluateJavaScript(js)
 
     @pyqtSlot()
