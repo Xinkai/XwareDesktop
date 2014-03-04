@@ -61,7 +61,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_exit.triggered.connect(self.slotExit)
         self.action_setting.triggered.connect(self.slotSetting)
 
-        self.action_createTask.triggered.connect(self.frontendpy.slotPrepareTasksCreation)
+        self.action_createTask.triggered.connect(self.frontendpy.queue.createTasksAction)
         self.action_refreshPage.triggered.connect(self.slotRefreshPage)
 
         self.action_ETMstart.triggered.connect(self.xwaredpy.slotStartETM)
@@ -178,6 +178,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def slotFrameLoadStarted(self):
         self.frontendpy.page_device_online = None
         self.frontendpy.page_mask_on = None
+        self.frontendpy.isXdjsLoaded = None
 
     @pyqtSlot()
     def injectXwareDesktop(self):

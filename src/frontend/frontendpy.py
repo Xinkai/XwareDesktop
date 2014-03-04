@@ -4,7 +4,7 @@ import os
 from urllib import parse
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
-import constants
+import constants, actions
 from actions import FrontendActionsQueue
 
 # Together with xwarejs.js, exchange information with the browser
@@ -15,14 +15,17 @@ class FrontendPy(QObject):
     sigActivateDevice = pyqtSignal(str)
     sigMaskOnOffChanged = pyqtSignal(bool)
 
+    queue = None
+    mainWin = None
+    page_mask_on = None
+    page_device_online = None
+    isXdjsLoaded = None
+
     def __init__(self, mainWin):
         super().__init__(mainWin)
         self.queue = FrontendActionsQueue(self)
         self.mainWin = mainWin
         self.mainWin.settings.applySettings.connect(self.tryLogin)
-
-        self.page_maskon = None
-        self.page_device_online = None
 
         styleSheet = QUrl(os.path.join(os.getcwd(), "style.css"))
         styleSheet.setScheme("file")
@@ -84,6 +87,7 @@ class FrontendPy(QObject):
     @pyqtSlot(QVariant)
     def xdjsLoaded(self, payload):
         print("xdjs loaded")
+        self.isXdjsLoaded = True
         self.tryLogin()
         self.tryActivate(payload)
 
@@ -114,15 +118,25 @@ class FrontendPy(QObject):
     def slotMaskOnOffChanged(self, val):
         self.page_mask_on = val
         self.sigMaskOnOffChanged.emit(val)
+        self.consumeAction()
+        print("Mask on", val)
 
     @pyqtSlot()
-    @pyqtSlot(str)
-    @pyqtSlot(list)
-    def slotPrepareTasksCreation(self, tasks = None):
-        if tasks is None:
-            self.sigCreateTasks.emit([""])
-        else:
-            if type(tasks) is str:
-                self.sigCreateTasks.emit([tasks])
-            else:
-                self.sigCreateTasks.emit(tasks)
+    def consumeAction(self):
+        if self.page_mask_on:
+            return
+
+        if not self.isXdjsLoaded:
+            return
+
+        try:
+            action = self.queue.dequeueAction()
+        except IndexError:
+            # no actions
+            return
+
+        if isinstance(action, actions.CreateTasksAction):
+            taskUrls = list(map(lambda task: task.url, action.tasks))
+            self.sigCreateTasks.emit(taskUrls)
+            print("newTasks", taskUrls)
+        print("consuming action", action)
