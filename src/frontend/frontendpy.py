@@ -97,7 +97,7 @@ class FrontendPy(QObject):
         url = self.mainWin.mountsFaker.convertToNativePath(url)
         qurl = QUrl(url)
         qurl.setScheme("file")
-        QDesktopServices.openUrl(qurl)
+        QDesktopServices().openUrl(qurl)
 
     @pyqtSlot(str, str)
     def saveCredentials(self, username, password):
