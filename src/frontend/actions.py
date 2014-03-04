@@ -3,7 +3,7 @@
 from PyQt5.QtCore import QObject
 
 from collections import deque
-import threading
+import threading, os
 
 from multiprocessing.connection import Listener, Client
 
@@ -40,6 +40,12 @@ class FrontendActionsQueue(QObject):
         self._listener.start()
 
     def listenerThread(self):
+        # clean if previous run crashes
+        try:
+            os.remove(constants.FRONTEND_SOCKET[0])
+        except FileNotFoundError:
+            pass
+
         with Listener(*constants.FRONTEND_SOCKET) as listener:
             while True:
                 with listener.accept() as conn:
