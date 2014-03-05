@@ -28,13 +28,13 @@ class CreateTask(object):
     LOCAL_TORRENT = 1
 
     url = None
-    type = None
-    def __init__(self, url = None, type = None):
+    kind = None
+    def __init__(self, url = None, kind = None):
         self.url = url
 
-        if type is None:
-            type = self.NORMAL
-        self.type = type
+        if kind is None:
+            kind = self.NORMAL
+        self.kind = kind
 
     def __repr__(self):
         return "{} <{}>".format(self.__class__.__name__, self.url)
@@ -81,13 +81,13 @@ class FrontendActionsQueue(QObject):
     @pyqtSlot(list)
     def createTasksAction(self, taskUrls = None):
         if taskUrls:
-            alltasks = map(self._newTask, taskUrls)
-            tasks = list(filter(lambda task: task.type == CreateTask.NORMAL, alltasks))
-            tasks_localtorrent = list(filter(lambda task: task.type == CreateTask.LOCAL_TORRENT,
+            alltasks = list(map(self._createTask, taskUrls))
+            tasks = list(filter(lambda task: task.kind == CreateTask.NORMAL, alltasks))
+            tasks_localtorrent = list(filter(lambda task: task.kind == CreateTask.LOCAL_TORRENT,
                                              alltasks))
         else:
             # else
-            tasks = [self._newTask()]
+            tasks = [self._createTask()]
             tasks_localtorrent = []
 
         if tasks:
@@ -95,7 +95,7 @@ class FrontendActionsQueue(QObject):
         for task_bt in tasks_localtorrent: # because only 1 bt-task can be added once.
             self.queueAction(CreateTasksAction([task_bt]))
 
-    def _newTask(self, taskUrl = None):
+    def _createTask(self, taskUrl = None):
         from urllib import parse
 
         if taskUrl is None:
@@ -109,9 +109,9 @@ class FrontendActionsQueue(QObject):
 
         elif parsed.scheme == "":
             if parsed.path.endswith(".torrent"):
-                return CreateTask(taskUrl, type = CreateTask.LOCAL_TORRENT)
+                return CreateTask(taskUrl, kind = CreateTask.LOCAL_TORRENT)
 
-        elif parsed.scheme in ("http", "https", "ftp", "magnet"):
+        elif parsed.scheme in ("http", "https", "ftp", "magnet", "ed2k"):
             return CreateTask(taskUrl)
 
 class FrontendCommunicationClient(object):

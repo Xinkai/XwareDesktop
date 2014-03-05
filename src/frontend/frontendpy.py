@@ -159,8 +159,12 @@ class FrontendPy(QObject):
             # no actions
             return
 
+        print("consuming action", action)
         if isinstance(action, actions.CreateTasksAction):
             taskUrls = list(map(lambda task: task.url, action.tasks))
-            self.sigCreateTasks.emit(taskUrls)
-            print("newTasks", taskUrls)
-        print("consuming action", action)
+            if action.tasks[0].kind == actions.CreateTask.NORMAL:
+                self.sigCreateTasks.emit(taskUrls)
+            else:
+                pass
+                # TODO
+
