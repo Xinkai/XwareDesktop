@@ -51,9 +51,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupSystray()
         self.setupStatusBar()
         self.connectUI()
-        self.app.sigFrontendUiSetupFinished.emit()
 
         self.setupWebkit()
+        self.app.sigFrontendUiSetupFinished.emit()
 
         # Load settings
         self.settings.applySettings.emit()
