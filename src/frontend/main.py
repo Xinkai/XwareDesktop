@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtCore import QUrl, pyqtSlot, QEvent
+from PyQt5.QtWebKitWidgets import QWebPage
 from PyQt5.QtWidgets import QMainWindow, QLabel, QSystemTrayIcon, QMenu
 from PyQt5.QtGui import QIcon, QPixmap, QWindowStateChangeEvent
 from PyQt5.Qt import Qt
@@ -10,6 +11,31 @@ import constants
 from ui_main import Ui_MainWindow
 
 log = print
+
+class customWebPage(QWebPage):
+    _overrideFile = None
+
+    def __init__(self, parent):
+        super().__init__(parent)
+
+    def chooseFile(self, parentFrame, suggestFile):
+        print("custom page::chooseFile", parentFrame, suggestFile)
+        if self._overrideFile:
+            return self.overrideFile
+        else:
+            return super().chooseFile(parentFrame, suggestFile)
+
+    @property
+    def overrideFile(self):
+        print("read overrideFile, then clear it.")
+        result = self._overrideFile
+        self._overrideFile = None
+        return result
+
+    @overrideFile.setter
+    def overrideFile(self, url):
+        self._overrideFile = url
+        print("set local torrent {}.".format(url))
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     app = None
@@ -35,6 +61,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def setupWebkit(self):
         self.settings.applySettings.connect(self.applySettingsToWebView)
 
+        self._customPage = customWebPage(self.webView)
+        self.webView.setPage(self._customPage)
         self.frame.loadStarted.connect(self.slotFrameLoadStarted)
         self.frame.urlChanged.connect(self.slotUrlChanged)
         self.frame.loadFinished.connect(self.injectXwareDesktop)
@@ -160,7 +188,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if url == constants.V2_PAGE:
             log("webView: redirect to V3.")
             self.webView.stop()
-            self.webView.load(QUrl(constants.V3_PAGE))
+            self.frame.load(QUrl(constants.V3_PAGE))
         elif url in (constants.V3_PAGE, constants.LOGIN_PAGE):
             pass
         else:
@@ -168,7 +196,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def slotRefreshPage(self):
-        self.webView.load(QUrl(constants.V3_PAGE))
+        self.frame.load(QUrl(constants.V3_PAGE))
 
     @pyqtSlot()
     def slotExit(self):
@@ -176,6 +204,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def slotFrameLoadStarted(self):
+        self.page.overrideFile = None
         self.frontendpy.isPageMaskOn = None
         self.frontendpy.isPageOnline = None
         self.frontendpy.isPageLogined = None

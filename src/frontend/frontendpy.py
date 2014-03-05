@@ -4,12 +4,15 @@ import os
 from urllib import parse
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
+from PyQt5.Qt import Qt
 import constants, actions
 from actions import FrontendActionsQueue
 
 # Together with xwarejs.js, exchange information with the browser
 class FrontendPy(QObject):
     sigCreateTasks = pyqtSignal("QStringList")
+    sigCreateTaskFromTorrentFile = pyqtSignal()
+    sigCreateTaskFromTorrentFileDone = pyqtSignal()
     sigLogin = pyqtSignal(str, str)
     sigToggleFlashAvailability = pyqtSignal(bool)
     sigActivateDevice = pyqtSignal(str)
@@ -165,6 +168,17 @@ class FrontendPy(QObject):
             if action.tasks[0].kind == actions.CreateTask.NORMAL:
                 self.sigCreateTasks.emit(taskUrls)
             else:
-                pass
-                # TODO
+                self.mainWin.page.overrideFile = taskUrls[0]
+                self.sigCreateTaskFromTorrentFile.emit()
+
+    @pyqtSlot()
+    def slotClickBtButton(self):
+        from PyQt5.QtGui import QKeyEvent
+        from PyQt5.QtCore import QEvent
+        keydownEvent = QKeyEvent(QEvent.KeyPress, # type
+                                 Qt.Key_Enter,    # key
+                                 Qt.NoModifier)   # modifiers
+
+        self.mainWin.app.sendEvent(self.mainWin.webView, keydownEvent)
+        self.sigCreateTaskFromTorrentFileDone.emit()
 

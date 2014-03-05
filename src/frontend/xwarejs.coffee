@@ -3,6 +3,8 @@
 class XwareJS
     constructor: () ->
         xdpy.sigCreateTasks.connect(@, @slotCreateTasks)
+        xdpy.sigCreateTaskFromTorrentFile.connect(@, @slotCreateTaskFromTorrentFile)
+        xdpy.sigCreateTaskFromTorrentFileDone.connect(@, @slotCreateTaskFromTorrentFileDone)
         xdpy.sigLogin.connect(@, @slotLogin)
         xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
         xdpy.sigToggleFlashAvailability.connect(@, @slotToggleFlashAvailability)
@@ -91,6 +93,16 @@ class XwareJS
 
         $createTaskUrl.get(0).focus()
         xdpy.requestFocus()
+
+    slotCreateTaskFromTorrentFile: () ->
+        App.set("dialogs.createTask.show", true)
+        $(".faked").addClass("faked-toggle").removeClass("faked")
+        $inputFile = $("#d-create-task-bt-file")
+        $inputFile.focus()
+        xdpy.slotClickBtButton()
+
+    slotCreateTaskFromTorrentFileDone: () ->
+        $(".faked-toggle").remove("faked-toggle").addClass("faked")
 
     slotToggleFlashAvailability: (available) ->
         App.set("system.flash", available)
