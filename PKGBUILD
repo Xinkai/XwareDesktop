@@ -28,7 +28,7 @@ fi
 
 if [ ! -f .localdev ]; then
     source=("${_commit}.tar.gz::https://github.com/Xinkai/XwareDesktop/archive/${_commit}.tar.gz")
-    md5sums=_md5sums
+    md5sums=${_md5sums}
     _nonlocal=1
 fi
 
