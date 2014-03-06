@@ -25,25 +25,25 @@ clean:
 	make -C frontend clean
 
 install: all
-	install -d -m 775                               $(DEST_DIR)$(PREFIX)
-	install -d -m 775                               $(DEST_DIR)$(PREFIX)/xware
-	install -d -m 775                               $(DEST_DIR)$(PREFIX)/xware/lib
-	install -d -m 775                               $(DEST_DIR)$(PREFIX)/frontend
+	install -d -m 775                               $(DESTDIR)$(PREFIX)
+	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware
+	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware/lib
+	install -d -m 775                               $(DESTDIR)$(PREFIX)/frontend
 
-	$(install_exe) -D ../xware/ETMDaemon            $(DEST_DIR)$(PREFIX)/xware/lib/ETMDaemon
-	$(install_exe) -D ../xware/EmbedThunderManager  $(DEST_DIR)$(PREFIX)/xware/lib/EmbedThunderManager
-	$(install_exe) ../xware/portal                  $(DEST_DIR)$(PREFIX)/xware/portal
+	$(install_exe) -D ../xware/ETMDaemon            $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
+	$(install_exe) -D ../xware/EmbedThunderManager  $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
+	$(install_exe) ../xware/portal                  $(DESTDIR)$(PREFIX)/xware/portal
 
-	$(install_exe) build/* $(DEST_DIR)$(PREFIX)
+	$(install_exe) build/* $(DESTDIR)$(PREFIX)
 
-	cp -R frontend $(DEST_DIR)$(PREFIX)
-	rm -rf         $(DEST_DIR)$(PREFIX)/frontend/__pycache__
-	rm -rf         $(DEST_DIR)$(PREFIX)/frontend/ui
-	rm -f          $(DEST_DIR)$(PREFIX)/frontend/xwarejs.coffee
-	rm -f          $(DEST_DIR)$(PREFIX)/frontend/Makefile
-	chmod 664      $(DEST_DIR)$(PREFIX)/frontend/*
-	chmod +x       $(DEST_DIR)$(PREFIX)/frontend/launcher.py
+	cp -R frontend $(DESTDIR)$(PREFIX)
+	rm -rf         $(DESTDIR)$(PREFIX)/frontend/__pycache__
+	rm -rf         $(DESTDIR)$(PREFIX)/frontend/ui
+	rm -f          $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
+	rm -f          $(DESTDIR)$(PREFIX)/frontend/Makefile
+	chmod 664      $(DESTDIR)$(PREFIX)/frontend/*
+	chmod +x       $(DESTDIR)$(PREFIX)/frontend/launcher.py
 
-	install -D     xwared.service                   $(DEST_DIR)/usr/lib/systemd/system/xwared.service
-	install -D -m 664 frontend/ui/rc/thunder.ico    $(DEST_DIR)$(PREFIX)/frontend/thunder.ico
-	install -D     frontend/xware_desktop.desktop   $(DEST_DIR)/usr/share/applications/xware_desktop.desktop
+	install -D     xwared.service                   $(DESTDIR)/usr/lib/systemd/system/xwared.service
+	install -D -m 664 frontend/ui/rc/thunder.ico    $(DESTDIR)$(PREFIX)/frontend/thunder.ico
+	install -D     frontend/xware_desktop.desktop   $(DESTDIR)/usr/share/applications/xware_desktop.desktop

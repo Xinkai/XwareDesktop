@@ -1,10 +1,10 @@
 
 pkgdesc="An attempt to bring Xware (Xunlei on routers) to desktop Linux."
 url="http://www.cuoan.net/xware_desktop"
-_commit="39989a29949fdaab75e78b040b8dff4c2031af7f"
+_commit=""
 
 pkgname="xware_desktop-git"
-pkgver="20140228"
+pkgver=""
 arch=("i686" "x86_64")
 conflicts=("xware_desktop")
 pkgrel=2
@@ -26,7 +26,7 @@ fi
 
 if [ ! -f .localdev ]; then
     source=("${_commit}.tar.gz::https://github.com/Xinkai/XwareDesktop/archive/${_commit}.tar.gz")
-    md5sums=('SKIP')
+    md5sums=('')
     _nonlocal=1
 fi
 
@@ -43,6 +43,6 @@ package() {
     if test $_nonlocal; then
         cd XwareDesktop-${_commit}/src
     fi
-    make DEST_DIR=${pkgdir} install
+    make DESTDIR=${pkgdir} install
 }
 
