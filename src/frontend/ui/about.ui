@@ -104,63 +104,173 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="layoutWidget_2">
+  <widget class="QTabWidget" name="tabWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>10</y>
-     <width>224</width>
-     <height>65</height>
+     <y>60</y>
+     <width>391</width>
+     <height>231</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_2">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <widget class="QLabel" name="label">
-        <property name="font">
-         <font>
-          <pointsize>20</pointsize>
-         </font>
-        </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tab_brief">
+    <attribute name="title">
+     <string>简介</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tab_versions">
+    <attribute name="title">
+     <string>版本详情</string>
+    </attribute>
+    <widget class="QWidget" name="">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>251</width>
+       <height>161</height>
+      </rect>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_13">
         <property name="text">
-         <string>Xware Desktop</string>
+         <string>Xware</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLabel" name="label_6">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_xwareVer">
         <property name="text">
-         <string>0.1</string>
+         <string>xware</string>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Python</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="label_pythonVer">
+        <property name="text">
+         <string>python</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Qt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_qtVer">
+        <property name="text">
+         <string>qt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_12">
+        <property name="text">
+         <string>Qt.WebKit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="label_qtwebkitVer">
+        <property name="text">
+         <string>webkit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_15">
+        <property name="text">
+         <string>Python.PyQt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="label_pyqtVer">
+        <property name="text">
+         <string>pyqt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Python.requests</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLabel" name="label_requestsVer">
+        <property name="text">
+         <string>requests</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Python.pyinotify</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLabel" name="label_pyinotifyVer">
+        <property name="text">
+         <string>pyinotify</string>
         </property>
        </widget>
       </item>
      </layout>
-    </item>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>12</x>
+     <y>13</y>
+     <width>222</width>
+     <height>39</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
     <item>
-     <widget class="QLabel" name="label_7">
+     <widget class="QLabel" name="label">
       <property name="font">
        <font>
-        <pointsize>10</pointsize>
-        <underline>true</underline>
+        <pointsize>20</pointsize>
        </font>
       </property>
       <property name="text">
-       <string>&lt;font color=&quot;grey&quot;&gt;与迅雷固件1.0.10配套&lt;/font&gt;</string>
+       <string>Xware Desktop</string>
       </property>
-      <property name="textFormat">
-       <enum>Qt::RichText</enum>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_6">
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>0.1</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+       <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
       </property>
      </widget>
     </item>
