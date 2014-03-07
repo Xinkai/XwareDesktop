@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "install" ]; then
+    useradd --no-create-home --user-group --shell /bin/false --system xware
+    rm -rf /tmp/thunder
+fi
+
+exit 0

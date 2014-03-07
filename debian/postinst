@@ -1,0 +1,34 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "configure" ]; then
+    echo "欢迎使用Xware Desktop。"
+    echo "设置方法和注意事项见项目主页。"
+    echo "项目主页 http://cuoan.net/xware-desktop"
+    echo "Github https://github.com/Xinkai/XwareDesktop"
+
+    touch /opt/xware_desktop/settings.ini
+    touch /opt/xware_desktop/mounts
+    mkdir -p /opt/xware_desktop/xware/cfg
+    touch /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+
+    chmod ug+rw /opt/xware_desktop/{settings.ini,mounts}
+    chmod -x    /opt/xware_desktop/{settings.ini,mounts}
+    chmod -x    /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+    chmod o-w   /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+
+    rm -rf          /opt/xware_desktop/frontend/__pycache__
+    mkdir -p -m 775 /opt/xware_desktop/frontend/__pycache__
+    chmod g+s       /opt/xware_desktop/frontend/__pycache__
+
+    chown -R xware:xware /opt/xware_desktop
+
+    chmod ug+s /opt/xware_desktop/xware/lib/ETMDaemon
+    chmod ug+s /opt/xware_desktop/xware/lib/EmbedThunderManager
+    chmod ug+s /opt/xware_desktop/xware/portal
+    chmod ug+s /opt/xware_desktop/permissioncheck
+    chmod ug+s /opt/xware_desktop/xwared
+    setcap CAP_SETGID=+ep /opt/xware_desktop/permissioncheck
+fi
+
+exit 0

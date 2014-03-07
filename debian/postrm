@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "purge" ] || [ "$1" == "remove" ]; then
+    userdel xware
+    groupdel xware
+    echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware_desktop内所有内容。"
+    rm -rf /opt/xware_desktop/frontend/__pycache__c
+fi
+
+exit 0
