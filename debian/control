@@ -11,6 +11,6 @@ Vcs-Browser: https://github.com/Xinkai/XwareDesktop
 
 Package: xware-desktop
 Architecture: i386
-Depends: python3, python3-pyqt5, libcap2-bin, zlib1g, python3-requests,
+Depends: python3, python3-pyqt5, python3-pyqt5.qtwebkit, libcap2-bin, zlib1g, python3-requests,
  python3-pyinotify
 Description: An attempt to bring Xware (Xunlei on router) to Linux desktop.
