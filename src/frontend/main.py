@@ -240,12 +240,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.settingsDialog.exec()
         del self.settingsDialog
 
-    # def _printDomainCookies(self):
-    #     from PyQt5.QtCore import QUrl
-    #     cookieJar = self.webView.page().networkAccessManager().cookieJar()
-    #     for cookie in cookieJar.cookiesForUrl(QUrl("http://yuancheng.xunlei.com/")):
-    #         print(bytes(cookie.name()).decode('utf-8'), bytes(cookie.value()).decode('utf-8'))
-
     @pyqtSlot(bool)
     def slotXwaredStatusChanged(self, enabled):
         self.menu_backend.setEnabled(enabled)
