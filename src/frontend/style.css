@@ -9,10 +9,11 @@
     cursor: pointer;
 }
 textarea,
+input:not([type]),
 input[type='email'],
 input[type='text'],
-input[type='password'],
-input.sel_inptxt {
+input[type='password']
+{
     -webkit-user-select: text;
     cursor: text;
 }
