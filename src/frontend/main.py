@@ -10,6 +10,8 @@ from frontendpy import FrontendPy
 import constants
 from ui_main import Ui_MainWindow
 
+import os
+
 log = print
 
 class customWebPage(QWebPage):
@@ -17,6 +19,7 @@ class customWebPage(QWebPage):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.overrideStyleSheet()
 
     def chooseFile(self, parentFrame, suggestFile):
         print("custom page::chooseFile", parentFrame, suggestFile)
@@ -36,6 +39,11 @@ class customWebPage(QWebPage):
     def overrideFile(self, url):
         self._overrideFile = url
         print("set local torrent {}.".format(url))
+
+    def overrideStyleSheet(self):
+        styleSheet = QUrl(os.path.join(os.getcwd(), "style.css"))
+        styleSheet.setScheme("file")
+        self.settings().setUserStyleSheetUrl(styleSheet)
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     app = None

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 from urllib import parse
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
@@ -30,11 +29,6 @@ class FrontendPy(QObject):
         self.queue = FrontendActionsQueue(self)
         self.mainWin = mainWin
         self.mainWin.settings.applySettings.connect(self.tryLogin)
-
-        styleSheet = QUrl(os.path.join(os.getcwd(), "style.css"))
-        styleSheet.setScheme("file")
-        self.mainWin.app.sigFrontendUiSetupFinished.connect(lambda: \
-            self.mainWin.webView.settings().setUserStyleSheetUrl(styleSheet))
 
         print("frontendpy loaded")
 
