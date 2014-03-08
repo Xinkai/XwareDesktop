@@ -11,10 +11,11 @@ import constants
 from ui_main import Ui_MainWindow
 
 import os
+from urllib import parse
 
 log = print
 
-class customWebPage(QWebPage):
+class CustomWebPage(QWebPage):
     _overrideFile = None
 
     def __init__(self, parent):
@@ -45,6 +46,12 @@ class customWebPage(QWebPage):
         styleSheet.setScheme("file")
         self.settings().setUserStyleSheetUrl(styleSheet)
 
+    def urlMatch(self, against):
+        return parse.urldefrag(self.mainFrame().url().toString())[0] == against
+
+    def urlMatchIn(self, *againsts):
+        return parse.urldefrag(self.mainFrame().url().toString())[0] in againsts
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     app = None
     savedWindowState = Qt.WindowNoState
@@ -69,7 +76,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def setupWebkit(self):
         self.settings.applySettings.connect(self.applySettingsToWebView)
 
-        self._customPage = customWebPage(self.webView)
+        self._customPage = CustomWebPage(self.webView)
         self.webView.setPage(self._customPage)
         self.frame.loadStarted.connect(self.slotFrameLoadStarted)
         self.frame.urlChanged.connect(self.slotUrlChanged)
@@ -191,17 +198,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @pyqtSlot()
     def slotUrlChanged(self):
-        from urllib import parse
-        url = parse.urldefrag(self.url)[0]
-        log("webView urlChanged:", url)
-        if url == constants.V2_PAGE:
+        if self.page.urlMatch(constants.V2_PAGE):
             log("webView: redirect to V3.")
             self.webView.stop()
             self.frame.load(QUrl(constants.V3_PAGE))
-        elif url in (constants.V3_PAGE, constants.LOGIN_PAGE):
+        elif self.page.urlMatchIn(constants.V3_PAGE, constants.LOGIN_PAGE):
             pass
         else:
-            log("Unable to handle this URL", url)
+            log("Unable to handle this URL", self.url)
 
     @pyqtSlot()
     def slotRefreshPage(self):

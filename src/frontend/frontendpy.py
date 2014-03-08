@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from urllib import parse
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
 from PyQt5.Qt import Qt
@@ -32,13 +31,10 @@ class FrontendPy(QObject):
 
         print("frontendpy loaded")
 
-    def urlMatch(self, against):
-        return parse.urldefrag(self.mainWin.url)[0] == against
-
     ################################### SLOTS ######################################
     @pyqtSlot()
     def tryLogin(self):
-        if self.urlMatch(constants.LOGIN_PAGE):
+        if self.mainWin.page.urlMatch(constants.LOGIN_PAGE):
             autologin = self.mainWin.settings.getbool("account", "autologin")
             if autologin:
                 username = self.mainWin.settings.get("account", "username")
@@ -47,7 +43,7 @@ class FrontendPy(QObject):
                     self.sigLogin.emit(username, password)
 
     def tryActivate(self, payload):
-        if not self.urlMatch(constants.V3_PAGE):
+        if not self.mainWin.page.urlMatch(constants.V3_PAGE):
             return # not v3 page
 
         if not payload["userid"]:
