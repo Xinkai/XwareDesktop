@@ -19,7 +19,7 @@ class customWebPage(QWebPage):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.overrideStyleSheet()
+        self.applyCustomStyleSheet()
 
     def chooseFile(self, parentFrame, suggestFile):
         print("custom page::chooseFile", parentFrame, suggestFile)
@@ -40,7 +40,7 @@ class customWebPage(QWebPage):
         self._overrideFile = url
         print("set local torrent {}.".format(url))
 
-    def overrideStyleSheet(self):
+    def applyCustomStyleSheet(self):
         styleSheet = QUrl(os.path.join(os.getcwd(), "style.css"))
         styleSheet.setScheme("file")
         self.settings().setUserStyleSheetUrl(styleSheet)
