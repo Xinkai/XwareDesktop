@@ -6,8 +6,16 @@
 /* make everything not user-selectable except for inputs by default */
 * {
     -webkit-user-select: none;
+    cursor: default;
+}
+
+a[href],
+a[href] *,
+label[for]
+{
     cursor: pointer;
 }
+
 textarea,
 input:not([type]),
 input[type='email'],
