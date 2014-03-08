@@ -4,7 +4,7 @@ PREFIX      = /opt/xware_desktop
 install_exe = install -m 775
 install     = install -m 664
 
-all: libmounthelper.so xwared permissioncheck pyqt xwarejs.js
+all: libmounthelper.so xwared permissioncheck pyqt xwarejs.js prepareXware
 
 libmounthelper.so: src/libmounthelper.c
 	mkdir -p build
@@ -23,6 +23,7 @@ permissioncheck: src/permissioncheck.c
 clean:
 	rm -rf pkg
 	rm -rf build
+	rm -rf preparedXware
 	rm -f src/frontend/ui_*.py
 	rm -f src/frontend/*_rc.py
 	rm -f src/frontend/xwarejs.js
@@ -37,15 +38,24 @@ pyqt:
 xwarejs.js: src/frontend/xwarejs.coffee
 	coffee -c src/frontend/xwarejs.coffee
 
+prepareXware:
+	mkdir -p preparedXware
+	cp xware/ETMDaemon           preparedXware/
+	cp xware/EmbedThunderManager preparedXware/
+	cp xware/portal              preparedXware/
+	chrpath --delete preparedXware/ETMDaemon
+	chrpath --delete preparedXware/EmbedThunderManager
+	chrpath --delete preparedXware/portal
+
 install: all
 	install -d -m 775                               $(DESTDIR)$(PREFIX)
 	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware
 	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware/lib
 	install -d -m 775                               $(DESTDIR)$(PREFIX)/frontend
 
-	$(install_exe) -D xware/ETMDaemon               $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
-	$(install_exe) -D xware/EmbedThunderManager     $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
-	$(install_exe) xware/portal                     $(DESTDIR)$(PREFIX)/xware/portal
+	$(install_exe) -D preparedXware/ETMDaemon             $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
+	$(install_exe) -D preparedXware/EmbedThunderManager   $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
+	$(install_exe)    preparedXware/portal                $(DESTDIR)$(PREFIX)/xware/portal
 
 	$(install_exe) build/* $(DESTDIR)$(PREFIX)
 

@@ -12,7 +12,7 @@ arch=("i686" "x86_64")
 conflicts=("xware_desktop")
 license=("GPL" "custom")
 
-makedepends=("python-pyqt5" "coffee-script")
+makedepends=("python-pyqt5" "coffee-script" "chrpath")
 if test "$CARCH" == x86_64; then
     makedepends+=("lib32-glib2" "gcc-multilib")
 else
