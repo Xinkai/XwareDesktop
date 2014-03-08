@@ -1,4 +1,4 @@
-
+# Maintainer: Xinkai <yeled.nova@gmail.com>
 pkgdesc="An attempt to bring Xware (Xunlei on routers) to desktop Linux."
 url="http://www.cuoan.net/xware_desktop"
 
@@ -19,7 +19,7 @@ else
     makedepends+=("glib2" "gcc")
 fi
 
-depends=("python-pyqt5" "qt5-webkit" "libcap" "python-requests" "python-pyinotify")
+depends=("python-pyqt5" "qt5-webkit" "libcap" "python-requests" "python-pyinotify" "desktop-file-utils")
 if test "$CARCH" == x86_64; then
     depends+=("lib32-glibc" "lib32-zlib" "lib32-glib2")
 else
@@ -28,7 +28,7 @@ fi
 
 if [ ! -f .localdev ]; then
     source=("${_commit}.tar.gz::https://github.com/Xinkai/XwareDesktop/archive/${_commit}.tar.gz")
-    md5sums=${_md5sums}
+    md5sums=(${_md5sums})
     _nonlocal=1
 fi
 

@@ -9,7 +9,9 @@ post_install() {
     echo "项目主页 http://cuoan.net/xware-desktop"
     echo "Github https://github.com/Xinkai/XwareDesktop"
 
+    # Arch specific
     systemctl daemon-reload
+    update-desktop-database -q
 
     touch /opt/xware_desktop/settings.ini
     touch /opt/xware_desktop/mounts
