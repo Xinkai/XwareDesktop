@@ -114,18 +114,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_showAbout.triggered.connect(self.slotShowAbout)
 
     def setupSystray(self):
-        self.trayIconMenu = QMenu(self)
+        self.trayIconMenu = QMenu(None)
 
-        icon = QIcon()
-        icon.addPixmap(QPixmap(":/image/thunder.ico"), QIcon.Normal, QIcon.Off)
+        icon = QIcon(":/image/thunder.ico")
         self.trayIconMenu.addAction(self.action_exit)
 
-        self.trayIcon = QSystemTrayIcon(self)
+        self.trayIcon = QSystemTrayIcon(None)
         self.trayIcon.setIcon(icon)
         self.trayIcon.setContextMenu(self.trayIconMenu)
         self.trayIcon.setVisible(True)
 
         self.trayIcon.activated.connect(self.slotActivateSystrayContextMenu)
+        self.app.lastWindowClosed.connect(self.teardownSystray)
+
+    @pyqtSlot()
+    def teardownSystray(self):
+        print("teardown Systray")
+        # On Ubuntu 13.10, systrayicon won't destroy itself gracefully, stops the whole program from exiting.
+        del self.trayIcon
 
     def setupStatusBar(self):
         xwaredStatus = QLabel(self.statusBar_main)
