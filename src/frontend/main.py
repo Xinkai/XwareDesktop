@@ -161,7 +161,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     @property
     def url(self):
-        return self.qurl.url()
+        # for some reason, on Ubuntu QUrl.url() is not there, call toString() instead.
+        return self.qurl.toString()
 
     @property
     def settings(self):
