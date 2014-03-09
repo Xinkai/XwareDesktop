@@ -17,7 +17,7 @@ preparedXware/
 pkg/
 
 # Debian package
-debian/xware-desktop
+debian/xware-desktop/
 debian/files
 debian/*.debhelper.log
 debian/*.substvars
