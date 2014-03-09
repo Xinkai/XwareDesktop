@@ -3,7 +3,7 @@ Maintainer: Xinkai <yeled.nova@gmail.com>
 Section: net
 Priority: optional
 Build-Depends: gcc, coffeescript, libglib2.0-dev, libmount-dev, pyqt5-dev-tools,
- pkg-config, debhelper (>= 9)
+ pkg-config, debhelper (>= 9), chrpath
 Standards-Version: 3.9.5
 Homepage: http://cuoan.net/xware-desktop
 Vcs-Git: git://gibhub.com/Xinkai/XwareDesktop.git
