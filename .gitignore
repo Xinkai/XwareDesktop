@@ -1,14 +1,26 @@
+# Python
 __pycache__/
 *.py[cod]
 
+# IDE
 .cproject
 .project
+.idea/
 
-*.so
+# Build/Prepared
+build/
+preparedXware/
 
 # Arch package
 *.pkg.tar.xz
+*.src.tar.gz
 pkg/
+
+# Debian package
+debian/xware-desktop
+debian/files
+debian/*.debhelper.log
+debian/*.substvars
 
 # pyqt generated
 ui_*.py
@@ -17,4 +29,6 @@ ui_*.py
 # coffeescript generated
 xwarejs.js
 
+# my building environment flag
 .localdev
+unused/
