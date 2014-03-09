@@ -177,4 +177,7 @@ class XwareJS
             xdpy.slotSetLogined(_logined)
 
 $ ->
+    if (not window.MutationObserver) and window.WebKitMutationObserver
+        window.MutationObserver = window.WebKitMutationObserver
+
     window.xdjs = new XwareJS()
