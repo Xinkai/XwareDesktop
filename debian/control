@@ -1,5 +1,5 @@
 Source: xware-desktop
-Maintainer: Xinkai <yeled.nova@gmail.com>
+Maintainer: Xinkai Chen <yeled.nova@gmail.com>
 Section: net
 Priority: optional
 Build-Depends: gcc-multilib, coffeescript, libglib2.0-dev:i386, libmount-dev, pyqt5-dev-tools,
