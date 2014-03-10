@@ -16,7 +16,7 @@ const char* XWARE_MOUNTS_PATH = "/opt/xware_desktop/mounts";
         void (*perror) (const char *__s) = dlsym(RTLD_NEXT, "perror");
 
 #define XD_SPRINTF \
-        int (*sprintf) (char *__restrict __s, const char *__restrict __format, ...) __THROWNL = dlsym(RTLD_NEXT, "sprintf");
+        int (*sprintf) (char *__restrict __s, const char *__restrict __format, ...) = dlsym(RTLD_NEXT, "sprintf");
 
 int xdperror(const char* s) {
     size_t size = strlen(s);
