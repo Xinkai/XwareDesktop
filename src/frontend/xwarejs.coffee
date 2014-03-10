@@ -144,7 +144,7 @@ class XwareJS
             "subtree": false
             "attributeOldValue": false
             "characterDataOldValue": false
-            "aattributeFilter": ["class"]
+            "attributeFilter": ["class"]
         })
 
     slotBindDeviceObserver: (boundPeerId) ->
