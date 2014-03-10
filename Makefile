@@ -4,11 +4,11 @@ PREFIX      = /opt/xware_desktop
 install_exe = install -m 775
 install     = install -m 664
 
-all: libmounthelper.so xwared permissioncheck pyqt xwarejs.js prepareXware
+all: etmpatch.so xwared permissioncheck pyqt xwarejs.js prepareXware
 
-libmounthelper.so: src/libmounthelper.c
+etmpatch.so: src/etmpatch.c
 	mkdir -p build
-	$(CC) $(FLAGS) -m32 -o build/libmounthelper.so -fPIC -shared -ldl src/libmounthelper.c
+	$(CC) $(FLAGS) -m32 -o build/etmpatch.so -fPIC -shared -ldl src/etmpatch.c
 
 xwared: src/xwared.c src/xwared.h
 	mkdir -p build

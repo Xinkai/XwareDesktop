@@ -21,7 +21,7 @@ void runETM() {
         exit(EXIT_FAILURE);
     } else if (etmPid == 0) {
         // child
-        hookLibmounthelper();
+        hookEtmPatch();
         printf("child: pid(%d) ppid(%d)\n", getpid(), getppid());
         flock(fdETMLock, LOCK_EX | LOCK_NB);
         execv(etmArgv[0], etmArgv);
@@ -166,15 +166,15 @@ void unload() {
     exit(EXIT_SUCCESS);
 }
 
-void hookLibmounthelper() {
+void hookEtmPatch() {
     char* LD_PRELOAD = getenv("LD_PRELOAD");
     if (LD_PRELOAD == NULL) {
-        if (setenv("LD_PRELOAD", LIBMOUNTHELPER_PATH, 1) == -1) {
+        if (setenv("LD_PRELOAD", ETMPATCH_PATH, 1) == -1) {
             perror("setenv");
         }
     } else {
         strcat(LD_PRELOAD, " ");
-        strcat(LD_PRELOAD, LIBMOUNTHELPER_PATH);
+        strcat(LD_PRELOAD, ETMPATCH_PATH);
         if (setenv("LD_PRELOAD", LD_PRELOAD, 1) == -1) {
             perror("setenv");
         }

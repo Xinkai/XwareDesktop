@@ -39,12 +39,12 @@ const char* etmWorkingDir = "/opt/xware_desktop/xware/lib";
 char* etmArgv[] = {"/opt/xware_desktop/xware/lib/EmbedThunderManager", "--verbose", NULL};
 //char* etmArgv[] = {"//usr/bin/sleep", "1", NULL};
 
-#define LIBMOUNTHELPER_PATH "/opt/xware_desktop/libmounthelper.so"
+#define ETMPATCH_PATH "/opt/xware_desktop/etmpatch.so"
 
 void registerSignalHandlers();
 void cleanPreviousRun();
 void unload();
-void hookLibmounthelper();
+void hookEtmPatch();
 int main(const int argc, const char* argv[]);
 
 
