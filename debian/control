@@ -2,15 +2,15 @@ Source: xware-desktop
 Maintainer: Xinkai <yeled.nova@gmail.com>
 Section: net
 Priority: optional
-Build-Depends: gcc, coffeescript, libglib2.0-dev, libmount-dev, pyqt5-dev-tools,
- pkg-config, debhelper (>= 9), chrpath
+Build-Depends: gcc-multilib, coffeescript, libglib2.0-dev:i386, libmount-dev, pyqt5-dev-tools,
+ pkg-config:i386, debhelper (>= 9), chrpath
 Standards-Version: 3.9.5
 Homepage: http://cuoan.net/xware-desktop
 Vcs-Git: git://gibhub.com/Xinkai/XwareDesktop.git
 Vcs-Browser: https://github.com/Xinkai/XwareDesktop
 
 Package: xware-desktop
-Architecture: i386
-Depends: python3, python3-pyqt5, python3-pyqt5.qtwebkit, libcap2-bin, zlib1g, python3-requests,
- python3-pyinotify
+Architecture: i386 amd64
+Depends: python3, python3-pyqt5, python3-pyqt5.qtwebkit, libcap2-bin, zlib1g:i386, python3-requests,
+ python3-pyinotify, libc6:i386
 Description: An attempt to bring Xware (Xunlei on routers) to desktop Linux.
