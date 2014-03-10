@@ -33,7 +33,10 @@ class MountsFaker(object):
         path = path[len(constants.ETM_MOUNTS_DIR):]
         parts = path.split("/")
         drive = parts[0][:-1] # "C:" -> "C"
-        return os.path.join(self.mounts[ord(drive)-ord("C")], *parts[1:])
+
+        nativePath = os.path.join(self.mounts[ord(drive)-ord("C")], *parts[1:])
+        resolvedPath = os.path.realpath(nativePath)
+        return resolvedPath
 
     def writeMounts(self):
         buffer = []
