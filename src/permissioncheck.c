@@ -32,7 +32,7 @@ int checkWritePermission(const char* path) {
         strcat(probepath, "/");
     }
 
-    int ret = access(probepath, W_OK | X_OK);
+    int ret = eaccess(probepath, W_OK | X_OK);
     if (ret == -1) {
         if (errno == EACCES) {
             printf("%s无法读写文件。xware用户对路径没有读写权限。%s\n", RED, NOSTYLE);
@@ -48,13 +48,13 @@ int checkWritePermission(const char* path) {
 
 int checkDirPermission(const char* dirpath) {
     if (strcmp(dirpath, "/") == 0) {
-        return (access("/", X_OK) == 0);
+        return (eaccess("/", X_OK) == 0);
     } else {
         char tmp[PATH_MAX] = {0};
         strncpy(tmp, dirpath, PATH_MAX);
         char* parentpath = dirname(tmp);
         if (checkDirPermission(parentpath)) {
-            int ret = access(dirpath, X_OK);
+            int ret = eaccess(dirpath, X_OK);
 //            printf("#%s\n", dirpath);
             if (ret == 0) {
                 return 1;
