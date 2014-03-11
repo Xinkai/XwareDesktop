@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
 
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem
 from ui_settings import Ui_Dialog
-import configparser
+import configparser, os
 import constants
 
 DEFAULT_SETTINGS = {
@@ -17,6 +17,7 @@ DEFAULT_SETTINGS = {
         "allowflash": True,
         "minimizetosystray": True,
         "closetominimize": True,
+        "cachelocation": os.path.expanduser("~/.xware-desktop/cache/webkit"),
     },
     "xwared": {
         "startetm": True,
