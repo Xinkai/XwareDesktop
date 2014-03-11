@@ -1,6 +1,5 @@
 #define _GNU_SOURCE
 #include <dirent.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,8 +15,6 @@
 #define GREEN         "\033[0;32m"
 
 // global variables
-const char* PROBENAME = "XwareDesktopPermissionProbe";
-
 gid_t xware_gid = -1;
 uid_t xware_uid = -1;
 gid_t grpList1[NGROUPS_MAX];
@@ -28,16 +25,15 @@ int matchAll(struct libmnt_fs* a, void* b) {
 }
 
 int checkWritePermission(const char* path) {
-    char probepath[PATH_MAX];
+    char probepath[PATH_MAX] = {0};
     strcpy(probepath, path);
     unsigned long destDirPathLength = strlen(path);
     if (!strcmp(&path[destDirPathLength - 1], "/") == 0) {
         strcat(probepath, "/");
     }
-    strcat(probepath, PROBENAME);
 
-    int fd = open(probepath, O_CREAT | O_RDWR, 0660);
-    if (fd == -1) {
+    int ret = access(probepath, W_OK | X_OK);
+    if (ret == -1) {
         if (errno == EACCES) {
             printf("%s无法读写文件。xware用户对路径没有读写权限。%s\n", RED, NOSTYLE);
         } else {
@@ -45,8 +41,6 @@ int checkWritePermission(const char* path) {
         }
         return 0;
     } else {
-        close(fd);
-        remove(probepath);
         printf("%s正常。%s\n", GREEN, NOSTYLE);
         return 1;
     }
@@ -54,13 +48,13 @@ int checkWritePermission(const char* path) {
 
 int checkDirPermission(const char* dirpath) {
     if (strcmp(dirpath, "/") == 0) {
-        return (chdir("/") == 0);
+        return (access("/", X_OK) == 0);
     } else {
-        char tmp[PATH_MAX];
+        char tmp[PATH_MAX] = {0};
         strncpy(tmp, dirpath, PATH_MAX);
         char* parentpath = dirname(tmp);
         if (checkDirPermission(parentpath)) {
-            int ret = chdir(dirpath);
+            int ret = access(dirpath, X_OK);
 //            printf("#%s\n", dirpath);
             if (ret == 0) {
                 return 1;
