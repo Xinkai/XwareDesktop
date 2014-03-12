@@ -50,5 +50,6 @@ package() {
         cd ../
     fi
     make DESTDIR=${pkgdir} install
+    install -D src/xwared.service ${pkgdir}/usr/lib/systemd/system/xwared.service
 }
 

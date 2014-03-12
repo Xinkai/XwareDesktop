@@ -67,6 +67,5 @@ install: all
 	chmod 664          $(DESTDIR)$(PREFIX)/frontend/*
 	chmod +x           $(DESTDIR)$(PREFIX)/frontend/launcher.py
 
-	install -D     src/xwared.service                   $(DESTDIR)/usr/lib/systemd/system/xwared.service
 	install -D -m 664 src/frontend/ui/rc/thunder.ico    $(DESTDIR)$(PREFIX)/frontend/thunder.ico
 	install -D     src/frontend/xware_desktop.desktop   $(DESTDIR)/usr/share/applications/xware_desktop.desktop
