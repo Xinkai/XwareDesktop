@@ -34,7 +34,7 @@ int xdaccess(const char* path, const int mode) {
     // access seems to support ACLs, but it performs tests based on real uid/gid, ignoring euid/egid.
     // so for now, permissioncheck REQUIRES CAP_SETUID and CAP_SETGID capabilities.
     // solely setting SUID/SGID won't work!
-    char modestr[3] = {0};
+    char modestr[4] = {0};
     modestr[0] = (mode & R_OK) ? 'r' : ' ';
     modestr[1] = (mode & W_OK) ? 'w' : ' ';
     modestr[2] = (mode & X_OK) ? 'x' : ' ';
