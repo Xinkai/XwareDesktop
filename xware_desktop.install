@@ -32,9 +32,8 @@ post_install() {
     chmod ug+s /opt/xware_desktop/xware/lib/ETMDaemon
     chmod ug+s /opt/xware_desktop/xware/lib/EmbedThunderManager
     chmod ug+s /opt/xware_desktop/xware/portal
-    chmod ug+s /opt/xware_desktop/permissioncheck
     chmod ug+s /opt/xware_desktop/xwared
-    setcap CAP_SETGID=+ep /opt/xware_desktop/permissioncheck
+    setcap "CAP_SETUID=+ep CAP_SETGID=+ep" /opt/xware_desktop/permissioncheck
 }
 
 post_upgrade() {
