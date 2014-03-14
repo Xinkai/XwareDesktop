@@ -6,4 +6,5 @@ if [ "$1" = "install" ]; then
     rm -rf /tmp/thunder
 fi
 
+#DEBHELPER#
 exit 0

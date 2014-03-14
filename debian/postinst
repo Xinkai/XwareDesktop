@@ -30,4 +30,5 @@ if [ "$1" = "configure" ]; then
     setcap "CAP_SETUID=+ep CAP_SETGID=+ep" /opt/xware_desktop/permissioncheck
 fi
 
+#DEBHELPER#
 exit 0

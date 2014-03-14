@@ -9,4 +9,5 @@ if [ "$1" = "purge" ] || [ "$1" = "remove" ]; then
     rm -rf /opt/xware_desktop/frontend/__pycache__c
 fi
 
+#DEBHELPER#
 exit 0
