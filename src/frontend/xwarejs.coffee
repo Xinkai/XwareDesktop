@@ -23,6 +23,9 @@ class XwareJS
             result.userid = null
         xdpy.xdjsLoaded(result)
 
+    log: (items...) ->
+        xdpy.log(items)
+
     slotLogin: (username, password) ->
         $username = $("#login-input-username")
         $password = $("#login-input-password")
@@ -154,22 +157,22 @@ class XwareJS
             Object.defineProperty(Data.downloader.all[boundPeerId], "online", {
                 get: () ->
                     return _online
-                set: (v) ->
+                set: (v) =>
                     _online = v
                     xdpy.slotSetOnline(v)
 
-                    xdpy.log "set online", v
+                    @log "set online", v is 1
                     console.log("set online", v)
             })
 
             Object.defineProperty(Data.downloader.all[boundPeerId], "logined", {
                 get: () ->
                     return _logined
-                set: (v) ->
+                set: (v) =>
                     _logined = v
                     xdpy.slotSetLogined(v)
 
-                    xdpy.log("set logined", v)
+                    @log "set logined", v is 1
                     console.log("set logined", v)
             })
 

@@ -107,9 +107,12 @@ class FrontendPy(QObject):
         self.mainWin.settings.setbool("account", "autologin", True)
         self.mainWin.settings.save()
 
-    @pyqtSlot(str)
-    def log(self, *args):
-        print("xdjs:", *args)
+    @pyqtSlot("QList<QVariant>")
+    def log(self, items):
+        print("xdjs: ", end = "")
+        for item in items:
+            print(item, end = " ")
+        print("")
 
     @pyqtSlot(bool)
     def slotMaskOnOffChanged(self, val):
