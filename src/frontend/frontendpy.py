@@ -25,9 +25,9 @@ class FrontendPy(QObject):
 
     def __init__(self, mainWin):
         super().__init__(mainWin)
-        self.queue = FrontendActionsQueue(self)
         self.mainWin = mainWin
         self.mainWin.settings.applySettings.connect(self.tryLogin)
+        self.queue = FrontendActionsQueue(self)
 
         print("frontendpy loaded")
 

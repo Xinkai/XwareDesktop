@@ -189,7 +189,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>240</y>
+         <y>260</y>
          <width>251</width>
          <height>23</height>
         </rect>
@@ -201,43 +201,11 @@
         <string>在网页中启用 Webkit 开发者工具</string>
        </property>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
+      <widget class="QWidget" name="">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>130</y>
-         <width>321</width>
-         <height>101</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_6">
-        <item>
-         <widget class="QCheckBox" name="checkBox_watchClipboard">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>监视剪切板</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPlainTextEdit" name="plaintext_watchPattern">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="plainText">
-           <string>*.exe</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>10</y>
+         <x>12</x>
+         <y>12</y>
          <width>217</width>
          <height>112</height>
         </rect>
@@ -282,6 +250,28 @@
            <string>显示悬浮窗</string>
           </property>
          </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="">
+       <property name="geometry">
+        <rect>
+         <x>240</x>
+         <y>10</y>
+         <width>661</width>
+         <height>271</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QCheckBox" name="checkBox_watchClipboard">
+          <property name="text">
+           <string>监视剪切板</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPlainTextEdit" name="plaintext_watchPattern"/>
         </item>
        </layout>
       </widget>
@@ -611,7 +601,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>checkBox_watchClipboard</tabstop>
   <tabstop>plaintext_watchPattern</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>

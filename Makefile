@@ -28,6 +28,7 @@ clean:
 	rm -f src/frontend/*_rc.py
 	rm -f src/frontend/xwarejs.js
 	rm -rf src/frontend/__pycache__
+	rm -rf src/frontend/tests/__pycache__
 
 pyqt:
 	pyuic5 -o src/frontend/ui_main.py     src/frontend/ui/main.ui
@@ -62,6 +63,7 @@ install: all
 	cp -R src/frontend $(DESTDIR)$(PREFIX)
 	rm -rf             $(DESTDIR)$(PREFIX)/frontend/__pycache__
 	rm -rf             $(DESTDIR)$(PREFIX)/frontend/ui
+	rm -rf             $(DESTDIR)$(PREFIX)/frontend/tests
 	rm -f              $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
 	rm -f              $(DESTDIR)$(PREFIX)/frontend/Makefile
 	chmod 664          $(DESTDIR)$(PREFIX)/frontend/*

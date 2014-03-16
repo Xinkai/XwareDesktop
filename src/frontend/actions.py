@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtGui import QGuiApplication
 
 from collections import deque
 import threading, os, sys
@@ -8,6 +9,7 @@ import threading, os, sys
 from multiprocessing.connection import Listener, Client
 
 import constants
+from mimeparser import UrlExtractor
 
 class FrontendAction(object):
     def __init__(self):
@@ -42,7 +44,9 @@ class CreateTask(object):
 class FrontendActionsQueue(QObject):
     _queue = None
     _listener = None
+    _clipboard = None
     frontendpy = None
+    urlExtractor = None
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -57,6 +61,11 @@ class FrontendActionsQueue(QObject):
         if tasks:
             self.createTasksAction(tasks)
 
+        self.urlExtractor = UrlExtractor(self)
+
+        self._clipboard = QGuiApplication.clipboard()
+        self.frontendpy.mainWin.settings.applySettings.connect(self.slotWatchClipboardToggled)
+
     def listenerThread(self):
         # clean if previous run crashes
         try:
@@ -69,6 +78,24 @@ class FrontendActionsQueue(QObject):
                 with listener.accept() as conn:
                     payload = conn.recv()
                     self.createTasksAction(payload)
+
+    @pyqtSlot()
+    def slotWatchClipboardToggled(self):
+        on = self.frontendpy.mainWin.settings.getbool("frontend", "watchclipboard")
+        if on:
+            self._clipboard.dataChanged.connect(self.slotClipboardDataChanged)
+        else:
+            try:
+                self._clipboard.dataChanged.disconnect(self.slotClipboardDataChanged)
+            except TypeError:
+                pass # not connected, meaning settings says no watch clipboard
+
+    @pyqtSlot()
+    def slotClipboardDataChanged(self):
+        mimeData = self._clipboard.mimeData()
+        urls = self.urlExtractor.extract(mimeData.text())
+        if len(urls) > 0:
+            self.createTasksAction(urls)
 
     def queueAction(self, action):
         self._queue.append(action)

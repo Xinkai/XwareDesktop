@@ -18,6 +18,38 @@ DEFAULT_SETTINGS = {
         "minimizetosystray": True,
         "closetominimize": True,
         "cachelocation": os.path.expanduser("~/.xware-desktop/cache/webkit"),
+        "watchclipboard": True,
+        "watchpattern":
+"""; 试验功能，暂不允许更改此设置
+; packages
+*.zip;*.tar;*.tgz;*.tar.gz;*.tbz;*.tbz2;*.tb2;*.tar.bz2;*.taz;*.tar.Z;*.tlz;*.tar.lz;*.tar.lzma;*.txz;*.tar.xz;*.cab;*.rar;*.7z;*.iso;*.dmg;*.img;
+
+; documents
+*.pdf;*.doc;*.docx;*.docm;*.xlt;*.xltx;*.xlsm;*.ppt;*.pptx;*.pptm;
+
+; audio
+*.mp1;*.mp2;*.mp3;*.mp4;*.flac;*.ape;*.webm;*.ogg;*.wav;*.wv;*.wma;*.aac;*.m4a;*.ra
+
+; video
+*.mp4;*.mkv;*.rm;*.rmvb;*.avi;*.flv;*.3gp;*.3g2;*.wmv;*.mov;*.vob
+
+; media-related
+*.srt;*.cue;*.m3u;*.sub
+
+; programming
+*.jar;*.apk;
+
+; Linux
+*.deb;*.rpm
+
+; Windows
+*.exe;*.msi;
+
+; Mac
+
+; misc
+*.rom;*.ttf;*.bin;*.torrent
+""",
     },
     "xwared": {
         "startetm": True,
@@ -76,6 +108,12 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_allowFlash.setChecked(self.settings.getbool("frontend", "allowflash"))
         self.checkBox_minimizeToSystray.setChecked(self.settings.getbool("frontend", "minimizetosystray"))
         self.checkBox_closeToMinimize.setChecked(self.settings.getbool("frontend", "closetominimize"))
+
+        # clipboard related
+        self.checkBox_watchClipboard.stateChanged.connect(self.slotWatchClipboardToggled)
+        self.checkBox_watchClipboard.setChecked(self.settings.getbool("frontend", "watchclipboard"))
+        self.slotWatchClipboardToggled(self.checkBox_watchClipboard.checkState())
+        self.plaintext_watchPattern.setPlainText(self.settings.get("frontend", "watchpattern"))
 
         from PyQt5.QtWidgets import QButtonGroup
         self.btngrp_etmStartWhen = QButtonGroup()
@@ -136,6 +174,14 @@ class SettingsDialog(QDialog, Ui_Dialog):
             prevLine = line
 
         return result
+
+    @pyqtSlot(int)
+    def slotWatchClipboardToggled(self, state):
+        # disable pattern settings, before
+        # 1. complete patterns
+        # 2. test glib key file compatibility
+        self.plaintext_watchPattern.setReadOnly(True)
+        self.plaintext_watchPattern.setEnabled(state)
 
     @pyqtSlot()
     def setupMounts(self):
@@ -218,7 +264,10 @@ class SettingsDialog(QDialog, Ui_Dialog):
                                 self.checkBox_minimizeToSystray.isChecked())
         self.settings.setbool("frontend", "closetominimize",
                                 self.checkBox_closeToMinimize.isChecked())
-
+        self.settings.setbool("frontend", "watchclipboard",
+                                self.checkBox_watchClipboard.isChecked())
+        # self.settings.set("frontend", "watchpattern",
+        #                         self.plaintext_watchPattern.toPlainText())
         self.settings.setint("xwared", "startetmwhen",
                           self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton()))
 
