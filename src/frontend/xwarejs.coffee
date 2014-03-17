@@ -161,7 +161,6 @@ class XwareJS
                     _online = v
                     xdpy.slotSetOnline(v)
 
-                    @log "set online", v is 1
                     console.log("set online", v)
             })
 
@@ -172,7 +171,6 @@ class XwareJS
                     _logined = v
                     xdpy.slotSetLogined(v)
 
-                    @log "set logined", v is 1
                     console.log("set logined", v)
             })
 

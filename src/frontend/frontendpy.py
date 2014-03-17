@@ -3,8 +3,12 @@
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
 from PyQt5.Qt import Qt
+import collections
+
 import constants, actions
 from actions import FrontendActionsQueue
+
+FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logined", "online"])
 
 # Together with xwarejs.js, exchange information with the browser
 class FrontendPy(QObject):
@@ -15,13 +19,14 @@ class FrontendPy(QObject):
     sigToggleFlashAvailability = pyqtSignal(bool)
     sigActivateDevice = pyqtSignal(str)
     sigNotifyPeerId = pyqtSignal(str) # let xdjs knows peerid
+    sigFrontendStatusChanged = pyqtSignal() # caused by webpage heartbeat/changed status/refresh page
 
     queue = None
     mainWin = None
     isPageMaskOn = None
-    isPageOnline = None
-    isPageLogined = None
-    isXdjsLoaded = None
+    _isPageOnline = None # property wraps them, in order to fire sigFrontendStatusChanged
+    _isPageLogined = None
+    _isXdjsLoaded = None
 
     def __init__(self, mainWin):
         super().__init__(mainWin)
@@ -31,6 +36,32 @@ class FrontendPy(QObject):
 
         print("frontendpy loaded")
 
+    @property
+    def isPageOnline(self):
+        return self._isPageOnline
+
+    @isPageOnline.setter
+    def isPageOnline(self, value):
+        self._isPageOnline = value
+        self.sigFrontendStatusChanged.emit()
+
+    @property
+    def isPageLogined(self):
+        return self._isPageLogined
+
+    @isPageLogined.setter
+    def isPageLogined(self, value):
+        self._isPageLogined = value
+        self.sigFrontendStatusChanged.emit()
+
+    @property
+    def isXdjsLoaded(self):
+        return self._isXdjsLoaded
+
+    @isXdjsLoaded.setter
+    def isXdjsLoaded(self, value):
+        self._isXdjsLoaded = value
+        self.sigFrontendStatusChanged.emit()
     ################################### SLOTS ######################################
     @pyqtSlot()
     def tryLogin(self):
@@ -175,3 +206,5 @@ class FrontendPy(QObject):
         self.mainWin.app.sendEvent(self.mainWin.webView, keydownEvent)
         self.sigCreateTaskFromTorrentFileDone.emit()
 
+    def getFrontendStatus(self):
+        return FrontendStatus(self.isXdjsLoaded, self.isPageLogined, self.isPageOnline)

@@ -7,12 +7,14 @@ from PyQt5.QtGui import QIcon, QWindowStateChangeEvent
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkDiskCache
 from PyQt5.Qt import Qt
 
-from frontendpy import FrontendPy
-import constants
-from ui_main import Ui_MainWindow
-
 import os
 from urllib import parse
+
+from frontendpy import FrontendPy
+import constants
+from misc import debounce
+from ui_main import Ui_MainWindow
+
 
 log = print
 
@@ -162,8 +164,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ETMstatus.setObjectName("label_ETMstatus")
         ETMstatus.setText("<font color=''></font>")
         self.statusBar_main.ETMstatus = ETMstatus
-        self.statusBar_main.addPermanentWidget(ETMstatus, 1)
+        self.statusBar_main.addPermanentWidget(ETMstatus)
         del ETMstatus
+
+        frontendStatus = QLabel(self.statusBar_main)
+        frontendStatus.setObjectName("label_frontendStatus")
+        frontendStatus.setText("<font color=''></font>")
+        self.statusBar_main.frontendStatus = frontendStatus
+        self.statusBar_main.addPermanentWidget(frontendStatus, 1)
+        del frontendStatus
 
         dlStatus = QLabel(self.statusBar_main)
         dlStatus.setObjectName("label_dlStatus")
@@ -181,6 +190,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.xwaredpy.sigXwaredStatusChanged.connect(self.slotXwaredStatusChanged)
         self.xwaredpy.sigETMStatusChanged.connect(self.slotETMStatusChanged)
+        self.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
         self.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
         self.etmpy.sigTasksSummaryUpdated[dict].connect(self.slotTasksSummaryUpdated)
 
@@ -289,6 +299,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.statusBar_main.ETMstatus.setText(
                 "<img src=':/image/attention.png' width=14 height=14><font color='red'>ETM</font>")
             self.statusBar_main.ETMstatus.setToolTip("ETM未启动")
+
+    @pyqtSlot()
+    @debounce(0.5, instant_first = True)
+    def slotFrontendStatusChanged(self):
+        frontendStatus = self.frontendpy.getFrontendStatus()
+        if all(frontendStatus):
+            self.statusBar_main.frontendStatus.setText(
+                "<img src=':/image/check.png' width=14 height=14><font color='green'>前端</font>")
+        else:
+            self.statusBar_main.frontendStatus.setText(
+                "<img src=':/image/attention.png' width=14 height=14><font color='red'>前端</font>")
+
+        self.statusBar_main.frontendStatus.setToolTip(
+            "<div style='color:{}'>页面代码已插入</div>\n"
+            "<div style='color:{}'>设备已登录</div>\n"
+            "<div style='color:{}'>设备在线</div>".format(*map(lambda s: "green" if s else "red",
+                                                              frontendStatus)))
+        print(frontendStatus)
 
     @pyqtSlot()
     def slotShowAbout(self):
