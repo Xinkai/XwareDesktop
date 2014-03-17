@@ -12,7 +12,7 @@ from ui_main import Ui_MainWindow
 
 log = print
 
-class CustomStatusBarItem(QLabel):
+class CustomStatusBarLabel(QLabel):
     def __init__(self, parent):
         super().__init__(parent)
         self.setTextFormat(Qt.RichText)
@@ -98,16 +98,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         del self.trayIcon
 
     def setupStatusBar(self):
-        self.statusBar_main.xwaredStatus = CustomStatusBarItem(self.statusBar_main)
-        self.statusBar_main.etmStatus = CustomStatusBarItem(self.statusBar_main)
-        self.statusBar_main.frontendStatus = CustomStatusBarItem(self.statusBar_main)
+        self.statusBar_main.xwaredStatus = CustomStatusBarLabel(self.statusBar_main)
+        self.statusBar_main.etmStatus = CustomStatusBarLabel(self.statusBar_main)
+        self.statusBar_main.frontendStatus = CustomStatusBarLabel(self.statusBar_main)
 
         sp = self.statusBar_main.frontendStatus.sizePolicy()
         sp.setHorizontalStretch(1)
         self.statusBar_main.frontendStatus.setSizePolicy(sp)
 
-        self.statusBar_main.dlStatus = CustomStatusBarItem(self.statusBar_main)
-        self.statusBar_main.ulStatus = CustomStatusBarItem(self.statusBar_main)
+        self.statusBar_main.dlStatus = CustomStatusBarLabel(self.statusBar_main)
+        self.statusBar_main.ulStatus = CustomStatusBarLabel(self.statusBar_main)
 
         self.xwaredpy.sigXwaredStatusChanged.connect(self.slotXwaredStatusChanged)
         self.xwaredpy.sigETMStatusChanged.connect(self.slotETMStatusChanged)
