@@ -71,6 +71,12 @@ class CustomWebPage(QWebPage):
     def urlMatchIn(self, *againsts):
         return parse.urldefrag(self.mainFrame().url().toString())[0] in againsts
 
+class CustomStatusBarItem(QLabel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setTextFormat(Qt.RichText)
+        parent.addPermanentWidget(self)
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     app = None
     savedWindowState = Qt.WindowNoState
@@ -153,40 +159,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         del self.trayIcon
 
     def setupStatusBar(self):
-        xwaredStatus = QLabel(self.statusBar_main)
-        xwaredStatus.setObjectName("label_xwaredStatus")
-        xwaredStatus.setText("<font color=''></font>")
-        self.statusBar_main.xwaredStatus = xwaredStatus
-        self.statusBar_main.addPermanentWidget(xwaredStatus)
-        del xwaredStatus
+        self.statusBar_main.xwaredStatus = CustomStatusBarItem(self.statusBar_main)
+        self.statusBar_main.etmStatus = CustomStatusBarItem(self.statusBar_main)
+        self.statusBar_main.frontendStatus = CustomStatusBarItem(self.statusBar_main)
 
-        ETMstatus = QLabel(self.statusBar_main)
-        ETMstatus.setObjectName("label_ETMstatus")
-        ETMstatus.setText("<font color=''></font>")
-        self.statusBar_main.ETMstatus = ETMstatus
-        self.statusBar_main.addPermanentWidget(ETMstatus)
-        del ETMstatus
+        sp = self.statusBar_main.frontendStatus.sizePolicy()
+        sp.setHorizontalStretch(1)
+        self.statusBar_main.frontendStatus.setSizePolicy(sp)
 
-        frontendStatus = QLabel(self.statusBar_main)
-        frontendStatus.setObjectName("label_frontendStatus")
-        frontendStatus.setText("<font color=''></font>")
-        self.statusBar_main.frontendStatus = frontendStatus
-        self.statusBar_main.addPermanentWidget(frontendStatus, 1)
-        del frontendStatus
-
-        dlStatus = QLabel(self.statusBar_main)
-        dlStatus.setObjectName("label_dlStatus")
-        dlStatus.setTextFormat(Qt.RichText)
-        self.statusBar_main.dlStatus = dlStatus
-        self.statusBar_main.addPermanentWidget(dlStatus)
-        del dlStatus
-
-        ulStatus = QLabel(self.statusBar_main)
-        ulStatus.setObjectName("label_ulStatus")
-        ulStatus.setTextFormat(Qt.RichText)
-        self.statusBar_main.ulStatus = ulStatus
-        self.statusBar_main.addPermanentWidget(ulStatus)
-        del ulStatus
+        self.statusBar_main.dlStatus = CustomStatusBarItem(self.statusBar_main)
+        self.statusBar_main.ulStatus = CustomStatusBarItem(self.statusBar_main)
 
         self.xwaredpy.sigXwaredStatusChanged.connect(self.slotXwaredStatusChanged)
         self.xwaredpy.sigETMStatusChanged.connect(self.slotETMStatusChanged)
@@ -292,13 +274,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_ETMrestart.setEnabled(enabled)
 
         if enabled:
-            self.statusBar_main.ETMstatus.setText(
+            self.statusBar_main.etmStatus.setText(
                 "<img src=':/image/check.png' width=14 height=14><font color='green'>ETM</font>")
-            self.statusBar_main.ETMstatus.setToolTip("ETM运行中")
+            self.statusBar_main.etmStatus.setToolTip("ETM运行中")
         else:
-            self.statusBar_main.ETMstatus.setText(
+            self.statusBar_main.etmStatus.setText(
                 "<img src=':/image/attention.png' width=14 height=14><font color='red'>ETM</font>")
-            self.statusBar_main.ETMstatus.setToolTip("ETM未启动")
+            self.statusBar_main.etmStatus.setToolTip("ETM未启动")
 
     @pyqtSlot()
     @debounce(0.5, instant_first = True)
