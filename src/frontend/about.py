@@ -2,7 +2,10 @@
 
 XWARE_VERSION = "1.0.10"
 
+from PyQt5.QtCore import pyqtSlot, QUrl
+from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtWidgets import QDialog
+
 from ui_about import Ui_dlg_about
 
 class AboutDialog(QDialog, Ui_dlg_about):
@@ -10,6 +13,7 @@ class AboutDialog(QDialog, Ui_dlg_about):
         super().__init__(parent)
         self.setupUi(self)
         self.fillLibVersions()
+        self.label_homepageLink.linkActivated.connect(self.openLinkInExternalBrowser)
 
     def fillLibVersions(self):
         self.label_xwareVer.setText(XWARE_VERSION)
@@ -29,3 +33,8 @@ class AboutDialog(QDialog, Ui_dlg_about):
 
         from PyQt5 import QtWebKit
         self.label_qtwebkitVer.setText(QtWebKit.qWebKitVersion())
+
+    @pyqtSlot(str)
+    def openLinkInExternalBrowser(self, link):
+        qurl = QUrl(link)
+        QDesktopServices().openUrl(qurl)
