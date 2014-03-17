@@ -45,7 +45,7 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QWebView" name="webView">
+     <widget class="CustomWebView" name="webView">
       <property name="minimumSize">
        <size>
         <width>1008</width>
@@ -184,6 +184,11 @@
    <class>QWebView</class>
    <extends>QWidget</extends>
    <header>QtWebKitWidgets/QWebView</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomWebView</class>
+   <extends>QWebView</extends>
+   <header>CustomWebView/CWebView</header>
   </customwidget>
  </customwidgets>
  <resources>

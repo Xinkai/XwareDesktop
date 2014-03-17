@@ -1,75 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import QUrl, pyqtSlot, QEvent, QCoreApplication
-from PyQt5.QtWebKitWidgets import QWebPage
+from PyQt5.QtCore import QUrl, pyqtSlot, QEvent
 from PyQt5.QtWidgets import QMainWindow, QLabel, QSystemTrayIcon, QMenu
 from PyQt5.QtGui import QIcon, QWindowStateChangeEvent
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkDiskCache
 from PyQt5.Qt import Qt
-
-import os
-from urllib import parse
 
 from frontendpy import FrontendPy
 import constants
 from misc import debounce
 from ui_main import Ui_MainWindow
 
-
 log = print
-
-class CustomNetworkAccessManager(QNetworkAccessManager):
-    _cachePath = None
-
-    def __init__(self):
-        super().__init__()
-
-        # set cache
-        self._cachePath = QNetworkDiskCache(self)
-        cacheLocation = QCoreApplication.instance().settings.get("frontend", "cachelocation")
-        self._cachePath.setCacheDirectory(cacheLocation)
-        self._cachePath.setMaximumCacheSize(20 * 1024 * 1024) # 20M
-        self.setCache(self._cachePath)
-
-class CustomWebPage(QWebPage):
-    _overrideFile = None
-    _networkAccessManager = None
-
-    def __init__(self, parent):
-        super().__init__(parent)
-        self._networkAccessManager = CustomNetworkAccessManager()
-        self.setNetworkAccessManager(self._networkAccessManager)
-        self.applyCustomStyleSheet()
-
-    def chooseFile(self, parentFrame, suggestFile):
-        print("custom page::chooseFile", parentFrame, suggestFile)
-        if self._overrideFile:
-            return self.overrideFile
-        else:
-            return super().chooseFile(parentFrame, suggestFile)
-
-    @property
-    def overrideFile(self):
-        print("read overrideFile, then clear it.")
-        result = self._overrideFile
-        self._overrideFile = None
-        return result
-
-    @overrideFile.setter
-    def overrideFile(self, url):
-        self._overrideFile = url
-        print("set local torrent {}.".format(url))
-
-    def applyCustomStyleSheet(self):
-        styleSheet = QUrl(os.path.join(os.getcwd(), "style.css"))
-        styleSheet.setScheme("file")
-        self.settings().setUserStyleSheetUrl(styleSheet)
-
-    def urlMatch(self, against):
-        return parse.urldefrag(self.mainFrame().url().toString())[0] == against
-
-    def urlMatchIn(self, *againsts):
-        return parse.urldefrag(self.mainFrame().url().toString())[0] in againsts
 
 class CustomStatusBarItem(QLabel):
     def __init__(self, parent):
@@ -101,8 +42,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def setupWebkit(self):
         self.settings.applySettings.connect(self.applySettingsToWebView)
 
-        self._customPage = CustomWebPage(self.webView)
-        self.webView.setPage(self._customPage)
         self.frame.loadStarted.connect(self.slotFrameLoadStarted)
         self.frame.urlChanged.connect(self.slotUrlChanged)
         self.frame.loadFinished.connect(self.injectXwareDesktop)

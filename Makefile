@@ -28,7 +28,7 @@ clean:
 	rm -f src/frontend/*_rc.py
 	rm -f src/frontend/xwarejs.js
 	rm -rf src/frontend/__pycache__
-	rm -rf src/frontend/tests/__pycache__
+	rm -rf src/frontend/*/__pycache__
 
 pyqt:
 	pyuic5 -o src/frontend/ui_main.py     src/frontend/ui/main.ui
@@ -64,9 +64,11 @@ install: all
 	rm -rf             $(DESTDIR)$(PREFIX)/frontend/__pycache__
 	rm -rf             $(DESTDIR)$(PREFIX)/frontend/ui
 	rm -rf             $(DESTDIR)$(PREFIX)/frontend/tests
+	rm -rf             $(DESTDIR)$(PREFIX)/frontend/*/__pycache__
 	rm -f              $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
 	rm -f              $(DESTDIR)$(PREFIX)/frontend/Makefile
 	chmod 664          $(DESTDIR)$(PREFIX)/frontend/*
+	chmod +x           $(DESTDIR)$(PREFIX)/frontend/CustomWebView
 	chmod +x           $(DESTDIR)$(PREFIX)/frontend/launcher.py
 
 	install -D -m 664 src/frontend/ui/rc/thunder.ico    $(DESTDIR)$(PREFIX)/frontend/thunder.ico
