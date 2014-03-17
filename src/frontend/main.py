@@ -110,7 +110,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusBar_main.ulStatus = CustomStatusBarLabel(self.statusBar_main)
 
         self.xwaredpy.sigXwaredStatusChanged.connect(self.slotXwaredStatusChanged)
-        self.xwaredpy.sigETMStatusChanged.connect(self.slotETMStatusChanged)
+        self.xwaredpy.sigETMStatusPolled.connect(self.slotETMStatusPolled)
         self.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
         self.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
         self.etmpy.sigTasksSummaryUpdated[dict].connect(self.slotTasksSummaryUpdated)
@@ -200,26 +200,47 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if enabled:
             self.statusBar_main.xwaredStatus.setText(
                 "<img src=':/image/check.png' width=14 height=14><font color='green'>xwared</font>")
-            self.statusBar_main.xwaredStatus.setToolTip("xwared运行中")
+            self.statusBar_main.xwaredStatus.setToolTip("<div style='color:green'>xwared运行中</div>")
         else:
             self.statusBar_main.xwaredStatus.setText(
                 "<img src=':/image/attention.png' width=14 height=14><font color='red'>xwared</font>")
-            self.statusBar_main.xwaredStatus.setToolTip("xwared未启动")
+            self.statusBar_main.xwaredStatus.setToolTip("<div style='color:red'>xwared未启动</div>")
 
-    @pyqtSlot(bool)
-    def slotETMStatusChanged(self, enabled):
+    @pyqtSlot()
+    def slotETMStatusPolled(self):
+        enabled = self.xwaredpy.etmStatus
+
         self.action_ETMstart.setEnabled(not enabled)
         self.action_ETMstop.setEnabled(enabled)
         self.action_ETMrestart.setEnabled(enabled)
 
+        overallCheck = False
+        tooltips = []
         if enabled:
+            activationStatus = self.etmpy.getActivationStatus()
+            tooltips.append("<div style='color:green'>ETM运行中</div>")
+            if activationStatus.status == 1:
+                overallCheck = True
+                tooltips.append(
+                    "<div style='color:green'>"
+                        "<img src=':/image/connected.png' width=16 height=16>"
+                    "设备已激活</div>")
+            else:
+                tooltips.append(
+                    "<div style='color:red'>"
+                        "<img src=':/image/disconnected.png' width=16 height=16>"
+                    "设备未激活</div>")
+        else:
+            tooltips.append("<div style='color:red'>ETM未启动</div>")
+
+        if overallCheck:
             self.statusBar_main.etmStatus.setText(
-                "<img src=':/image/check.png' width=14 height=14><font color='green'>ETM</font>")
-            self.statusBar_main.etmStatus.setToolTip("ETM运行中")
+                    "<img src=':/image/check.png' width=14 height=14><font color='green'>ETM</font>")
         else:
             self.statusBar_main.etmStatus.setText(
                 "<img src=':/image/attention.png' width=14 height=14><font color='red'>ETM</font>")
-            self.statusBar_main.etmStatus.setToolTip("ETM未启动")
+
+        self.statusBar_main.etmStatus.setToolTip("".join(tooltips))
 
     @pyqtSlot()
     @debounce(0.5, instant_first = True)

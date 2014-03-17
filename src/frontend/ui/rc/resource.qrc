@@ -8,7 +8,7 @@
     <file>refresh.png</file>
     <file>up.png</file>
     <file>down.png</file>
-    <file>disconnect.png</file>
+    <file>disconnected.png</file>
     <file>thunder.ico</file>
   </qresource>
 </RCC>

@@ -9,15 +9,15 @@ import constants
 # an interface to watch, notify, and supervise the status of xwared and ETM
 class XwaredPy(QObject):
     sigXwaredStatusChanged = pyqtSignal(bool)
-    sigETMStatusChanged = pyqtSignal(bool)
+    sigETMStatusPolled = pyqtSignal()
 
+    etmStatus = None
+    xwaredStatus = None
     def __init__(self, app):
         super().__init__(app)
         self.app = app
 
         self.startXware()
-        self.xwaredStatus = None
-        self.etmStatus = None
         self.app.sigFrontendUiSetupFinished.connect(self.watch)
         self.app.lastWindowClosed.connect(self.stopXware)
 
@@ -69,9 +69,8 @@ class XwaredPy(QObject):
             except FileNotFoundError:
                 etmStatus = False
 
-            if etmStatus != self.etmStatus:
-                self.etmStatus = etmStatus
-                self.sigETMStatusChanged.emit(etmStatus)
+            self.etmStatus = etmStatus
+            self.sigETMStatusPolled.emit()
             time.sleep(1)
 
     @pyqtSlot()

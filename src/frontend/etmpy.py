@@ -103,7 +103,7 @@ class EtmPy(QObject):
         try:
             req = requests.get(self.lcontrol + "getsysinfo")
             res = req.json()
-            status = res[3]
+            status = res[3] # 1 - bound, 0 - unbound
             code = res[4]
         except (ConnectionError, LocalCtrlNotAvailableError):
             status = -1 # error
