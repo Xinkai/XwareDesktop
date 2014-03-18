@@ -16,6 +16,12 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>50</width>
+    <height>50</height>
+   </size>
+  </property>
   <property name="maximumSize">
    <size>
     <width>50</width>
@@ -32,6 +38,37 @@
   <property name="locale">
    <locale language="Chinese" country="China"/>
   </property>
+  <widget class="MonitorGraphicsView" name="graphicsView">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>50</width>
+     <height>50</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>50</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="verticalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+   <property name="horizontalScrollBarPolicy">
+    <enum>Qt::ScrollBarAlwaysOff</enum>
+   </property>
+  </widget>
  </widget>
  <customwidgets>
   <customwidget>
@@ -39,6 +76,11 @@
    <extends>QWidget</extends>
    <header>MonitorWidget/MonitorWidget</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MonitorGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>MonitorWidget/MonitorGraphicsView</header>
   </customwidget>
  </customwidgets>
  <resources>

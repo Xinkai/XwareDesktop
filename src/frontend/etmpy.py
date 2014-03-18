@@ -22,7 +22,8 @@ class EtmPy(QObject):
     sigCfgChanged = pyqtSignal()
 
     cfg = {}
-
+    runningTasksStat = None
+    completedTasksStat = None
     def __init__(self, app):
         super().__init__(app)
         self.app = app
@@ -37,8 +38,11 @@ class EtmPy(QObject):
         self.onEtmCfgChanged()
         self.watchManager.add_watch(constants.ETM_CFG_DIR, pyinotify.ALL_EVENTS)
 
-        self.t = threading.Thread(target = self.getCurrentTasksSummary, daemon = True,
-                                  name = "tasks summary polling")
+        # task stats
+        self.runningTasksStat = RunningTaskStatistic(self)
+        self.completedTasksStat = CompletedTaskStatistic(self)
+        self.t = threading.Thread(target = self.pollTasks, daemon = True,
+                                  name = "tasks polling")
         self.t.start()
 
     @debounce(0.5, instant_first=True)
@@ -89,15 +93,28 @@ class EtmPy(QObject):
         requests.post(self.lcontrol + \
                       "settings?downloadSpeedLimit={}&uploadSpeedLimit={}&maxRunTaskNumber={}".format(*newsettings))
 
-    def getCurrentTasksSummary(self):
+    def _requestPollTasks(self, kind): # kind means type, but type is a python reserved word.
+        try:
+            req = requests.get(self.lcontrol + "list?v=2&type={}&pos=0&number=99999&needUrl=1".format(kind))
+            result = req.json()
+        except (ConnectionError, LocalCtrlNotAvailableError):
+            result = None
+        return result
+
+    def pollTasks(self):
         while True:
-            try:
-                req = requests.get(self.lcontrol + "list?v=2&type=1&pos=0&number=0&needUrl=1")
-                res = req.json()
-                self.sigTasksSummaryUpdated[dict].emit(res)
-            except (ConnectionError, LocalCtrlNotAvailableError):
+            resRunning = self._requestPollTasks(0)
+            self.runningTasksStat.update(resRunning)
+
+            reqCompleted = self._requestPollTasks(1)
+            self.completedTasksStat.update(reqCompleted)
+
+            # emit summary, it doesn't matter using resRunning or resCompleted
+            if resRunning:
+                self.sigTasksSummaryUpdated[dict].emit(resRunning)
+            else:
                 self.sigTasksSummaryUpdated[bool].emit(False)
-            time.sleep(2)
+            time.sleep(1)
 
     def getActivationStatus(self):
         try:
@@ -119,3 +136,74 @@ class EtmPy(QObject):
 
         result = ActivationStatus(userid, status, code, peerid)
         return result
+
+class TaskStatistic(QObject):
+    _tasks = None # copy from _stat_mod upon it's done.
+    _tasks_mod = None # make changes to this one.
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self._tasks = {}
+        self._tasks_mod = {}
+
+class CompletedTaskStatistic(TaskStatistic):
+    sigTaskCompleted = pyqtSignal(int)
+
+    def __init__(self, parent = None):
+        super().__init__(parent)
+
+    def update(self, data):
+        if data is None:
+            return
+
+        # make a list of id of recent finished tasks
+        completed = []
+
+        self._tasks_mod.clear()
+        for task in data["tasks"]:
+            tid = task["id"]
+            self._tasks_mod[tid] = task
+
+            if tid not in self._tasks:
+                completed.append(tid)
+
+        self._tasks = self._tasks_mod.copy()
+        for completedId in completed:
+            self.sigTaskCompleted.emit(completedId)
+
+class RunningTaskStatistic(TaskStatistic):
+    SPEEDS_SAMPLES_COUNT = 10
+
+    def __init__(self, parent = None):
+        super().__init__(parent)
+
+    def getSpeeds(self, tid):
+        try:
+            result = self._tasks[tid]["speeds"]
+        except KeyError:
+            result = [0] * self.SPEEDS_SAMPLES_COUNT
+        return result
+
+    @staticmethod
+    def _composeNewSpeeds(oldSpeeds, newSpeed):
+        return oldSpeeds[1:] + [newSpeed]
+
+    def update(self, data):
+        if data is None:
+            # if data is None, meaning request failed, push speed 0 to all tasks
+            for tid, task in self._tasks.items():
+                oldSpeeds = self.getSpeeds(tid)
+                newSpeeds = self._composeNewSpeeds(oldSpeeds, 0)
+                task["speeds"] = newSpeeds
+            return
+
+        self._tasks_mod.clear()
+        for task in data["tasks"]:
+            tid = task["id"]
+            self._tasks_mod[tid] = task
+
+            oldSpeeds = self.getSpeeds(tid)
+            newSpeeds = self._composeNewSpeeds(oldSpeeds, task["speed"])
+            self._tasks_mod[tid]["speeds"] = newSpeeds
+
+        self._tasks = self._tasks_mod.copy()
