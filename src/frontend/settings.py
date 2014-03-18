@@ -18,6 +18,7 @@ DEFAULT_SETTINGS = {
         "minimizetosystray": True,
         "closetominimize": True,
         "cachelocation": os.path.expanduser("~/.xware-desktop/cache/webkit"),
+        "showmonitorwindow": False,
         "watchclipboard": True,
         "watchpattern":
 """; 试验功能，暂不允许更改此设置
@@ -108,7 +109,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_allowFlash.setChecked(self.settings.getbool("frontend", "allowflash"))
         self.checkBox_minimizeToSystray.setChecked(self.settings.getbool("frontend", "minimizetosystray"))
         self.checkBox_closeToMinimize.setChecked(self.settings.getbool("frontend", "closetominimize"))
-
+        self.checkBox_showMonitorWindow.setChecked(self.settings.getbool("frontend", "showmonitorwindow"))
         # clipboard related
         self.checkBox_watchClipboard.stateChanged.connect(self.slotWatchClipboardToggled)
         self.checkBox_watchClipboard.setChecked(self.settings.getbool("frontend", "watchclipboard"))
@@ -264,6 +265,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
                                 self.checkBox_minimizeToSystray.isChecked())
         self.settings.setbool("frontend", "closetominimize",
                                 self.checkBox_closeToMinimize.isChecked())
+        # self.settings.setbool("frontend", "showmonitorwindow",
+        #                         self.checkBox_showMonitorWindow.isChecked())
         self.settings.setbool("frontend", "watchclipboard",
                                 self.checkBox_watchClipboard.isChecked())
         # self.settings.set("frontend", "watchpattern",

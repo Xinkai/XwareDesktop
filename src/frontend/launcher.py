@@ -4,7 +4,7 @@
 import sys
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
-import main, constants, settings
+import main, constants, settings, monitor
 from xwaredpy import XwaredPy
 from etmpy import EtmPy
 import mounts
@@ -15,6 +15,8 @@ log = print
 class XwareDesktop(QApplication):
     sigFrontendUiSetupFinished = pyqtSignal()
 
+    mainWin = None
+    monitorWin = None
     def __init__(self, *args):
         super().__init__(*args)
         self.setApplicationName("XwareDesktop")
@@ -32,6 +34,8 @@ class XwareDesktop(QApplication):
         self.xwaredpy = XwaredPy(self)
         self.etmpy = EtmPy(self)
         self.mountsFaker = mounts.MountsFaker()
+
+        self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
 
         self.mainWin = main.MainWindow(self)
         self.mainWin.show()
@@ -79,6 +83,22 @@ class XwareDesktop(QApplication):
     def cleanUp(self):
         self.xwaredpy.stopXware()
         print("cleanup")
+
+    @pyqtSlot()
+    def slotCreateCloseMonitorWindow(self):
+        show = self.settings.getbool("frontend", "showmonitorwindow")
+        if show:
+            if self.monitorWin:
+                pass # already shown, do nothing
+            else:
+                self.monitorWin = monitor.MonitorWindow(None)
+                self.monitorWin.show()
+        else:
+            if self.monitorWin:
+                del self.monitorWin
+                self.monitorWin = None
+            else:
+                pass # not shown, do nothing
 
 if __name__ == "__main__":
     app = XwareDesktop(sys.argv)

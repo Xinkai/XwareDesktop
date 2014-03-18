@@ -201,7 +201,7 @@
         <string>在网页中启用 Webkit 开发者工具</string>
        </property>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>12</x>
@@ -242,18 +242,15 @@
          </widget>
         </item>
         <item>
-         <widget class="QCheckBox" name="checkBox_showFloatingWindow">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
+         <widget class="QCheckBox" name="checkBox_showMonitorWindow">
           <property name="text">
-           <string>显示悬浮窗</string>
+           <string>显示悬浮窗(此功能未完成)</string>
           </property>
          </widget>
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="">
+      <widget class="QWidget" name="layoutWidget">
        <property name="geometry">
         <rect>
          <x>240</x>
@@ -601,8 +598,30 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>plaintext_watchPattern</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>lineEdit_loginUsername</tabstop>
+  <tabstop>lineEdit_loginPassword</tabstop>
+  <tabstop>checkBox_autoLogin</tabstop>
+  <tabstop>radio_backendStartWhen1</tabstop>
+  <tabstop>radio_backendStartWhen2</tabstop>
+  <tabstop>radio_backendStartWhen3</tabstop>
   <tabstop>buttonBox</tabstop>
+  <tabstop>checkBox_allowFlash</tabstop>
+  <tabstop>checkBox_minimizeToSystray</tabstop>
+  <tabstop>checkBox_closeToMinimize</tabstop>
+  <tabstop>checkBox_showMonitorWindow</tabstop>
+  <tabstop>checkBox_enableDevelopersTools</tabstop>
+  <tabstop>checkBox_watchClipboard</tabstop>
+  <tabstop>plaintext_watchPattern</tabstop>
+  <tabstop>spinBox_maxRunningTasksNum</tabstop>
+  <tabstop>spinBox_dSpeedLimit</tabstop>
+  <tabstop>spinBox_uSpeedLimit</tabstop>
+  <tabstop>lineEdit_defaultDownloadPath</tabstop>
+  <tabstop>lineEdit_lcport</tabstop>
+  <tabstop>btn_refreshMount</tabstop>
+  <tabstop>btn_removeMount</tabstop>
+  <tabstop>btn_addMount</tabstop>
+  <tabstop>table_mounts</tabstop>
  </tabstops>
  <resources>
   <include location="rc/resource.qrc"/>

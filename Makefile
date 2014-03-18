@@ -34,6 +34,7 @@ pyqt:
 	pyuic5 -o src/frontend/ui_main.py     src/frontend/ui/main.ui
 	pyuic5 -o src/frontend/ui_settings.py src/frontend/ui/settings.ui
 	pyuic5 -o src/frontend/ui_about.py    src/frontend/ui/about.ui
+	pyuic5 -o src/frontend/ui_monitor.py  src/frontend/ui/monitor.ui
 	pyrcc5 -o src/frontend/resource_rc.py src/frontend/ui/rc/resource.qrc
 
 xwarejs.js: src/frontend/xwarejs.coffee
@@ -69,6 +70,7 @@ install: all
 	rm -f              $(DESTDIR)$(PREFIX)/frontend/Makefile
 	chmod 664          $(DESTDIR)$(PREFIX)/frontend/*
 	chmod +x           $(DESTDIR)$(PREFIX)/frontend/CustomWebView
+	chmod +x           $(DESTDIR)$(PREFIX)/frontend/MonitorWidget
 	chmod +x           $(DESTDIR)$(PREFIX)/frontend/launcher.py
 
 	install -D -m 664 src/frontend/ui/rc/thunder.ico    $(DESTDIR)$(PREFIX)/frontend/thunder.ico
