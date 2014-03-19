@@ -41,9 +41,9 @@ class XwareDesktop(QApplication):
         self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
 
         self.mainWin = main.MainWindow(self)
-        self.settings.applySettings.emit()
-
         self.mainWin.show()
+
+        self.settings.applySettings.emit()
 
     def checkOneInstance(self):
         tasks = sys.argv[1:]
