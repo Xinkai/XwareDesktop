@@ -13,10 +13,9 @@ import fcntl, os
 log = print
 
 class XwareDesktop(QApplication):
-    sigFrontendUiSetupFinished = pyqtSignal()
-
     mainWin = None
     monitorWin = None
+
     def __init__(self, *args):
         super().__init__(*args)
         self.setApplicationName("XwareDesktop")

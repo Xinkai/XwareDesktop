@@ -34,7 +34,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.connectUI()
 
         self.setupWebkit()
-        self.app.sigFrontendUiSetupFinished.emit()
 
         # Load settings
         self.settings.applySettings.emit()
@@ -109,7 +108,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusBar_main.dlStatus = CustomStatusBarLabel(self.statusBar_main)
         self.statusBar_main.ulStatus = CustomStatusBarLabel(self.statusBar_main)
 
-        self.xwaredpy.sigXwaredStatusChanged.connect(self.slotXwaredStatusChanged)
+        self.xwaredpy.sigXwaredStatusPolled.connect(self.slotXwaredStatusPolled)
         self.xwaredpy.sigETMStatusPolled.connect(self.slotETMStatusPolled)
         self.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
         self.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
@@ -195,7 +194,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         del self.settingsDialog
 
     @pyqtSlot(bool)
-    def slotXwaredStatusChanged(self, enabled):
+    def slotXwaredStatusPolled(self, enabled):
         self.menu_backend.setEnabled(enabled)
         if enabled:
             self.statusBar_main.xwaredStatus.setText(

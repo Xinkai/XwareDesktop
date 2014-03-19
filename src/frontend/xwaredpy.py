@@ -8,17 +8,21 @@ import constants
 
 # an interface to watch, notify, and supervise the status of xwared and ETM
 class XwaredPy(QObject):
-    sigXwaredStatusChanged = pyqtSignal(bool)
+    sigXwaredStatusPolled = pyqtSignal(bool)
     sigETMStatusPolled = pyqtSignal()
 
     etmStatus = None
     xwaredStatus = None
+
+    _t = None
     def __init__(self, app):
         super().__init__(app)
         self.app = app
 
         self.startXware()
-        self.app.sigFrontendUiSetupFinished.connect(self.watch)
+        self._t = threading.Thread(target = self._watcherThread, daemon = True,
+                                  name = "xwared/etm watch thread")
+        self._t.start()
         self.app.lastWindowClosed.connect(self.stopXware)
 
     def startXware(self):
@@ -34,42 +38,34 @@ class XwaredPy(QObject):
             self.app.settings.setbool("xwared", "startetm", True)
             self.app.settings.save()
 
-    def watch(self):
-        self.t = threading.Thread(target = self._watcherThread, daemon = True,
-                                  name = "xwared/etm watch thread")
-        self.t.start()
-
     def _watcherThread(self):
         while True:
             try:
                 xwaredLockFile = open(constants.XWARED_LOCK)
                 try:
                     xwaredLock = fcntl.flock(xwaredLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    xwaredStatus = False
+                    self.xwaredStatus = False
                     fcntl.flock(xwaredLockFile, fcntl.LOCK_UN)
                 except BlockingIOError:
-                    xwaredStatus = True
+                    self.xwaredStatus = True
                 xwaredLockFile.close()
             except FileNotFoundError:
-                xwaredStatus = False
+                self.xwaredStatus = False
 
-            if xwaredStatus != self.xwaredStatus:
-                self.xwaredStatus = xwaredStatus
-                self.sigXwaredStatusChanged.emit(xwaredStatus)
+            self.sigXwaredStatusPolled.emit(self.xwaredStatus)
 
             try:
                 etmLockFile = open(constants.ETM_LOCK)
                 try:
                     etmLock = fcntl.flock(etmLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    etmStatus = False
+                    self.etmStatus = False
                     fcntl.flock(etmLockFile, fcntl.LOCK_UN)
                 except BlockingIOError:
-                    etmStatus = True
+                    self.etmStatus = True
                 etmLockFile.close()
             except FileNotFoundError:
-                etmStatus = False
+                self.etmStatus = False
 
-            self.etmStatus = etmStatus
             self.sigETMStatusPolled.emit()
             time.sleep(1)
 
