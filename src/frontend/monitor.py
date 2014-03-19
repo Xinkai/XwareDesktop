@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from PyQt5.Qt import Qt
+
 from ui_monitor import MonitorWidget, Ui_Form
 
 class MonitorWindow(MonitorWidget, Ui_Form):
@@ -7,3 +9,4 @@ class MonitorWindow(MonitorWidget, Ui_Form):
         super().__init__(parent)
         self.setupUi(self)
         self.setStyleSheet("background: skyblue;")
+        self.setAttribute(Qt.WA_TranslucentBackground)
