@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from PyQt5.QtCore import QUrl, pyqtSlot, QEvent
 from PyQt5.QtWidgets import QMainWindow, QLabel, QSystemTrayIcon, QMenu
 from PyQt5.QtGui import QIcon, QWindowStateChangeEvent

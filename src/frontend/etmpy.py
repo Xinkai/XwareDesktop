@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from PyQt5.QtCore import QObject, pyqtSignal
 import threading, time
 import requests
@@ -106,8 +108,8 @@ class EtmPy(QObject):
             resRunning = self._requestPollTasks(0)
             self.runningTasksStat.update(resRunning)
 
-            reqCompleted = self._requestPollTasks(1)
-            self.completedTasksStat.update(reqCompleted)
+            resCompleted = self._requestPollTasks(1)
+            self.completedTasksStat.update(resCompleted)
 
             # emit summary, it doesn't matter using resRunning or resCompleted
             if resRunning:

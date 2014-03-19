@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import QObject, QCoreApplication
+import logging
+
+from PyQt5.QtCore import QObject, QCoreApplication, pyqtSlot
 import re
 
 # qqdl, flashget, thunder, http, ftp, https, ed2k, magnet
@@ -20,6 +22,7 @@ class UrlExtractor(QObject):
         else:
             pass # unittest
 
+    @pyqtSlot()
     def slotSettingsChanged(self):
         patternLines = self._app.settings.get("frontend", "watchpattern").split("\n")
         patternList = []

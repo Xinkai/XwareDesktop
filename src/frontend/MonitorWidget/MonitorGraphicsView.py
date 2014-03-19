@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from PyQt5.QtCore import QPointF, pyqtSlot
 from PyQt5.QtGui import QPolygonF, QPen, QBrush, QLinearGradient
 from PyQt5.Qt import Qt

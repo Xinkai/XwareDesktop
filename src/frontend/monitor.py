@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.Qt import Qt
 from PyQt5.QtGui import QGuiApplication
@@ -32,6 +34,7 @@ class MonitorWindow(MonitorWidget, Ui_Form):
             runningTaskIds = self.app.etmpy.runningTasksStat.getTIDs()
             for tid in runningTaskIds:
                 task = self.app.etmpy.runningTasksStat.getTask(tid)
+                logging.debug("updateSpeedsThread, deadlock incoming, maybe")
                 self.sigTaskUpdating.emit(task)
                 time.sleep(1)
                 break

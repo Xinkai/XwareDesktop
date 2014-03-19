@@ -1,14 +1,17 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import sys
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
+import logging
+
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication
+
+import fcntl, os, sys
+
 import main, constants, settings, monitor
 from xwaredpy import XwaredPy
 from etmpy import EtmPy
 import mounts
-import fcntl, os
 
 log = print
 
@@ -18,6 +21,7 @@ class XwareDesktop(QApplication):
 
     def __init__(self, *args):
         super().__init__(*args)
+        logging.info("XWARE DESKTOP STARTS")
         self.setApplicationName("XwareDesktop")
         self.setApplicationVersion("0.1")
 
@@ -87,6 +91,7 @@ class XwareDesktop(QApplication):
 
     @pyqtSlot()
     def slotCreateCloseMonitorWindow(self):
+        logging.debug("slotCreateCloseMonitorWindow")
         show = self.settings.getbool("frontend", "showmonitorwindow")
         if show:
             if self.monitorWin:
@@ -102,5 +107,7 @@ class XwareDesktop(QApplication):
                 pass # not shown, do nothing
 
 if __name__ == "__main__":
+    logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"),
+                        level = logging.DEBUG)
     app = XwareDesktop(sys.argv)
     sys.exit(app.exec())

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from PyQt5.QtCore import QObject, pyqtSlot
 from PyQt5.QtGui import QGuiApplication
 
