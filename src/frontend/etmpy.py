@@ -172,16 +172,27 @@ class CompletedTaskStatistic(TaskStatistic):
             self.sigTaskCompleted.emit(completedId)
 
 class RunningTaskStatistic(TaskStatistic):
-    SPEEDS_SAMPLES_COUNT = 10
+    SPEEDS_SAMPLES_COUNT = 25
 
     def __init__(self, parent = None):
         super().__init__(parent)
 
-    def getSpeeds(self, tid):
+    def _getSpeeds(self, tid):
         try:
             result = self._tasks[tid]["speeds"]
         except KeyError:
             result = [0] * self.SPEEDS_SAMPLES_COUNT
+        return result
+
+    def getTIDs(self):
+        tids = list(self._tasks.keys())
+        return tids
+
+    def getTask(self, tid):
+        try:
+            result = self._tasks[tid].copy()
+        except KeyError:
+            result = dict()
         return result
 
     @staticmethod
@@ -192,7 +203,7 @@ class RunningTaskStatistic(TaskStatistic):
         if data is None:
             # if data is None, meaning request failed, push speed 0 to all tasks
             for tid, task in self._tasks.items():
-                oldSpeeds = self.getSpeeds(tid)
+                oldSpeeds = self._getSpeeds(tid)
                 newSpeeds = self._composeNewSpeeds(oldSpeeds, 0)
                 task["speeds"] = newSpeeds
             return
@@ -202,7 +213,7 @@ class RunningTaskStatistic(TaskStatistic):
             tid = task["id"]
             self._tasks_mod[tid] = task
 
-            oldSpeeds = self.getSpeeds(tid)
+            oldSpeeds = self._getSpeeds(tid)
             newSpeeds = self._composeNewSpeeds(oldSpeeds, task["speed"])
             self._tasks_mod[tid]["speeds"] = newSpeeds
 

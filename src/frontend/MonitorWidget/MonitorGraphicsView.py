@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import QPointF
+from PyQt5.QtCore import QPointF, pyqtSlot
 from PyQt5.QtGui import QPolygonF, QPen, QBrush, QLinearGradient
 from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene
@@ -19,6 +19,9 @@ class MonitorGraphicsView(QGraphicsView):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.monitorWin = parent
+        if self.monitorWin:
+            self.monitorWin.sigTaskUpdating.connect(self.slotTaskUpdate)
+
         self.scene = QGraphicsScene(self)
         self.scene.setSceneRect(0, 0, self.SIZE[0], self.SIZE[1])
         self.setScene(self.scene)
@@ -62,8 +65,20 @@ class MonitorGraphicsView(QGraphicsView):
         self._speedsPolygon.setPolygon(polygon)
 
     def _setProgress(self, process): # 10000 means 100%
-        self._progressText.setPlainText("{:.1f}%".format(process / 100))
+        if process is None:
+            self._progressText.setPlainText("")
+        else:
+            self._progressText.setPlainText("{:.1f}%".format(process / 100))
 
     @classmethod
     def _translateSpeedToPosY(cls, speed):
         return cls.SIZE[1] * (1.0 - speed / cls.MAXSPEED)
+
+    @pyqtSlot(dict)
+    def slotTaskUpdate(self, task):
+        if task:
+            self._setProgress(task["progress"])
+            self._setSpeeds(task["speeds"])
+        else:
+            self._setProgress(None)
+            self._setSpeeds([0.0])
