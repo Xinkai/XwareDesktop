@@ -35,9 +35,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.setupWebkit()
 
-        # Load settings
-        self.settings.applySettings.emit()
-
     def setupWebkit(self):
         self.settings.applySettings.connect(self.applySettingsToWebView)
 
