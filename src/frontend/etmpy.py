@@ -116,7 +116,7 @@ class EtmPy(QObject):
                 self.sigTasksSummaryUpdated[dict].emit(resRunning)
             else:
                 self.sigTasksSummaryUpdated[bool].emit(False)
-            time.sleep(1)
+            time.sleep(0.5)
 
     def getActivationStatus(self):
         try:

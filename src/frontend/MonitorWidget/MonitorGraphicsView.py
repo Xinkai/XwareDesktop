@@ -11,7 +11,7 @@ class MonitorGraphicsView(QGraphicsView):
     monitorWin = None
 
     SIZE = (50.0, 50.0)
-    MAXSPEED = 1024 * 1024 # 1mb in bytes
+    FULLSPEED = 512 * 1024 # 512 in kb/s
 
     _progressText = None
     _speedsPolygon = None
@@ -72,9 +72,8 @@ class MonitorGraphicsView(QGraphicsView):
         else:
             self._progressText.setPlainText("{:.1f}%".format(process / 100))
 
-    @classmethod
-    def _translateSpeedToPosY(cls, speed):
-        return cls.SIZE[1] * (1.0 - speed / cls.MAXSPEED)
+    def _translateSpeedToPosY(self, speed):
+        return self.SIZE[1] * (1.0 - speed / self.FULLSPEED)
 
     @pyqtSlot(dict)
     def slotTaskUpdate(self, task):

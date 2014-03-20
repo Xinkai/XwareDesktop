@@ -272,6 +272,44 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="layoutWidget">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>130</y>
+         <width>141</width>
+         <height>51</height>
+        </rect>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_8">
+        <item>
+         <widget class="QLabel" name="label_monitorFullSpeed">
+          <property name="text">
+           <string>悬浮窗满速</string>
+          </property>
+          <property name="buddy">
+           <cstring>spinBox_monitorFullSpeed</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBox_monitorFullSpeed">
+          <property name="suffix">
+           <string>kb/s</string>
+          </property>
+          <property name="minimum">
+           <number>100</number>
+          </property>
+          <property name="maximum">
+           <number>8192</number>
+          </property>
+          <property name="singleStep">
+           <number>20</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_mount">
       <attribute name="title">
