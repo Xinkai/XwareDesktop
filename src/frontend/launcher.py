@@ -105,7 +105,7 @@ class XwareDesktop(QApplication):
         else:
             if self.monitorWin:
                 logging.debug("close monitorwin")
-                self.monitorWin.destroy()
+                self.monitorWin.close()
                 del self.monitorWin
                 self.monitorWin = None
             else:
