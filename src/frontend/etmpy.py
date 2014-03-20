@@ -36,7 +36,6 @@ class EtmPy(QObject):
         self.notifier.name = "etmpy inotifier"
         self.notifier.daemon = True
         self.notifier.start()
-        self.app.lastWindowClosed.connect(lambda: self.notifier.stop())
         self.onEtmCfgChanged()
         self.watchManager.add_watch(constants.ETM_CFG_DIR, pyinotify.ALL_EVENTS)
 
