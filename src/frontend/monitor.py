@@ -19,6 +19,7 @@ class MonitorWindow(MonitorWidget, Ui_Form):
     _thread_should_stop = False
 
     TICKS_PER_TASK = 4
+    TICK_INTERVAL = 0.5 # second(s)
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setupUi(self)
@@ -45,23 +46,17 @@ class MonitorWindow(MonitorWidget, Ui_Form):
                         task = self.app.etmpy.runningTasksStat.getTask(tid)
 
                         if self._thread_should_stop:
-                            break # jump to GET OUT ASAP
+                            return # end the thread
 
                         logging.debug("updateSpeedsThread, deadlock incoming, maybe")
                         try:
                             self.sigTaskUpdating.emit(task)
                         except TypeError:
                             # monitor closed
-                            break # jump to GET OUT ASAP
-                        time.sleep(.5)
-                else:
-# GET OUT ASAP:
-                    break # jump to the END OF THREAD
+                            return # end the thread
+                        time.sleep(self.TICK_INTERVAL)
             else:
-                if self._thread_should_stop:
-                    break # jump to the END OF THREAD
-                time.sleep(.5)
-# END OF THREAD:
+                time.sleep(self.TICK_INTERVAL)
 
     @pyqtSlot()
     def _setMonitorFullSpeed(self):
