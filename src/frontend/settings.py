@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, Qt
 
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem
 from ui_settings import Ui_Dialog
@@ -98,6 +98,9 @@ class SettingsAccessor(QObject):
 class SettingsDialog(QDialog, Ui_Dialog):
     def __init__(self, parent):
         super().__init__(parent)
+        self.setWindowModality(Qt.WindowModal)
+        self.setAttribute(Qt.WA_DeleteOnClose)
+
         self.mainWin = parent
         self.setupUi(self)
 
@@ -125,7 +128,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
         self.btngrp_etmStartWhen.button(self.settings.getint("xwared", "startetmwhen")).setChecked(True)
 
-        self.rejected.connect(lambda: self.close())
         self.accepted.connect(self.writeSettings)
 
         self.btn_addMount.clicked.connect(self.slotAddMount)

@@ -168,8 +168,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def slotSetting(self):
         from settings import SettingsDialog
         self.settingsDialog = SettingsDialog(self)
-        self.settingsDialog.exec()
-        del self.settingsDialog
+        self.settingsDialog.show()
 
     @pyqtSlot(bool)
     def slotXwaredStatusPolled(self, enabled):
@@ -241,8 +240,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def slotShowAbout(self):
         from about import AboutDialog
         self.aboutDialog = AboutDialog(self)
-        self.aboutDialog.exec()
-        del self.aboutDialog
+        self.aboutDialog.show()
 
     @pyqtSlot(bool)
     @pyqtSlot(dict)
