@@ -11,6 +11,7 @@ import fcntl, os, sys
 import main, constants, settings, monitor
 from xwaredpy import XwaredPy
 from etmpy import EtmPy
+from systray import Systray
 import mounts
 
 log = print
@@ -42,6 +43,8 @@ class XwareDesktop(QApplication):
 
         self.mainWin = main.MainWindow(self)
         self.mainWin.show()
+
+        self.systray = Systray(self)
 
         self.settings.applySettings.emit()
 

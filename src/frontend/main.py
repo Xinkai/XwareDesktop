@@ -3,8 +3,8 @@
 import logging
 
 from PyQt5.QtCore import QUrl, pyqtSlot, QEvent
-from PyQt5.QtWidgets import QMainWindow, QLabel, QSystemTrayIcon, QMenu
-from PyQt5.QtGui import QIcon, QWindowStateChangeEvent
+from PyQt5.QtWidgets import QMainWindow, QLabel
+from PyQt5.QtGui import QWindowStateChangeEvent
 from PyQt5.Qt import Qt
 
 from frontendpy import FrontendPy
@@ -31,7 +31,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.frontendpy = FrontendPy(self) # setup Webkit Bridge
         # UI
         self.setupUi(self)
-        self.setupSystray()
         self.setupStatusBar()
         self.connectUI()
 
@@ -74,26 +73,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_ETMrestart.triggered.connect(self.xwaredpy.slotRestartETM)
 
         self.action_showAbout.triggered.connect(self.slotShowAbout)
-
-    def setupSystray(self):
-        self.trayIconMenu = QMenu(None)
-
-        icon = QIcon(":/image/thunder.ico")
-        self.trayIconMenu.addAction(self.action_exit)
-
-        self.trayIcon = QSystemTrayIcon(None)
-        self.trayIcon.setIcon(icon)
-        self.trayIcon.setContextMenu(self.trayIconMenu)
-        self.trayIcon.setVisible(True)
-
-        self.trayIcon.activated.connect(self.slotActivateSystrayContextMenu)
-        self.app.lastWindowClosed.connect(self.teardownSystray)
-
-    @pyqtSlot()
-    def teardownSystray(self):
-        print("teardown Systray")
-        # On Ubuntu 13.10, systrayicon won't destroy itself gracefully, stops the whole program from exiting.
-        del self.trayIcon
 
     def setupStatusBar(self):
         self.statusBar_main.xwaredStatus = CustomStatusBarLabel(self.statusBar_main)
@@ -286,27 +265,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusBar_main.ulStatus.setText(
             "<img src=':/image/up.png' height=14 width=14>{}/s".format(misc.getHumanBytesNumber(summary["upSpeed"]))
         )
-
-    @pyqtSlot(QSystemTrayIcon.ActivationReason)
-    def slotActivateSystrayContextMenu(self, reason):
-        if reason == QSystemTrayIcon.Context: # right
-            pass
-        elif reason == QSystemTrayIcon.MiddleClick: # middle
-            pass
-        elif reason == QSystemTrayIcon.DoubleClick: # double click
-            pass
-        elif reason == QSystemTrayIcon.Trigger: # left
-            if self.settings.getbool("frontend", "minimizetosystray"):
-                if self.isHidden():
-                    self.setVisible(True)
-                    self.setWindowState(self.savedWindowState)
-                else:
-                    self.setWindowState(Qt.WindowMinimized)
-            else:
-                if self.isMinimized():
-                    self.setWindowState(self.savedWindowState)
-                else:
-                    self.setWindowState(Qt.WindowMinimized)
 
     @pyqtSlot(QWindowStateChangeEvent)
     def changeEvent(self, qEvent):
