@@ -112,7 +112,6 @@ class XwareDesktop(QApplication):
                 pass # not shown, do nothing
 
 if __name__ == "__main__":
-    logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"),
-                        level = logging.DEBUG)
+    logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))
     app = XwareDesktop(sys.argv)
     sys.exit(app.exec())
