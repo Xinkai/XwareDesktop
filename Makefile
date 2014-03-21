@@ -68,10 +68,8 @@ install: all
 	rm -rf             $(DESTDIR)$(PREFIX)/frontend/*/__pycache__
 	rm -f              $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
 	rm -f              $(DESTDIR)$(PREFIX)/frontend/Makefile
-	chmod 664          $(DESTDIR)$(PREFIX)/frontend/*
-	chmod +x           $(DESTDIR)$(PREFIX)/frontend/CustomWebView
-	chmod +x           $(DESTDIR)$(PREFIX)/frontend/MonitorWidget
-	chmod +x           $(DESTDIR)$(PREFIX)/frontend/PersistentGeometry
+	find $(DESTDIR)$(PREFIX)/frontend -type f -print0 | xargs -0 chmod 664
+	find $(DESTDIR)$(PREFIX)/frontend -type d -print0 | xargs -0 chmod 775
 	chmod +x           $(DESTDIR)$(PREFIX)/frontend/launcher.py
 
 	install -D -m 664 src/frontend/ui/rc/thunder.ico    $(DESTDIR)$(PREFIX)/frontend/thunder.ico
