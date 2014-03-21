@@ -19,7 +19,7 @@ DEFAULT_SETTINGS = {
         "enabledeveloperstools": False,
         "allowflash": True,
         "minimizetosystray": True,
-        "closetominimize": True,
+        "closetominimize": False,
         "cachelocation": os.path.expanduser("~/.xware-desktop/cache/webkit"),
         "showmonitorwindow": False,
         "monitorfullspeed": 512,
