@@ -233,9 +233,6 @@
         </item>
         <item>
          <widget class="QCheckBox" name="checkBox_closeToMinimize">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="text">
            <string>关闭窗口时最小化</string>
           </property>

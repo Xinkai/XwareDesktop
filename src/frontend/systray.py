@@ -28,8 +28,7 @@ class Systray(QObject):
         self.trayIcon.activated.connect(self.slotSystrayActivated)
         self.app.lastWindowClosed.connect(self.slotTeardown)
 
-        if self.mainWin:
-            self.trayIconMenu.addAction(self.mainWin.action_exit)
+        self.trayIconMenu.addAction(self.mainWin.action_exit)
 
     @pyqtSlot()
     def slotTeardown(self):
@@ -39,9 +38,6 @@ class Systray(QObject):
 
     @pyqtSlot(QSystemTrayIcon.ActivationReason)
     def slotSystrayActivated(self, reason):
-        if not self.mainWin:
-            return
-
         if reason == QSystemTrayIcon.Context: # right
             pass
         elif reason == QSystemTrayIcon.MiddleClick: # middle
@@ -49,14 +45,7 @@ class Systray(QObject):
         elif reason == QSystemTrayIcon.DoubleClick: # double click
             pass
         elif reason == QSystemTrayIcon.Trigger: # left
-            if self.app.settings.getbool("frontend", "minimizetosystray"):
-                if self.mainWin.isHidden():
-                    self.mainWin.setVisible(True)
-                    self.mainWin.setWindowState(self.mainWin.savedWindowState)
-                else:
-                    self.mainWin.setWindowState(Qt.WindowMinimized)
+            if self.mainWin.isHidden() or self.mainWin.isMinimized():
+                self.mainWin.restore()
             else:
-                if self.mainWin.isMinimized():
-                    self.mainWin.setWindowState(self.mainWin.savedWindowState)
-                else:
-                    self.mainWin.setWindowState(Qt.WindowMinimized)
+                self.mainWin.minimize()

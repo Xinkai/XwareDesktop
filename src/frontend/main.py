@@ -2,10 +2,8 @@
 
 import logging
 
-from PyQt5.QtCore import QUrl, pyqtSlot, QEvent
+from PyQt5.QtCore import QUrl, pyqtSlot, QEvent, Qt
 from PyQt5.QtWidgets import QMainWindow, QLabel
-from PyQt5.QtGui import QWindowStateChangeEvent
-from PyQt5.Qt import Qt
 
 from frontendpy import FrontendPy
 import constants
@@ -264,16 +262,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "<img src=':/image/up.png' height=14 width=14>{}/s".format(misc.getHumanBytesNumber(summary["upSpeed"]))
         )
 
-    @pyqtSlot(QWindowStateChangeEvent)
     def changeEvent(self, qEvent):
         if qEvent.type() == QEvent.WindowStateChange:
-            if self.windowState() & Qt.WindowMinimized:
+            if self.isMinimized():
                 if self.settings.getbool("frontend", "minimizetosystray"):
-                    self.setVisible(False)
-            else:
-                # the following two lines should not be necessary.
-                # without these lines, restoring from minimized can be problematic.
-                # treat it as a workaround.
-                if int(qEvent.oldState()) == Qt.WindowMinimized:
-                    return
-                self.savedWindowState = self.windowState()
+                    self.setHidden(True)
+        super().changeEvent(qEvent)
+
+    def minimize(self):
+        self.showMinimized()
+
+    def restore(self):
+        self.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
+        if self.isHidden():
+            self.setHidden(False)
+
+    def closeEvent(self, qCloseEvent):
+        if self.settings.getbool("frontend", "closetominimize"):
+            qCloseEvent.ignore()
+            self.minimize()
+        else:
+            qCloseEvent.accept()

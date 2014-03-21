@@ -267,8 +267,13 @@ class SettingsDialog(QDialog, Ui_Dialog):
                                 self.checkBox_allowFlash.isChecked())
         self.settings.setbool("frontend", "minimizetosystray",
                                 self.checkBox_minimizeToSystray.isChecked())
+
+        # A possible Qt bug
+        # https://bugreports.qt-project.org/browse/QTBUG-37695
         self.settings.setbool("frontend", "closetominimize",
                                 self.checkBox_closeToMinimize.isChecked())
+
+        # disable for now due to deadlock problem
         # self.settings.setbool("frontend", "showmonitorwindow",
         #                         self.checkBox_showMonitorWindow.isChecked())
         self.settings.setint("frontend", "monitorfullspeed",
