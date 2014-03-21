@@ -31,7 +31,7 @@ class XwareDesktop(QApplication):
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         self.checkOneInstance()
 
-        self.settings = settings.SettingsAccessor()
+        self.settings = settings.SettingsAccessor(self)
         self.lastWindowClosed.connect(self.cleanUp)
 
         # components

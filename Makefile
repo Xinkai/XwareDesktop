@@ -71,6 +71,7 @@ install: all
 	chmod 664          $(DESTDIR)$(PREFIX)/frontend/*
 	chmod +x           $(DESTDIR)$(PREFIX)/frontend/CustomWebView
 	chmod +x           $(DESTDIR)$(PREFIX)/frontend/MonitorWidget
+	chmod +x           $(DESTDIR)$(PREFIX)/frontend/PersistentGeometry
 	chmod +x           $(DESTDIR)$(PREFIX)/frontend/launcher.py
 
 	install -D -m 664 src/frontend/ui/rc/thunder.ico    $(DESTDIR)$(PREFIX)/frontend/thunder.ico

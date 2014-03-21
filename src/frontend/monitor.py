@@ -2,15 +2,15 @@
 
 import logging
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot
-from PyQt5.Qt import Qt
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
 from PyQt5.QtGui import QGuiApplication
 
 import threading, time
 
 from ui_monitor import MonitorWidget, Ui_Form
+from PersistentGeometry import PersistentGeometry
 
-class MonitorWindow(MonitorWidget, Ui_Form):
+class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
     sigTaskUpdating = pyqtSignal(dict)
 
     app = None
@@ -36,6 +36,7 @@ class MonitorWindow(MonitorWidget, Ui_Form):
                                         name = "monitor task updating",
                                         daemon = True)
         self._thread.start()
+        self.preserveGeometry("monitor")
 
     def updateTaskThread(self):
         while True:

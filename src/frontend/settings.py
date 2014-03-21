@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, Qt
 
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, Qt
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem
+
+import pickle, binascii
+
 from ui_settings import Ui_Dialog
 import configparser, os
 import constants
@@ -52,6 +55,8 @@ DEFAULT_SETTINGS = {
 ; misc
 *.rom;*.ttf;*.bin;*.torrent
 """,
+        "mainwingeometry": None,
+        "monitorwingeometry": None,
     },
     "xwared": {
         "startetm": True,
@@ -62,10 +67,13 @@ DEFAULT_SETTINGS = {
 class SettingsAccessor(QObject):
     applySettings = pyqtSignal()
 
-    def __init__(self):
+    app = None
+    def __init__(self, app):
         super().__init__()
         self.config = configparser.ConfigParser()
         self.config.read(constants.CONFIG_FILE)
+        self.app = app
+        self.app.aboutToQuit.connect(self.save)
 
     def get(self, section, key):
         return self.config.get(section, key, fallback = DEFAULT_SETTINGS[section][key])
@@ -90,6 +98,22 @@ class SettingsAccessor(QObject):
     def setbool(self, section, key, value):
         assert type(value) is bool
         self.set(section, key, "1" if value else "0")
+
+    def getobj(self, section, key):
+        pickledStr = self.get(section, key)
+        if type(pickledStr) is str and len(pickledStr) > 0:
+            pickledBytes = pickledStr.encode("ascii")
+            pickled = binascii.unhexlify(pickledBytes)
+            unpickled = pickle.loads(pickled)
+            return unpickled
+        else:
+            return pickledStr
+
+    def setobj(self, section, key, value):
+        pickled = pickle.dumps(value, 3) # protocol 3 requires Py3.0
+        pickledBytes = binascii.hexlify(pickled)
+        pickledStr = pickledBytes.decode("ascii")
+        self.set(section, key, pickledStr)
 
     def save(self):
         with open(constants.CONFIG_FILE, 'w') as configfile:

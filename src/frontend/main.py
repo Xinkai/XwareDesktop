@@ -9,6 +9,7 @@ from frontendpy import FrontendPy
 import constants
 from misc import debounce
 from ui_main import Ui_MainWindow
+from PersistentGeometry import PersistentGeometry
 
 log = print
 
@@ -18,7 +19,7 @@ class CustomStatusBarLabel(QLabel):
         self.setTextFormat(Qt.RichText)
         parent.addPermanentWidget(self)
 
-class MainWindow(QMainWindow, Ui_MainWindow):
+class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     app = None
     savedWindowState = Qt.WindowNoState
 
@@ -33,6 +34,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.connectUI()
 
         self.setupWebkit()
+
+        self.preserveGeometry("main")
 
     def setupWebkit(self):
         self.settings.applySettings.connect(self.applySettingsToWebView)
