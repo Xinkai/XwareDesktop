@@ -21,7 +21,6 @@ class CustomStatusBarLabel(QLabel):
 
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     app = None
-    savedWindowState = Qt.WindowNoState
 
     def __init__(self, app):
         super().__init__()
