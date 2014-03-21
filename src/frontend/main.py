@@ -47,7 +47,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     @pyqtSlot()
     def applySettingsToWebView(self):
         from PyQt5.QtWebKit import QWebSettings
-        from PyQt5.Qt import Qt
 
         isDevToolsAllowed = self.settings.getbool("frontend", "enabledeveloperstools")
         self.webView.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, isDevToolsAllowed)
