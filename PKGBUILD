@@ -12,7 +12,7 @@ arch=("i686" "x86_64")
 conflicts=("xware_desktop")
 license=("GPL" "custom")
 
-makedepends=("python-pyqt5" "coffee-script" "chrpath")
+makedepends=("python-pyqt5" "coffee-script" "chrpath" "findutils")
 if test "$CARCH" == x86_64; then
     makedepends+=("lib32-glib2" "gcc-multilib")
 else
@@ -50,6 +50,6 @@ package() {
         cd ../
     fi
     make DESTDIR=${pkgdir} install
-    install -D src/xwared.service ${pkgdir}/usr/lib/systemd/system/xwared.service
+    install -D -m 644 src/xwared.service ${pkgdir}/usr/lib/systemd/system/xwared.service
 }
 

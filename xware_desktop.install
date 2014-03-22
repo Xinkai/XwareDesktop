@@ -4,45 +4,40 @@ pre_install() {
 }
 
 post_install() {
-    echo "欢迎使用Xware Desktop。"
-    echo "设置方法和注意事项见项目主页。"
-    echo "项目主页 http://cuoan.net/xware-desktop"
-    echo "Github https://github.com/Xinkai/XwareDesktop"
-
     # Arch specific
     systemctl daemon-reload
     update-desktop-database -q
 
-    touch /opt/xware_desktop/settings.ini
-    touch /opt/xware_desktop/mounts
-    mkdir -p /opt/xware_desktop/xware/cfg
-    touch /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
-
-    chmod ug+rw /opt/xware_desktop/{settings.ini,mounts}
-    chmod -x    /opt/xware_desktop/{settings.ini,mounts}
-    chmod -x    /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
-    chmod o-w   /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
-
-    rm -rf          /opt/xware_desktop/frontend/__pycache__
-    mkdir -p -m 775 /opt/xware_desktop/frontend/__pycache__
-    chmod g+s       /opt/xware_desktop/frontend/__pycache__
-
+    touch     /opt/xware_desktop/{settings.ini,mounts}
+    touch     /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+    chmod 664 /opt/xware_desktop/{settings.ini,mounts}
+    chmod 664 /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+    python3   -O -m compileall -q /opt/xware_desktop/frontend
     chown -R xware:xware /opt/xware_desktop
-
-    chmod ug+s /opt/xware_desktop/xware/lib/ETMDaemon
-    chmod ug+s /opt/xware_desktop/xware/lib/EmbedThunderManager
-    chmod ug+s /opt/xware_desktop/xware/portal
-    chmod ug+s /opt/xware_desktop/xwared
     setcap "CAP_SETUID=+ep CAP_SETGID=+ep" /opt/xware_desktop/permissioncheck
+
+    echo "欢迎使用Xware Desktop。"
+    echo "设置方法和注意事项见项目主页。"
+    echo "项目主页 http://cuoan.net/xware-desktop"
+    echo "Github https://github.com/Xinkai/XwareDesktop"
+}
+
+pre_upgrade() {
+    rm -rf /opt/xware_desktop/frontend/__pycache__
+    rm -rf /opt/xware_desktop/frontend/*/__pycache__
 }
 
 post_upgrade() {
     post_install
 }
 
+pre_remove() {
+    systemctl stop xwared
+}
+
 post_remove() {
     userdel xware
-    groupdel xware
     echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware_desktop内所有内容。"
     rm -rf /opt/xware_desktop/frontend/__pycache__
+    rm -rf /opt/xware_desktop/frontend/*/__pycache__
 }

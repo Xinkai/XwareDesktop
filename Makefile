@@ -1,8 +1,9 @@
-CC          = gcc
-FLAGS       = -Wall -O3
-PREFIX      = /opt/xware_desktop
-install_exe = install -m 775
-install     = install -m 664
+CC            = gcc
+FLAGS         = -Wall -O3
+PREFIX        = /opt/xware_desktop
+install_xware = install -m 764
+install_exe   = install -m 775
+install       = install -m 664
 
 all: etmpatch.so xwared permissioncheck pyqt xwarejs.js prepareXware
 
@@ -53,24 +54,30 @@ install: all
 	install -d -m 775                               $(DESTDIR)$(PREFIX)
 	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware
 	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware/lib
-	install -d -m 775                               $(DESTDIR)$(PREFIX)/frontend
+	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware/cfg
 
-	$(install_exe) -D preparedXware/ETMDaemon             $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
-	$(install_exe) -D preparedXware/EmbedThunderManager   $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
-	$(install_exe)    preparedXware/portal                $(DESTDIR)$(PREFIX)/xware/portal
+	# xware
+	$(install_xware) preparedXware/ETMDaemon           $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
+	$(install_xware) preparedXware/EmbedThunderManager $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
+	$(install_xware) preparedXware/portal              $(DESTDIR)$(PREFIX)/xware/portal
 
-	$(install_exe) build/* $(DESTDIR)$(PREFIX)
+	# binary
+	$(install_exe)     build/permissioncheck           $(DESTDIR)$(PREFIX)/permissioncheck
+	$(install_xware)   build/etmpatch.so               $(DESTDIR)$(PREFIX)/etmpatch.so
+	$(install_xware)   build/xwared                    $(DESTDIR)$(PREFIX)/xwared
 
+	# frontend
 	cp -R src/frontend $(DESTDIR)$(PREFIX)
 	rm -rf             $(DESTDIR)$(PREFIX)/frontend/__pycache__
-	rm -rf             $(DESTDIR)$(PREFIX)/frontend/ui
-	rm -rf             $(DESTDIR)$(PREFIX)/frontend/tests
 	rm -rf             $(DESTDIR)$(PREFIX)/frontend/*/__pycache__
-	rm -f              $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
-	rm -f              $(DESTDIR)$(PREFIX)/frontend/Makefile
+	rm -r              $(DESTDIR)$(PREFIX)/frontend/ui
+	rm -r              $(DESTDIR)$(PREFIX)/frontend/tests
+	rm                 $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
+	rm                 $(DESTDIR)$(PREFIX)/frontend/xware_desktop.desktop
 	find $(DESTDIR)$(PREFIX)/frontend -type f -print0 | xargs -0 chmod 664
 	find $(DESTDIR)$(PREFIX)/frontend -type d -print0 | xargs -0 chmod 775
-	chmod +x           $(DESTDIR)$(PREFIX)/frontend/launcher.py
+	chmod 775          $(DESTDIR)$(PREFIX)/frontend/launcher.py
 
-	install -D -m 664 src/frontend/ui/rc/thunder.ico    $(DESTDIR)$(PREFIX)/frontend/thunder.ico
-	install -D     src/frontend/xware_desktop.desktop   $(DESTDIR)/usr/share/applications/xware_desktop.desktop
+	# other
+	install    -m 644 src/frontend/ui/rc/thunder.ico      $(DESTDIR)$(PREFIX)/frontend/thunder.ico
+	install -D -m 644 src/frontend/xware_desktop.desktop  $(DESTDIR)/usr/share/applications/xware_desktop.desktop

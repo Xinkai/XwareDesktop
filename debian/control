@@ -10,7 +10,8 @@ Build-Depends:
  libmount-dev,
  pyqt5-dev-tools,
  debhelper (>= 9),
- chrpath
+ chrpath,
+ findutils
 Standards-Version: 3.9.5
 Homepage: http://cuoan.net/xware-desktop
 Vcs-Git: git://gibhub.com/Xinkai/XwareDesktop.git
