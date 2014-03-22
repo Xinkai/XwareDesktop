@@ -119,6 +119,10 @@ class FrontendActionsQueue(QObject):
             tasks = [self._createTask()]
             tasks_localtorrent = []
 
+        # remove those urls which were not recognized by self._createTask
+        tasks = list(filter(lambda t: t is not None, tasks))
+        tasks_localtorrent = list(filter(lambda t: t is not None, tasks_localtorrent))
+
         if tasks:
             self.queueAction(CreateTasksAction(tasks))
         for task_bt in tasks_localtorrent: # because only 1 bt-task can be added once.
@@ -129,6 +133,9 @@ class FrontendActionsQueue(QObject):
 
         if taskUrl is None:
             return CreateTask()
+
+        if taskUrl.startswith("file://"):
+            taskUrl = taskUrl[len("file://"):]
 
         parsed = parse.urlparse(taskUrl)
         if parsed.scheme in ("thunder", "flashget", "qqdl"):
