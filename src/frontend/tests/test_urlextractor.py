@@ -59,6 +59,9 @@ ed2k://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee24
 ed2k with additional data
 ed2k://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/|sources,202.89.123.6:4662|/
 
+another ed2k
+ed2k://|file|%E6%B5%81%E8%A8%80%E7%BB%88%E7%BB%93%E8%80%85.Mythbusters.S10E03.Chi_Eng.HR-HDTV.AC3.1024X576.x264-YYeTs%E4%BA%BA%E4%BA%BA%E5%BD%B1%E8%A7%86.mkv|508401285|fa88f4e9f904cffa96d08cd5c4a5fad2|h=2i7c5wvqurfn7ddfhdi4xpjbyivb7qi5|/
+
 magnet
 magnet:?xt.1=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C&xt.2=urn:sha1:TXGCZQTH26NL6OUQAJJPFALHG2LTGBC7
 
@@ -91,6 +94,7 @@ http://www.test.com/1.exe?op=DOWNLOAD
 http://10.5.3.2/archive.zip
 ed2k://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
 ed2k://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/|sources,202.89.123.6:4662|/
+ed2k://|file|%E6%B5%81%E8%A8%80%E7%BB%88%E7%BB%93%E8%80%85.Mythbusters.S10E03.Chi_Eng.HR-HDTV.AC3.1024X576.x264-YYeTs%E4%BA%BA%E4%BA%BA%E5%BD%B1%E8%A7%86.mkv|508401285|fa88f4e9f904cffa96d08cd5c4a5fad2|h=2i7c5wvqurfn7ddfhdi4xpjbyivb7qi5|/
 magnet:?xt.1=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C&xt.2=urn:sha1:TXGCZQTH26NL6OUQAJJPFALHG2LTGBC7
 magnet:?xt=urn:btih:d8621b178ec96d703fa28d83ad16b87904f8f4d4&dn=Arch+Linux+2013.12.01+dual&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337""".split("\n")))
 
