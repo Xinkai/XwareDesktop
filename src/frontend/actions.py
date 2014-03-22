@@ -95,7 +95,11 @@ class FrontendActionsQueue(QObject):
     @pyqtSlot()
     def slotClipboardDataChanged(self):
         mimeData = self._clipboard.mimeData()
-        urls = self.urlExtractor.extract(mimeData.text())
+        self.createTasksFromMimeData(mimeData)
+
+    def createTasksFromMimeData(self, data):
+        # This method only checks text data.
+        urls = self.urlExtractor.extract(data.text())
         if len(urls) > 0:
             self.createTasksAction(urls)
 

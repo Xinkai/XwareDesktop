@@ -7,7 +7,9 @@ from PyQt5.QtGui import QPolygonF, QPen, QBrush, QLinearGradient
 from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene
 
-class MonitorGraphicsView(QGraphicsView):
+from DragDrop import AllowDrop
+
+class MonitorGraphicsView(QGraphicsView, AllowDrop):
     monitorWin = None
 
     SIZE = (50.0, 50.0)
@@ -41,6 +43,8 @@ class MonitorGraphicsView(QGraphicsView):
                                                     self._speedsBrush)
         self._progressText = self.scene.addText("")
         self._progressText.setPos(10, 0)
+
+        self.setupDropSupport()
 
     def mousePressEvent(self, qMouseEvent):
         self.monitorWin.mousePressEvent(qMouseEvent)
