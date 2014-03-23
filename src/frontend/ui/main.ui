@@ -97,7 +97,7 @@
    <addaction name="menu_backend"/>
    <addaction name="menu_help"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar_main">
+  <widget class="CustomStatusBar" name="statusBar_main">
    <property name="autoFillBackground">
     <bool>false</bool>
    </property>
@@ -189,6 +189,11 @@
    <class>CustomWebView</class>
    <extends>QWebView</extends>
    <header>CustomWebView/CWebView</header>
+  </customwidget>
+  <customwidget>
+   <class>CustomStatusBar</class>
+   <extends>QStatusBar</extends>
+   <header>CustomStatusBar/CStatusBar</header>
   </customwidget>
  </customwidgets>
  <resources>

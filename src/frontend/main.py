@@ -3,20 +3,13 @@
 import logging
 
 from PyQt5.QtCore import QUrl, pyqtSlot, QEvent, Qt
-from PyQt5.QtWidgets import QMainWindow, QLabel
+from PyQt5.QtWidgets import QMainWindow
 
 import constants
-from misc import debounce
 from ui_main import Ui_MainWindow
 from PersistentGeometry import PersistentGeometry
 
 log = print
-
-class CustomStatusBarLabel(QLabel):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.setTextFormat(Qt.RichText)
-        parent.addPermanentWidget(self)
 
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     app = None
@@ -27,7 +20,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
 
         # UI
         self.setupUi(self)
-        self.setupStatusBar()
         self.connectUI()
 
         self.setupWebkit()
@@ -65,29 +57,12 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.action_createTask.triggered.connect(self.frontendpy.queue.createTasksAction)
         self.action_refreshPage.triggered.connect(self.slotRefreshPage)
 
+        # Note: The menu actions enable/disable toggling are handled by statusbar.
         self.action_ETMstart.triggered.connect(self.xwaredpy.slotStartETM)
         self.action_ETMstop.triggered.connect(self.xwaredpy.slotStopETM)
         self.action_ETMrestart.triggered.connect(self.xwaredpy.slotRestartETM)
 
         self.action_showAbout.triggered.connect(self.slotShowAbout)
-
-    def setupStatusBar(self):
-        self.statusBar_main.xwaredStatus = CustomStatusBarLabel(self.statusBar_main)
-        self.statusBar_main.etmStatus = CustomStatusBarLabel(self.statusBar_main)
-        self.statusBar_main.frontendStatus = CustomStatusBarLabel(self.statusBar_main)
-
-        sp = self.statusBar_main.frontendStatus.sizePolicy()
-        sp.setHorizontalStretch(1)
-        self.statusBar_main.frontendStatus.setSizePolicy(sp)
-
-        self.statusBar_main.dlStatus = CustomStatusBarLabel(self.statusBar_main)
-        self.statusBar_main.ulStatus = CustomStatusBarLabel(self.statusBar_main)
-
-        self.xwaredpy.sigXwaredStatusPolled.connect(self.slotXwaredStatusPolled)
-        self.xwaredpy.sigETMStatusPolled.connect(self.slotETMStatusPolled)
-        self.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
-        self.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
-        self.etmpy.sigTasksSummaryUpdated[dict].connect(self.slotTasksSummaryUpdated)
 
     # shorthand
     @property
@@ -171,99 +146,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.settingsDialog = SettingsDialog(self)
         self.settingsDialog.show()
 
-    @pyqtSlot(bool)
-    def slotXwaredStatusPolled(self, enabled):
-        self.menu_backend.setEnabled(enabled)
-        if enabled:
-            self.statusBar_main.xwaredStatus.setText(
-                "<img src=':/image/check.png' width=14 height=14><font color='green'>xwared</font>")
-            self.statusBar_main.xwaredStatus.setToolTip("<div style='color:green'>xwared运行中</div>")
-        else:
-            self.statusBar_main.xwaredStatus.setText(
-                "<img src=':/image/attention.png' width=14 height=14><font color='red'>xwared</font>")
-            self.statusBar_main.xwaredStatus.setToolTip("<div style='color:red'>xwared未启动</div>")
-
-    @pyqtSlot()
-    def slotETMStatusPolled(self):
-        enabled = self.xwaredpy.etmStatus
-
-        self.action_ETMstart.setEnabled(not enabled)
-        self.action_ETMstop.setEnabled(enabled)
-        self.action_ETMrestart.setEnabled(enabled)
-
-        overallCheck = False
-        tooltips = []
-        if enabled:
-            activationStatus = self.etmpy.getActivationStatus()
-            tooltips.append("<div style='color:green'>ETM运行中</div>")
-            if activationStatus.status == 1:
-                overallCheck = True
-                tooltips.append(
-                    "<div style='color:green'>"
-                        "<img src=':/image/connected.png' width=16 height=16>"
-                    "设备已激活</div>")
-            else:
-                tooltips.append(
-                    "<div style='color:red'>"
-                        "<img src=':/image/disconnected.png' width=16 height=16>"
-                    "设备未激活</div>")
-        else:
-            tooltips.append("<div style='color:red'>ETM未启动</div>")
-
-        if overallCheck:
-            self.statusBar_main.etmStatus.setText(
-                    "<img src=':/image/check.png' width=14 height=14><font color='green'>ETM</font>")
-        else:
-            self.statusBar_main.etmStatus.setText(
-                "<img src=':/image/attention.png' width=14 height=14><font color='red'>ETM</font>")
-
-        self.statusBar_main.etmStatus.setToolTip("".join(tooltips))
-
-    @pyqtSlot()
-    @debounce(0.5, instant_first = True)
-    def slotFrontendStatusChanged(self):
-        frontendStatus = self.frontendpy.getFrontendStatus()
-        if all(frontendStatus):
-            self.statusBar_main.frontendStatus.setText(
-                "<img src=':/image/check.png' width=14 height=14><font color='green'>前端</font>")
-        else:
-            self.statusBar_main.frontendStatus.setText(
-                "<img src=':/image/attention.png' width=14 height=14><font color='red'>前端</font>")
-
-        self.statusBar_main.frontendStatus.setToolTip(
-            "<div style='color:{}'>页面代码已插入</div>\n"
-            "<div style='color:{}'>设备已登录</div>\n"
-            "<div style='color:{}'>设备在线</div>".format(*map(lambda s: "green" if s else "red",
-                                                              frontendStatus)))
-        print(frontendStatus)
-
     @pyqtSlot()
     def slotShowAbout(self):
         from about import AboutDialog
         self.aboutDialog = AboutDialog(self)
         self.aboutDialog.show()
-
-    @pyqtSlot(bool)
-    @pyqtSlot(dict)
-    def slotTasksSummaryUpdated(self, summary):
-        import misc
-        if not summary:
-            self.statusBar_main.dlStatus.setText(
-                "<img src=':/image/down.png' height=14 width=14>获取下载状态失败"
-            )
-            self.statusBar_main.dlStatus.setToolTip("")
-            self.statusBar_main.ulStatus.setText(
-                "<img src=':/image/up.png' height=14 width=14>获取上传状态失败"
-            )
-            return
-
-        self.statusBar_main.dlStatus.setText(
-            "<img src=':/image/down.png' height=14 width=14>{}/s".format(
-                                        misc.getHumanBytesNumber(summary["dlSpeed"])))
-        self.statusBar_main.dlStatus.setToolTip("{}任务下载中".format(summary["dlNum"]))
-        self.statusBar_main.ulStatus.setText(
-            "<img src=':/image/up.png' height=14 width=14>{}/s".format(misc.getHumanBytesNumber(summary["upSpeed"]))
-        )
 
     def changeEvent(self, qEvent):
         if qEvent.type() == QEvent.WindowStateChange:
