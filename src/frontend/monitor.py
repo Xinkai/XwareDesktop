@@ -50,12 +50,16 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
                             return # end the thread
 
                         logging.debug("updateSpeedsThread, deadlock incoming, maybe")
+                        time.sleep(self.TICK_INTERVAL)
                         try:
                             self.sigTaskUpdating.emit(task)
                         except TypeError:
                             # monitor closed
                             return # end the thread
-                        time.sleep(self.TICK_INTERVAL)
+
+                        # FIXME: move the sleep function ahead, before sigTaskUpdating.emit
+                        # it seems to make the deadlock go away.
+                        # time.sleep(self.TICK_INTERVAL)
             else:
                 time.sleep(self.TICK_INTERVAL)
 
