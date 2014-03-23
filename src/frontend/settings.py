@@ -21,7 +21,7 @@ DEFAULT_SETTINGS = {
         "minimizetosystray": True,
         "closetominimize": False,
         "cachelocation": os.path.expanduser("~/.xware-desktop/cache/webkit"),
-        "showmonitorwindow": False,
+        "showmonitorwindow": True,
         "monitorfullspeed": 512,
         "watchclipboard": True,
         "watchpattern":
@@ -297,9 +297,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.settings.setbool("frontend", "closetominimize",
                                 self.checkBox_closeToMinimize.isChecked())
 
-        # disable for now due to deadlock problem
-        # self.settings.setbool("frontend", "showmonitorwindow",
-        #                         self.checkBox_showMonitorWindow.isChecked())
+        self.settings.setbool("frontend", "showmonitorwindow",
+                                self.checkBox_showMonitorWindow.isChecked())
         self.settings.setint("frontend", "monitorfullspeed",
                                 self.spinBox_monitorFullSpeed.value())
         self.settings.setbool("frontend", "watchclipboard",

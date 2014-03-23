@@ -241,7 +241,7 @@
         <item>
          <widget class="QCheckBox" name="checkBox_showMonitorWindow">
           <property name="text">
-           <string>显示悬浮窗(此功能未完成)</string>
+           <string>显示悬浮窗</string>
           </property>
          </widget>
         </item>
