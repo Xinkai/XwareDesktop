@@ -23,20 +23,26 @@ class FrontendPy(QObject):
     sigNotifyPeerId = pyqtSignal(str) # let xdjs knows peerid
     sigFrontendStatusChanged = pyqtSignal() # caused by webpage heartbeat/changed status/refresh page
 
+    app = None
     queue = None
-    mainWin = None
     isPageMaskOn = None
     _isPageOnline = None # property wraps them, in order to fire sigFrontendStatusChanged
     _isPageLogined = None
     _isXdjsLoaded = None
 
-    def __init__(self, mainWin):
-        super().__init__(mainWin)
-        self.mainWin = mainWin
-        self.mainWin.settings.applySettings.connect(self.tryLogin)
+    def __init__(self, app):
+        super().__init__(app)
+        self.app = app
+        self.app.settings.applySettings.connect(self.tryLogin)
         self.queue = FrontendActionsQueue(self)
 
-        print("frontendpy loaded")
+    @property
+    def mainWin(self):
+        try:
+            mainWin = self.app.mainWin
+        except AttributeError:
+            raise Exception("frontendpy didn't wait for mainWin.")
+        return mainWin
 
     @property
     def isPageOnline(self):
@@ -67,27 +73,27 @@ class FrontendPy(QObject):
     ################################### SLOTS ######################################
     @pyqtSlot()
     def tryLogin(self):
-        if self.mainWin.page.urlMatch(constants.LOGIN_PAGE):
-            autologin = self.mainWin.settings.getbool("account", "autologin")
+        if self.app.mainWin.page.urlMatch(constants.LOGIN_PAGE):
+            autologin = self.app.settings.getbool("account", "autologin")
             if autologin:
-                username = self.mainWin.settings.get("account", "username")
-                password = self.mainWin.settings.get("account", "password")
+                username = self.app.settings.get("account", "username")
+                password = self.app.settings.get("account", "password")
                 if username and password:
                     self.sigLogin.emit(username, password)
 
     def tryActivate(self, payload):
-        if not self.mainWin.page.urlMatch(constants.V3_PAGE):
+        if not self.app.mainWin.page.urlMatch(constants.V3_PAGE):
             return # not v3 page
 
         if not payload["userid"]:
             return # not logged in
 
-        userid, status, code, peerid = self.mainWin.etmpy.getActivationStatus()
+        userid, status, code, peerid = self.app.etmpy.getActivationStatus()
 
         if userid == 0:
             # unbound
             if status == -1:
-                QMessageBox.warning(self.mainWin, "Xware Desktop 警告", "ETM未启用，无法激活。需要启动ETM后，刷新页面。",
+                QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "ETM未启用，无法激活。需要启动ETM后，刷新页面。",
                                     QMessageBox.Ok, QMessageBox.Ok)
                 return
 
@@ -102,12 +108,12 @@ class FrontendPy(QObject):
                 return
 
             elif userid != int(payload["userid"]):
-                QMessageBox.warning(self.mainWin, "Xware Desktop 警告", "登录的迅雷账户不是绑定的迅雷账户。",
+                QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "登录的迅雷账户不是绑定的迅雷账户。",
                                     QMessageBox.Ok, QMessageBox.Ok)
                 return
 
             elif peerid not in payload["peerids"]:
-                QMessageBox.warning(self.mainWin, "Xware Desktop 警告", "前端尚未出现绑定的设备，请稍侯刷新。",
+                QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "前端尚未出现绑定的设备，请稍侯刷新。",
                                     QMessageBox.Ok, QMessageBox.Ok)
                 return
             else:
@@ -128,17 +134,17 @@ class FrontendPy(QObject):
     @pyqtSlot(str)
     def systemOpen(self, url):
         from PyQt5.QtGui import QDesktopServices
-        url = self.mainWin.mountsFaker.convertToNativePath(url)
+        url = self.app.mountsFaker.convertToNativePath(url)
         qurl = QUrl(url)
         qurl.setScheme("file")
         QDesktopServices().openUrl(qurl)
 
     @pyqtSlot(str, str)
     def saveCredentials(self, username, password):
-        self.mainWin.settings.set("account", "username", username)
-        self.mainWin.settings.set("account", "password", password)
-        self.mainWin.settings.setbool("account", "autologin", True)
-        self.mainWin.settings.save()
+        self.app.settings.set("account", "username", username)
+        self.app.settings.set("account", "password", password)
+        self.app.settings.setbool("account", "autologin", True)
+        self.app.settings.save()
 
     @pyqtSlot("QList<QVariant>")
     def log(self, items):
@@ -205,7 +211,7 @@ class FrontendPy(QObject):
                                  Qt.Key_Enter,    # key
                                  Qt.NoModifier)   # modifiers
 
-        self.mainWin.app.sendEvent(self.mainWin.webView, keydownEvent)
+        self.app.sendEvent(self.mainWin.webView, keydownEvent)
         self.sigCreateTaskFromTorrentFileDone.emit()
 
     def getFrontendStatus(self):

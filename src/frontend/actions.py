@@ -44,6 +44,7 @@ class CreateTask(object):
         return "{} <{}>".format(self.__class__.__name__, self.url)
 
 class FrontendActionsQueue(QObject):
+    app = None
     _queue = None
     _listener = None
     _clipboard = None
@@ -52,6 +53,7 @@ class FrontendActionsQueue(QObject):
 
     def __init__(self, parent = None):
         super().__init__(parent)
+        self.app = QGuiApplication.instance()
         self._queue = deque()
         self.frontendpy = parent
 
@@ -66,7 +68,7 @@ class FrontendActionsQueue(QObject):
         self.urlExtractor = UrlExtractor(self)
 
         self._clipboard = QGuiApplication.clipboard()
-        self.frontendpy.mainWin.settings.applySettings.connect(self.slotWatchClipboardToggled)
+        self.app.settings.applySettings.connect(self.slotWatchClipboardToggled)
 
     def listenerThread(self):
         # clean if previous run crashes

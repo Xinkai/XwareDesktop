@@ -5,7 +5,6 @@ import logging
 from PyQt5.QtCore import QUrl, pyqtSlot, QEvent, Qt
 from PyQt5.QtWidgets import QMainWindow, QLabel
 
-from frontendpy import FrontendPy
 import constants
 from misc import debounce
 from ui_main import Ui_MainWindow
@@ -26,7 +25,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         super().__init__()
         self.app = app
 
-        self.frontendpy = FrontendPy(self) # setup Webkit Bridge
         # UI
         self.setupUi(self)
         self.setupStatusBar()
@@ -124,6 +122,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     @property
     def mountsFaker(self):
         return self.app.mountsFaker
+
+    @property
+    def frontendpy(self):
+        return self.app.frontendpy
     # shorthand ends
 
     @pyqtSlot()
