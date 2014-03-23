@@ -4,7 +4,6 @@ import logging
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtGui import QIcon
-from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
 
 class Systray(QObject):
