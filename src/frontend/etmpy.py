@@ -150,6 +150,17 @@ class TaskStatistic(QObject):
         self._tasks = {}
         self._tasks_mod = {}
 
+    def getTIDs(self):
+        tids = list(self._tasks.keys())
+        return tids
+
+    def getTask(self, tid):
+        try:
+            result = self._tasks[tid].copy()
+        except KeyError:
+            result = dict()
+        return result
+
 class CompletedTaskStatistic(TaskStatistic):
     sigTaskCompleted = pyqtSignal(int)
 
@@ -186,17 +197,6 @@ class RunningTaskStatistic(TaskStatistic):
             result = self._tasks[tid]["speeds"]
         except KeyError:
             result = [0] * self.SPEEDS_SAMPLES_COUNT
-        return result
-
-    def getTIDs(self):
-        tids = list(self._tasks.keys())
-        return tids
-
-    def getTask(self, tid):
-        try:
-            result = self._tasks[tid].copy()
-        except KeyError:
-            result = dict()
         return result
 
     @staticmethod
