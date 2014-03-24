@@ -11,4 +11,7 @@
     <file>disconnected.png</file>
     <file>thunder.ico</file>
   </qresource>
+  <qresource prefix="sound">
+    <file>download-complete.wav</file>
+  </qresource>
 </RCC>
