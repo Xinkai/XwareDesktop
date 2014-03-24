@@ -145,6 +145,20 @@ class TaskStatistic(QObject):
     _tasks = None # copy from _stat_mod upon it's done.
     _tasks_mod = None # make changes to this one.
 
+    TASK_STATES = {
+        0: ("dload", "下载中"),
+        8: ("wait", "等待中"),
+        9: ("pause", "已停止"),
+        10: ("pause", "已暂停"),
+        11: ("finish", "已完成"),
+        12: ("delete", "下载失败"),
+        13: ("finish", "上传中"),
+        14: ("wait", "提交中"),
+        15: ("delete", "已删除"),
+        16: ("delete", "已移至回收站"),
+        37: ("wait", "已挂起"),
+        38: ("delete", "发生错误"),
+    }
     def __init__(self, parent):
         super().__init__(parent)
         self._tasks = {}
