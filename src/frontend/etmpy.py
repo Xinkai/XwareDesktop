@@ -4,10 +4,11 @@ import logging
 
 from PyQt5.QtCore import QObject, pyqtSignal
 import threading, time
-import requests
+import requests, json
 import collections
 import pyinotify
 from requests.exceptions import ConnectionError
+from urllib.parse import unquote
 
 import constants
 from misc import debounce
@@ -97,7 +98,9 @@ class EtmPy(QObject):
     def _requestPollTasks(self, kind): # kind means type, but type is a python reserved word.
         try:
             req = requests.get(self.lcontrol + "list?v=2&type={}&pos=0&number=99999&needUrl=1".format(kind))
-            result = req.json()
+            res = req.content.decode("utf-8")
+            res = unquote(res)
+            result = json.loads(res)
         except (ConnectionError, LocalCtrlNotAvailableError):
             result = None
         return result
