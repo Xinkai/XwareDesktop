@@ -20,6 +20,8 @@ DEFAULT_SETTINGS = {
         "allowflash": True,
         "minimizetosystray": True,
         "closetominimize": False,
+        "popnotifications": True,
+        "notifybysound": True,
         "cachelocation": os.path.expanduser("~/.xware-desktop/cache/webkit"),
         "showmonitorwindow": True,
         "monitorfullspeed": 512,
@@ -137,6 +139,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_allowFlash.setChecked(self.settings.getbool("frontend", "allowflash"))
         self.checkBox_minimizeToSystray.setChecked(self.settings.getbool("frontend", "minimizetosystray"))
         self.checkBox_closeToMinimize.setChecked(self.settings.getbool("frontend", "closetominimize"))
+        self.checkBox_popNotifications.setChecked(self.settings.getbool("frontend", "popnotifications"))
+        self.checkBox_notifyBySound.setChecked(self.settings.getbool("frontend", "notifybysound"))
         self.checkBox_showMonitorWindow.setChecked(self.settings.getbool("frontend", "showmonitorwindow"))
         self.spinBox_monitorFullSpeed.setValue(self.settings.getint("frontend", "monitorfullspeed"))
         # clipboard related
@@ -296,6 +300,10 @@ class SettingsDialog(QDialog, Ui_Dialog):
         # https://bugreports.qt-project.org/browse/QTBUG-37695
         self.settings.setbool("frontend", "closetominimize",
                                 self.checkBox_closeToMinimize.isChecked())
+        self.settings.setbool("frontend", "popnotifications",
+                                self.checkBox_popNotifications.isChecked())
+        self.settings.setbool("frontend", "notifybysound",
+                                self.checkBox_notifyBySound.isChecked())
 
         self.settings.setbool("frontend", "showmonitorwindow",
                                 self.checkBox_showMonitorWindow.isChecked())

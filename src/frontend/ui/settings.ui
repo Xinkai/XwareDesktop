@@ -207,7 +207,7 @@
          <x>12</x>
          <y>12</y>
          <width>217</width>
-         <height>112</height>
+         <height>170</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -245,6 +245,20 @@
           </property>
          </widget>
         </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_popNotifications">
+          <property name="text">
+           <string>弹出通知窗口</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_notifyBySound">
+          <property name="text">
+           <string>播放通知声音</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="layoutWidget">
@@ -273,7 +287,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>130</y>
+         <y>190</y>
          <width>141</width>
          <height>51</height>
         </rect>

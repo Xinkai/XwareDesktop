@@ -51,13 +51,17 @@ class Notifier(QObject):
         task = self._completedTasksStat.getTask(taskId)
 
         if task.get("state", None) == 11: # see definitions in class TaskStatistic.
-            self._qSound_complete.play()
+            if self.app.settings.getbool("frontend", "notifybysound"):
+                self._qSound_complete.play()
             self._dbus_notify(task)
         else:
             # TODO: Also notify if errors occur
             pass
 
     def _dbus_notify(self, task):
+        if not self.app.settings.getbool("frontend", "popnotifications"):
+            return
+
         qdBusMsg = self._interface.call("Notify",
             QDBusArgument("Xware Desktop", QMetaType.QString), # app_name
             QDBusArgument(0, QMetaType.UInt), # replace_id
