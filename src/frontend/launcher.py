@@ -13,6 +13,7 @@ from xwaredpy import XwaredPy
 from etmpy import EtmPy
 from systray import Systray
 import mounts
+from Notify import Notifier
 from frontendpy import FrontendPy
 
 log = print
@@ -39,6 +40,7 @@ class XwareDesktop(QApplication):
         self.xwaredpy = XwaredPy(self)
         self.etmpy = EtmPy(self)
         self.mountsFaker = mounts.MountsFaker()
+        self.dbusNotify = Notifier(self)
         self.frontendpy = FrontendPy(self)
 
         self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
