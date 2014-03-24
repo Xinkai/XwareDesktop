@@ -164,6 +164,7 @@ class TaskStatistic(QObject):
 class CompletedTaskStatistic(TaskStatistic):
     sigTaskCompleted = pyqtSignal(int)
 
+    _initialized = False # False (app startup) => sigTaskComplete shouldn't fire
     def __init__(self, parent = None):
         super().__init__(parent)
 
@@ -183,8 +184,11 @@ class CompletedTaskStatistic(TaskStatistic):
                 completed.append(tid)
 
         self._tasks = self._tasks_mod.copy()
-        for completedId in completed:
-            self.sigTaskCompleted.emit(completedId)
+        if self._initialized:
+            for completedId in completed:
+                self.sigTaskCompleted.emit(completedId)
+        else:
+            self._initialized = True
 
 class RunningTaskStatistic(TaskStatistic):
     SPEEDS_SAMPLES_COUNT = 25
