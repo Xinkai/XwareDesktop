@@ -81,7 +81,10 @@ class Notifier(QObject):
     @pyqtSlot(QDBusMessage)
     def slotActionInvoked(self, msg):
         notifyId, action = msg.arguments()
-        task = self._notifications[notifyId]
+        task = self._notifications.get(notifyId, None)
+        if not task:
+            # other applications' notifications
+            return
         name = task["name"] # filename
         path = task["path"] # location
 
