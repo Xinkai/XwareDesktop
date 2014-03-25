@@ -159,6 +159,7 @@ class TaskStatistic(QObject):
         37: ("wait", "已挂起"),
         38: ("delete", "发生错误"),
     }
+    _initialized = False # when the application starts up, it shouldn't fire.
     def __init__(self, parent):
         super().__init__(parent)
         self._tasks = {}
@@ -175,10 +176,12 @@ class TaskStatistic(QObject):
             result = dict()
         return result
 
+    def getTasks(self):
+        return self._tasks.copy()
+
 class CompletedTaskStatistic(TaskStatistic):
     sigTaskCompleted = pyqtSignal(int)
 
-    _initialized = False # False (app startup) => sigTaskComplete shouldn't fire
     def __init__(self, parent = None):
         super().__init__(parent)
 
@@ -205,6 +208,7 @@ class CompletedTaskStatistic(TaskStatistic):
             self._initialized = True
 
 class RunningTaskStatistic(TaskStatistic):
+    sigTaskNolongerRunning = pyqtSignal(int) # the task finished/recycled/wronged
     SPEEDS_SAMPLES_COUNT = 25
 
     def __init__(self, parent = None):
@@ -239,4 +243,12 @@ class RunningTaskStatistic(TaskStatistic):
             newSpeeds = self._composeNewSpeeds(oldSpeeds, task["speed"])
             self._tasks_mod[tid]["speeds"] = newSpeeds
 
+        nolongerRunning = set(self.getTIDs()) - \
+                          set(self._tasks_mod.keys())
+
         self._tasks = self._tasks_mod.copy()
+        if self._initialized:
+            for nolongerRunningId in nolongerRunning:
+                self.sigTaskNolongerRunning.emit(nolongerRunningId)
+        else:
+            self._initialized = True
