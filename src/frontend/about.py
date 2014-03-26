@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-XWARE_VERSION = "1.0.11"
+XWARE_VERSION = "1.0.12"
 
 from PyQt5.QtCore import pyqtSlot, QUrl, Qt
 from PyQt5.QtGui import QDesktopServices
