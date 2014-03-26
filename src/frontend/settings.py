@@ -8,6 +8,7 @@ import pickle, binascii
 from ui_settings import Ui_Dialog
 import configparser, os
 import constants
+import DistroDependent
 
 DEFAULT_SETTINGS = {
     "account": {
@@ -63,7 +64,14 @@ DEFAULT_SETTINGS = {
     "xwared": {
         "startetm": True,
         "startetmwhen": 1
-    }
+    },
+    "scheduler": {
+        "powergroup": DistroDependent.SCHEDULER_POWERGROUP,
+        "poweroffcmd": DistroDependent.SCHEDULER_POWEROFF_COMMAND,
+        "hybridsleepcmd": DistroDependent.SCHEDULER_HYBRIDSLEEP_COMMAND,
+        "hibernatecmd": DistroDependent.SCHEDULER_HIBERNATE_COMMAND,
+        "suspendcmd": DistroDependent.SCHEDULER_SUSPEND_COMMAND,
+    },
 }
 
 class SettingsAccessor(QObject):
