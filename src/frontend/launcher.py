@@ -15,6 +15,7 @@ from systray import Systray
 import mounts
 from Notify import Notifier
 from frontendpy import FrontendPy
+from Schedule import Scheduler
 
 log = print
 
@@ -42,6 +43,7 @@ class XwareDesktop(QApplication):
         self.mountsFaker = mounts.MountsFaker()
         self.dbusNotify = Notifier(self)
         self.frontendpy = FrontendPy(self)
+        self.scheduler = Scheduler(self)
 
         self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
 
