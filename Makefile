@@ -26,6 +26,7 @@ clean:
 	rm -rf build
 	rm -rf preparedXware
 	rm -f src/frontend/ui_*.py
+	rm -f src/frontend/*/ui_*.py
 	rm -f src/frontend/*_rc.py
 	rm -f src/frontend/xwarejs.js
 	rm -rf src/frontend/__pycache__
@@ -36,6 +37,7 @@ pyqt:
 	pyuic5 -o src/frontend/ui_settings.py src/frontend/ui/settings.ui
 	pyuic5 -o src/frontend/ui_about.py    src/frontend/ui/about.ui
 	pyuic5 -o src/frontend/ui_monitor.py  src/frontend/ui/monitor.ui
+	pyuic5 -o src/frontend/Schedule/ui_scheduler.py  src/frontend/ui/scheduler.ui
 	pyrcc5 -o src/frontend/resource_rc.py src/frontend/ui/rc/resource.qrc
 
 xwarejs.js: src/frontend/xwarejs.coffee
