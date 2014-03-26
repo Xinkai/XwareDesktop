@@ -21,9 +21,10 @@ class CustomStatusBar(QStatusBar):
         self.etmStatus = CustomStatusBarLabel(self)
         self.frontendStatus = CustomStatusBarLabel(self)
 
-        sp = self.frontendStatus.sizePolicy()
+        self.spacer = CustomStatusBarLabel(self)
+        sp = self.spacer.sizePolicy()
         sp.setHorizontalStretch(1)
-        self.frontendStatus.setSizePolicy(sp)
+        self.spacer.setSizePolicy(sp)
 
         self.dlStatus = CustomStatusBarLabel(self)
         self.ulStatus = CustomStatusBarLabel(self)
