@@ -209,6 +209,7 @@ class CompletedTaskStatistic(TaskStatistic):
 
 class RunningTaskStatistic(TaskStatistic):
     sigTaskNolongerRunning = pyqtSignal(int) # the task finished/recycled/wronged
+    sigTaskAdded = pyqtSignal(int)
     SPEEDS_SAMPLES_COUNT = 25
 
     def __init__(self, parent = None):
@@ -243,12 +244,17 @@ class RunningTaskStatistic(TaskStatistic):
             newSpeeds = self._composeNewSpeeds(oldSpeeds, task["speed"])
             self._tasks_mod[tid]["speeds"] = newSpeeds
 
-        nolongerRunning = set(self.getTIDs()) - \
-                          set(self._tasks_mod.keys())
+        prevTaskIds = set(self.getTIDs())
+        currTaskIds = set(self._tasks_mod.keys())
+
+        nolongerRunning = prevTaskIds - currTaskIds
+        added = currTaskIds - prevTaskIds
 
         self._tasks = self._tasks_mod.copy()
         if self._initialized:
             for nolongerRunningId in nolongerRunning:
                 self.sigTaskNolongerRunning.emit(nolongerRunningId)
+            for addedId in added:
+                self.sigTaskAdded.emit(addedId)
         else:
             self._initialized = True
