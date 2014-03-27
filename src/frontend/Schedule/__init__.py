@@ -11,8 +11,8 @@ SELECTED_TASKS_COMPLETED = 1
 ACTION_NONE = 0
 ACTION_POWEROFF = 1
 ACTION_HYBRIDSLEEP = 2
-ACTION_SUSPEND = 3
-ACTION_HIBERNATE = 4
+ACTION_HIBERNATE = 3
+ACTION_SUSPEND = 4
 
 # Scheduler controls what happens when tasks finished.
 class Scheduler(QObject):
@@ -24,13 +24,14 @@ class Scheduler(QObject):
         (SELECTED_TASKS_COMPLETED, "选中的"),
     )
 
-    POSSIBLE_ACTIONS = (
+    _ALL_POSSIBLE_ACTIONS = (
         (ACTION_NONE, "无"),
-        (ACTION_POWEROFF, "关机"),
-        (ACTION_HYBRIDSLEEP, "混合休眠"),
-        (ACTION_SUSPEND, "睡眠"),
-        (ACTION_HIBERNATE, "休眠"),
+        (ACTION_POWEROFF, "关机", "poweroff"),
+        (ACTION_HYBRIDSLEEP, "混合休眠", "hybridsleep"),
+        (ACTION_HIBERNATE, "休眠", "hibernate"),
+        (ACTION_SUSPEND, "睡眠", "suspend"),
     )
+    POSSIBLE_ACTIONS = None
 
     app = None
     _action = None
@@ -42,6 +43,16 @@ class Scheduler(QObject):
         self.app = app
         self._waitingTaskIds = set()
         self.reset()
+
+        # compute POSSIBLE_ACTIONS
+        self.POSSIBLE_ACTIONS = []
+        for action in self._ALL_POSSIBLE_ACTIONS:
+            if len(action) == 2:
+                # ACTION_NONE
+                self.POSSIBLE_ACTIONS.append(action)
+            else:
+                if self.app.settings.get("scheduler", action[2] + "cmd"):
+                    self.POSSIBLE_ACTIONS.append(action)
 
         self.app.etmpy.runningTasksStat.sigTaskNolongerRunning.connect(self.slotMayAct)
         self.app.etmpy.runningTasksStat.sigTaskAdded.connect(self.slotMayAct)
