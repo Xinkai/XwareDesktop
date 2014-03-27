@@ -18,8 +18,31 @@ class SchedulerWindow(QDialog, Ui_Dialog):
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.app = QApplication.instance()
+        self.powerGroupCheck()
         self.scheduler = self.app.scheduler
         self.loadFromScheduler()
+
+    def powerGroupCheck(self):
+        from misc import getGroupMembership
+        grpName = self.app.settings.get("scheduler", "powergroup")
+        if not grpName:
+            # skip checking
+            return
+
+        membership = getGroupMembership(grpName)
+        problem = None
+        if not membership.groupExists:
+            problem = "未找到电源组({})".format(grpName)
+        else:
+            if not membership.isIn:
+                problem = "用户不在电源组({})".format(grpName)
+            else:
+                if not membership.isEffective:
+                    problem = "用户在电源组但未生效"
+
+        if problem:
+            self.label_powerGroupCheck.setText(
+                "<font color='red'>警告: {}，<a href='https://github.com/Xinkai/XwareDesktop/wiki/计划任务'>查看帮助</a></font>".format(problem))
 
     def loadFromScheduler(self):
         # actWhen ComboBox
