@@ -22,7 +22,7 @@ class CustomStatusBar(QStatusBar):
         self.etmStatus = CustomStatusBarLabel(self)
         self.frontendStatus = CustomStatusBarLabel(self)
 
-        # self.schedulerBtn = SchedulerButton(self)
+        self.schedulerBtn = SchedulerButton(self)
 
         self.spacer = CustomStatusBarLabel(self)
         sp = self.spacer.sizePolicy()
