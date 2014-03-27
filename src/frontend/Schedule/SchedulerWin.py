@@ -8,11 +8,6 @@ from .ui_scheduler import Ui_Dialog
 
 import Schedule
 
-class CustomListWidgetItem(QListWidgetItem):
-    def __init__(self, parent):
-        super().__init__(parent)
-
-
 class SchedulerWindow(QDialog, Ui_Dialog):
     app = None
     scheduler = None
@@ -25,7 +20,6 @@ class SchedulerWindow(QDialog, Ui_Dialog):
         self.app = QApplication.instance()
         self.scheduler = self.app.scheduler
         self.loadFromScheduler()
-
 
     def loadFromScheduler(self):
         # actWhen ComboBox
