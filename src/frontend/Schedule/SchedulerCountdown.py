@@ -20,7 +20,8 @@ class CountdownMessageBox(QMessageBox):
                          getattr(self.app, "mainWin", None), # parent
                          Qt.Dialog | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_DeleteOnClose)
-        self.setWindowModality(Qt.ApplicationModal)
+        # Note: setting WindowModality cancels StaysOnTop
+        # self.setWindowModality(Qt.ApplicationModal)
 
         # Due to a possible Qt Bug, the reject button must be added first.
         # https://bugreports.qt-project.org/browse/QTBUG-37870
