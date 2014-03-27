@@ -247,7 +247,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
             if drive1 != drive2:
                 errors.append("警告：盘符映射在'{actual}'，而不是'{should}'。需要重启后端修复。".format(actual = drive2, should = drive1))
 
-            from PyQt5.Qt import Qt
             from PyQt5.QtGui import QBrush
 
             brush = QBrush()
@@ -269,7 +268,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
     def slotAddMount(self):
         import os
         from PyQt5.QtWidgets import QFileDialog
-        from PyQt5.Qt import Qt
 
         fileDialog = QFileDialog(self, Qt.Dialog)
         fileDialog.setFileMode(QFileDialog.Directory)

@@ -3,8 +3,7 @@
 import logging
 
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
-from PyQt5.Qt import Qt
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
 import collections
 
 import constants, actions
