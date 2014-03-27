@@ -81,7 +81,7 @@
     <rect>
      <x>10</x>
      <y>250</y>
-     <width>121</width>
+     <width>141</width>
      <height>27</height>
     </rect>
    </property>
@@ -97,7 +97,14 @@
      </widget>
     </item>
     <item>
-     <widget class="QComboBox" name="comboBox_action"/>
+     <widget class="QComboBox" name="comboBox_action">
+      <property name="minimumSize">
+       <size>
+        <width>80</width>
+        <height>0</height>
+       </size>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QLabel" name="label_3">
@@ -111,12 +118,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>155</width>
+     <width>159</width>
      <height>27</height>
     </rect>
    </property>
@@ -150,7 +157,6 @@
  <tabstops>
   <tabstop>comboBox_actWhen</tabstop>
   <tabstop>listWidget_tasks</tabstop>
-  <tabstop>comboBox_action</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>

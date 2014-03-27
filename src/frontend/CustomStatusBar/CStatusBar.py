@@ -6,6 +6,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QStatusBar
 from .CStatusBarLabel import CustomStatusBarLabel
+from Schedule.SchedulerButton import SchedulerButton
 
 from misc import debounce, getHumanBytesNumber
 
@@ -20,6 +21,8 @@ class CustomStatusBar(QStatusBar):
         self.xwaredStatus = CustomStatusBarLabel(self)
         self.etmStatus = CustomStatusBarLabel(self)
         self.frontendStatus = CustomStatusBarLabel(self)
+
+        # self.schedulerBtn = SchedulerButton(self)
 
         self.spacer = CustomStatusBarLabel(self)
         sp = self.spacer.sizePolicy()

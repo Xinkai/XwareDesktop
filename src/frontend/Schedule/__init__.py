@@ -3,18 +3,21 @@
 import logging
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from Schedule.SchedulerCountdown import CountdownMessageBox
 
 ALL_TASKS_COMPLETED = 0
 SELECTED_TASKS_COMPLETED = 1
 
 ACTION_NONE = 0
-ACTION_SLEEP = 1
-ACTION_HIBERNATE = 2
-ACTION_SHUTDOWN = 3
+ACTION_POWEROFF = 1
+ACTION_HYBRIDSLEEP = 2
+ACTION_SUSPEND = 3
+ACTION_HIBERNATE = 4
 
 # Scheduler controls what happens when tasks finished.
 class Scheduler(QObject):
     sigSchedulerSummaryUpdated = pyqtSignal()
+    sigActionConfirmed = pyqtSignal(bool)
 
     POSSIBLE_ACTWHENS = (
         (ALL_TASKS_COMPLETED, "所有的"),
@@ -23,22 +26,26 @@ class Scheduler(QObject):
 
     POSSIBLE_ACTIONS = (
         (ACTION_NONE, "无"),
-        (ACTION_SLEEP, "睡眠"),
+        (ACTION_POWEROFF, "关机"),
+        (ACTION_HYBRIDSLEEP, "混合休眠"),
+        (ACTION_SUSPEND, "睡眠"),
         (ACTION_HIBERNATE, "休眠"),
-        (ACTION_SHUTDOWN, "关机"),
     )
 
     app = None
-    _action = ACTION_NONE
-    _actWhen = ALL_TASKS_COMPLETED
-    _waitingTaskIds = set()         # user-selected tasks
-    _stillWaitingTasksNumber = 0    # user-selected tasks - nolonger running tasks
+    _action = None
+    _actWhen = None
+    _waitingTaskIds = None         # user-selected tasks
+    _stillWaitingTasksNumber = 0   # (computed) user-selected tasks - nolonger running tasks
     def __init__(self, app):
         super().__init__(app)
         self.app = app
+        self._waitingTaskIds = set()
+        self.reset()
 
         self.app.etmpy.runningTasksStat.sigTaskNolongerRunning.connect(self.slotMayAct)
         self.app.etmpy.runningTasksStat.sigTaskAdded.connect(self.slotMayAct)
+        self.sigActionConfirmed[bool].connect(self.act)
 
     @property
     def actWhen(self):
@@ -70,15 +77,18 @@ class Scheduler(QObject):
         return cls.POSSIBLE_ACTIONS[actionId][1]
 
     def getSummary(self):
-        # return either False / str
-        # False -> scheduled to do something
+        # return either True / False / str
+        # True -> action undergoing, system shutting down
+        # False -> scheduled to do nothing
         # str -> one sentence summary
         if self.action == ACTION_NONE:
             return False
 
         if self._stillWaitingTasksNumber:
             return "{}个任务结束后{}".format(self._stillWaitingTasksNumber,
-                                            self.getActionName(self._action))
+                                            self.getActionName(self.action))
+        else:
+            return True
 
     @pyqtSlot(int)
     def slotMayAct(self):
@@ -101,16 +111,10 @@ class Scheduler(QObject):
             logging.info("not take action because desired tasks are running.")
             return
 
-        self.sigSchedulerSummaryUpdated.emit()
-
-        if self.action == ACTION_HIBERNATE:
-            print("HIBERNATE")
-        elif self.action == ACTION_SLEEP:
-            print("SLEEP")
-        elif self.action == ACTION_SHUTDOWN:
-            print("SHUTDOWN")
-        else:
-            raise Exception("Unknown action")
+        self.confirmDlg = CountdownMessageBox(self.getActionName(self.action))
+        self.confirmDlg.show()
+        self.confirmDlg.activateWindow()
+        self.confirmDlg.raise_()
 
     def set(self, actWhen, taskIds, action):
         if actWhen == SELECTED_TASKS_COMPLETED:
@@ -119,3 +123,29 @@ class Scheduler(QObject):
             self._actWhen, self._action = actWhen, action
 
         self.slotMayAct()
+
+    def reset(self):
+        # Should be called when
+        # 1. app starts up
+        # 2. immediately before power-control commands are run
+        # 3. action is canceled by user
+        self.set(ALL_TASKS_COMPLETED, set(), ACTION_NONE)
+
+    @pyqtSlot(int)
+    def act(self, confirmed):
+        del self.confirmDlg
+        if confirmed:
+            if self.action == ACTION_POWEROFF:
+                cmd = self.app.settings.get("scheduler", "poweroffcmd")
+            elif self.action == ACTION_HYBRIDSLEEP:
+                cmd = self.app.settings.get("scheduler", "hybridsleepcmd")
+            elif self.action == ACTION_HIBERNATE:
+                cmd = self.app.settings.get("scheduler", "hibernatecmd")
+            elif self.action == ACTION_SUSPEND:
+                cmd = self.app.settings.get("scheduler", "suspendcmd")
+            else:
+                raise Exception("Unknown action")
+            self.reset()
+            print(cmd) # TODO
+        else:
+            self.reset()
