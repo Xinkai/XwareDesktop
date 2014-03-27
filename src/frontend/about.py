@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import pyqtSlot, QUrl, Qt
-from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 
 from __init__ import  __version__, XWARE_VERSION
@@ -15,7 +14,6 @@ class AboutDialog(QDialog, Ui_dlg_about):
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.fillLibVersions()
-        self.label_homepageLink.linkActivated.connect(self.openLinkInExternalBrowser)
 
     def fillLibVersions(self):
         self.label_version.setText(__version__)
@@ -37,8 +35,3 @@ class AboutDialog(QDialog, Ui_dlg_about):
 
         from PyQt5 import QtWebKit
         self.label_qtwebkitVer.setText(QtWebKit.qWebKitVersion())
-
-    @pyqtSlot(str)
-    def openLinkInExternalBrowser(self, link):
-        qurl = QUrl(link)
-        QDesktopServices().openUrl(qurl)

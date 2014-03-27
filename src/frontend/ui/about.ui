@@ -74,6 +74,9 @@
         <property name="text">
          <string>&lt;a href=&quot;http://cuoan.net/xware-desktop&quot;&gt;http://cuoan.net/xware-desktop&lt;/a&gt;</string>
         </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -97,6 +100,9 @@
         </property>
         <property name="text">
          <string>&lt;a href=&quot;https://github.com/Xinkai/XwareDesktop&quot;&gt;https://github.com/Xinkai/XwareDesktop&lt;/a&gt;</string>
+        </property>
+        <property name="openExternalLinks">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
