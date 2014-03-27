@@ -3,7 +3,7 @@
 import logging
 
 from PyQt5.QtCore import QObject, pyqtSlot
-from PyQt5.QtGui import QGuiApplication
+from PyQt5.QtWidgets import QApplication
 
 from collections import deque
 import threading, os, sys
@@ -53,7 +53,7 @@ class FrontendActionsQueue(QObject):
 
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.app = QGuiApplication.instance()
+        self.app = QApplication.instance()
         self._queue = deque()
         self.frontendpy = parent
 
@@ -67,7 +67,7 @@ class FrontendActionsQueue(QObject):
 
         self.urlExtractor = UrlExtractor(self)
 
-        self._clipboard = QGuiApplication.clipboard()
+        self._clipboard = QApplication.clipboard()
         self.app.settings.applySettings.connect(self.slotWatchClipboardToggled)
 
     def listenerThread(self):

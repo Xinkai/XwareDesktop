@@ -3,8 +3,7 @@
 import logging
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QGuiApplication
-from PyQt5.QtWidgets import QStatusBar
+from PyQt5.QtWidgets import QApplication, QStatusBar
 from .CStatusBarLabel import CustomStatusBarLabel
 from Schedule.SchedulerButton import SchedulerButton
 
@@ -14,7 +13,7 @@ class CustomStatusBar(QStatusBar):
     app = None
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.app = QGuiApplication.instance()
+        self.app = QApplication.instance()
         self.setupStatusBar()
 
     def setupStatusBar(self):

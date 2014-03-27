@@ -3,7 +3,7 @@
 import logging
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
-from PyQt5.QtGui import QGuiApplication
+from PyQt5.QtWidgets import QApplication
 
 import threading, time
 
@@ -27,7 +27,7 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.app = QGuiApplication.instance()
+        self.app = QApplication.instance()
 
         self.app.settings.applySettings.connect(self._setMonitorFullSpeed)
         self._setMonitorFullSpeed()
