@@ -85,7 +85,7 @@ class Scheduler(QObject):
 
     @classmethod
     def getActionName(cls, actionId):
-        return cls.POSSIBLE_ACTIONS[actionId][1]
+        return cls._ALL_POSSIBLE_ACTIONS[actionId][1]
 
     def getSummary(self):
         # return either True / False / str
