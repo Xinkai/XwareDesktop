@@ -16,6 +16,7 @@ import mounts
 from Notify import Notifier
 from frontendpy import FrontendPy
 from Schedule import Scheduler
+from misc import getGroupMembership
 
 log = print
 
@@ -73,22 +74,18 @@ class XwareDesktop(QApplication):
 
     def checkUsergroup(self):
         from PyQt5.QtWidgets import QMessageBox
-        import grp, getpass
-        try:
-            xwareGrp = grp.getgrnam("xware")
-        except KeyError:
+        membership = getGroupMembership("xware")
+        if not membership.groupExists:
             QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "未在本机上找到xware用户组，需要重新安装。",
                                 QMessageBox.Ok, QMessageBox.Ok)
             sys.exit(-1)
 
-        xwareGid, xwareMembers = xwareGrp[2], xwareGrp[3]
-        if getpass.getuser() not in xwareMembers:
+        if not membership.isIn:
             QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "当前用户不在xware用户组。",
                                 QMessageBox.Ok, QMessageBox.Ok)
             sys.exit(-1)
 
-        currentGroups = os.getgroups()
-        if xwareGid not in currentGroups:
+        if not membership.isEffective:
             QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "当前进程没有应用xware用户组，请注销并重登入。",
                                 QMessageBox.Ok, QMessageBox.Ok)
             sys.exit(-1)
