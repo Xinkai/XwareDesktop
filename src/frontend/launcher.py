@@ -3,6 +3,7 @@
 
 import logging
 
+from __init__ import __version__
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication
 
@@ -28,7 +29,7 @@ class XwareDesktop(QApplication):
         super().__init__(*args)
         logging.info("XWARE DESKTOP STARTS")
         self.setApplicationName("XwareDesktop")
-        self.setApplicationVersion("0.1")
+        self.setApplicationVersion(__version__)
 
         self.checkUsergroup()
 
