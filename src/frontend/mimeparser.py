@@ -2,7 +2,8 @@
 
 import logging
 
-from PyQt5.QtCore import QObject, QCoreApplication, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSlot
+from PyQt5.QtWidgets import QApplication
 import re
 
 # qqdl, flashget, thunder, http, ftp, https, ed2k, magnet
@@ -16,7 +17,7 @@ class UrlExtractor(QObject):
         super().__init__(actionsQueue)
         self.actionsQueue = actionsQueue
 
-        self._app = QCoreApplication.instance()
+        self._app = QApplication.instance()
         if self._app:
             self._app.settings.applySettings.connect(self.slotSettingsChanged)
         else:
