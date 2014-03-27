@@ -10,6 +10,7 @@
 #include <pthread.h>
 #include <sys/stat.h>
 #include <glib.h>
+#include <pwd.h>
 
 #define CONFIG_PATH "/opt/xware_desktop/settings.ini"
 

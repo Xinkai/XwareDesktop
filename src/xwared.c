@@ -181,9 +181,36 @@ void hookEtmPatch() {
     }
 }
 
+void checkUser() {
+    // refuse to run if not running as xware:xware
+    // get uid, gid of 'xware'
+    struct passwd* usrInfo = getpwnam("xware");
+    if (usrInfo == NULL) {
+        if (errno == 0) {
+            printf("未找到xware用户。请重新安装。\n");
+        } else {
+            perror("getpwnam");
+        }
+        exit(EXIT_FAILURE);
+    }
+    uid_t xware_uid = usrInfo->pw_uid;
+    gid_t xware_gid = usrInfo->pw_gid;
+
+    if ((getuid() != xware_uid) | (geteuid() != xware_uid)) {
+        printf("必须以xware用户运行。\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if ((getgid() != xware_gid) | (getegid() != xware_gid)) {
+        printf("必须以xware组运行。\n");
+        exit(EXIT_FAILURE);
+    }
+}
+
 int main(const int argc, const char* argv[]) {
     setbuf(stdout, NULL);
     setbuf(stderr, NULL);
+    checkUser();
     if (chdir(etmWorkingDir) == -1) {
         perror("chdir");
         exit(EXIT_FAILURE);
