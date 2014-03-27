@@ -190,7 +190,11 @@ void prepare() {
     // get uid, gid of 'xware'
     struct passwd* usrInfo = getpwnam("xware");
     if (usrInfo == NULL) {
-        perror("getpwnam");
+        if (errno == 0) {
+            printf("未找到xware用户。请重新安装。\n");
+        } else {
+            perror("getpwnam");
+        }
         exit(EXIT_FAILURE);
     }
     xware_uid = usrInfo->pw_uid;
