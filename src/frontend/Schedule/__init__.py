@@ -3,6 +3,7 @@
 import logging
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+import os
 from Schedule.SchedulerCountdown import CountdownMessageBox
 
 ALL_TASKS_COMPLETED = 0
@@ -157,6 +158,7 @@ class Scheduler(QObject):
             else:
                 raise Exception("Unknown action")
             self.reset()
-            print(cmd) # TODO
+            logging.info("scheduler is about to execute: {}".format(cmd))
+            os.system(cmd)
         else:
             self.reset()
