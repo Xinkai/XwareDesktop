@@ -77,17 +77,17 @@ class XwareDesktop(QApplication):
         from PyQt5.QtWidgets import QMessageBox
         membership = getGroupMembership("xware")
         if not membership.groupExists:
-            QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "未在本机上找到xware用户组，需要重新安装。",
+            QMessageBox.warning(None, "Xware Desktop 警告", "未在本机上找到xware用户组，需要重新安装。",
                                 QMessageBox.Ok, QMessageBox.Ok)
             sys.exit(-1)
 
         if not membership.isIn:
-            QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "当前用户不在xware用户组。",
+            QMessageBox.warning(None, "Xware Desktop 警告", "当前用户不在xware用户组。",
                                 QMessageBox.Ok, QMessageBox.Ok)
             sys.exit(-1)
 
         if not membership.isEffective:
-            QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "当前进程没有应用xware用户组，请注销并重登入。",
+            QMessageBox.warning(None, "Xware Desktop 警告", "当前进程没有应用xware用户组，请注销并重登入。",
                                 QMessageBox.Ok, QMessageBox.Ok)
             sys.exit(-1)
 
