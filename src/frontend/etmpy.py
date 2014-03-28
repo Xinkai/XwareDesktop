@@ -108,12 +108,10 @@ class EtmPy(QObject):
     def pollTasks(self):
         while True:
             resRunning = self._requestPollTasks(0)
-            if resRunning is not None:
-                self.runningTasksStat.update(resRunning)
+            self.runningTasksStat.update(resRunning)
 
             resCompleted = self._requestPollTasks(1)
-            if resCompleted is not None:
-                self.completedTasksStat.update(resCompleted)
+            self.completedTasksStat.update(resCompleted)
 
             # emit summary, it doesn't matter using resRunning or resCompleted
             if resRunning is not None:
