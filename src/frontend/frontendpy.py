@@ -112,11 +112,9 @@ class FrontendPy(QObject):
                 return
 
             elif peerid not in payload["peerids"]:
-                QMessageBox.warning(None, "Xware Desktop 警告", "前端尚未出现绑定的设备，请稍侯刷新。",
-                                    QMessageBox.Ok, QMessageBox.Ok)
-                return
-            else:
-                self.sigNotifyPeerId.emit(peerid)
+                logging.warning("Network is slow, there're no peerids when xdjs loaded.")
+
+            self.sigNotifyPeerId.emit(peerid)
 
     @pyqtSlot(QVariant)
     def xdjsLoaded(self, payload):

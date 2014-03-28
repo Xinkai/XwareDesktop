@@ -8,7 +8,10 @@ class XwareJS
         xdpy.sigLogin.connect(@, @slotLogin)
         xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
         xdpy.sigToggleFlashAvailability.connect(@, @slotToggleFlashAvailability)
-        xdpy.sigNotifyPeerId.connect(@, @slotBindDeviceObserver)
+
+        @deviceObserverBounded = false
+        xdpy.sigNotifyPeerId.connect(@, @slotWaitToBindDeviceObserver)
+
         @bindDblclick()
         @bindContextMenu()
         @bindSaveCredentials()
@@ -150,32 +153,50 @@ class XwareJS
             "attributeFilter": ["class"]
         })
 
-    slotBindDeviceObserver: (boundPeerId) ->
+    bindDeviceObserver: (boundPeerId) ->
+        # prevent multiple binding
+        if @deviceObserverBounded
+            return
+        @deviceObserverBounded = true
+        @log "bindDeviceObserver"
+
         _online = Data.downloader.all[boundPeerId].online
         _logined = Data.downloader.all[boundPeerId].logined
+
+        Object.defineProperty(Data.downloader.all[boundPeerId], "online", {
+            get: () ->
+                return _online
+            set: (v) =>
+                _online = v
+                xdpy.slotSetOnline(v)
+
+                console.log("set online", v)
+        })
+
+        Object.defineProperty(Data.downloader.all[boundPeerId], "logined", {
+            get: () ->
+                return _logined
+            set: (v) =>
+                _logined = v
+                xdpy.slotSetLogined(v)
+
+                console.log("set logined", v)
+        })
+
+        xdpy.slotSetOnline(_online)
+        xdpy.slotSetLogined(_logined)
+
+    slotWaitToBindDeviceObserver: (boundPeerId) ->
+        # This method exists because the peerids are loaded by an ajax request,
+        # when the network is a bit slow, peerids are delayed.
+        # Using a setInterval to wait for the peerids being loaded is good enough.
         if Data?.downloader?
-            Object.defineProperty(Data.downloader.all[boundPeerId], "online", {
-                get: () ->
-                    return _online
-                set: (v) =>
-                    _online = v
-                    xdpy.slotSetOnline(v)
-
-                    console.log("set online", v)
-            })
-
-            Object.defineProperty(Data.downloader.all[boundPeerId], "logined", {
-                get: () ->
-                    return _logined
-                set: (v) =>
-                    _logined = v
-                    xdpy.slotSetLogined(v)
-
-                    console.log("set logined", v)
-            })
-
-            xdpy.slotSetOnline(_online)
-            xdpy.slotSetLogined(_logined)
+            # the right page
+            intervalId = setInterval () =>
+                if boundPeerId of Data.downloader.all
+                    clearInterval(intervalId)
+                    @bindDeviceObserver(boundPeerId)
+            , 500
 
 $ ->
     if (not window.MutationObserver) and window.WebKitMutationObserver
