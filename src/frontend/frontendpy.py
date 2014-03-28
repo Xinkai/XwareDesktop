@@ -92,7 +92,7 @@ class FrontendPy(QObject):
         if userid == 0:
             # unbound
             if status == -1:
-                QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "ETM未启用，无法激活。需要启动ETM后，刷新页面。",
+                QMessageBox.warning(None, "Xware Desktop 警告", "ETM未启用，无法激活。需要启动ETM后，刷新页面。",
                                     QMessageBox.Ok, QMessageBox.Ok)
                 return
 
@@ -107,12 +107,12 @@ class FrontendPy(QObject):
                 return
 
             elif userid != int(payload["userid"]):
-                QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "登录的迅雷账户不是绑定的迅雷账户。",
+                QMessageBox.warning(None, "Xware Desktop 警告", "登录的迅雷账户不是绑定的迅雷账户。",
                                     QMessageBox.Ok, QMessageBox.Ok)
                 return
 
             elif peerid not in payload["peerids"]:
-                QMessageBox.warning(QMessageBox(None), "Xware Desktop 警告", "前端尚未出现绑定的设备，请稍侯刷新。",
+                QMessageBox.warning(None, "Xware Desktop 警告", "前端尚未出现绑定的设备，请稍侯刷新。",
                                     QMessageBox.Ok, QMessageBox.Ok)
                 return
             else:
