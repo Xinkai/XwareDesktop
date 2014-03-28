@@ -67,7 +67,7 @@ class UrlExtractor(QObject):
                 r"(?:[a-f0-9]{32})\|"                         # hash
                 r"(?:(?:[\w|\/|.|\-|:|\,|=]+)|(?= |\r|\n|\t|))" # additional
             r")|(?:"
-            r"magnet:\?[\w|\.|\=|\:|\&|\+|%]+"
+            r"magnet:\?[\w|\.|\=|\:|\&|\+|%|-]+"
             r")"
         , re.I)
 
