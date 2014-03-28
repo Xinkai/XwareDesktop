@@ -480,41 +480,6 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>190</y>
-         <width>241</width>
-         <height>50</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QLabel" name="label_defaultDownloadPath">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>默认下载路径</string>
-          </property>
-          <property name="buddy">
-           <cstring>lineEdit_defaultDownloadPath</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_defaultDownloadPath">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="placeholderText">
-           <string>填写使用&quot;/&quot;作为分隔符的 Windows 路径</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
          <y>130</y>
          <width>181</width>
          <height>51</height>
@@ -665,7 +630,6 @@
   <tabstop>spinBox_maxRunningTasksNum</tabstop>
   <tabstop>spinBox_dSpeedLimit</tabstop>
   <tabstop>spinBox_uSpeedLimit</tabstop>
-  <tabstop>lineEdit_defaultDownloadPath</tabstop>
   <tabstop>lineEdit_lcport</tabstop>
   <tabstop>btn_refreshMount</tabstop>
   <tabstop>btn_removeMount</tabstop>
