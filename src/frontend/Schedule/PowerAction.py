@@ -103,7 +103,7 @@ class PowerActionManager(QObject):
     def _dbusAct(self, action):
         logging.info("scheduler is about to act: {}".format(action))
         self._interface.call(action.internalName,
-                             True)
+                             False)
 
     def _cmdAct(self, action):
         logging.info("scheduler is about to execute: {}".format(action))
