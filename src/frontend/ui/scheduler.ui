@@ -153,19 +153,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QLabel" name="label_powerGroupCheck">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>276</y>
-     <width>211</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-  </widget>
  </widget>
  <tabstops>
   <tabstop>comboBox_actWhen</tabstop>

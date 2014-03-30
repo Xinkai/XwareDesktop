@@ -66,11 +66,10 @@ DEFAULT_SETTINGS = {
         "startetmwhen": 1
     },
     "scheduler": {
-        "powergroup": DistroDependent.SCHEDULER_POWERGROUP,
-        "poweroffcmd": DistroDependent.SCHEDULER_POWEROFF_COMMAND,
-        "hybridsleepcmd": DistroDependent.SCHEDULER_HYBRIDSLEEP_COMMAND,
-        "hibernatecmd": DistroDependent.SCHEDULER_HIBERNATE_COMMAND,
-        "suspendcmd": DistroDependent.SCHEDULER_SUSPEND_COMMAND,
+        "poweroffcmd": "",
+        "hybridsleepcmd": "",
+        "hibernatecmd": "",
+        "suspendcmd": "",
     },
 }
 
@@ -84,6 +83,9 @@ class SettingsAccessor(QObject):
         self.config.read(constants.CONFIG_FILE)
         self.app = app
         self.app.aboutToQuit.connect(self.save)
+
+    def has(self, section, key):
+        return self.config.has_option(section, key)
 
     def get(self, section, key):
         return self.config.get(section, key, fallback = DEFAULT_SETTINGS[section][key])

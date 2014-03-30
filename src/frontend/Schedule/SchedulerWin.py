@@ -18,31 +18,8 @@ class SchedulerWindow(QDialog, Ui_Dialog):
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.app = QApplication.instance()
-        self.powerGroupCheck()
         self.scheduler = self.app.scheduler
         self.loadFromScheduler()
-
-    def powerGroupCheck(self):
-        from misc import getGroupMembership
-        grpName = self.app.settings.get("scheduler", "powergroup")
-        if not grpName:
-            # skip checking
-            return
-
-        membership = getGroupMembership(grpName)
-        problem = None
-        if not membership.groupExists:
-            problem = "未找到电源组({})".format(grpName)
-        else:
-            if not membership.isIn:
-                problem = "用户不在电源组({})".format(grpName)
-            else:
-                if not membership.isEffective:
-                    problem = "用户在电源组但未生效"
-
-        if problem:
-            self.label_powerGroupCheck.setText(
-                "<font color='red'>警告: {}，<a href='https://github.com/Xinkai/XwareDesktop/wiki/计划任务'>查看帮助</a></font>".format(problem))
 
     def loadFromScheduler(self):
         # actWhen ComboBox
@@ -69,10 +46,15 @@ class SchedulerWindow(QDialog, Ui_Dialog):
                 item.setSelected(False)
 
         # action comboBox
-        for row, pair in enumerate(self.scheduler.POSSIBLE_ACTIONS):
-            self.comboBox_action.addItem(pair[1])
-            self.comboBox_action.setItemData(row, pair[0])
-        self.comboBox_action.setCurrentIndex(self.scheduler.action)
+        selectedIndex = None
+        for action in self.scheduler.actions:
+            if action.command or action.availability == "yes":
+                self.comboBox_action.addItem(action.displayName)
+                row = self.comboBox_action.count() - 1
+                self.comboBox_action.setItemData(row, action.actionId)
+                if self.scheduler.actionId == action.actionId:
+                    selectedIndex = row
+        self.comboBox_action.setCurrentIndex(selectedIndex)
 
     @pyqtSlot(int)
     def slotActWhenChanged(self, choice):
@@ -88,7 +70,7 @@ class SchedulerWindow(QDialog, Ui_Dialog):
         actWhen = self.comboBox_actWhen.currentData()
         taskIds = set(map(lambda item: item.data(Qt.UserRole),
                                   self.listWidget_tasks.selectedItems()))
-        action = self.comboBox_action.currentData()
+        actionId = self.comboBox_action.currentData()
 
-        self.scheduler.set(actWhen, taskIds, action)
+        self.scheduler.set(actWhen, taskIds, actionId)
         self.close()
