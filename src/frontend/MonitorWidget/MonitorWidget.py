@@ -3,7 +3,9 @@
 from PyQt5.Qt import Qt
 from PyQt5.QtWidgets import QWidget
 
-class MonitorWidget(QWidget):
+from Compat.TeardownHelper import TeardownHelper
+
+class MonitorWidget(QWidget, TeardownHelper):
     _isBeingDragged = False
     _dragOffset = None
 
