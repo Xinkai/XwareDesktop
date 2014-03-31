@@ -153,11 +153,22 @@ class XwareJS
             "attributeFilter": ["class"]
         })
 
+    getDeviceIndex: (peerId) ->
+        for i, item of Data.downloader.list
+            if item.pid is peerId
+                return i
+        return NaN
+
     bindDeviceObserver: (boundPeerId) ->
         # prevent multiple binding
         if @deviceObserverBounded
             return
         @deviceObserverBounded = true
+
+        deviceIndex = @getDeviceIndex(boundPeerId)
+        if (not isNaN(deviceIndex)) and (App.get("downloader.activedIndex") isnt deviceIndex)
+            App.set("downloader.activedIndex", deviceIndex)
+
         @log "bindDeviceObserver"
 
         _online = Data.downloader.all[boundPeerId].online
