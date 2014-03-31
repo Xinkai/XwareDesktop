@@ -1,5 +1,9 @@
 pre_install() {
-    useradd --no-create-home --user-group --shell /bin/false --system xware
+    if id -g xware > /dev/null 2>&1; then
+        useradd --no-create-home --user-group --shell /bin/false --system xware
+    else
+        useradd --no-create-home --gid xware --shell /bin/false --system xware
+    fi
     rm -rf /tmp/thunder
 }
 
