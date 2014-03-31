@@ -116,6 +116,10 @@ class XwareDesktop(QApplication):
                 pass # not shown, do nothing
 
 if __name__ == "__main__":
+    try:
+        os.mkdir(os.path.expanduser("~/.xware-desktop"))
+    except OSError:
+        pass # already exists
     logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))
     app = XwareDesktop(sys.argv)
     sys.exit(app.exec())
