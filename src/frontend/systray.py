@@ -6,6 +6,8 @@ from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
 
+from Compat.CompatSystemTrayIcon import CompatSystemTrayIcon
+
 class Systray(QObject):
     app = None
     trayIconMenu = None
@@ -19,21 +21,13 @@ class Systray(QObject):
 
         icon = QIcon(":/image/thunder.ico")
 
-        self.trayIcon = QSystemTrayIcon(None)
+        self.trayIcon = CompatSystemTrayIcon(self)
         self.trayIcon.setIcon(icon)
         self.trayIcon.setContextMenu(self.trayIconMenu)
         self.trayIcon.setVisible(True)
 
         self.trayIcon.activated.connect(self.slotSystrayActivated)
-        self.app.lastWindowClosed.connect(self.slotTeardown)
-
         self.trayIconMenu.addAction(self.mainWin.action_exit)
-
-    @pyqtSlot()
-    def slotTeardown(self):
-        print("teardown Systray")
-        # On Ubuntu 13.10, systrayicon won't destroy itself gracefully, stops the whole program from exiting.
-        del self.trayIcon
 
     @pyqtSlot(QSystemTrayIcon.ActivationReason)
     def slotSystrayActivated(self, reason):
