@@ -1,8 +1,10 @@
 pre_install() {
-    if id -g xware > /dev/null 2>&1; then
-        useradd --no-create-home --user-group --shell /bin/false --system xware
-    else
+    getent group xware >/dev/null 2>&1
+    RET=$?
+    if [ $RET -eq 0 ]; then
         useradd --no-create-home --gid xware --shell /bin/false --system xware
+    else
+        useradd --no-create-home --user-group --shell /bin/false --system xware
     fi
     rm -rf /tmp/thunder
 }
@@ -40,7 +42,7 @@ pre_remove() {
 }
 
 post_remove() {
-    userdel xware
+    userdel xware 2>/dev/null
     echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware_desktop内所有内容。"
     rm -rf /opt/xware_desktop/frontend
 }
