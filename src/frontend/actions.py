@@ -116,23 +116,23 @@ class FrontendActionsQueue(QObject):
     @pyqtSlot(list)
     def createTasksAction(self, taskUrls = None):
         if taskUrls:
-            alltasks = list(map(self._createTask, taskUrls))
+            alltasks = self._filterInvalidTasks(map(self._createTask, taskUrls))
             tasks = list(filter(lambda task: task.kind == CreateTask.NORMAL, alltasks))
             tasks_localtorrent = list(filter(lambda task: task.kind == CreateTask.LOCAL_TORRENT,
                                              alltasks))
         else:
             # else
-            tasks = [self._createTask()]
+            tasks = self._filterInvalidTasks([self._createTask()])
             tasks_localtorrent = []
-
-        # remove those urls which were not recognized by self._createTask
-        tasks = list(filter(lambda t: t is not None, tasks))
-        tasks_localtorrent = list(filter(lambda t: t is not None, tasks_localtorrent))
 
         if tasks:
             self.queueAction(CreateTasksAction(tasks))
         for task_bt in tasks_localtorrent: # because only 1 bt-task can be added once.
             self.queueAction(CreateTasksAction([task_bt]))
+
+    def _filterInvalidTasks(self, tasks):
+        # remove those urls which were not recognized by self._createTask
+        return list(filter(lambda t: t is not None, tasks))
 
     def _createTask(self, taskUrl = None):
         from urllib import parse
