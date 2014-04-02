@@ -137,7 +137,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.setWindowModality(Qt.WindowModal)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.mainWin = parent
+        self.app = parent.app
         self.setupUi(self)
 
         self.lineEdit_loginUsername.setText(self.settings.get("account", "username"))
@@ -181,7 +181,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
     # shorthand
     @property
     def settings(self):
-        return self.mainWin.settings
+        return self.app.settings
     # shorthand ends
 
     @staticmethod
@@ -233,8 +233,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         PermissionError = self.permissionCheck()
 
-        mountsMapping = self.mainWin.mountsFaker.getMountsMapping()
-        for i, mount in enumerate(self.mainWin.mountsFaker.mounts):
+        mountsMapping = self.app.mountsFaker.getMountsMapping()
+        for i, mount in enumerate(self.app.mountsFaker.mounts):
             # mounts = ['/path/to/1', 'path/to/2', ...]
             self.table_mounts.insertRow(i)
             self.table_mounts.setItem(i, 0, QTableWidgetItem(mount))
@@ -330,7 +330,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.settings.save()
 
-        self.mainWin.mountsFaker.setMounts(self.newMounts)
+        self.app.mountsFaker.setMounts(self.newMounts)
         self.settings.applySettings.emit()
 
     @property
@@ -340,7 +340,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot()
     def setupETM(self):
-        etmpy = self.mainWin.etmpy
+        etmpy = self.app.etmpy
 
         # fill values
         self.lineEdit_lcport.setText(etmpy.cfg.get("local_control.listen_port", "不可用"))
@@ -366,4 +366,4 @@ class SettingsDialog(QDialog, Ui_Dialog):
                                        uLimit = self.spinBox_uSpeedLimit.value(),
                                        maxRunningTasksNum = self.spinBox_maxRunningTasksNum.value())
 
-        self.mainWin.etmpy.saveSettings(newsettings)
+        self.app.etmpy.saveSettings(newsettings)
