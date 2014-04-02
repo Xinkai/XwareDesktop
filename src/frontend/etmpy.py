@@ -9,6 +9,7 @@ import collections
 import pyinotify
 from requests.exceptions import ConnectionError
 from urllib.parse import unquote
+from datetime import datetime
 
 import constants
 from misc import debounce
@@ -202,8 +203,13 @@ class CompletedTaskStatistic(TaskStatistic):
 
         self._tasks = self._tasks_mod.copy()
         if self._initialized:
+            # prevent already-completed tasks firing sigTaskCompleted when ETM starting later than frontend
+            # by comparing `completeTime` with `timestamp`
+            # threshold: 10 secs
+            timestamp = datetime.timestamp(datetime.now())
             for completedId in completed:
-                self.sigTaskCompleted.emit(completedId)
+                if 0 <= timestamp - self._tasks[completedId]["completeTime"] <= 10:
+                    self.sigTaskCompleted.emit(completedId)
         else:
             self._initialized = True
 
