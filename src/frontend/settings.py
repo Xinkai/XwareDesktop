@@ -105,7 +105,7 @@ class SettingsAccessor(QObject):
         self.set(section, key, str(value))
 
     def getbool(self, section, key):
-        return bool(self.get(section, key))
+        return True if self.get(section, key) in ("1", True) else False
 
     def setbool(self, section, key, value):
         assert type(value) is bool
