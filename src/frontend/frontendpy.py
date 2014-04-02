@@ -126,6 +126,7 @@ class FrontendPy(QObject):
 
     @pyqtSlot()
     def requestFocus(self):
+        self.mainWin.restore()
         self.mainWin.frame.setFocus()
 
     @pyqtSlot(str)
