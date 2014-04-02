@@ -149,8 +149,11 @@
    <property name="text">
     <string>刷新页面</string>
    </property>
-   <property name="shortcut">
-    <string>F5, Ctrl+R</string>
+   <property name="shortcuts">
+    <stringlist>
+     <string>Ctrl+R</string>
+     <string>F5</string>
+    </stringlist>
    </property>
   </action>
   <action name="action_ETMstop">
