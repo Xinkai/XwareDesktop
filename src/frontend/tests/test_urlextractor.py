@@ -71,6 +71,9 @@ magnet:?xt=urn:btih:d8621b178ec96d703fa28d83ad16b87904f8f4d4&dn=Arch+Linux+2013.
 magnet 3
 magnet:?xt=urn:btih:ae5097941646d4fa76c9b83f0734d76787b9aaa0&dn=Suits.S03E14.720p.HDTV.x264-REMARKABLE%5Brartv%5D&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337
 
+magnet 4
+magnet:?xt=urn:btih:757fc565c56462b28b4f9c86b21ac753500eb2a7&dn=archlinux-2014.04.01-dual.iso&tr=udp://tracker.archlinux.org:6969&tr=http://tracker.archlinux.org:6969/announce
+
 END THIS TEST WITH A LITTLE DANCE:)
 """
 
@@ -101,6 +104,7 @@ ed2k://|file|%E6%B5%81%E8%A8%80%E7%BB%88%E7%BB%93%E8%80%85.Mythbusters.S10E03.Ch
 magnet:?xt.1=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C&xt.2=urn:sha1:TXGCZQTH26NL6OUQAJJPFALHG2LTGBC7
 magnet:?xt=urn:btih:d8621b178ec96d703fa28d83ad16b87904f8f4d4&dn=Arch+Linux+2013.12.01+dual&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337
 magnet:?xt=urn:btih:ae5097941646d4fa76c9b83f0734d76787b9aaa0&dn=Suits.S03E14.720p.HDTV.x264-REMARKABLE%5Brartv%5D&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337
+magnet:?xt=urn:btih:757fc565c56462b28b4f9c86b21ac753500eb2a7&dn=archlinux-2014.04.01-dual.iso&tr=udp://tracker.archlinux.org:6969&tr=http://tracker.archlinux.org:6969/announce
 """.strip().split("\n")))
 
 if __name__=="__main__":
