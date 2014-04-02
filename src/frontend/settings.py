@@ -303,6 +303,11 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
         autoStartFileExists = self.autoStartFileExists()
         if self.checkBox_autoStartFrontend.isChecked() and not autoStartFileExists:
+            # mkdir if autostart dir doesn't exist
+            try:
+                os.mkdir(os.path.dirname(self.settings.get("account", "autostartlocation")))
+            except OSError:
+                pass # already exists
             os.symlink(constants.DESKTOP_FILE_LOCATION, self.settings.get("account", "autostartlocation"))
         elif (not self.checkBox_autoStartFrontend.isChecked()) and autoStartFileExists:
             os.remove(self.settings.get("account", "autostartlocation"))
