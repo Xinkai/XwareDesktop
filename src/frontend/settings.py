@@ -14,7 +14,8 @@ DEFAULT_SETTINGS = {
     "account": {
         "username": None,
         "password": None,
-        "autologin": True
+        "autologin": True,
+        "autostartlocation": os.path.expanduser("~/.config/autostart/xware-desktop.desktop"),
     },
     "frontend": {
         "enabledeveloperstools": False,
@@ -143,6 +144,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.lineEdit_loginUsername.setText(self.settings.get("account", "username"))
         self.lineEdit_loginPassword.setText(self.settings.get("account", "password"))
         self.checkBox_autoLogin.setChecked(self.settings.getbool("account", "autologin"))
+        self.checkBox_autoStartFrontend.setChecked(self.autoStartFileExists())
 
         self.checkBox_enableDevelopersTools.setChecked(
             self.settings.getbool("frontend", "enabledeveloperstools"))
@@ -183,6 +185,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
     def settings(self):
         return self.app.settings
     # shorthand ends
+
+    def autoStartFileExists(self):
+        return os.path.lexists(self.settings.get("account", "autostartlocation"))
 
     @staticmethod
     def permissionCheck():
@@ -296,6 +301,11 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.settings.set("account", "username", self.lineEdit_loginUsername.text())
         self.settings.set("account", "password", self.lineEdit_loginPassword.text())
         self.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
+        autoStartFileExists = self.autoStartFileExists()
+        if self.checkBox_autoStartFrontend.isChecked() and not autoStartFileExists:
+            os.symlink(constants.DESKTOP_FILE_LOCATION, self.settings.get("account", "autostartlocation"))
+        elif (not self.checkBox_autoStartFrontend.isChecked()) and autoStartFileExists:
+            os.remove(self.settings.get("account", "autostartlocation"))
 
         self.settings.setbool("frontend", "enabledeveloperstools",
                                 self.checkBox_enableDevelopersTools.isChecked())

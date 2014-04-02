@@ -116,18 +116,18 @@
         </rect>
        </property>
        <property name="title">
-        <string>前端登录</string>
+        <string>前端启动登录</string>
        </property>
        <property name="flat">
         <bool>true</bool>
        </property>
-       <widget class="QWidget" name="layoutWidget">
+       <widget class="QWidget" name="">
         <property name="geometry">
          <rect>
-          <x>11</x>
-          <y>32</y>
-          <width>211</width>
-          <height>87</height>
+          <x>12</x>
+          <y>33</y>
+          <width>206</width>
+          <height>89</height>
          </rect>
         </property>
         <layout class="QGridLayout" name="gridLayout">
@@ -165,17 +165,28 @@
           </widget>
          </item>
          <item row="2" column="0" colspan="2">
-          <widget class="QCheckBox" name="checkBox_autoLogin">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="text">
-            <string>自动登录前端</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <item>
+            <widget class="QCheckBox" name="checkBox_autoLogin">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>自动登录前端</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QCheckBox" name="checkBox_autoStartFrontend">
+             <property name="text">
+              <string>开机启动前端</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
