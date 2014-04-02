@@ -48,9 +48,11 @@ prepareXware:
 	cp xware/ETMDaemon           preparedXware/
 	cp xware/EmbedThunderManager preparedXware/
 	cp xware/portal              preparedXware/
+	cp xware/vod_httpserver      preparedXware/
 	chrpath --delete preparedXware/ETMDaemon
 	chrpath --delete preparedXware/EmbedThunderManager
 	chrpath --delete preparedXware/portal
+	chrpath --delete preparedXware/vod_httpserver
 
 install: all
 	install -d -m 775                               $(DESTDIR)$(PREFIX)
@@ -61,6 +63,7 @@ install: all
 	# xware
 	$(install_xware) preparedXware/ETMDaemon           $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
 	$(install_xware) preparedXware/EmbedThunderManager $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
+	$(install_xware) preparedXware/vod_httpserver      $(DESTDIR)$(PREFIX)/xware/lib/vod_httpserver
 	$(install_xware) preparedXware/portal              $(DESTDIR)$(PREFIX)/xware/portal
 
 	# binary
