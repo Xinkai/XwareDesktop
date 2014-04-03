@@ -101,7 +101,7 @@ class CustomStatusBar(QStatusBar):
             "<div style='color:{}'>设备已登录</div>\n"
             "<div style='color:{}'>设备在线</div>".format(*map(lambda s: "green" if s else "red",
                                                               frontendStatus)))
-        print(frontendStatus)
+        logging.info(frontendStatus)
 
     @pyqtSlot(bool)
     @pyqtSlot(dict)
