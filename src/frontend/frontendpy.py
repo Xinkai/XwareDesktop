@@ -155,8 +155,7 @@ class FrontendPy(QObject):
     def slotMaskOnOffChanged(self, val):
         self.isPageMaskOn = val
         if not val:
-            self.consumeAction("action acted")
-        print("Mask on", val)
+            self.consumeAction("mask off")
 
     @pyqtSlot(bool)
     def slotSetOnline(self, online):
