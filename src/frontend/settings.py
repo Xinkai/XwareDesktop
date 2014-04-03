@@ -345,7 +345,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.settings.save()
 
-        self.app.mountsFaker.setMounts(self.newMounts)
+        self.app.mountsFaker.mounts = self.newMounts
         self.settings.applySettings.emit()
 
     @property

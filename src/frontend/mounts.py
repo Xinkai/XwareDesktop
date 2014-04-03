@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import constants
+from collections import OrderedDict
 import os
 import uuid
 
+import constants
+
 class MountsFaker(object):
+    _mounts = None
     def __init__(self):
-        self.mounts = []
+        self._mounts = OrderedDict()
 
         with open(constants.MOUNTS_FILE, "r") as mountsFile:
             lines = mountsFile.readlines()
@@ -19,12 +22,23 @@ class MountsFaker(object):
                     continue # comment
 
                 parts = line.split()
-                path = parts[1]
+                path, uuid_ = parts[1], parts[0][len("UUID="):]
 
-                self.mounts.append(path)
+                self._mounts[path] = uuid_
 
-    def setMounts(self, mounts):
-        self.mounts = mounts
+    @property
+    def mounts(self):
+        # encapsulate self._mounts, which is an ordereddict of <path:uuid>
+        # only expose a list of <path>
+        return list(self._mounts.keys())
+
+    @mounts.setter
+    def mounts(self, paths):
+        new_Mounts = OrderedDict()
+        for path in paths:
+           new_Mounts[path] = self._mounts.get(path, str(uuid.uuid1()))
+
+        self._mounts = new_Mounts
         self.writeMounts()
 
     def convertToNativePath(self, path):
@@ -42,13 +56,10 @@ class MountsFaker(object):
         buffer = []
         buffer.append(constants.MOUNTS_FILE_HEADER)
 
-        def produceLine(path):
+        for path, uuid_ in self._mounts.items():
             # we only care about the first two columns
-            return "UUID={uuid} {path} auto defaults,rw 0 0".format(uuid = str(uuid.uuid1()),
-                                                                    path = path)
-
-        for path in self.mounts:
-            buffer.append(produceLine(path))
+            buffer.append("UUID={uuid} {path} auto defaults,rw 0 0".format(uuid = uuid_,
+                                                                           path = path))
 
         buffer.append("")
 
