@@ -85,14 +85,13 @@ class FrontendActionsQueue(QObject):
 
     @pyqtSlot()
     def slotWatchClipboardToggled(self):
+        try:
+            self._clipboard.dataChanged.disconnect(self.slotClipboardDataChanged)
+        except TypeError:
+            pass # not connected, meaning settings says no watch clipboard
         on = self.frontendpy.mainWin.settings.getbool("frontend", "watchclipboard")
         if on:
             self._clipboard.dataChanged.connect(self.slotClipboardDataChanged)
-        else:
-            try:
-                self._clipboard.dataChanged.disconnect(self.slotClipboardDataChanged)
-            except TypeError:
-                pass # not connected, meaning settings says no watch clipboard
 
     @pyqtSlot()
     def slotClipboardDataChanged(self):
