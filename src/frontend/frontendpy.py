@@ -34,6 +34,7 @@ class FrontendPy(QObject):
         self.app = app
         self.app.settings.applySettings.connect(self.tryLogin)
         self.queue = FrontendActionsQueue(self)
+        self.app.sigMainWinLoaded.connect(self.connectUI)
 
     @property
     def mainWin(self):
@@ -42,6 +43,10 @@ class FrontendPy(QObject):
         except AttributeError:
             raise Exception("frontendpy didn't wait for mainWin.")
         return mainWin
+
+    @pyqtSlot()
+    def connectUI(self):
+        self.app.mainWin.action_createTask.triggered.connect(self.queue.createTasksAction)
 
     @property
     def isPageMaskOn(self):
