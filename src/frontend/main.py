@@ -54,13 +54,13 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.action_exit.triggered.connect(self.slotExit)
         self.action_setting.triggered.connect(self.slotSetting)
 
-        self.action_createTask.triggered.connect(self.frontendpy.queue.createTasksAction)
+        self.action_createTask.triggered.connect(self.app.frontendpy.queue.createTasksAction)
         self.action_refreshPage.triggered.connect(self.slotRefreshPage)
 
         # Note: The menu actions enable/disable toggling are handled by statusbar.
-        self.action_ETMstart.triggered.connect(self.xwaredpy.slotStartETM)
-        self.action_ETMstop.triggered.connect(self.xwaredpy.slotStopETM)
-        self.action_ETMrestart.triggered.connect(self.xwaredpy.slotRestartETM)
+        self.action_ETMstart.triggered.connect(self.app.xwaredpy.slotStartETM)
+        self.action_ETMstop.triggered.connect(self.app.xwaredpy.slotStopETM)
+        self.action_ETMrestart.triggered.connect(self.app.xwaredpy.slotRestartETM)
 
         self.action_showAbout.triggered.connect(self.slotShowAbout)
 
@@ -72,35 +72,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     @property
     def frame(self):
         return self.webView.page().mainFrame()
-
-    @property
-    def qurl(self):
-        return self.webView.url()
-
-    @property
-    def url(self):
-        # for some reason, on Ubuntu QUrl.url() is not there, call toString() instead.
-        return self.qurl.toString()
-
-    @property
-    def settings(self):
-        return self.app.settings
-
-    @property
-    def xwaredpy(self):
-        return self.app.xwaredpy
-
-    @property
-    def etmpy(self):
-        return self.app.etmpy
-
-    @property
-    def mountsFaker(self):
-        return self.app.mountsFaker
-
-    @property
-    def frontendpy(self):
-        return self.app.frontendpy
     # shorthand ends
 
     @pyqtSlot()
@@ -112,7 +83,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         elif self.page.urlMatchIn(constants.V3_PAGE, constants.LOGIN_PAGE):
             pass
         else:
-            log("Unable to handle this URL", self.url)
+            log("Unable to handle this URL", self.webView.url().toString())
 
     @pyqtSlot()
     def slotRefreshPage(self):
@@ -125,15 +96,15 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     @pyqtSlot()
     def slotFrameLoadStarted(self):
         self.page.overrideFile = None
-        self.frontendpy.isPageMaskOn = None
-        self.frontendpy.isPageOnline = None
-        self.frontendpy.isPageLogined = None
-        self.frontendpy.isXdjsLoaded = None
+        self.app.frontendpy.isPageMaskOn = None
+        self.app.frontendpy.isPageOnline = None
+        self.app.frontendpy.isPageLogined = None
+        self.app.frontendpy.isXdjsLoaded = None
 
     @pyqtSlot()
     def injectXwareDesktop(self):
         # inject xdpy object
-        self.frame.addToJavaScriptWindowObject("xdpy", self.frontendpy)
+        self.frame.addToJavaScriptWindowObject("xdpy", self.app.frontendpy)
 
         # inject xdjs script
         with open("xwarejs.js") as file:
@@ -155,7 +126,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     def changeEvent(self, qEvent):
         if qEvent.type() == QEvent.WindowStateChange:
             if self.isMinimized():
-                if self.settings.getbool("frontend", "minimizetosystray"):
+                if self.app.settings.getbool("frontend", "minimizetosystray"):
                     self.setHidden(True)
         super().changeEvent(qEvent)
 
@@ -169,7 +140,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.raise_()
 
     def closeEvent(self, qCloseEvent):
-        if self.settings.getbool("frontend", "closetominimize"):
+        if self.app.settings.getbool("frontend", "closetominimize"):
             qCloseEvent.ignore()
             self.minimize()
         else:
