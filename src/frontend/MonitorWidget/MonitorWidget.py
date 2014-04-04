@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.Qt import Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QApplication
 
 from Compat.TeardownHelper import TeardownHelper
