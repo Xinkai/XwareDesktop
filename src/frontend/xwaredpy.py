@@ -19,11 +19,11 @@ class XwaredPy(QObject):
         super().__init__(app)
         self.app = app
 
+        self.app.lastWindowClosed.connect(self.stopXware)
         self.startXware()
         self._t = threading.Thread(target = self._watcherThread, daemon = True,
                                   name = "xwared/etm watch thread")
         self._t.start()
-        self.app.lastWindowClosed.connect(self.stopXware)
         self.app.sigMainWinLoaded.connect(self.connectUI)
 
     @pyqtSlot()
@@ -40,7 +40,6 @@ class XwaredPy(QObject):
             self.app.settings.save()
 
     def stopXware(self):
-        # this method is called by XwareDesktop::cleanUp
         if self.app.settings.getint("xwared", "startetmwhen") == 3:
             self.slotStopETM()
             self.app.settings.setbool("xwared", "startetm", True)

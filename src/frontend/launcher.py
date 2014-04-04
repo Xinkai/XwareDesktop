@@ -19,8 +19,6 @@ from frontendpy import FrontendPy
 from Schedule import Scheduler
 from misc import getGroupMembership
 
-log = print
-
 class XwareDesktop(QApplication):
     mainWin = None
     monitorWin = None
@@ -38,7 +36,6 @@ class XwareDesktop(QApplication):
         self.checkOneInstance()
 
         self.settings = settings.SettingsAccessor(self)
-        self.lastWindowClosed.connect(self.cleanUp)
 
         # components
         self.xwaredpy = XwaredPy(self)
@@ -92,11 +89,6 @@ class XwareDesktop(QApplication):
             QMessageBox.warning(None, "Xware Desktop 警告", "当前进程没有应用xware用户组，请注销并重登入。",
                                 QMessageBox.Ok, QMessageBox.Ok)
             sys.exit(-1)
-
-    @pyqtSlot()
-    def cleanUp(self):
-        self.xwaredpy.stopXware()
-        print("cleanup")
 
     @pyqtSlot()
     def slotCreateCloseMonitorWindow(self):
