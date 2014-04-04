@@ -24,6 +24,14 @@ class XwaredPy(QObject):
                                   name = "xwared/etm watch thread")
         self._t.start()
         self.app.lastWindowClosed.connect(self.stopXware)
+        self.app.sigMainWinLoaded.connect(self.connectUI)
+
+    @pyqtSlot()
+    def connectUI(self):
+        # Note: The menu actions enable/disable toggling are handled by statusbar.
+        self.app.mainWin.action_ETMstart.triggered.connect(self.slotStartETM)
+        self.app.mainWin.action_ETMstop.triggered.connect(self.slotStopETM)
+        self.app.mainWin.action_ETMrestart.triggered.connect(self.slotRestartETM)
 
     def startXware(self):
         if self.app.settings.getint("xwared", "startetmwhen") == 3:

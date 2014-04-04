@@ -24,12 +24,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         # connect UI related signal/slot
         self.action_exit.triggered.connect(self.slotExit)
         self.action_setting.triggered.connect(self.slotSetting)
-
-        # Note: The menu actions enable/disable toggling are handled by statusbar.
-        self.action_ETMstart.triggered.connect(self.app.xwaredpy.slotStartETM)
-        self.action_ETMstop.triggered.connect(self.app.xwaredpy.slotStopETM)
-        self.action_ETMrestart.triggered.connect(self.app.xwaredpy.slotRestartETM)
-
         self.action_showAbout.triggered.connect(self.slotShowAbout)
 
     # shorthand
