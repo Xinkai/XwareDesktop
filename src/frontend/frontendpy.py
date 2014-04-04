@@ -24,7 +24,7 @@ class FrontendPy(QObject):
 
     app = None
     queue = None
-    isPageMaskOn = None
+    _isPageMaskOn = None
     _isPageOnline = None # property wraps them, in order to fire sigFrontendStatusChanged
     _isPageLogined = None
     _isXdjsLoaded = None
@@ -44,13 +44,27 @@ class FrontendPy(QObject):
         return mainWin
 
     @property
+    def isPageMaskOn(self):
+        return self._isPageMaskOn
+
+    @isPageMaskOn.setter
+    def isPageMaskOn(self, value):
+        self._isPageMaskOn = value
+        if self._isPageMaskOn is False:
+            self.consumeAction("mask off")
+
+    @property
     def isPageOnline(self):
         return self._isPageOnline
 
     @isPageOnline.setter
     def isPageOnline(self, value):
+        if self._isPageOnline == value:
+            return # Heartbeat, don't need to continue if online status stays the same
         self._isPageOnline = value
         self.sigFrontendStatusChanged.emit()
+        if self._isPageOnline:
+            self.consumeAction("online")
 
     @property
     def isPageLogined(self):
@@ -60,6 +74,8 @@ class FrontendPy(QObject):
     def isPageLogined(self, value):
         self._isPageLogined = value
         self.sigFrontendStatusChanged.emit()
+        if self._isPageLogined:
+            self.consumeAction("logined")
 
     @property
     def isXdjsLoaded(self):
@@ -69,6 +85,8 @@ class FrontendPy(QObject):
     def isXdjsLoaded(self, value):
         self._isXdjsLoaded = value
         self.sigFrontendStatusChanged.emit()
+        if self._isXdjsLoaded:
+            self.consumeAction("xdjs loaded")
     ################################### SLOTS ######################################
     @pyqtSlot()
     def tryLogin(self):
@@ -122,7 +140,6 @@ class FrontendPy(QObject):
         self.isXdjsLoaded = True
         self.tryLogin()
         self.tryActivate(payload)
-        self.consumeAction("xdjs loaded")
 
     @pyqtSlot()
     def requestFocus(self):
@@ -154,20 +171,14 @@ class FrontendPy(QObject):
     @pyqtSlot(bool)
     def slotMaskOnOffChanged(self, maskon):
         self.isPageMaskOn = maskon
-        if not maskon:
-            self.consumeAction("mask off")
 
     @pyqtSlot(bool)
     def slotSetOnline(self, online):
         self.isPageOnline = online
-        if online:
-            self.consumeAction("online")
 
     @pyqtSlot(bool)
     def slotSetLogined(self, logined):
         self.isPageLogined = logined
-        if logined:
-            self.consumeAction("logined")
 
     @pyqtSlot()
     def consumeAction(self, reason):
