@@ -4,7 +4,7 @@
 import logging
 
 from __init__ import __version__
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
 import fcntl, os, sys
@@ -24,6 +24,7 @@ log = print
 class XwareDesktop(QApplication):
     mainWin = None
     monitorWin = None
+    sigMainWinLoaded = pyqtSignal()
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -51,6 +52,7 @@ class XwareDesktop(QApplication):
 
         self.mainWin = main.MainWindow(self)
         self.mainWin.show()
+        self.sigMainWinLoaded.emit()
 
         self.systray = Systray(self)
 
