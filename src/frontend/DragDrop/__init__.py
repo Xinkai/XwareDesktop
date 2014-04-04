@@ -26,6 +26,10 @@ class AllowDrop(object):
             pass
         qDropEvent.acceptProposedAction()
 
+    def dragMoveEvent(self, dragMoveEvent):
+        # even this is a noop, it's required for dropEvent to be called.
+        pass
+
     def dragEnterEvent(self, dragEnterEvent):
         print("dragenter", dragEnterEvent.proposedAction())
         dragEnterEvent.acceptProposedAction()
