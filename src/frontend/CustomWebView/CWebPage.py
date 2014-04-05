@@ -6,7 +6,6 @@ from PyQt5.QtCore import QUrl, pyqtSlot
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWebKitWidgets import QWebPage
 
-import os
 from urllib import parse
 
 import constants
@@ -65,7 +64,7 @@ class CustomWebPage(QWebPage):
     # Local Torrent File Chooser Support Ends Here
 
     def applyCustomStyleSheet(self):
-        styleSheet = QUrl(os.path.join(os.getcwd(), "style.css"))
+        styleSheet = QUrl(constants.XWARESTYLE_FILE)
         styleSheet.setScheme("file")
         self.settings().setUserStyleSheetUrl(styleSheet)
 
@@ -95,7 +94,7 @@ class CustomWebPage(QWebPage):
         self.frame.addToJavaScriptWindowObject("xdpy", self.app.frontendpy)
 
         # inject xdjs script
-        with open("xwarejs.js") as file:
+        with open(constants.XWAREJS_FILE) as file:
             js = file.read()
         self.frame.evaluateJavaScript(js)
 
