@@ -86,3 +86,5 @@ install: all
 	# other
 	install    -m 644 src/frontend/ui/rc/thunder.ico      $(DESTDIR)$(PREFIX)/frontend/thunder.ico
 	install -D -m 644 src/frontend/xware_desktop.desktop  $(DESTDIR)/usr/share/applications/xware_desktop.desktop
+	install -d $(DESTDIR)/usr/bin
+	ln -s $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop

@@ -55,6 +55,7 @@ install -D -m 664 src/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.
 /opt/xware_desktop
 /usr/share/applications/xware_desktop.desktop
 /usr/lib/systemd/system/xwared.service
+/usr/bin/xware-desktop
 
 %pre
     if [ $1 -eq 1 ]; then
