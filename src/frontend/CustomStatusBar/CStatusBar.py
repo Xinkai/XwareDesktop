@@ -6,6 +6,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QApplication, QStatusBar
 from .CStatusBarLabel import CustomStatusBarLabel
 from Schedule.SchedulerButton import SchedulerButton
+from Settings.QuickSpeedLimit import QuickSpeedLimitBtn
 
 from misc import debounce, getHumanBytesNumber
 
@@ -21,6 +22,7 @@ class CustomStatusBar(QStatusBar):
         self.etmStatus = CustomStatusBarLabel(self)
         self.frontendStatus = CustomStatusBarLabel(self)
 
+        self.quickSpeedLimitBtn = QuickSpeedLimitBtn(self)
         self.schedulerBtn = SchedulerButton(self)
 
         self.spacer = CustomStatusBarLabel(self)
@@ -30,6 +32,7 @@ class CustomStatusBar(QStatusBar):
 
         self.dlStatus = CustomStatusBarLabel(self)
         self.ulStatus = CustomStatusBarLabel(self)
+
 
         self.app.xwaredpy.sigXwaredStatusPolled.connect(self.slotXwaredStatusPolled)
         self.app.xwaredpy.sigETMStatusPolled.connect(self.slotETMStatusPolled)

@@ -38,6 +38,7 @@ pyqt:
 	pyuic5 -o src/frontend/ui_about.py    src/frontend/ui/about.ui
 	pyuic5 -o src/frontend/ui_monitor.py  src/frontend/ui/monitor.ui
 	pyuic5 -o src/frontend/Schedule/ui_scheduler.py  src/frontend/ui/scheduler.ui
+	pyuic5 -o src/frontend/Settings/ui_quickspeedlimit.py  src/frontend/ui/quickspeedlimit.ui
 	pyrcc5 -o src/frontend/resource_rc.py src/frontend/ui/rc/resource.qrc
 
 xwarejs.js: src/frontend/xwarejs.coffee

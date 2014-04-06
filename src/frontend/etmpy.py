@@ -100,8 +100,13 @@ class EtmPy(QObject):
             self.app.settings.setint("internal", "ulspeedlimit", newsettings.uLimit)
 
         try:
-            requests.post(self.lcontrol + \
-                          "settings?downloadSpeedLimit={}&uploadSpeedLimit={}&maxRunTaskNumber={}".format(*newsettings))
+            if newsettings.maxRunningTasksNum:
+                requests.post(self.lcontrol + \
+                              "settings?downloadSpeedLimit={}&uploadSpeedLimit={}&maxRunTaskNumber={}".format(*newsettings))
+            else:
+                requests.post(self.lcontrol + \
+                              "settings?downloadSpeedLimit={}&uploadSpeedLimit={}".format(newsettings.dLimit,
+                                                                                          newsettings.uLimit))
         except (ConnectionError, LocalCtrlNotAvailableError):
             logging.error("trying to set etm settings, but failed.")
 
