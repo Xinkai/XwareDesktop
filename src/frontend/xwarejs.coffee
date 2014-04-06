@@ -16,6 +16,7 @@ class XwareJS
         @bindContextMenu()
         @bindSaveCredentials()
         @bindMaskObserver()
+        @bindTaskTabObserver()
 
         result = {}
         if Data?
@@ -208,6 +209,26 @@ class XwareJS
                     clearInterval(intervalId)
                     @bindDeviceObserver(boundPeerId)
             , 500
+
+    bindTaskTabObserver: () ->
+        taskSidebar = document.getElementById("task-sidebar")
+        if not taskSidebar
+            return
+
+        observer = new MutationObserver (mutations) =>
+            mutations.forEach (m) =>
+                if "on" in m.target.classList and not m.oldValue
+                    $("#task-list").attr("data-showtype", m.target.getAttribute("data-value"))
+
+        observer.observe(taskSidebar, {
+            "childList": false
+            "attributes": true
+            "characterData": false
+            "subtree": true
+            "attributeOldValue": true
+            "characterDataOldValue": false
+            "attributeFilter": ['class']
+        })
 
 $ ->
     if (not window.MutationObserver) and window.WebKitMutationObserver

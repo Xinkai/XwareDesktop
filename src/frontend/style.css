@@ -25,3 +25,48 @@ input[type='password']
     -webkit-user-select: text;
     cursor: text;
 }
+
+#task-list[data-showtype='0'] .rw_u02 {
+    width: 555px !important;
+}
+#task-list[data-showtype='0'] .rw_u03 {
+    width: 235px !important;
+}
+#task-list[data-showtype='0'] .rw_name {
+    width: 475px !important;
+}
+#task-list[data-showtype='0'] .rw_p_name {
+    width: 380px !important;
+}
+
+#task-list[data-showtype='1'] .rw_u02 {
+    width: 770px !important;
+}
+#task-list[data-showtype='1'] .rw_name {
+    width: 730px !important;
+}
+#task-list[data-showtype='1'] .rw_p_name {
+    width: 640px !important;
+}
+#task-list[data-showtype='1'] .rw_u03 {
+    display: none !important;
+}
+
+#task-list[data-showtype='2'] .rw_u02 {
+    width: 730px !important;
+}
+#task-list[data-showtype='2'] .rw_name {
+    width: 690px !important;
+}
+#task-list[data-showtype='2'] .rw_p_name {
+    width: 580px !important;
+}
+#task-list[data-showtype='2'] .rw_u03 {
+    width: 40px !important;
+}
+#task-list[data-showtype='2'] .rw_u03 .rw_fi_btn {
+    position: inherit !important;
+    margin-top: 7px !important;
+    right: 12px !important;
+    top: 0 !important;
+}
