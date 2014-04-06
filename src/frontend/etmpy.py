@@ -99,8 +99,11 @@ class EtmPy(QObject):
         if newsettings.uLimit != -1:
             self.app.settings.setint("internal", "ulspeedlimit", newsettings.uLimit)
 
-        requests.post(self.lcontrol + \
-                      "settings?downloadSpeedLimit={}&uploadSpeedLimit={}&maxRunTaskNumber={}".format(*newsettings))
+        try:
+            requests.post(self.lcontrol + \
+                          "settings?downloadSpeedLimit={}&uploadSpeedLimit={}&maxRunTaskNumber={}".format(*newsettings))
+        except (ConnectionError, LocalCtrlNotAvailableError):
+            logging.error("trying to set etm settings, but failed.")
 
     def _requestPollTasks(self, kind): # kind means type, but type is a python reserved word.
         try:
