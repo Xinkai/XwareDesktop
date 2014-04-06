@@ -38,6 +38,15 @@ input[type='password']
 #task-list[data-showtype='0'] .rw_p_name {
     width: 380px !important;
 }
+#task-list[data-showtype='0'] .rw_u_add .rw_u02 {
+    display: none !important;
+}
+#task-list[data-showtype='0'] .rw_u_add .rw_u03 {
+    float: right !important;
+}
+#task-list[data-showtype='0'] .rw_u_add .rw_u03 .rw_u_btn {
+    line-height: inherit !important;
+}
 
 #task-list[data-showtype='1'] .rw_u02 {
     width: 770px !important;
