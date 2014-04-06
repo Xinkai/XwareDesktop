@@ -2,6 +2,7 @@
 import os
 
 BASE_DIR = "/opt/xware_desktop"
+FRONTEND_DIR = os.path.dirname(__file__)
 
 LOGIN_PAGE = "http://yuancheng.xunlei.com/login.html"
 V2_PAGE = "http://yuancheng.xunlei.com/"
@@ -28,5 +29,5 @@ PERMISSIONCHECK = os.path.join(BASE_DIR, "permissioncheck")
 
 DESKTOP_FILE_LOCATION = "/usr/share/applications/xware_desktop.desktop"
 
-XWAREJS_FILE = os.path.join(BASE_DIR, "frontend/xwarejs.js")
-XWARESTYLE_FILE = os.path.join(BASE_DIR, "frontend/style.css")
+XWAREJS_FILE = os.path.join(FRONTEND_DIR, "xwarejs.js")
+XWARESTYLE_FILE = os.path.join(FRONTEND_DIR, "style.css")
