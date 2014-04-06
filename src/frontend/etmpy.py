@@ -93,6 +93,12 @@ class EtmPy(QObject):
             return False
 
     def saveSettings(self, newsettings):
+        # save limits before disabling
+        if newsettings.dLimit != -1:
+            self.app.settings.setint("internal", "dlspeedlimit", newsettings.dLimit)
+        if newsettings.uLimit != -1:
+            self.app.settings.setint("internal", "ulspeedlimit", newsettings.uLimit)
+
         requests.post(self.lcontrol + \
                       "settings?downloadSpeedLimit={}&uploadSpeedLimit={}&maxRunTaskNumber={}".format(*newsettings))
 

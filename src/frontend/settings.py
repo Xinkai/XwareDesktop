@@ -72,6 +72,10 @@ DEFAULT_SETTINGS = {
         "hibernatecmd": "",
         "suspendcmd": "",
     },
+    "internal": {
+        "dlspeedlimit": 512,
+        "ulspeedlimit": 50,
+    },
 }
 
 class SettingsAccessor(QObject):
