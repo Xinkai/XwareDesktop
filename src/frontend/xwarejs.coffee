@@ -140,6 +140,13 @@ class XwareJS
         $(input).val(code).blur().trigger('input')
         input.focus()
 
+        # refresh the page 5 seconds after 激活 btn is clicked
+        $activateBtn = $(".btn_inp", $panel)
+        $activateBtn.on "click", () ->
+            setTimeout () ->
+                location.reload(true)
+            , 5000
+
     bindMaskObserver: () ->
         mask = document.getElementById("mask")
         maskon = false
