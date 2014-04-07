@@ -9,7 +9,7 @@ class XwareJS
         xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
         xdpy.sigToggleFlashAvailability.connect(@, @slotToggleFlashAvailability)
 
-        @deviceObserverBounded = false
+        @boundPeerId = false
         xdpy.sigNotifyPeerId.connect(@, @slotWaitToBindDeviceObserver)
 
         @bindDblclick()
@@ -61,8 +61,14 @@ class XwareJS
             password = $password.val()
             xdpy.saveCredentials(username, password)
 
+    isShowingLocalDevice: () ->
+        return @boundPeerId is Data.downloader.pid
+
     bindDblclick: () ->
+        _this = @
         $("#task-list").on "dblclick", "div.rw_unit", (event) ->
+            if not _this.isShowingLocalDevice()
+                return
             tid = $(@).attr("data-tid")
             task = Data.task.all[tid]
             if task.stateText is "已完成"
@@ -72,7 +78,10 @@ class XwareJS
                 event.stopPropagation()
 
     bindContextMenu: () ->
+        _this = @
         $("#task-list").on "contextmenu", "div.rw_unit", (event) ->
+            if not _this.isShowingLocalDevice()
+                return
             tid = $(@).attr("data-tid")
             task = Data.task.all[tid]
 
@@ -162,9 +171,9 @@ class XwareJS
 
     bindDeviceObserver: (boundPeerId) ->
         # prevent multiple binding
-        if @deviceObserverBounded
+        if @boundPeerId
             return
-        @deviceObserverBounded = true
+        @boundPeerId = boundPeerId
 
         deviceIndex = @getDeviceIndex(boundPeerId)
         if (not isNaN(deviceIndex)) and (App.get("downloader.activedIndex") isnt deviceIndex)
