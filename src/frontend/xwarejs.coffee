@@ -17,6 +17,7 @@ class XwareJS
         @bindSaveCredentials()
         @bindMaskObserver()
         @bindTaskTabObserver()
+        @fixDeviceShortName()
 
         result = {}
         if Data?
@@ -245,6 +246,10 @@ class XwareJS
             "characterDataOldValue": false
             "attributeFilter": ['class']
         })
+
+    fixDeviceShortName: () ->
+        if Data?.downloader?.template?
+            Data.downloader.template.item = Data.downloader.template.item.replace(/\{\{shortName\}\}/g, "{{name}}")
 
 $ ->
     if (not window.MutationObserver) and window.WebKitMutationObserver
