@@ -8,9 +8,9 @@ def getHumanBytesNumber(byteNum):
     mega = kilo * kilo
 
     if byteNum >= mega:
-        return "{:.2f}MB".format(byteNum / mega)
+        return "{:.2f}MiB".format(byteNum / mega)
     else:
-        return "{:.2f}KB".format(byteNum / kilo)
+        return "{:.2f}KiB".format(byteNum / kilo)
 
 def debounce(wait, instant_first = True):
     # skip all calls that are invoked for a certain period of time, except for the last one.

@@ -121,7 +121,7 @@
        <property name="flat">
         <bool>true</bool>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>12</x>
@@ -317,7 +317,7 @@
         <item>
          <widget class="QSpinBox" name="spinBox_monitorFullSpeed">
           <property name="suffix">
-           <string>kb/s</string>
+           <string> KiB/s</string>
           </property>
           <property name="minimum">
            <number>100</number>
@@ -512,6 +512,9 @@
           <property name="toolTip">
            <string>无限制设置为-1</string>
           </property>
+          <property name="suffix">
+           <string> KiB/s</string>
+          </property>
           <property name="minimum">
            <number>-1</number>
           </property>
@@ -549,6 +552,9 @@
          <widget class="QSpinBox" name="spinBox_dSpeedLimit">
           <property name="toolTip">
            <string>无限制设置为-1</string>
+          </property>
+          <property name="suffix">
+           <string> KiB/s</string>
           </property>
           <property name="minimum">
            <number>-1</number>
