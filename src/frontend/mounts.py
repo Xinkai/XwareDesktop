@@ -11,7 +11,7 @@ class MountsFaker(object):
     def __init__(self):
         self._mounts = OrderedDict()
 
-        with open(constants.MOUNTS_FILE, "r") as mountsFile:
+        with open(constants.MOUNTS_FILE, "r", encoding = "UTF-8") as mountsFile:
             lines = mountsFile.readlines()
             for line in lines:
                 if line.replace("\t", "").replace(" ", "").replace("\n", "") == "":
@@ -63,7 +63,7 @@ class MountsFaker(object):
 
         buffer.append("")
 
-        with open(constants.MOUNTS_FILE, "w") as mountFile:
+        with open(constants.MOUNTS_FILE, "w", encoding = "UTF-8") as mountFile:
             mountFile.writelines("\n".join(buffer))
 
     def getMountsMapping(self):

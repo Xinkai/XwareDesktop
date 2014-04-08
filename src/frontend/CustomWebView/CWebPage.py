@@ -94,7 +94,7 @@ class CustomWebPage(QWebPage):
         self.frame.addToJavaScriptWindowObject("xdpy", self.app.frontendpy)
 
         # inject xdjs script
-        with open(constants.XWAREJS_FILE) as file:
+        with open(constants.XWAREJS_FILE, encoding = "UTF-8") as file:
             js = file.read()
         self.frame.evaluateJavaScript(js)
 

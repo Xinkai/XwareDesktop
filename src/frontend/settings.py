@@ -133,7 +133,7 @@ class SettingsAccessor(QObject):
         self.set(section, key, pickledStr)
 
     def save(self):
-        with open(constants.CONFIG_FILE, 'w') as configfile:
+        with open(constants.CONFIG_FILE, 'w', encoding = "UTF-8") as configfile:
             self.config.write(configfile)
 
 class SettingsDialog(QDialog, Ui_Dialog):
