@@ -55,16 +55,16 @@ class UrlExtractor(QObject):
                 r"(?:(?:[\w]+)(?:\:[\w]+)?@)?"                  # username, password
                 r"(?:[\w|.|\-]+)"                               # host, also works for ip address
                 r"(?:\:[0-9]{1,5})?/"                           # port, slash
-                r"(?:[\w.%=\/&\-\,])+" +                        # path + filename
+                r"(?:[\w.%=\/&\-\,\(\)])+" +                      # path + filename
                 r"(?:{})".format(patternStr) +                  # extension
                 r"(?:(?:\?[\w.\-=%&,\/]*)|(?= |\r|\n|\t|))"
             r")|(?:"
             # match all ed2k
             r"ed2k://"
                 r"(?:\|file\|)"                                 # type -> file
-                r"(?:[\w|_|\-|.|%]+)\|"                          # filename
+                r"(?:[\w|_|\-|.|%]+)\|"                         # filename
                 r"(?:[0-9]+)\|"                                 # filesize
-                r"(?:[a-f0-9]{32})\|"                         # hash
+                r"(?:[a-f0-9]{32})\|"                           # hash
                 r"(?:(?:[\w|\/|.|\-|:|\,|=]+)|(?= |\r|\n|\t|))" # additional
             r")|(?:"
             r"magnet:\?[\w|\.|\=|\:|\&|\+|%|\-|\/]+"
