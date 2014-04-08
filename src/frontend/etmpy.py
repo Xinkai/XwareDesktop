@@ -70,14 +70,7 @@ class EtmPy(QObject):
 
     @property
     def lcontrol(self):
-        lcport = self.cfg.get("local_control.listen_port", None)
-
-        try:
-            lcport = int(lcport)
-        except (ValueError, TypeError):
-            raise LocalCtrlNotAvailableError
-
-        return "http://127.0.0.1:{}/".format(lcport)
+        return "http://127.0.0.1:{}/".format(self.getLcPort())
 
     def getSettings(self):
         try:
@@ -151,10 +144,21 @@ class EtmPy(QObject):
         except ValueError:
             userid = 0 # unbound -> 0
 
-        peerid = self.cfg.get("rc.peerid", "")
+        peerid = self.getPeerId()
 
         result = ActivationStatus(userid, status, code, peerid)
         return result
+
+    def getPeerId(self):
+        return self.cfg.get("rc.peerid", "")
+
+    def getLcPort(self):
+        lcport = self.cfg.get("local_control.listen_port", "")
+        try:
+            lcport = int(lcport)
+        except (ValueError, TypeError):
+            raise LocalCtrlNotAvailableError
+        return lcport
 
 class TaskStatistic(QObject):
     _tasks = None # copy from _stat_mod upon it's done.
