@@ -1,15 +1,33 @@
 # -*- coding: utf-8 -*-
 
+import logging
+
 from PyQt5.QtCore import QUrlQuery
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkDiskCache
 from PyQt5.QtWidgets import QApplication
 
+def forLocalDeviceOnly(func):
+    def wrapper(SELF, request):
+        # Looking for Pid in query string, try matching with locally bound peerid
+        app = QApplication.instance()
+        localPeerId = app.etmpy.getPeerId()
+        if not localPeerId:
+            return request
+
+        urlQuery = QUrlQuery(request.url())
+        queryItems = dict(urlQuery.queryItems())
+        if queryItems.get("pid", None) != localPeerId:
+            return request
+        return func(SELF, request)
+    return wrapper
+
 class CustomNetworkAccessManager(QNetworkAccessManager):
+    app = None
     _cachePath = None
 
     def __init__(self, parent = None):
         super().__init__(parent)
-
+        self.app = QApplication.instance()
         # set cache
         self._cachePath = QNetworkDiskCache(self)
         cacheLocation = QApplication.instance().settings.get("frontend", "cachelocation")
@@ -30,6 +48,13 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
     def getPreprocessorFor(self, path):
         return getattr(self, "_preprocess_request_{}".format(path), None)
 
+    def _redirectToLocal(self, request):
+        qurl = request.url()
+        qurl.setHost("127.0.0.1")
+        qurl.setPort(self.app.etmpy.getLcPort())
+        request.setUrl(qurl)
+        return request
+
     def _preprocess_request_bind(self, request):
         # set boxName when binding the device to hostname
         import os
@@ -47,4 +72,9 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
         qurl.setQuery(urlQuery)
         request.setUrl(qurl)
 
+        return request
+
+    @forLocalDeviceOnly
+    def _preprocess_request_boxSpace(self, request):
+        request = self._redirectToLocal(request)
         return request
