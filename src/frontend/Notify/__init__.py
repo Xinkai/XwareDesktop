@@ -100,6 +100,5 @@ class Notifier(QObject):
             raise Exception("Unknown action from slotActionInvoked.")
 
         nativeOpenPath = self.app.mountsFaker.convertToNativePath(openPath)
-        qUrl = QUrl(nativeOpenPath)
-        qUrl.setScheme("file")
+        qUrl = QUrl.fromLocalFile(nativeOpenPath)
         QDesktopServices().openUrl(qUrl)

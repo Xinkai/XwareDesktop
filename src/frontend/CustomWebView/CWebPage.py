@@ -64,8 +64,7 @@ class CustomWebPage(QWebPage):
     # Local Torrent File Chooser Support Ends Here
 
     def applyCustomStyleSheet(self):
-        styleSheet = QUrl(constants.XWARESTYLE_FILE)
-        styleSheet.setScheme("file")
+        styleSheet = QUrl.fromLocalFile(constants.XWARESTYLE_FILE)
         self.settings().setUserStyleSheetUrl(styleSheet)
 
     # mainFrame functions
