@@ -6,6 +6,8 @@ from PyQt5.QtCore import QUrlQuery
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkDiskCache
 from PyQt5.QtWidgets import QApplication
 
+from Compat.CompatUrl import CompatUrl
+
 def forLocalDeviceOnly(func):
     def wrapper(SELF, request):
         # Looking for Pid in query string, try matching with locally bound peerid
@@ -36,7 +38,7 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
         self.setCache(self._cachePath)
 
     def createRequest(self, op, request, device = None):
-        qurl = request.url()
+        qurl = CompatUrl(request.url())
         if qurl.host() == "homecloud.yuancheng.xunlei.com":
             path = qurl.fileName()
             preprocessor = self.getPreprocessorFor(path)
