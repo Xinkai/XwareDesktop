@@ -3,7 +3,7 @@
  <class>dlg_about</class>
  <widget class="QDialog" name="dlg_about">
   <property name="windowModality">
-   <enum>Qt::NonModal</enum>
+   <enum>Qt::WindowModal</enum>
   </property>
   <property name="geometry">
    <rect>

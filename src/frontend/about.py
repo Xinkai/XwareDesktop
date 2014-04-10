@@ -10,7 +10,6 @@ class AboutDialog(QDialog, Ui_dlg_about):
     def __init__(self, parent):
         super().__init__(parent)
         self.setupUi(self)
-        self.setWindowModality(Qt.WindowModal)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.fillLibVersions()
