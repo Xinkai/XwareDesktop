@@ -11,6 +11,8 @@ from PersistentGeometry import PersistentGeometry
 
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     app = None
+    settingsDialog = None
+    aboutDialog = None
 
     def __init__(self, app):
         super().__init__()
