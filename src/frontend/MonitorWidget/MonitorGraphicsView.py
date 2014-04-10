@@ -8,11 +8,12 @@ from PyQt5.QtWidgets import QGraphicsView, QGraphicsScene
 
 from DragDrop import AllowDrop
 
+
 class MonitorGraphicsView(QGraphicsView, AllowDrop):
     monitorWin = None
 
     SIZE = (50.0, 50.0)
-    FULLSPEED = 512 * 1024 # 512 in kb/s
+    FULLSPEED = 512 * 1024  # 512 in kb/s
 
     _progressText = None
     _speedsPolygon = None
@@ -56,7 +57,7 @@ class MonitorGraphicsView(QGraphicsView, AllowDrop):
 
     def _setSpeeds(self, speeds):
         polygon = QPolygonF()
-        polygon.append(QPointF(0, self.SIZE[1])) # start the polygon
+        polygon.append(QPointF(0, self.SIZE[1]))  # start the polygon
 
         nSamples = len(speeds)
         xPerSample = self.SIZE[0] / nSamples
@@ -64,12 +65,12 @@ class MonitorGraphicsView(QGraphicsView, AllowDrop):
         for i, speed in enumerate(speeds):
             y = self._translateSpeedToPosY(speed)
             polygon.append(QPointF(xPerSample * i, y))
-            polygon.append(QPointF(xPerSample * (i+1), y))
-        polygon.append(QPointF(*self.SIZE)) # close the polygon
+            polygon.append(QPointF(xPerSample * (i + 1), y))
+        polygon.append(QPointF(*self.SIZE))  # close the polygon
 
         self._speedsPolygon.setPolygon(polygon)
 
-    def _setProgress(self, process): # 10000 means 100%
+    def _setProgress(self, process):  # 10000 means 100%
         if process is None:
             self._progressText.setPlainText("")
         else:

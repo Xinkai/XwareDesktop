@@ -10,8 +10,19 @@ from Settings.QuickSpeedLimit import QuickSpeedLimitBtn
 
 from misc import debounce, getHumanBytesNumber
 
+
 class CustomStatusBar(QStatusBar):
     app = None
+
+    xwaredStatus = None
+    etmStatus = None
+    frontendStatus = None
+    quickSpeedLimitBtn = None
+    schedulerBtn = None
+    spacer = None
+    dlStatus = None
+    ulStatus = None
+
     def __init__(self, parent = None):
         super().__init__(parent)
         self.app = QApplication.instance()
@@ -33,7 +44,6 @@ class CustomStatusBar(QStatusBar):
         self.dlStatus = CustomStatusBarLabel(self)
         self.ulStatus = CustomStatusBarLabel(self)
 
-
         self.app.xwaredpy.sigXwaredStatusPolled.connect(self.slotXwaredStatusPolled)
         self.app.xwaredpy.sigETMStatusPolled.connect(self.slotETMStatusPolled)
         self.app.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
@@ -45,11 +55,13 @@ class CustomStatusBar(QStatusBar):
         self.app.mainWin.menu_backend.setEnabled(enabled)
         if enabled:
             self.xwaredStatus.setText(
-                "<img src=':/image/check.png' width=14 height=14><font color='green'>xwared</font>")
+                "<img src=':/image/check.png' width=14 height=14>"
+                "<font color='green'>xwared</font>")
             self.xwaredStatus.setToolTip("<div style='color:green'>xwared运行中</div>")
         else:
             self.xwaredStatus.setText(
-                "<img src=':/image/attention.png' width=14 height=14><font color='red'>xwared</font>")
+                "<img src=':/image/attention.png' width=14 height=14>"
+                "<font color='red'>xwared</font>")
             self.xwaredStatus.setToolTip("<div style='color:red'>xwared未启动</div>")
 
     @pyqtSlot()
@@ -69,22 +81,24 @@ class CustomStatusBar(QStatusBar):
                 overallCheck = True
                 tooltips.append(
                     "<div style='color:green'>"
-                        "<img src=':/image/connected.png' width=16 height=16>"
+                    "<img src=':/image/connected.png' width=16 height=16>"
                     "设备已激活</div>")
             else:
                 tooltips.append(
                     "<div style='color:red'>"
-                        "<img src=':/image/disconnected.png' width=16 height=16>"
+                    "<img src=':/image/disconnected.png' width=16 height=16>"
                     "设备未激活</div>")
         else:
             tooltips.append("<div style='color:red'>ETM未启动</div>")
 
         if overallCheck:
             self.etmStatus.setText(
-                    "<img src=':/image/check.png' width=14 height=14><font color='green'>ETM</font>")
+                "<img src=':/image/check.png' width=14 height=14>"
+                "<font color='green'>ETM</font>")
         else:
             self.etmStatus.setText(
-                "<img src=':/image/attention.png' width=14 height=14><font color='red'>ETM</font>")
+                "<img src=':/image/attention.png' width=14 height=14>"
+                "<font color='red'>ETM</font>")
 
         self.etmStatus.setToolTip("".join(tooltips))
 
@@ -99,11 +113,13 @@ class CustomStatusBar(QStatusBar):
             self.frontendStatus.setText(
                 "<img src=':/image/attention.png' width=14 height=14><font color='red'>前端</font>")
 
-        self.frontendStatus.setToolTip(
-            "<div style='color:{}'>页面代码已插入</div>\n"
-            "<div style='color:{}'>设备已登录</div>\n"
-            "<div style='color:{}'>设备在线</div>".format(*map(lambda s: "green" if s else "red",
-                                                              frontendStatus)))
+        tooltipTemplate = \
+            "<div style='color:{}'>页面代码已插入</div>\n" \
+            "<div style='color:{}'>设备已登录</div>\n" \
+            "<div style='color:{}'>设备在线</div>"
+        tooltip = tooltipTemplate.format(*map(lambda s: "green" if s else "red", frontendStatus))
+
+        self.frontendStatus.setToolTip(tooltip)
         logging.info(frontendStatus)
 
     @pyqtSlot(bool)
@@ -121,8 +137,10 @@ class CustomStatusBar(QStatusBar):
 
         self.dlStatus.setText(
             "<img src=':/image/down.png' height=14 width=14>{}/s".format(
-                                        getHumanBytesNumber(summary["dlSpeed"])))
+                getHumanBytesNumber(summary["dlSpeed"])))
         self.dlStatus.setToolTip("{}任务下载中".format(summary["dlNum"]))
+
         self.ulStatus.setText(
-            "<img src=':/image/up.png' height=14 width=14>{}/s".format(getHumanBytesNumber(summary["upSpeed"]))
+            "<img src=':/image/up.png' height=14 width=14>{}/s".format(
+                getHumanBytesNumber(summary["upSpeed"]))
         )

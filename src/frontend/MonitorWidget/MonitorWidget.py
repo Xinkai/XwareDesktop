@@ -5,11 +5,13 @@ from PyQt5.QtWidgets import QWidget, QApplication
 
 from Compat.TeardownHelper import TeardownHelper
 
+
 class MonitorWidget(QWidget, TeardownHelper):
     _isBeingDragged = False
     _dragOffset = None
 
     app = None
+
     def __init__(self, parent = None):
         super().__init__(parent)
         self.app = QApplication.instance()

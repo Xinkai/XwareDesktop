@@ -13,13 +13,15 @@ _DBUS_NOTIFY_SERVICE = "org.freedesktop.Notifications"
 _DBUS_NOTIFY_PATH = "/org/freedesktop/Notifications"
 _DBUS_NOTIFY_INTERFACE = "org.freedesktop.Notifications"
 
+
 class Notifier(QObject):
     app = None
     _conn = None
     _interface = None
-    _notifications = None # a dict of notifyId: taskDict
+    _notifications = None  # a dict of notifyId: taskDict
 
     _completedTasksStat = None
+
     def __init__(self, app):
         super().__init__(app)
         self.app = app
@@ -50,7 +52,7 @@ class Notifier(QObject):
     def notifyTask(self, taskId):
         task = self._completedTasksStat.getTask(taskId)
 
-        if task.get("state", None) == 11: # see definitions in class TaskStatistic.
+        if task.get("state", None) == 11:  # see definitions in class TaskStatistic.
             if self.app.settings.getbool("frontend", "notifybysound"):
                 self._qSound_complete.play()
             self._dbus_notify(task)
@@ -62,17 +64,18 @@ class Notifier(QObject):
         if not self.app.settings.getbool("frontend", "popnotifications"):
             return
 
-        qdBusMsg = self._interface.call("Notify",
-            QDBusArgument("Xware Desktop", QMetaType.QString), # app_name
-            QDBusArgument(0, QMetaType.UInt), # replace_id
-            QDBusArgument("/opt/xware_desktop/frontend/thunder.ico", QMetaType.QString), # app_icon
-            QDBusArgument("下载完成", QMetaType.QString), # summary
-            QDBusArgument(task["name"], QMetaType.QString), # body
-            QDBusArgument(["open", "打开", "openDir", "打开文件夹"], QMetaType.QStringList), # actions,
+        qdBusMsg = self._interface.call(
+            "Notify",
+            QDBusArgument("Xware Desktop", QMetaType.QString),  # app_name
+            QDBusArgument(0, QMetaType.UInt),  # replace_id
+            QDBusArgument("/opt/xware_desktop/frontend/thunder.ico", QMetaType.QString),  # app_icon
+            QDBusArgument("下载完成", QMetaType.QString),  # summary
+            QDBusArgument(task["name"], QMetaType.QString),  # body
+            QDBusArgument(["open", "打开", "openDir", "打开文件夹"], QMetaType.QStringList),  # actions,
             {
                 "category": "transfer.complete",
-            }, # hints
-            QDBusArgument(5000, QMetaType.Int), #timeout
+            },  # hints
+            QDBusArgument(5000, QMetaType.Int),  # timeout
         )
 
         if qdBusMsg.errorName():
@@ -89,8 +92,8 @@ class Notifier(QObject):
         if not task:
             # other applications' notifications
             return
-        name = task["name"] # filename
-        path = task["path"] # location
+        name = task["name"]  # filename
+        path = task["path"]  # location
 
         if action == "open":
             openPath = os.path.join(path, name)

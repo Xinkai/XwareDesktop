@@ -8,6 +8,7 @@ from .ui_scheduler import Ui_Dialog
 
 import Schedule
 
+
 class SchedulerWindow(QDialog, Ui_Dialog):
     app = None
     scheduler = None
@@ -69,7 +70,7 @@ class SchedulerWindow(QDialog, Ui_Dialog):
     def accept(self):
         actWhen = self.comboBox_actWhen.currentData()
         taskIds = set(map(lambda item: item.data(Qt.UserRole),
-                                  self.listWidget_tasks.selectedItems()))
+                          self.listWidget_tasks.selectedItems()))
         actionId = self.comboBox_action.currentData()
 
         self.scheduler.set(actWhen, taskIds, actionId)

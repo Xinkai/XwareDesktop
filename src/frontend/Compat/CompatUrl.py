@@ -5,6 +5,7 @@ import logging
 from PyQt5.QtCore import QUrl
 from urllib.parse import urlparse
 
+
 class CompatUrl(QUrl):
     def __init__(self, *args):
         super().__init__(*args)

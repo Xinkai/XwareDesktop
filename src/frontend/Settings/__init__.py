@@ -5,6 +5,7 @@ import logging
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QMenu
 
+
 class SettingMenu(QMenu):
     # A QMenu that allows settings to be done.
     def __init__(self, parent):

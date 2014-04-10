@@ -6,6 +6,7 @@ from PyQt5.QtGui import QIcon
 from Schedule.SchedulerWin import SchedulerWindow
 from CustomStatusBar.CStatusButton import CustomStatusBarButton
 
+
 class SchedulerButton(CustomStatusBarButton):
     def __init__(self, parent):
         super().__init__(parent)

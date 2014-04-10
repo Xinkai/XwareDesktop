@@ -4,7 +4,10 @@ import logging
 
 from PyQt5.QtWidgets import QApplication
 
+
 class AllowDrop(object):
+    _actionsQueue = None
+
     def setupDropSupport(self):
         self._actionsQueue = QApplication.instance().frontendpy.queue
         self.setAcceptDrops(True)
@@ -12,7 +15,7 @@ class AllowDrop(object):
     def dropEvent(self, qDropEvent):
         print("event drop")
         if qDropEvent.source() is not None:
-            return # drag starts within the application
+            return  # drag starts within the application
         mimeData = qDropEvent.mimeData()
 
         if mimeData.hasUrls():

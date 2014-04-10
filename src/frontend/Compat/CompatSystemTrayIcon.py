@@ -3,7 +3,9 @@
 from PyQt5.QtWidgets import QSystemTrayIcon
 from Compat.TeardownHelper import TeardownHelper
 
-# On Ubuntu 13.10, systrayicon won't destroy itself gracefully, stops the whole program from exiting.
+
+# On Ubuntu 13.10, systrayicon won't destroy itself gracefully,
+# stops the whole program from exiting.
 # hiding it works around the problem
 class CompatSystemTrayIcon(QSystemTrayIcon, TeardownHelper):
     def __init__(self, parent = None):

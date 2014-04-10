@@ -17,6 +17,7 @@ ACTION_HYBRIDSLEEP = 2
 ACTION_HIBERNATE = 3
 ACTION_SUSPEND = 4
 
+
 class PowerAction(object):
     # defines a power action
     manager = None
@@ -72,6 +73,7 @@ class PowerActionManager(QObject):
     _conn = None
     _interface = None
     actions = None
+
     def __init__(self, parent = None):
         super().__init__(parent)
         self._conn = QDBusConnection("Xware Desktop").systemBus()
@@ -107,6 +109,7 @@ class PowerActionManager(QObject):
         if msg.errorName():
             logging.error(msg.errorMessage())
 
-    def _cmdAct(self, action):
+    @staticmethod
+    def _cmdAct(action):
         logging.info("scheduler is about to execute: {}".format(action))
         os.system(action.command)

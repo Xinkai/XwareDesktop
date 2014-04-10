@@ -5,19 +5,21 @@ import logging
 from PyQt5.QtCore import QTimer, Qt, pyqtSlot
 from PyQt5.QtWidgets import QMessageBox, QApplication
 
+
 class CountdownMessageBox(QMessageBox):
     app = None
     _timeout = None
     _timer = None
     _actionStr = None
+
     def __init__(self, actionStr):
         self.app = QApplication.instance()
         self._actionStr = actionStr
-        super().__init__(QMessageBox.Question, # icon
+        super().__init__(QMessageBox.Question,  # icon
                          "Xware Desktop任务完成",     # title
                          "",
-                         QMessageBox.NoButton, # buttons
-                         getattr(self.app, "mainWin", None), # parent
+                         QMessageBox.NoButton,  # buttons
+                         getattr(self.app, "mainWin", None),  # parent
                          Qt.Dialog | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_DeleteOnClose)
         # Note: setting WindowModality cancels StaysOnTop
@@ -32,7 +34,7 @@ class CountdownMessageBox(QMessageBox):
         self.updateText()
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.slotTick)
-        self._timer.start(1000) # one tick per second
+        self._timer.start(1000)  # one tick per second
 
     @pyqtSlot()
     def slotTick(self):
@@ -44,16 +46,16 @@ class CountdownMessageBox(QMessageBox):
             self.accept()
 
     def updateText(self):
-        self.setText("任务已完成。将于{}秒后{}。".format(self._timeout,
-                                                      self._actionStr))
+        self.setText("任务已完成。将于{}秒后{}。".format(self._timeout, self._actionStr))
+
     @pyqtSlot()
     def accept(self):
         print("Scheduler confirmation accepted")
-        self.app.scheduler.sigActionConfirmed.emit(True) # act
+        self.app.scheduler.sigActionConfirmed.emit(True)  # act
         super().accept()
 
     @pyqtSlot()
     def reject(self):
         print("Scheduler confirmation rejected")
-        self.app.scheduler.sigActionConfirmed.emit(False) # reset
+        self.app.scheduler.sigActionConfirmed.emit(False)  # reset
         super().reject()

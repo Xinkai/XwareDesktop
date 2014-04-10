@@ -9,6 +9,7 @@ from PyQt5.QtWebKitWidgets import QWebView
 import constants
 from .CWebPage import CustomWebPage
 
+
 class CustomWebView(QWebView):
     app = None
     _customPage = None

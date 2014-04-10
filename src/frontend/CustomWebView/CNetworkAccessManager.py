@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QApplication
 
 from Compat.CompatUrl import CompatUrl
 
+
 def forLocalDeviceOnly(func):
     def wrapper(SELF, request):
         # Looking for Pid in query string, try matching with locally bound peerid
@@ -23,6 +24,7 @@ def forLocalDeviceOnly(func):
         return func(SELF, request)
     return wrapper
 
+
 class CustomNetworkAccessManager(QNetworkAccessManager):
     app = None
     _cachePath = None
@@ -34,7 +36,7 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
         self._cachePath = QNetworkDiskCache(self)
         cacheLocation = QApplication.instance().settings.get("frontend", "cachelocation")
         self._cachePath.setCacheDirectory(cacheLocation)
-        self._cachePath.setMaximumCacheSize(20 * 1024 * 1024) # 20M
+        self._cachePath.setMaximumCacheSize(20 * 1024 * 1024)  # 20M
         self.setCache(self._cachePath)
 
     def createRequest(self, op, request, device = None):
@@ -57,7 +59,8 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
         request.setUrl(qurl)
         return request
 
-    def _preprocess_request_bind(self, request):
+    @staticmethod
+    def _preprocess_request_bind(request):
         # set boxName when binding the device to hostname
         import os
 

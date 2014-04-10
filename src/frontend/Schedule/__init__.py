@@ -9,6 +9,7 @@ from Schedule.PowerAction import PowerActionManager, ACTION_NONE
 ALL_TASKS_COMPLETED = 0
 SELECTED_TASKS_COMPLETED = 1
 
+
 class Scheduler(QObject):
     # connects PowerActionManager and SchedulerWin, also does confirmation.
 
@@ -25,6 +26,8 @@ class Scheduler(QObject):
     _actWhen = None
     _waitingTaskIds = None         # user-selected tasks
     _stillWaitingTasksNumber = 0   # (computed) user-selected tasks - nolonger running tasks
+    confirmDlg = None
+
     def __init__(self, app):
         super().__init__(app)
         self.app = app
@@ -75,8 +78,9 @@ class Scheduler(QObject):
             return False
 
         if self._stillWaitingTasksNumber:
-            return "{}个任务结束后{}".format(self._stillWaitingTasksNumber,
-                                           self.getActionNameById(self.actionId))
+            return "{}个任务结束后{}".format(
+                self._stillWaitingTasksNumber,
+                self.getActionNameById(self.actionId))
         else:
             return True
 

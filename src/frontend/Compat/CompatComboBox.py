@@ -2,6 +2,7 @@
 
 from PyQt5.QtWidgets import QComboBox
 
+
 class CompatComboBox(QComboBox):
     def __init__(self, parent):
         super().__init__(parent)

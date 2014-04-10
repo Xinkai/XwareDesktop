@@ -11,6 +11,7 @@ from urllib import parse
 import constants
 from .CNetworkAccessManager import CustomNetworkAccessManager
 
+
 class CustomWebPage(QWebPage):
     app = None
     _overrideFile = None

@@ -9,8 +9,10 @@ from CustomStatusBar.CStatusButton import CustomStatusBarToolButton
 from .ui_quickspeedlimit import Ui_Form_quickSpeedLimit
 from etmpy import EtmSetting
 
+
 class QuickSpeedLimitBtn(CustomStatusBarToolButton):
     app = None
+
     def __init__(self, parent):
         super().__init__(parent)
         self.app = QApplication.instance()
@@ -27,14 +29,17 @@ class QuickSpeedLimitBtn(CustomStatusBarToolButton):
     def slotToggleEnableFlag(self):
         self.setEnabled(self.app.xwaredpy.etmStatus)
 
+
 class SpeedLimitingWidgetAction(QWidgetAction):
     def __init__(self, parent):
         super().__init__(parent)
         widget = QuickSpeedLimitForm(parent)
         self.setDefaultWidget(widget)
 
+
 class QuickSpeedLimitForm(QWidget, Ui_Form_quickSpeedLimit):
     app = None
+
     def __init__(self, parent):
         super().__init__(parent)
         self.app = QApplication.instance()

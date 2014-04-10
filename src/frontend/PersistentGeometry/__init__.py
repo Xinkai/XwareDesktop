@@ -5,6 +5,7 @@ import logging
 from PyQt5.QtWidgets import QApplication
 from misc import debounce
 
+
 # A helper to automatically preserve the geometry of windows.
 # Usage: Inherit PersistentGeometry, and then call preserveGeometry(keyname)
 class PersistentGeometry(object):
@@ -19,9 +20,10 @@ class PersistentGeometry(object):
 
     @debounce(0.2, instant_first = False)
     def _setGeometry(self):
-        QApplication.instance().settings.setobj("frontend",
-                                                "{}wingeometry".format(self._persistent_geometry_name),
-                                                self.saveGeometry())
+        QApplication.instance().settings.setobj(
+            "frontend",
+            "{}wingeometry".format(self._persistent_geometry_name),
+            self.saveGeometry())
 
     def moveEvent(self, qMoveEvent):
         if getattr(self, "_persistent_geometry_name", False):
