@@ -28,9 +28,6 @@ class CountdownMessageBox(QMessageBox):
         self.rejectBtn = self.addButton("取消", QMessageBox.RejectRole)
         self.acceptBtn = self.addButton("立刻执行", QMessageBox.AcceptRole)
 
-        self.accepted.connect(self.act)
-        self.rejected.connect(self.reset)
-
         self._timeout = 60
         self.updateText()
         self._timer = QTimer(self)
@@ -50,13 +47,13 @@ class CountdownMessageBox(QMessageBox):
         self.setText("任务已完成。将于{}秒后{}。".format(self._timeout,
                                                       self._actionStr))
     @pyqtSlot()
-    def act(self):
+    def accept(self):
         print("Scheduler confirmation accepted")
-        self.app.scheduler.sigActionConfirmed.emit(True)
-        self.close()
+        self.app.scheduler.sigActionConfirmed.emit(True) # act
+        super().accept()
 
     @pyqtSlot()
-    def reset(self):
+    def reject(self):
         print("Scheduler confirmation rejected")
-        self.app.scheduler.sigActionConfirmed.emit(False)
-        self.close()
+        self.app.scheduler.sigActionConfirmed.emit(False) # reset
+        super().reject()
