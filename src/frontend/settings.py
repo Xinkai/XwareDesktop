@@ -139,7 +139,6 @@ class SettingsAccessor(QObject):
 class SettingsDialog(QDialog, Ui_Dialog):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setWindowModality(Qt.WindowModal)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.app = parent.app
@@ -171,8 +170,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
         self.btngrp_etmStartWhen.button(self.settings.getint("xwared", "startetmwhen")).setChecked(True)
-
-        self.accepted.connect(self.writeSettings)
 
         self.btn_addMount.clicked.connect(self.slotAddMount)
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)
@@ -301,7 +298,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.table_mounts.removeRow(row)
 
     @pyqtSlot()
-    def writeSettings(self):
+    def accept(self):
         self.settings.set("account", "username", self.lineEdit_loginUsername.text())
         self.settings.set("account", "password", self.lineEdit_loginPassword.text())
         self.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
@@ -351,6 +348,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.app.mountsFaker.mounts = self.newMounts
         self.settings.applySettings.emit()
+        super().accept()
 
     @property
     def newMounts(self):
