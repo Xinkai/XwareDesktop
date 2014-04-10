@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
 
 from Compat.CompatSystemTrayIcon import CompatSystemTrayIcon
 
+
 class Systray(QObject):
     app = None
     trayIconMenu = None
@@ -31,13 +32,13 @@ class Systray(QObject):
 
     @pyqtSlot(QSystemTrayIcon.ActivationReason)
     def slotSystrayActivated(self, reason):
-        if reason == QSystemTrayIcon.Context: # right
+        if reason == QSystemTrayIcon.Context:  # right
             pass
-        elif reason == QSystemTrayIcon.MiddleClick: # middle
+        elif reason == QSystemTrayIcon.MiddleClick:  # middle
             pass
-        elif reason == QSystemTrayIcon.DoubleClick: # double click
+        elif reason == QSystemTrayIcon.DoubleClick:  # double click
             pass
-        elif reason == QSystemTrayIcon.Trigger: # left
+        elif reason == QSystemTrayIcon.Trigger:  # left
             if self.mainWin.isHidden() or self.mainWin.isMinimized():
                 self.mainWin.restore()
             else:

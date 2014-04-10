@@ -6,8 +6,10 @@ import uuid
 
 import constants
 
+
 class MountsFaker(object):
     _mounts = None
+
     def __init__(self):
         self._mounts = OrderedDict()
 
@@ -15,11 +17,11 @@ class MountsFaker(object):
             lines = mountsFile.readlines()
             for line in lines:
                 if line.replace("\t", "").replace(" ", "").replace("\n", "") == "":
-                    continue # empty line
+                    continue  # empty line
 
                 lstripped = line.lstrip()
                 if len(lstripped) > 0 and lstripped[0] == "#":
-                    continue # comment
+                    continue  # comment
 
                 parts = line.split()
                 path, uuid_ = parts[1], parts[0][len("UUID="):]
@@ -36,7 +38,7 @@ class MountsFaker(object):
     def mounts(self, paths):
         new_Mounts = OrderedDict()
         for path in paths:
-           new_Mounts[path] = self._mounts.get(path, str(uuid.uuid1()))
+            new_Mounts[path] = self._mounts.get(path, str(uuid.uuid1()))
 
         self._mounts = new_Mounts
         self.writeMounts()
@@ -46,14 +48,14 @@ class MountsFaker(object):
 
         path = path[len(constants.ETM_MOUNTS_DIR):]
         parts = path.split("/")
-        drive = parts[0][:-1] # "C:" -> "C"
+        drive = parts[0][:-1]  # "C:" -> "C"
 
-        nativePath = os.path.join(self.mounts[ord(drive)-ord("C")], *parts[1:])
+        nativePath = os.path.join(self.mounts[ord(drive) - ord("C")], *parts[1:])
         resolvedPath = os.path.realpath(nativePath)
         return resolvedPath
 
     def writeMounts(self):
-        buffer = []
+        buffer = list()
         buffer.append(constants.MOUNTS_FILE_HEADER)
 
         for path, uuid_ in self._mounts.items():
@@ -66,7 +68,8 @@ class MountsFaker(object):
         with open(constants.MOUNTS_FILE, "w", encoding = "UTF-8") as mountFile:
             mountFile.writelines("\n".join(buffer))
 
-    def getMountsMapping(self):
+    @staticmethod
+    def getMountsMapping():
         # checks when ETM really uses
         mapping = {}
         try:
@@ -77,4 +80,3 @@ class MountsFaker(object):
         except FileNotFoundError:
             pass
         return mapping
-

@@ -3,8 +3,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 
-from __init__ import  __version__, XWARE_VERSION
+from __init__ import __version__, XWARE_VERSION
 from ui_about import Ui_dlg_about
+
 
 class AboutDialog(QDialog, Ui_dlg_about):
     def __init__(self, parent):

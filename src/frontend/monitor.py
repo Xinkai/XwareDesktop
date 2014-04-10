@@ -10,6 +10,7 @@ import threading, time
 from ui_monitor import MonitorWidget, Ui_Form
 from PersistentGeometry import PersistentGeometry
 
+
 class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
     sigTaskUpdating = pyqtSignal(dict)
 
@@ -19,7 +20,8 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
     _thread_should_stop = False
 
     TICKS_PER_TASK = 4
-    TICK_INTERVAL = 0.5 # second(s)
+    TICK_INTERVAL = 0.5  # second(s)
+
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setupUi(self)
@@ -47,7 +49,7 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
                         task = self.app.etmpy.runningTasksStat.getTask(tid)
 
                         if self._thread_should_stop:
-                            return # end the thread
+                            return  # end the thread
 
                         logging.debug("updateSpeedsThread, deadlock incoming, maybe")
                         time.sleep(self.TICK_INTERVAL)
@@ -55,7 +57,7 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
                             self.sigTaskUpdating.emit(task)
                         except TypeError:
                             # monitor closed
-                            return # end the thread
+                            return  # end the thread
 
                         # FIXME: move the sleep function ahead, before sigTaskUpdating.emit
                         # it seems to make the deadlock go away.

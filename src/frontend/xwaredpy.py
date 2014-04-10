@@ -6,6 +6,7 @@ import threading, time
 import fcntl
 import constants
 
+
 # an interface to watch, notify, and supervise the status of xwared and ETM
 class XwaredPy(QObject):
     sigXwaredStatusPolled = pyqtSignal(bool)
@@ -15,6 +16,7 @@ class XwaredPy(QObject):
     xwaredStatus = None
 
     _t = None
+
     def __init__(self, app):
         super().__init__(app)
         self.app = app
@@ -22,7 +24,7 @@ class XwaredPy(QObject):
         self.app.lastWindowClosed.connect(self.stopXware)
         self.startXware()
         self._t = threading.Thread(target = self._watcherThread, daemon = True,
-                                  name = "xwared/etm watch thread")
+                                   name = "xwared/etm watch thread")
         self._t.start()
         self.app.sigMainWinLoaded.connect(self.connectUI)
 

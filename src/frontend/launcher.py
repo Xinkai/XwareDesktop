@@ -19,6 +19,7 @@ from frontendpy import FrontendPy
 from Schedule import Scheduler
 from misc import getGroupMembership
 
+
 class XwareDesktop(QApplication):
     mainWin = None
     monitorWin = None
@@ -55,7 +56,8 @@ class XwareDesktop(QApplication):
 
         self.settings.applySettings.emit()
 
-    def checkOneInstance(self):
+    @staticmethod
+    def checkOneInstance():
         tasks = sys.argv[1:]
 
         fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT, mode = 0o666)
@@ -72,7 +74,8 @@ class XwareDesktop(QApplication):
                 actions.FrontendCommunicationClient(tasks)
                 sys.exit(0)
 
-    def checkUsergroup(self):
+    @staticmethod
+    def checkUsergroup():
         from PyQt5.QtWidgets import QMessageBox
         membership = getGroupMembership("xware")
         if not membership.groupExists:
@@ -96,7 +99,7 @@ class XwareDesktop(QApplication):
         show = self.settings.getbool("frontend", "showmonitorwindow")
         if show:
             if self.monitorWin:
-                pass # already shown, do nothing
+                pass  # already shown, do nothing
             else:
                 self.monitorWin = monitor.MonitorWindow(None)
                 self.monitorWin.show()
@@ -107,13 +110,13 @@ class XwareDesktop(QApplication):
                 del self.monitorWin
                 self.monitorWin = None
             else:
-                pass # not shown, do nothing
+                pass  # not shown, do nothing
 
 if __name__ == "__main__":
     try:
         os.mkdir(os.path.expanduser("~/.xware-desktop"))
     except OSError:
-        pass # already exists
+        pass  # already exists
     logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))
     app = XwareDesktop(sys.argv)
     sys.exit(app.exec())

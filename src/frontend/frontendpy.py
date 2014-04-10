@@ -11,6 +11,7 @@ from actions import FrontendActionsQueue
 
 FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logined", "online"])
 
+
 # Together with xwarejs.js, exchange information with the browser
 class FrontendPy(QObject):
     sigCreateTasks = pyqtSignal("QStringList")
@@ -19,13 +20,13 @@ class FrontendPy(QObject):
     sigLogin = pyqtSignal(str, str)
     sigToggleFlashAvailability = pyqtSignal(bool)
     sigActivateDevice = pyqtSignal(str)
-    sigNotifyPeerId = pyqtSignal(str) # let xdjs knows peerid
-    sigFrontendStatusChanged = pyqtSignal() # caused by webpage heartbeat/changed status/refresh page
+    sigNotifyPeerId = pyqtSignal(str)  # let xdjs knows peerid
+    sigFrontendStatusChanged = pyqtSignal()  # caused by page heartbeat/changed status/refresh page
 
     app = None
     queue = None
     _isPageMaskOn = None
-    _isPageOnline = None # property wraps them, in order to fire sigFrontendStatusChanged
+    _isPageOnline = None  # property wraps them, in order to fire sigFrontendStatusChanged
     _isPageLogined = None
     _isXdjsLoaded = None
 
@@ -65,7 +66,7 @@ class FrontendPy(QObject):
     @isPageOnline.setter
     def isPageOnline(self, value):
         if self._isPageOnline == value:
-            return # Heartbeat, don't need to continue if online status stays the same
+            return  # Heartbeat, don't need to continue if online status stays the same
         self._isPageOnline = value
         self.sigFrontendStatusChanged.emit()
         if self._isPageOnline:
@@ -92,7 +93,7 @@ class FrontendPy(QObject):
         self.sigFrontendStatusChanged.emit()
         if self._isXdjsLoaded:
             self.consumeAction("xdjs loaded")
-    ################################### SLOTS ######################################
+
     @pyqtSlot()
     def tryLogin(self):
         if self.app.mainWin.page.urlMatch(constants.LOGIN_PAGE):
@@ -105,10 +106,10 @@ class FrontendPy(QObject):
 
     def tryActivate(self, payload):
         if not self.app.mainWin.page.urlMatch(constants.V3_PAGE):
-            return # not v3 page
+            return  # not v3 page
 
         if not payload["userid"]:
-            return # not logged in
+            return  # not logged in
 
         userid, status, code, peerid = self.app.etmpy.getActivationStatus()
 
@@ -120,7 +121,7 @@ class FrontendPy(QObject):
                 return
 
             elif status == 0 and code:
-                self.sigActivateDevice.emit(code) # to activate
+                self.sigActivateDevice.emit(code)  # to activate
                 return
 
         else:
@@ -223,9 +224,9 @@ class FrontendPy(QObject):
     def slotClickBtButton(self):
         from PyQt5.QtGui import QKeyEvent
         from PyQt5.QtCore import QEvent
-        keydownEvent = QKeyEvent(QEvent.KeyPress, # type
-                                 Qt.Key_Enter,    # key
-                                 Qt.NoModifier)   # modifiers
+        keydownEvent = QKeyEvent(QEvent.KeyPress,  # type
+                                 Qt.Key_Enter,     # key
+                                 Qt.NoModifier)    # modifiers
 
         self.app.sendEvent(self.mainWin.webView, keydownEvent)
         self.sigCreateTaskFromTorrentFileDone.emit()

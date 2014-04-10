@@ -13,12 +13,14 @@ from multiprocessing.connection import Listener, Client
 import constants
 from mimeparser import UrlExtractor
 
+
 class FrontendAction(object):
     def __init__(self):
         super().__init__()
 
+
 class CreateTasksAction(FrontendAction):
-    tasks = None # tasks to add in the same batch
+    tasks = None  # tasks to add in the same batch
 
     def __init__(self, tasks):
         super().__init__()
@@ -27,12 +29,14 @@ class CreateTasksAction(FrontendAction):
     def __repr__(self):
         return "{} [{}]".format(self.__class__.__name__, self.tasks)
 
+
 class CreateTask(object):
     NORMAL = 0
     LOCAL_TORRENT = 1
 
     url = None
     kind = None
+
     def __init__(self, url = None, kind = None):
         self.url = url
 
@@ -42,6 +46,7 @@ class CreateTask(object):
 
     def __repr__(self):
         return "{} <{}>".format(self.__class__.__name__, self.url)
+
 
 class FrontendActionsQueue(QObject):
     app = None
@@ -88,7 +93,7 @@ class FrontendActionsQueue(QObject):
         try:
             self._clipboard.dataChanged.disconnect(self.slotClipboardDataChanged)
         except TypeError:
-            pass # not connected, meaning settings says no watch clipboard
+            pass  # not connected, meaning settings says no watch clipboard
         on = self.app.settings.getbool("frontend", "watchclipboard")
         if on:
             self._clipboard.dataChanged.connect(self.slotClipboardDataChanged)
@@ -126,14 +131,16 @@ class FrontendActionsQueue(QObject):
 
         if tasks:
             self.queueAction(CreateTasksAction(tasks))
-        for task_bt in tasks_localtorrent: # because only 1 bt-task can be added once.
+        for task_bt in tasks_localtorrent:  # because only 1 bt-task can be added once.
             self.queueAction(CreateTasksAction([task_bt]))
 
-    def _filterInvalidTasks(self, tasks):
+    @staticmethod
+    def _filterInvalidTasks(tasks):
         # remove those urls which were not recognized by self._createTask
         return list(filter(lambda t: t is not None, tasks))
 
-    def _createTask(self, taskUrl = None):
+    @staticmethod
+    def _createTask(taskUrl = None):
         from urllib import parse
 
         if taskUrl is None:
@@ -154,6 +161,7 @@ class FrontendActionsQueue(QObject):
 
         elif parsed.scheme in ("http", "https", "ftp", "magnet", "ed2k"):
             return CreateTask(taskUrl)
+
 
 class FrontendCommunicationClient(object):
     def __init__(self, payload):

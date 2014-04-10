@@ -3,6 +3,7 @@
 from threading import Timer
 import base64
 
+
 def getHumanBytesNumber(byteNum):
     kilo = 1024
     mega = kilo * kilo
@@ -11,6 +12,7 @@ def getHumanBytesNumber(byteNum):
         return "{:.2f}MiB".format(byteNum / mega)
     else:
         return "{:.2f}KiB".format(byteNum / kilo)
+
 
 def debounce(wait, instant_first = True):
     # skip all calls that are invoked for a certain period of time, except for the last one.
@@ -35,12 +37,12 @@ def debounce(wait, instant_first = True):
         return debounced
     return debouncer
 
+
 def decodePrivateLink(link):
     # try to return the real link behind thunder:// flashget:// qqdl://
-    if "\n" in link or \
-        "\t" in link or \
-        "\r" in link:
-        raise Exception("decodePrivateLink Failed. Maybe passed in multiple private links? {}".format(link))
+    if "\n" in link or "\t" in link or "\r" in link:
+        raise Exception("decodePrivateLink Failed. "
+                        "Maybe passed in multiple private links? {}".format(link))
 
     scheme, *path = link.split("://")
     assert len(path) == 1, "Invalid private link {}.".format(link)
@@ -62,6 +64,7 @@ def decodePrivateLink(link):
 
 import collections
 GroupMembership = collections.namedtuple("GroupMembership", ["groupExists", "isIn", "isEffective"])
+
 
 def getGroupMembership(grpName):
     # return GroupMembership(bool, bool, bool)

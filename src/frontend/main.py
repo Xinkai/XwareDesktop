@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QMainWindow
 from ui_main import Ui_MainWindow
 from PersistentGeometry import PersistentGeometry
 
+
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     app = None
 

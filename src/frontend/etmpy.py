@@ -13,13 +13,15 @@ from datetime import datetime
 
 import constants
 from misc import debounce
-log = print
+
 
 class LocalCtrlNotAvailableError(BaseException):
     pass
 
 EtmSetting = collections.namedtuple("EtmSetting", ["dLimit", "uLimit", "maxRunningTasksNum"])
-ActivationStatus = collections.namedtuple("ActivationStatus", ["userid", "status", "code", "peerid"])
+ActivationStatus = collections.namedtuple("ActivationStatus",
+                                          ["userid", "status", "code", "peerid"])
+
 
 class EtmPy(QObject):
     sigTasksSummaryUpdated = pyqtSignal([bool], [dict])
@@ -28,6 +30,7 @@ class EtmPy(QObject):
     cfg = {}
     runningTasksStat = None
     completedTasksStat = None
+
     def __init__(self, app):
         super().__init__(app)
         self.app = app
@@ -57,7 +60,7 @@ class EtmPy(QObject):
         for line in lines:
             eq = line.index("=")
             k = line[:eq]
-            v = line[(eq+1):].strip()
+            v = line[(eq + 1):].strip()
             pairs[k] = v
         self.cfg = pairs
 
@@ -75,7 +78,7 @@ class EtmPy(QObject):
     def getSettings(self):
         try:
             req = requests.get(self.lcontrol + "getspeedlimit")
-            limits = req.json()[1:] # not sure about what first element means, ignore for now
+            limits = req.json()[1:]  # not sure about what first element means, ignore for now
 
             req = requests.get(self.lcontrol + "getrunningtaskslimit")
             maxRunningTasksNum = req.json()[1]
@@ -94,18 +97,22 @@ class EtmPy(QObject):
 
         try:
             if newsettings.maxRunningTasksNum:
-                requests.post(self.lcontrol + \
-                              "settings?downloadSpeedLimit={}&uploadSpeedLimit={}&maxRunTaskNumber={}".format(*newsettings))
+                requests.post(self.lcontrol +
+                              "settings?downloadSpeedLimit={}"
+                              "&uploadSpeedLimit={}"
+                              "&maxRunTaskNumber={}".format(*newsettings))
             else:
-                requests.post(self.lcontrol + \
-                              "settings?downloadSpeedLimit={}&uploadSpeedLimit={}".format(newsettings.dLimit,
-                                                                                          newsettings.uLimit))
+                requests.post(self.lcontrol +
+                              "settings?downloadSpeedLimit={}"
+                              "&uploadSpeedLimit={}".format(newsettings.dLimit,
+                                                            newsettings.uLimit))
         except (ConnectionError, LocalCtrlNotAvailableError):
             logging.error("trying to set etm settings, but failed.")
 
-    def _requestPollTasks(self, kind): # kind means type, but type is a python reserved word.
+    def _requestPollTasks(self, kind):  # kind means type, but type is a python reserved word.
         try:
-            req = requests.get(self.lcontrol + "list?v=2&type={}&pos=0&number=99999&needUrl=1".format(kind))
+            req = requests.get(self.lcontrol +
+                               "list?v=2&type={}&pos=0&number=99999&needUrl=1".format(kind))
             res = req.content.decode("utf-8")
             res = unquote(res)
             result = json.loads(res)
@@ -132,17 +139,17 @@ class EtmPy(QObject):
         try:
             req = requests.get(self.lcontrol + "getsysinfo")
             res = req.json()
-            status = res[3] # 1 - bound, 0 - unbound
+            status = res[3]  # 1 - bound, 0 - unbound
             code = res[4]
         except (ConnectionError, LocalCtrlNotAvailableError):
-            status = -1 # error
+            status = -1  # error
             code = None
 
         userid = self.cfg.get("userid", 0)
         try:
             userid = int(userid)
         except ValueError:
-            userid = 0 # unbound -> 0
+            userid = 0  # unbound -> 0
 
         peerid = self.getPeerId()
 
@@ -160,9 +167,10 @@ class EtmPy(QObject):
             raise LocalCtrlNotAvailableError
         return lcport
 
+
 class TaskStatistic(QObject):
-    _tasks = None # copy from _stat_mod upon it's done.
-    _tasks_mod = None # make changes to this one.
+    _tasks = None  # copy from _stat_mod upon it's done.
+    _tasks_mod = None  # make changes to this one.
 
     TASK_STATES = {
         0: ("dload", "下载中"),
@@ -178,7 +186,8 @@ class TaskStatistic(QObject):
         37: ("wait", "已挂起"),
         38: ("delete", "发生错误"),
     }
-    _initialized = False # when the application starts up, it shouldn't fire.
+    _initialized = False  # when the application starts up, it shouldn't fire.
+
     def __init__(self, parent):
         super().__init__(parent)
         self._tasks = {}
@@ -197,6 +206,7 @@ class TaskStatistic(QObject):
 
     def getTasks(self):
         return self._tasks.copy()
+
 
 class CompletedTaskStatistic(TaskStatistic):
     sigTaskCompleted = pyqtSignal(int)
@@ -221,7 +231,8 @@ class CompletedTaskStatistic(TaskStatistic):
 
         self._tasks = self._tasks_mod.copy()
         if self._initialized:
-            # prevent already-completed tasks firing sigTaskCompleted when ETM starting later than frontend
+            # prevent already-completed tasks firing sigTaskCompleted
+            #   when ETM starting later than frontend
             # by comparing `completeTime` with `timestamp`
             # threshold: 10 secs
             timestamp = datetime.timestamp(datetime.now())
@@ -231,8 +242,9 @@ class CompletedTaskStatistic(TaskStatistic):
         else:
             self._initialized = True
 
+
 class RunningTaskStatistic(TaskStatistic):
-    sigTaskNolongerRunning = pyqtSignal(int) # the task finished/recycled/wronged
+    sigTaskNolongerRunning = pyqtSignal(int)  # the task finished/recycled/wronged
     sigTaskAdded = pyqtSignal(int)
     SPEEDS_SAMPLES_COUNT = 25
 
