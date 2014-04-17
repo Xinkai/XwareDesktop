@@ -21,7 +21,7 @@ class XwaredPy(QObject):
         super().__init__(app)
         self.app = app
 
-        self.app.lastWindowClosed.connect(self.stopXware)
+        self.app.aboutToQuit.connect(self.stopXware)
         self.startXware()
         self._t = threading.Thread(target = self._watcherThread, daemon = True,
                                    name = "xwared/etm watch thread")
