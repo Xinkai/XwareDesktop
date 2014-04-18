@@ -64,6 +64,7 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
                         # time.sleep(self.TICK_INTERVAL)
             else:
                 time.sleep(self.TICK_INTERVAL)
+                self.sigTaskUpdating.emit(dict())
 
     @pyqtSlot()
     def _setMonitorFullSpeed(self):
