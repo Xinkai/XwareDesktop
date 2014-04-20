@@ -115,7 +115,8 @@ class XwaredPy(QObject):
 
         sd = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
         try:
-            return sd.connect(constants.XWARED_SOCKET)
+            sd.connect(constants.XWARED_SOCKET)
+            return sd
         except FileNotFoundError:
             logging.error("XWARED_SOCKET doesn't exist, check if xwared is running.")
             return None
