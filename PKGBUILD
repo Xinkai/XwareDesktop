@@ -51,5 +51,5 @@ package() {
     fi
     make DESTDIR=${pkgdir} install
     install -D -m 644 src/xwared.service ${pkgdir}/usr/lib/systemd/system/xwared.service
+    echo -e "\n__githash__ = \"${_commit}\"\n" >> ${pkgdir}/opt/xware_desktop/frontend/__init__.py
 }
-

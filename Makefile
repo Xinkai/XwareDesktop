@@ -4,6 +4,7 @@ PREFIX        = /opt/xware_desktop
 install_xware = install -m 764
 install_exe   = install -m 775
 install       = install -m 664
+GITHASH       = "`git rev-parse master 2>/dev/null`"
 
 all: etmpatch.so xwared permissioncheck pyqt xwarejs.js prepareXware
 
@@ -94,3 +95,5 @@ install: all
 	install -D -m 644 src/frontend/xware_desktop.desktop  $(DESTDIR)/usr/share/applications/xware_desktop.desktop
 	install -d $(DESTDIR)/usr/bin
 	ln -s $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop
+
+	echo -e "\n__githash__ = \"$(GITHASH)\"\n" >> $(DESTDIR)$(PREFIX)/frontend/__init__.py

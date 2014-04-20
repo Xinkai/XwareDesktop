@@ -4,6 +4,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 
 from __init__ import __version__, XWARE_VERSION
+try:
+    from __init__ import __githash__
+except ImportError:
+    __githash__ = None
 from ui_about import Ui_dlg_about
 
 
@@ -16,6 +20,9 @@ class AboutDialog(QDialog, Ui_dlg_about):
         self.fillLibVersions()
 
     def fillLibVersions(self):
+        if __githash__:
+            self.label_githash.setText(__githash__)
+
         self.label_version.setText(__version__)
 
         self.label_xwareVer.setText(XWARE_VERSION)
