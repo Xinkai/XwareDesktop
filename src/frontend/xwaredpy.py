@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 import threading, time
@@ -80,35 +81,41 @@ class XwaredPy(QObject):
 
     @pyqtSlot()
     def slotStartETM(self):
-        sd = self.prepareSocket()
-        sd.sendall(b"ETM_START\0")
-        sd.close()
+        sd = self.__prepareSocket()
+        if sd:
+            sd.sendall(b"ETM_START\0")
+            sd.close()
         if self.app.settings.getint("xwared", "startetmwhen") == 2:
             self.app.settings.setbool("xwared", "startetm", True)
             self.app.settings.save()
 
     @pyqtSlot()
     def slotStopETM(self):
-        sd = self.prepareSocket()
-        sd.sendall(b"ETM_STOP\0")
-        sd.close()
+        sd = self.__prepareSocket()
+        if sd:
+            sd.sendall(b"ETM_STOP\0")
+            sd.close()
         if self.app.settings.getint("xwared", "startetmwhen") == 2:
             self.app.settings.setbool("xwared", "startetm", False)
             self.app.settings.save()
 
     @pyqtSlot()
     def slotRestartETM(self):
-        sd = self.prepareSocket()
-        sd.sendall(b"ETM_RESTART\0")
-        sd.close()
+        sd = self.__prepareSocket()
+        if sd:
+            sd.sendall(b"ETM_RESTART\0")
+            sd.close()
         if self.app.settings.getint("xwared", "startetmwhen") == 2:
             self.app.settings.setbool("xwared", "startetm", True)
             self.app.settings.save()
 
     @staticmethod
-    def prepareSocket():
+    def __prepareSocket():
         import socket
 
         sd = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
-        sd.connect(constants.XWARED_SOCKET)
-        return sd
+        try:
+            return sd.connect(constants.XWARED_SOCKET)
+        except FileNotFoundError:
+            logging.error("XWARED_SOCKET doesn't exist, check if xwared is running.")
+            return None
