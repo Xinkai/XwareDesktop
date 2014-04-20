@@ -53,7 +53,7 @@ class XwaredPy(QObject):
             try:
                 xwaredLockFile = open(constants.XWARED_LOCK)
                 try:
-                    xwaredLock = fcntl.flock(xwaredLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    fcntl.flock(xwaredLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
                     self.xwaredStatus = False
                     fcntl.flock(xwaredLockFile, fcntl.LOCK_UN)
                 except BlockingIOError:
@@ -67,7 +67,7 @@ class XwaredPy(QObject):
             try:
                 etmLockFile = open(constants.ETM_LOCK)
                 try:
-                    etmLock = fcntl.flock(etmLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+                    fcntl.flock(etmLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
                     self.etmStatus = False
                     fcntl.flock(etmLockFile, fcntl.LOCK_UN)
                 except BlockingIOError:
