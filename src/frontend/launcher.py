@@ -9,6 +9,11 @@ from PyQt5.QtWidgets import QApplication
 
 import fcntl, os, sys
 
+if __name__ == "__main__":
+    from CrashReport import CrashAwareThreading
+    CrashAwareThreading.installCrashReport()
+    CrashAwareThreading.installThreadExceptionHandler()
+
 import main, constants, settings, monitor
 from xwaredpy import XwaredPy
 from etmpy import EtmPy

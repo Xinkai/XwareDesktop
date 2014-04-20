@@ -39,6 +39,7 @@ pyqt:
 	pyuic5 -o src/frontend/ui_monitor.py  src/frontend/ui/monitor.ui
 	pyuic5 -o src/frontend/Schedule/ui_scheduler.py  src/frontend/ui/scheduler.ui
 	pyuic5 -o src/frontend/Settings/ui_quickspeedlimit.py  src/frontend/ui/quickspeedlimit.ui
+	pyuic5 -o src/frontend/CrashReport/ui_crashreport.py  src/frontend/ui/crashreport.ui
 	pyrcc5 -o src/frontend/resource_rc.py src/frontend/ui/rc/resource.qrc
 
 pep8:
@@ -86,6 +87,7 @@ install: all
 	find $(DESTDIR)$(PREFIX)/frontend -type f -print0 | xargs -0 chmod 664
 	find $(DESTDIR)$(PREFIX)/frontend -type d -print0 | xargs -0 chmod 775
 	chmod 775          $(DESTDIR)$(PREFIX)/frontend/launcher.py
+	chmod 775          $(DESTDIR)$(PREFIX)/frontend/CrashReport/CrashReportApp.py
 
 	# other
 	install    -m 644 src/frontend/ui/rc/thunder.ico      $(DESTDIR)$(PREFIX)/frontend/thunder.ico
