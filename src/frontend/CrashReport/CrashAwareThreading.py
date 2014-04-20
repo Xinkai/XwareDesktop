@@ -43,7 +43,7 @@ def __installForReal(thread):
         CrashReport(formatted)
 
         if threading.current_thread() == threading.main_thread():
-            pass  # MainThread exceptions automatically shutdown the program
+            sys.exit(os.EX_SOFTWARE)  # Make sure MainThread exceptions also causes app termination.
         else:
             os._exit(os.EX_SOFTWARE)
 
