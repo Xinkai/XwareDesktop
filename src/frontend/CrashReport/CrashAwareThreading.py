@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# This file make python threads know what to do when an unhandled exception occurs.
-# Typically opens the CrashReportApp and do its stuff.
-# This is a workaround against python bug: http://bugs.python.org/issue1230540
+# Providing the utilities that make python threads know what to do when unhandled exceptions occur.
+# Typically opening the CrashReportApp and doing its stuff.
+# This is a workaround against the python bug: http://bugs.python.org/issue1230540
 
 # For the Main thread, just call installCrashReport()
 # For other non-running-yet threads, just call installThreadExceptionHandler()
