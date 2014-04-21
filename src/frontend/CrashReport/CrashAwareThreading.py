@@ -31,12 +31,9 @@ def installThreadExceptionHandler():
     threading.Thread = _PatchedThread
 
 
-def __installForReal(thread):
-    # save the old, default handler
-    thread.__defaultExceptHook = sys.excepthook
-
+def __installForReal():
     def __reportCrash(etype, value, tb):
-        thread.__defaultExceptHook(etype, value, tb)
+        sys.__excepthook__(etype, value, tb)
 
         formatted = "".join(traceback.format_exception(etype, value, tb))
 
@@ -54,7 +51,7 @@ def installCrashReport():
     thread = threading.current_thread()
 
     if not getattr(thread, "IsCrashAware", False):
-        __installForReal(thread)
+        __installForReal()
         thread.IsCrashAware = True
     else:
         print("Already installed crash report on thread '{}'.".format(thread.name))
