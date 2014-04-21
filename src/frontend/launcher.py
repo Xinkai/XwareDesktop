@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import faulthandler
+faulthandler.enable()
+
 import logging
 
 from __init__ import __version__
