@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
+
 import collections
 
 import constants, actions
@@ -23,7 +25,6 @@ class FrontendPy(QObject):
     sigNotifyPeerId = pyqtSignal(str)  # let xdjs knows peerid
     sigFrontendStatusChanged = pyqtSignal()  # caused by page heartbeat/changed status/refresh page
 
-    app = None
     queue = None
     _isPageMaskOn = None
     _isPageOnline = None  # property wraps them, in order to fire sigFrontendStatusChanged
@@ -32,22 +33,21 @@ class FrontendPy(QObject):
 
     def __init__(self, app):
         super().__init__(app)
-        self.app = app
-        self.app.settings.applySettings.connect(self.tryLogin)
+        app.settings.applySettings.connect(self.tryLogin)
         self.queue = FrontendActionsQueue(self)
-        self.app.sigMainWinLoaded.connect(self.connectUI)
+        app.sigMainWinLoaded.connect(self.connectUI)
 
     @property
     def mainWin(self):
         try:
-            mainWin = self.app.mainWin
+            mainWin = app.mainWin
         except AttributeError:
             raise Exception("frontendpy didn't wait for mainWin.")
         return mainWin
 
     @pyqtSlot()
     def connectUI(self):
-        self.app.mainWin.action_createTask.triggered.connect(self.queue.createTasksAction)
+        app.mainWin.action_createTask.triggered.connect(self.queue.createTasksAction)
 
     @property
     def isPageMaskOn(self):
@@ -96,22 +96,22 @@ class FrontendPy(QObject):
 
     @pyqtSlot()
     def tryLogin(self):
-        if self.app.mainWin.page.urlMatch(constants.LOGIN_PAGE):
-            autologin = self.app.settings.getbool("account", "autologin")
+        if app.mainWin.page.urlMatch(constants.LOGIN_PAGE):
+            autologin = app.settings.getbool("account", "autologin")
             if autologin:
-                username = self.app.settings.get("account", "username")
-                password = self.app.settings.get("account", "password")
+                username = app.settings.get("account", "username")
+                password = app.settings.get("account", "password")
                 if username and password:
                     self.sigLogin.emit(username, password)
 
     def tryActivate(self, payload):
-        if not self.app.mainWin.page.urlMatch(constants.V3_PAGE):
+        if not app.mainWin.page.urlMatch(constants.V3_PAGE):
             return  # not v3 page
 
         if not payload["userid"]:
             return  # not logged in
 
-        userid, status, code, peerid = self.app.etmpy.getActivationStatus()
+        userid, status, code, peerid = app.etmpy.getActivationStatus()
 
         if userid == 0:
             # unbound
@@ -155,16 +155,16 @@ class FrontendPy(QObject):
     @pyqtSlot(str)
     def systemOpen(self, url):
         from PyQt5.QtGui import QDesktopServices
-        url = self.app.mountsFaker.convertToNativePath(url)
+        url = app.mountsFaker.convertToNativePath(url)
         qurl = QUrl.fromLocalFile(url)
         QDesktopServices().openUrl(qurl)
 
     @pyqtSlot(str, str)
     def saveCredentials(self, username, password):
-        self.app.settings.set("account", "username", username)
-        self.app.settings.set("account", "password", password)
-        self.app.settings.setbool("account", "autologin", True)
-        self.app.settings.save()
+        app.settings.set("account", "username", username)
+        app.settings.set("account", "password", password)
+        app.settings.setbool("account", "autologin", True)
+        app.settings.save()
 
     @pyqtSlot("QList<QVariant>")
     def log(self, items):
@@ -228,7 +228,7 @@ class FrontendPy(QObject):
                                  Qt.Key_Enter,     # key
                                  Qt.NoModifier)    # modifiers
 
-        self.app.sendEvent(self.mainWin.webView, keydownEvent)
+        app.sendEvent(self.mainWin.webView, keydownEvent)
         self.sigCreateTaskFromTorrentFileDone.emit()
 
     def getFrontendStatus(self):

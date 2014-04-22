@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
-from PyQt5.QtWidgets import QApplication
+from launcher import app
 
 
 class AllowDrop(object):
     _actionsQueue = None
 
     def setupDropSupport(self):
-        self._actionsQueue = QApplication.instance().frontendpy.queue
+        self._actionsQueue = app.frontendpy.queue
         self.setAcceptDrops(True)
 
     def dropEvent(self, qDropEvent):

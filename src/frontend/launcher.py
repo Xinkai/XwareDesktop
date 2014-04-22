@@ -17,15 +17,7 @@ if __name__ == "__main__":
     CrashAwareThreading.installCrashReport()
     CrashAwareThreading.installThreadExceptionHandler()
 
-import main, constants, settings, monitor
-from xwaredpy import XwaredPy
-from etmpy import EtmPy
-from systray import Systray
-import mounts
-from Notify import Notifier
-from frontendpy import FrontendPy
-from Schedule import Scheduler
-from misc import getGroupMembership
+__all__ = ['app']
 
 
 class XwareDesktop(QApplication):
@@ -35,6 +27,16 @@ class XwareDesktop(QApplication):
 
     def __init__(self, *args):
         super().__init__(*args)
+
+        import main, settings
+        from xwaredpy import XwaredPy
+        from etmpy import EtmPy
+        from systray import Systray
+        import mounts
+        from Notify import Notifier
+        from frontendpy import FrontendPy
+        from Schedule import Scheduler
+
         logging.info("XWARE DESKTOP STARTS")
         self.setApplicationName("XwareDesktop")
         self.setApplicationVersion(__version__)
@@ -56,7 +58,7 @@ class XwareDesktop(QApplication):
 
         self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
 
-        self.mainWin = main.MainWindow(self)
+        self.mainWin = main.MainWindow(None)
         self.mainWin.show()
         self.sigMainWinLoaded.emit()
 
@@ -67,7 +69,7 @@ class XwareDesktop(QApplication):
     @staticmethod
     def checkOneInstance():
         tasks = sys.argv[1:]
-
+        import constants
         fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT, mode = 0o666)
 
         import actions
@@ -85,6 +87,7 @@ class XwareDesktop(QApplication):
     @staticmethod
     def checkUsergroup():
         from PyQt5.QtWidgets import QMessageBox
+        from misc import getGroupMembership
         membership = getGroupMembership("xware")
         if not membership.groupExists:
             QMessageBox.warning(None, "Xware Desktop 警告", "未在本机上找到xware用户组，需要重新安装。",
@@ -105,6 +108,7 @@ class XwareDesktop(QApplication):
     def slotCreateCloseMonitorWindow(self):
         logging.debug("slotCreateCloseMonitorWindow")
         show = self.settings.getbool("frontend", "showmonitorwindow")
+        import monitor
         if show:
             if self.monitorWin:
                 pass  # already shown, do nothing
@@ -120,11 +124,15 @@ class XwareDesktop(QApplication):
             else:
                 pass  # not shown, do nothing
 
+app = None
 if __name__ == "__main__":
     try:
         os.mkdir(os.path.expanduser("~/.xware-desktop"))
     except OSError:
         pass  # already exists
     logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))
+
     app = XwareDesktop(sys.argv)
     sys.exit(app.exec())
+else:
+    app = QApplication.instance()

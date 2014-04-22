@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSlot
-from PyQt5.QtWidgets import QApplication
+
 import re
 
 
@@ -11,21 +12,19 @@ import re
 class UrlExtractor(QObject):
     _patterns = None
     actionsQueue = None
-    _app = None
 
     def __init__(self, actionsQueue):
         super().__init__(actionsQueue)
         self.actionsQueue = actionsQueue
 
-        self._app = QApplication.instance()
-        if self._app:
-            self._app.settings.applySettings.connect(self.slotSettingsChanged)
+        if app:
+            app.settings.applySettings.connect(self.slotSettingsChanged)
         else:
             pass  # unittest
 
     @pyqtSlot()
     def slotSettingsChanged(self):
-        patternLines = self._app.settings.get("frontend", "watchpattern").split("\n")
+        patternLines = app.settings.get("frontend", "watchpattern").split("\n")
         patternList = []
         for line in patternLines:
             if len(line) == 0 or line[0] == ";":

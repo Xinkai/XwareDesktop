@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from launcher import app
+
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, Qt
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem
 
@@ -83,14 +85,11 @@ DEFAULT_SETTINGS = {
 class SettingsAccessor(QObject):
     applySettings = pyqtSignal()
 
-    app = None
-
-    def __init__(self, app):
-        super().__init__()
+    def __init__(self, parent):
+        super().__init__(parent)
         self.config = configparser.ConfigParser()
         self.config.read(constants.CONFIG_FILE)
-        self.app = app
-        self.app.aboutToQuit.connect(self.save)
+        app.aboutToQuit.connect(self.save)
 
     def has(self, section, key):
         return self.config.has_option(section, key)
@@ -145,7 +144,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
         super().__init__(parent)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.app = parent.app
         self.setupUi(self)
 
         self.lineEdit_loginUsername.setText(self.settings.get("account", "username"))
@@ -195,7 +193,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
     # shorthand
     @property
     def settings(self):
-        return self.app.settings
+        return app.settings
     # shorthand ends
 
     def autoStartFileExists(self):
@@ -253,8 +251,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         permissionCheckResult = self.permissionCheck()
         permissionCheckFailed = ["无法获得检测权限。运行/opt/xware_desktop/permissioncheck查看原因。"]
 
-        mountsMapping = self.app.mountsFaker.getMountsMapping()
-        for i, mount in enumerate(self.app.mountsFaker.mounts):
+        mountsMapping = app.mountsFaker.getMountsMapping()
+        for i, mount in enumerate(app.mountsFaker.mounts):
             # mounts = ['/path/to/1', 'path/to/2', ...]
             self.table_mounts.insertRow(i)
             self.table_mounts.setItem(i, 0, QTableWidgetItem(mount))
@@ -366,7 +364,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.settings.save()
 
-        self.app.mountsFaker.mounts = self.newMounts
+        app.mountsFaker.mounts = self.newMounts
         self.settings.applySettings.emit()
         super().accept()
 
@@ -377,7 +375,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot()
     def setupETM(self):
-        etmpy = self.app.etmpy
+        etmpy = app.etmpy
 
         # fill values
         self.lineEdit_lcport.setText(etmpy.cfg.get("local_control.listen_port", "不可用"))
@@ -403,4 +401,4 @@ class SettingsDialog(QDialog, Ui_Dialog):
                                        uLimit = self.spinBox_uSpeedLimit.value(),
                                        maxRunningTasksNum = self.spinBox_maxRunningTasksNum.value())
 
-        self.app.etmpy.saveSettings(newsettings)
+        app.etmpy.saveSettings(newsettings)

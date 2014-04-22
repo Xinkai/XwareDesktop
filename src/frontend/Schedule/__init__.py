@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+
 from Schedule.SchedulerCountdown import CountdownMessageBox
 from Schedule.PowerAction import PowerActionManager, ACTION_NONE
 
@@ -21,24 +23,22 @@ class Scheduler(QObject):
         (SELECTED_TASKS_COMPLETED, "选中的"),
     )
 
-    app = None
     _actionId = None
     _actWhen = None
     _waitingTaskIds = None         # user-selected tasks
     _stillWaitingTasksNumber = 0   # (computed) user-selected tasks - nolonger running tasks
     confirmDlg = None
 
-    def __init__(self, app):
-        super().__init__(app)
-        self.app = app
+    def __init__(self, parent):
+        super().__init__(parent)
         self._waitingTaskIds = set()
         self.reset()
 
         self.powerActionManager = PowerActionManager(self)
         self.actions = self.powerActionManager.actions
 
-        self.app.etmpy.runningTasksStat.sigTaskNolongerRunning.connect(self.slotMayAct)
-        self.app.etmpy.runningTasksStat.sigTaskAdded.connect(self.slotMayAct)
+        app.etmpy.runningTasksStat.sigTaskNolongerRunning.connect(self.slotMayAct)
+        app.etmpy.runningTasksStat.sigTaskAdded.connect(self.slotMayAct)
         self.sigActionConfirmed[bool].connect(self.slotConfirmed)
 
     @property
@@ -91,7 +91,7 @@ class Scheduler(QObject):
             logging.info("cancel schedule because action is none")
             return
 
-        runningTaskIds = self.app.etmpy.runningTasksStat.getTIDs()
+        runningTaskIds = app.etmpy.runningTasksStat.getTIDs()
         if self.actWhen == SELECTED_TASKS_COMPLETED:
             stillWaitingTaskIds = set(runningTaskIds) & self.waitingTaskIds
             self._stillWaitingTasksNumber = len(stillWaitingTaskIds)

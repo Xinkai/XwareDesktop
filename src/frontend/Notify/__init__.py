@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSlot, QMetaType, QUrl
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusArgument, QDBusMessage
@@ -15,16 +16,14 @@ _DBUS_NOTIFY_INTERFACE = "org.freedesktop.Notifications"
 
 
 class Notifier(QObject):
-    app = None
     _conn = None
     _interface = None
     _notifications = None  # a dict of notifyId: taskDict
 
     _completedTasksStat = None
 
-    def __init__(self, app):
-        super().__init__(app)
-        self.app = app
+    def __init__(self, parent):
+        super().__init__(parent)
         self._conn = QDBusConnection("Xware Desktop").sessionBus()
 
         self._interface = QDBusInterface(_DBUS_NOTIFY_SERVICE,
@@ -33,7 +32,7 @@ class Notifier(QObject):
                                          self._conn)
 
         self._notifications = {}
-        self._completedTasksStat = self.app.etmpy.completedTasksStat
+        self._completedTasksStat = app.etmpy.completedTasksStat
         self._completedTasksStat.sigTaskCompleted.connect(self.notifyTask)
 
         successful = self._conn.connect(_DBUS_NOTIFY_SERVICE,
@@ -53,7 +52,7 @@ class Notifier(QObject):
         task = self._completedTasksStat.getTask(taskId)
 
         if task.get("state", None) == 11:  # see definitions in class TaskStatistic.
-            if self.app.settings.getbool("frontend", "notifybysound"):
+            if app.settings.getbool("frontend", "notifybysound"):
                 self._qSound_complete.play()
             self._dbus_notify(task)
         else:
@@ -61,7 +60,7 @@ class Notifier(QObject):
             pass
 
     def _dbus_notify(self, task):
-        if not self.app.settings.getbool("frontend", "popnotifications"):
+        if not app.settings.getbool("frontend", "popnotifications"):
             return
 
         qdBusMsg = self._interface.call(
@@ -102,6 +101,6 @@ class Notifier(QObject):
         else:
             raise Exception("Unknown action from slotActionInvoked.")
 
-        nativeOpenPath = self.app.mountsFaker.convertToNativePath(openPath)
+        nativeOpenPath = app.mountsFaker.convertToNativePath(openPath)
         qUrl = QUrl.fromLocalFile(nativeOpenPath)
         QDesktopServices().openUrl(qUrl)

@@ -1,25 +1,24 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QTimer, Qt, pyqtSlot
-from PyQt5.QtWidgets import QMessageBox, QApplication
+from PyQt5.QtWidgets import QMessageBox
 
 
 class CountdownMessageBox(QMessageBox):
-    app = None
     _timeout = None
     _timer = None
     _actionStr = None
 
     def __init__(self, actionStr):
-        self.app = QApplication.instance()
         self._actionStr = actionStr
         super().__init__(QMessageBox.Question,  # icon
                          "Xware Desktop任务完成",     # title
                          "",
                          QMessageBox.NoButton,  # buttons
-                         getattr(self.app, "mainWin", None),  # parent
+                         getattr(app, "mainWin", None),  # parent
                          Qt.Dialog | Qt.WindowStaysOnTopHint)
         self.setAttribute(Qt.WA_DeleteOnClose)
         # Note: setting WindowModality cancels StaysOnTop
@@ -51,11 +50,11 @@ class CountdownMessageBox(QMessageBox):
     @pyqtSlot()
     def accept(self):
         print("Scheduler confirmation accepted")
-        self.app.scheduler.sigActionConfirmed.emit(True)  # act
+        app.scheduler.sigActionConfirmed.emit(True)  # act
         super().accept()
 
     @pyqtSlot()
     def reject(self):
         print("Scheduler confirmation rejected")
-        self.app.scheduler.sigActionConfirmed.emit(False)  # reset
+        app.scheduler.sigActionConfirmed.emit(False)  # reset
         super().reject()

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import pyqtSlot, QEvent, Qt
 from PyQt5.QtWidgets import QMainWindow
@@ -10,13 +11,11 @@ from PersistentGeometry import PersistentGeometry
 
 
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
-    app = None
     settingsDialog = None
     aboutDialog = None
 
-    def __init__(self, app):
-        super().__init__()
-        self.app = app
+    def __init__(self, parent):
+        super().__init__(parent)
 
         # UI
         self.setupUi(self)
@@ -41,7 +40,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
 
     @pyqtSlot()
     def slotExit(self):
-        self.app.quit()
+        app.quit()
 
     @pyqtSlot()
     def slotSetting(self):
@@ -58,7 +57,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     def changeEvent(self, qEvent):
         if qEvent.type() == QEvent.WindowStateChange:
             if self.isMinimized():
-                if self.app.settings.getbool("frontend", "minimizetosystray"):
+                if app.settings.getbool("frontend", "minimizetosystray"):
                     self.setHidden(True)
         super().changeEvent(qEvent)
 
@@ -72,7 +71,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.raise_()
 
     def closeEvent(self, qCloseEvent):
-        if self.app.settings.getbool("frontend", "closetominimize"):
+        if app.settings.getbool("frontend", "closetominimize"):
             qCloseEvent.ignore()
             self.minimize()
         else:

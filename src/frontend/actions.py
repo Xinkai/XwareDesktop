@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSlot
 from PyQt5.QtWidgets import QApplication
 
 from collections import deque
 import threading, os, sys
-
 from multiprocessing.connection import Listener, Client
 
 import constants
@@ -49,7 +49,6 @@ class CreateTask(object):
 
 
 class FrontendActionsQueue(QObject):
-    app = None
     _queue = None
     _listener = None
     _clipboard = None
@@ -58,7 +57,6 @@ class FrontendActionsQueue(QObject):
 
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.app = QApplication.instance()
         self._queue = deque()
         self.frontendpy = parent
 
@@ -73,7 +71,7 @@ class FrontendActionsQueue(QObject):
         self.urlExtractor = UrlExtractor(self)
 
         self._clipboard = QApplication.clipboard()
-        self.app.settings.applySettings.connect(self.slotWatchClipboardToggled)
+        app.settings.applySettings.connect(self.slotWatchClipboardToggled)
 
     def listenerThread(self):
         # clean if previous run crashes
@@ -94,7 +92,7 @@ class FrontendActionsQueue(QObject):
             self._clipboard.dataChanged.disconnect(self.slotClipboardDataChanged)
         except TypeError:
             pass  # not connected, meaning settings says no watch clipboard
-        on = self.app.settings.getbool("frontend", "watchclipboard")
+        on = app.settings.getbool("frontend", "watchclipboard")
         if on:
             self._clipboard.dataChanged.connect(self.slotClipboardDataChanged)
 

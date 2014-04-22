@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import pyqtSlot, Qt
-from PyQt5.QtWidgets import QDialog, QApplication, QListWidgetItem
-from .ui_scheduler import Ui_Dialog
+from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
+from .ui_scheduler import Ui_Dialog
 import Schedule
 
 
 class SchedulerWindow(QDialog, Ui_Dialog):
-    app = None
     scheduler = None
 
     def __init__(self, parent = None):
@@ -18,8 +18,7 @@ class SchedulerWindow(QDialog, Ui_Dialog):
         self.setupUi(self)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.app = QApplication.instance()
-        self.scheduler = self.app.scheduler
+        self.scheduler = app.scheduler
         self.loadFromScheduler()
 
     def loadFromScheduler(self):
@@ -33,7 +32,7 @@ class SchedulerWindow(QDialog, Ui_Dialog):
         self.comboBox_actWhen.activated[int].connect(self.slotActWhenChanged)
 
         # tasks list
-        runningTasks = self.app.etmpy.runningTasksStat.getTasks()
+        runningTasks = app.etmpy.runningTasksStat.getTasks()
         waitingTaskIds = self.scheduler.waitingTaskIds
         for rTaskId, rTask in runningTasks.items():
             item = QListWidgetItem(rTask["name"])

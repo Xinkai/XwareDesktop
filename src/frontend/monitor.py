@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
-from PyQt5.QtWidgets import QApplication
 
 import threading, time
 
@@ -14,7 +14,6 @@ from PersistentGeometry import PersistentGeometry
 class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
     sigTaskUpdating = pyqtSignal(dict)
 
-    app = None
     _stat = None
     _thread = None
     _thread_should_stop = False
@@ -29,9 +28,7 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.app = QApplication.instance()
-
-        self.app.settings.applySettings.connect(self._setMonitorFullSpeed)
+        app.settings.applySettings.connect(self._setMonitorFullSpeed)
         self._setMonitorFullSpeed()
 
         self._thread = threading.Thread(target = self.updateTaskThread,
@@ -42,11 +39,11 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
 
     def updateTaskThread(self):
         while True:
-            runningTaskIds = self.app.etmpy.runningTasksStat.getTIDs()
+            runningTaskIds = app.etmpy.runningTasksStat.getTIDs()
             if runningTaskIds:
                 for tid in runningTaskIds:
                     for i in range(self.TICKS_PER_TASK):
-                        task = self.app.etmpy.runningTasksStat.getTask(tid)
+                        task = app.etmpy.runningTasksStat.getTask(tid)
 
                         if self._thread_should_stop:
                             return  # end the thread
@@ -68,7 +65,7 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
 
     @pyqtSlot()
     def _setMonitorFullSpeed(self):
-        fullSpeed = self.app.settings.getint("frontend", "monitorfullspeed")
+        fullSpeed = app.settings.getint("frontend", "monitorfullspeed")
         logging.info("monitor full speed -> {}".format(fullSpeed))
         self.graphicsView.FULLSPEED = 1024 * fullSpeed
 

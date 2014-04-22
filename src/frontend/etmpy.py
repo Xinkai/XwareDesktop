@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSignal
+
 import threading, time
 import requests, json
 import collections
@@ -33,7 +35,6 @@ class EtmPy(QObject):
 
     def __init__(self, app):
         super().__init__(app)
-        self.app = app
 
         self.watchManager = pyinotify.WatchManager()
         self.notifier = pyinotify.ThreadedNotifier(self.watchManager,
@@ -91,9 +92,9 @@ class EtmPy(QObject):
     def saveSettings(self, newsettings):
         # save limits before disabling
         if newsettings.dLimit != -1:
-            self.app.settings.setint("internal", "dlspeedlimit", newsettings.dLimit)
+            app.settings.setint("internal", "dlspeedlimit", newsettings.dLimit)
         if newsettings.uLimit != -1:
-            self.app.settings.setint("internal", "ulspeedlimit", newsettings.uLimit)
+            app.settings.setint("internal", "ulspeedlimit", newsettings.uLimit)
 
         try:
             if newsettings.maxRunningTasksNum:

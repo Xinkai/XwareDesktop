@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface
-from PyQt5.QtWidgets import QApplication
+
 import os
 
 _DBUS_POWER_SERVICE = "org.freedesktop.login1"
@@ -33,17 +34,17 @@ class PowerAction(object):
         self.actionId = actionId
         self.displayName = displayName
         self.internalName = internalName
-        settings = QApplication.instance().settings
+
         if self.actionId == ACTION_NONE:
             # always allow doing nothing
             availability = "yes"
             command = None
         else:
             optionKey = self.internalName.lower() + "cmd"
-            if settings.has("scheduler", optionKey):
+            if app.settings.has("scheduler", optionKey):
                 # override action with command
                 availability = "cmd"
-                command = settings.get("scheduler", optionKey)
+                command = app.settings.get("scheduler", optionKey)
                 # TODO: check if the command is bad.
             else:
                 # use the default action, namely logind.

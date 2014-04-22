@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
-from PyQt5.QtWidgets import QApplication
 from misc import debounce
 
 
@@ -12,7 +12,6 @@ class PersistentGeometry(object):
     _persistent_geometry_name = None
 
     def preserveGeometry(self, keyname):
-        app = QApplication.instance()
         savedGeometry = app.settings.getobj("frontend", "{}wingeometry".format(keyname))
         if savedGeometry:
             self.restoreGeometry(savedGeometry)
@@ -20,7 +19,7 @@ class PersistentGeometry(object):
 
     @debounce(0.2, instant_first = False)
     def _setGeometry(self):
-        QApplication.instance().settings.setobj(
+        app.settings.setobj(
             "frontend",
             "{}wingeometry".format(self._persistent_geometry_name),
             self.saveGeometry())

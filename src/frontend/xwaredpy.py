@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+
 import threading, time
 import fcntl
 import constants
@@ -18,35 +20,34 @@ class XwaredPy(QObject):
 
     _t = None
 
-    def __init__(self, app):
-        super().__init__(app)
-        self.app = app
+    def __init__(self, parent):
+        super().__init__(parent)
 
-        self.app.aboutToQuit.connect(self.stopXware)
+        app.aboutToQuit.connect(self.stopXware)
         self.startXware()
         self._t = threading.Thread(target = self._watcherThread, daemon = True,
                                    name = "xwared/etm watch thread")
         self._t.start()
-        self.app.sigMainWinLoaded.connect(self.connectUI)
+        app.sigMainWinLoaded.connect(self.connectUI)
 
     @pyqtSlot()
     def connectUI(self):
         # Note: The menu actions enable/disable toggling are handled by statusbar.
-        self.app.mainWin.action_ETMstart.triggered.connect(self.slotStartETM)
-        self.app.mainWin.action_ETMstop.triggered.connect(self.slotStopETM)
-        self.app.mainWin.action_ETMrestart.triggered.connect(self.slotRestartETM)
+        app.mainWin.action_ETMstart.triggered.connect(self.slotStartETM)
+        app.mainWin.action_ETMstop.triggered.connect(self.slotStopETM)
+        app.mainWin.action_ETMrestart.triggered.connect(self.slotRestartETM)
 
     def startXware(self):
-        if self.app.settings.getint("xwared", "startetmwhen") == 3:
+        if app.settings.getint("xwared", "startetmwhen") == 3:
             self.slotStartETM()
-            self.app.settings.setbool("xwared", "startetm", True)
-            self.app.settings.save()
+            app.settings.setbool("xwared", "startetm", True)
+            app.settings.save()
 
     def stopXware(self):
-        if self.app.settings.getint("xwared", "startetmwhen") == 3:
+        if app.settings.getint("xwared", "startetmwhen") == 3:
             self.slotStopETM()
-            self.app.settings.setbool("xwared", "startetm", True)
-            self.app.settings.save()
+            app.settings.setbool("xwared", "startetm", True)
+            app.settings.save()
 
     def _watcherThread(self):
         while True:
@@ -85,9 +86,9 @@ class XwaredPy(QObject):
         if sd:
             sd.sendall(b"ETM_START\0")
             sd.close()
-        if self.app.settings.getint("xwared", "startetmwhen") == 2:
-            self.app.settings.setbool("xwared", "startetm", True)
-            self.app.settings.save()
+        if app.settings.getint("xwared", "startetmwhen") == 2:
+            app.settings.setbool("xwared", "startetm", True)
+            app.settings.save()
 
     @pyqtSlot()
     def slotStopETM(self):
@@ -95,9 +96,9 @@ class XwaredPy(QObject):
         if sd:
             sd.sendall(b"ETM_STOP\0")
             sd.close()
-        if self.app.settings.getint("xwared", "startetmwhen") == 2:
-            self.app.settings.setbool("xwared", "startetm", False)
-            self.app.settings.save()
+        if app.settings.getint("xwared", "startetmwhen") == 2:
+            app.settings.setbool("xwared", "startetm", False)
+            app.settings.save()
 
     @pyqtSlot()
     def slotRestartETM(self):
@@ -105,9 +106,9 @@ class XwaredPy(QObject):
         if sd:
             sd.sendall(b"ETM_RESTART\0")
             sd.close()
-        if self.app.settings.getint("xwared", "startetmwhen") == 2:
-            self.app.settings.setbool("xwared", "startetm", True)
-            self.app.settings.save()
+        if app.settings.getint("xwared", "startetmwhen") == 2:
+            app.settings.setbool("xwared", "startetm", True)
+            app.settings.save()
 
     @staticmethod
     def __prepareSocket():

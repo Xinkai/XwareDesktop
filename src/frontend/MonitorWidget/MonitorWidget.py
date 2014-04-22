@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
+import logging
+from launcher import app
+
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QApplication
+from PyQt5.QtWidgets import QWidget
 
 from Compat.TeardownHelper import TeardownHelper
 
@@ -10,11 +13,8 @@ class MonitorWidget(QWidget, TeardownHelper):
     _isBeingDragged = False
     _dragOffset = None
 
-    app = None
-
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.app = QApplication.instance()
         self.setWindowFlags(Qt.FramelessWindowHint |
                             Qt.ToolTip |
                             Qt.WindowStaysOnTopHint)
@@ -33,4 +33,4 @@ class MonitorWidget(QWidget, TeardownHelper):
             self._dragOffset = None
 
     def mouseDoubleClickEvent(self, qMouseEvent):
-        self.app.mainWin.restore()
+        app.mainWin.restore()

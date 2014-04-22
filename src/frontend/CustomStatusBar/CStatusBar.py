@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QApplication, QStatusBar
+from PyQt5.QtWidgets import QStatusBar
+
 from .CStatusBarLabel import CustomStatusBarLabel
 from Schedule.SchedulerButton import SchedulerButton
 from Settings.QuickSpeedLimit import QuickSpeedLimitBtn
-
 from misc import debounce, getHumanBytesNumber
 
 
 class CustomStatusBar(QStatusBar):
-    app = None
-
     xwaredStatus = None
     etmStatus = None
     frontendStatus = None
@@ -25,7 +24,6 @@ class CustomStatusBar(QStatusBar):
 
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.app = QApplication.instance()
         self.setupStatusBar()
 
     def setupStatusBar(self):
@@ -44,15 +42,15 @@ class CustomStatusBar(QStatusBar):
         self.dlStatus = CustomStatusBarLabel(self)
         self.ulStatus = CustomStatusBarLabel(self)
 
-        self.app.xwaredpy.sigXwaredStatusPolled.connect(self.slotXwaredStatusPolled)
-        self.app.xwaredpy.sigETMStatusPolled.connect(self.slotETMStatusPolled)
-        self.app.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
-        self.app.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
-        self.app.etmpy.sigTasksSummaryUpdated[dict].connect(self.slotTasksSummaryUpdated)
+        app.xwaredpy.sigXwaredStatusPolled.connect(self.slotXwaredStatusPolled)
+        app.xwaredpy.sigETMStatusPolled.connect(self.slotETMStatusPolled)
+        app.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
+        app.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
+        app.etmpy.sigTasksSummaryUpdated[dict].connect(self.slotTasksSummaryUpdated)
 
     @pyqtSlot(bool)
     def slotXwaredStatusPolled(self, enabled):
-        self.app.mainWin.menu_backend.setEnabled(enabled)
+        app.mainWin.menu_backend.setEnabled(enabled)
         if enabled:
             self.xwaredStatus.setText(
                 "<img src=':/image/check.png' width=14 height=14>"
@@ -66,16 +64,16 @@ class CustomStatusBar(QStatusBar):
 
     @pyqtSlot()
     def slotETMStatusPolled(self):
-        enabled = self.app.xwaredpy.etmStatus
+        enabled = app.xwaredpy.etmStatus
 
-        self.app.mainWin.action_ETMstart.setEnabled(not enabled)
-        self.app.mainWin.action_ETMstop.setEnabled(enabled)
-        self.app.mainWin.action_ETMrestart.setEnabled(enabled)
+        app.mainWin.action_ETMstart.setEnabled(not enabled)
+        app.mainWin.action_ETMstop.setEnabled(enabled)
+        app.mainWin.action_ETMrestart.setEnabled(enabled)
 
         overallCheck = False
         tooltips = []
         if enabled:
-            activationStatus = self.app.etmpy.getActivationStatus()
+            activationStatus = app.etmpy.getActivationStatus()
             tooltips.append("<div style='color:green'>ETM运行中</div>")
             if activationStatus.status == 1:
                 overallCheck = True
@@ -105,7 +103,7 @@ class CustomStatusBar(QStatusBar):
     @pyqtSlot()
     @debounce(0.5, instant_first = True)
     def slotFrontendStatusChanged(self):
-        frontendStatus = self.app.frontendpy.getFrontendStatus()
+        frontendStatus = app.frontendpy.getFrontendStatus()
         if all(frontendStatus):
             self.frontendStatus.setText(
                 "<img src=':/image/check.png' width=14 height=14><font color='green'>前端</font>")

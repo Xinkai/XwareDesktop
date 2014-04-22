@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import QUrl, pyqtSlot
-from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWebKitWidgets import QWebPage
 
 from urllib import parse
@@ -13,13 +13,11 @@ from .CNetworkAccessManager import CustomNetworkAccessManager
 
 
 class CustomWebPage(QWebPage):
-    app = None
     _overrideFile = None
     _networkAccessManager = None
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.app = QApplication.instance()
         self._networkAccessManager = CustomNetworkAccessManager()
         self.setNetworkAccessManager(self._networkAccessManager)
         self.applyCustomStyleSheet()
@@ -27,7 +25,7 @@ class CustomWebPage(QWebPage):
         self.frame.loadStarted.connect(self.slotFrameLoadStarted)
         self.frame.urlChanged.connect(self.slotUrlChanged)
         self.frame.loadFinished.connect(self.injectXwareDesktop)
-        self.app.sigMainWinLoaded.connect(self.connectUI)
+        app.sigMainWinLoaded.connect(self.connectUI)
 
     @property
     def frame(self):
@@ -35,7 +33,7 @@ class CustomWebPage(QWebPage):
 
     @pyqtSlot()
     def connectUI(self):
-        self.app.mainWin.action_refreshPage.triggered.connect(self.slotRefreshPage)
+        app.mainWin.action_refreshPage.triggered.connect(self.slotRefreshPage)
 
     # Local Torrent File Chooser Support
     def chooseFile(self, parentFrame, suggestFile):
@@ -72,10 +70,10 @@ class CustomWebPage(QWebPage):
     @pyqtSlot()
     def slotFrameLoadStarted(self):
         self.overrideFile = None
-        self.app.frontendpy.isPageMaskOn = None
-        self.app.frontendpy.isPageOnline = None
-        self.app.frontendpy.isPageLogined = None
-        self.app.frontendpy.isXdjsLoaded = None
+        app.frontendpy.isPageMaskOn = None
+        app.frontendpy.isPageOnline = None
+        app.frontendpy.isPageLogined = None
+        app.frontendpy.isXdjsLoaded = None
 
     @pyqtSlot()
     def slotUrlChanged(self):
@@ -91,7 +89,7 @@ class CustomWebPage(QWebPage):
     @pyqtSlot()
     def injectXwareDesktop(self):
         # inject xdpy object
-        self.frame.addToJavaScriptWindowObject("xdpy", self.app.frontendpy)
+        self.frame.addToJavaScriptWindowObject("xdpy", app.frontendpy)
 
         # inject xdjs script
         with open(constants.XWAREJS_FILE, encoding = "UTF-8") as file:

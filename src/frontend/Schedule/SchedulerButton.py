@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import Qt, pyqtSlot
+import logging
+from launcher import app
+
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QIcon
 
 from Schedule.SchedulerWin import SchedulerWindow
@@ -12,17 +15,16 @@ class SchedulerButton(CustomStatusBarButton):
         super().__init__(parent)
         self.setIcon(QIcon(":/image/clock.png"))
         self.updateText()
-        self.app.scheduler.sigSchedulerSummaryUpdated.connect(self.updateText)
+        app.scheduler.sigSchedulerSummaryUpdated.connect(self.updateText)
         self.clicked.connect(self.slotClicked)
 
     @pyqtSlot()
     def slotClicked(self):
-        mainWin = self.app.mainWin
-        mainWin.schedulerWin = SchedulerWindow(mainWin)
-        mainWin.schedulerWin.show()
+        app.mainWin.schedulerWin = SchedulerWindow(app.mainWin)
+        app.mainWin.schedulerWin.show()
 
     def updateText(self):
-        summary = self.app.scheduler.getSummary()
+        summary = app.scheduler.getSummary()
         if type(summary) is str:
             self.setText(summary)
         else:

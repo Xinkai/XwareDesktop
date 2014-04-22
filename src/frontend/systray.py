@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from launcher import app
 
 from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtGui import QIcon
@@ -10,13 +11,10 @@ from Compat.CompatSystemTrayIcon import CompatSystemTrayIcon
 
 
 class Systray(QObject):
-    app = None
     trayIconMenu = None
 
-    def __init__(self, app):
-        super().__init__()
-        self.app = app
-        self.mainWin = self.app.mainWin
+    def __init__(self, parent):
+        super().__init__(parent)
 
         self.trayIconMenu = QMenu(None)
 
@@ -28,7 +26,7 @@ class Systray(QObject):
         self.trayIcon.setVisible(True)
 
         self.trayIcon.activated.connect(self.slotSystrayActivated)
-        self.trayIconMenu.addAction(self.mainWin.action_exit)
+        self.trayIconMenu.addAction(app.mainWin.action_exit)
 
     @pyqtSlot(QSystemTrayIcon.ActivationReason)
     def slotSystrayActivated(self, reason):
@@ -39,7 +37,7 @@ class Systray(QObject):
         elif reason == QSystemTrayIcon.DoubleClick:  # double click
             pass
         elif reason == QSystemTrayIcon.Trigger:  # left
-            if self.mainWin.isHidden() or self.mainWin.isMinimized():
-                self.mainWin.restore()
+            if app.mainWin.isHidden() or app.mainWin.isMinimized():
+                app.mainWin.restore()
             else:
-                self.mainWin.minimize()
+                app.mainWin.minimize()
