@@ -35,7 +35,7 @@ clean:
 
 pyqt:
 	pyuic5 -o src/frontend/ui_main.py     src/frontend/ui/main.ui
-	pyuic5 -o src/frontend/ui_settings.py src/frontend/ui/settings.ui
+	pyuic5 -o src/frontend/Settings/ui_settings.py src/frontend/ui/settings.ui
 	pyuic5 -o src/frontend/ui_about.py    src/frontend/ui/about.ui
 	pyuic5 -o src/frontend/ui_monitor.py  src/frontend/ui/monitor.ui
 	pyuic5 -o src/frontend/Schedule/ui_scheduler.py  src/frontend/ui/scheduler.ui

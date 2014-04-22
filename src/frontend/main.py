@@ -8,6 +8,8 @@ from PyQt5.QtWidgets import QMainWindow
 
 from ui_main import Ui_MainWindow
 from PersistentGeometry import PersistentGeometry
+from about import AboutDialog
+from Settings import SettingsDialog
 
 
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
@@ -44,13 +46,11 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
 
     @pyqtSlot()
     def slotSetting(self):
-        from settings import SettingsDialog
         self.settingsDialog = SettingsDialog(self)
         self.settingsDialog.show()
 
     @pyqtSlot()
     def slotShowAbout(self):
-        from about import AboutDialog
         self.aboutDialog = AboutDialog(self)
         self.aboutDialog.show()
 

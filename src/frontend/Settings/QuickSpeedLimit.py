@@ -5,10 +5,10 @@ from launcher import app
 
 from PyQt5.QtWidgets import QWidget, QWidgetAction
 
-from Settings import SettingMenu
+from etmpy import EtmSetting
 from CustomStatusBar.CStatusButton import CustomStatusBarToolButton
 from .ui_quickspeedlimit import Ui_Form_quickSpeedLimit
-from etmpy import EtmSetting
+from .menu import SettingMenu
 
 
 class QuickSpeedLimitBtn(CustomStatusBarToolButton):

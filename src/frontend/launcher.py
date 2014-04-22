@@ -28,7 +28,9 @@ class XwareDesktop(QApplication):
     def __init__(self, *args):
         super().__init__(*args)
 
-        import main, settings
+        import main
+        import constants
+        from Settings import SettingsAccessor, DEFAULT_SETTINGS
         from xwaredpy import XwaredPy
         from etmpy import EtmPy
         from systray import Systray
@@ -46,7 +48,9 @@ class XwareDesktop(QApplication):
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         self.checkOneInstance()
 
-        self.settings = settings.SettingsAccessor(self)
+        self.settings = SettingsAccessor(self,
+                                         configFilePath = constants.CONFIG_FILE,
+                                         defaultDict = DEFAULT_SETTINGS)
 
         # components
         self.xwaredpy = XwaredPy(self)
