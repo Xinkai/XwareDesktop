@@ -33,8 +33,8 @@ class EtmPy(QObject):
     runningTasksStat = None
     completedTasksStat = None
 
-    def __init__(self, app):
-        super().__init__(app)
+    def __init__(self, parent):
+        super().__init__(parent)
 
         self.watchManager = pyinotify.WatchManager()
         self.notifier = pyinotify.ThreadedNotifier(self.watchManager,

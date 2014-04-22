@@ -31,8 +31,8 @@ class FrontendPy(QObject):
     _isPageLogined = None
     _isXdjsLoaded = None
 
-    def __init__(self, app):
-        super().__init__(app)
+    def __init__(self, parent):
+        super().__init__(parent)
         app.settings.applySettings.connect(self.tryLogin)
         self.queue = FrontendActionsQueue(self)
         app.sigMainWinLoaded.connect(self.connectUI)
