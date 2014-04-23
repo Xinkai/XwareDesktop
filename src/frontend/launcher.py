@@ -8,7 +8,7 @@ import logging
 
 from __init__ import __version__
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QMessageBox
 
 import fcntl, os, sys
 
@@ -17,6 +17,7 @@ if __name__ == "__main__":
     CrashAwareThreading.installCrashReport()
     CrashAwareThreading.installThreadExceptionHandler()
 
+import constants
 __all__ = ['app']
 
 
@@ -29,7 +30,6 @@ class XwareDesktop(QApplication):
         super().__init__(*args)
 
         import main
-        import constants
         from Settings import SettingsAccessor, DEFAULT_SETTINGS
         from xwaredpy import XwaredPy
         from etmpy import EtmPy
@@ -73,7 +73,7 @@ class XwareDesktop(QApplication):
     @staticmethod
     def checkOneInstance():
         tasks = sys.argv[1:]
-        import constants
+
         fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT, mode = 0o666)
 
         import actions
@@ -90,7 +90,6 @@ class XwareDesktop(QApplication):
 
     @staticmethod
     def checkUsergroup():
-        from PyQt5.QtWidgets import QMessageBox
         from misc import getGroupMembership
         membership = getGroupMembership("xware")
         if not membership.groupExists:

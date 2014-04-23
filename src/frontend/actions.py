@@ -9,9 +9,11 @@ from PyQt5.QtWidgets import QApplication
 from collections import deque
 import threading, os, sys
 from multiprocessing.connection import Listener, Client
+from urllib import parse
 
 import constants
 from mimeparser import UrlExtractor
+import misc
 
 
 class FrontendAction(object):
@@ -52,13 +54,11 @@ class FrontendActionsQueue(QObject):
     _queue = None
     _listener = None
     _clipboard = None
-    frontendpy = None
     urlExtractor = None
 
     def __init__(self, parent = None):
         super().__init__(parent)
         self._queue = deque()
-        self.frontendpy = parent
 
         self._listener = threading.Thread(target = self.listenerThread, daemon = True,
                                           name = "frontend communication listener")
@@ -109,7 +109,7 @@ class FrontendActionsQueue(QObject):
 
     def queueAction(self, action):
         self._queue.append(action)
-        self.frontendpy.consumeAction("action newly queued")
+        app.frontendpy.consumeAction("action newly queued")
 
     def dequeueAction(self):
         return self._queue.popleft()
@@ -139,8 +139,6 @@ class FrontendActionsQueue(QObject):
 
     @staticmethod
     def _createTask(taskUrl = None):
-        from urllib import parse
-
         if taskUrl is None:
             return CreateTask()
 
@@ -149,7 +147,6 @@ class FrontendActionsQueue(QObject):
 
         parsed = parse.urlparse(taskUrl)
         if parsed.scheme in ("thunder", "flashget", "qqdl"):
-            import misc
             url = misc.decodePrivateLink(taskUrl)
             return CreateTask(url)
 

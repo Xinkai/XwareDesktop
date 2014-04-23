@@ -6,6 +6,8 @@ from launcher import app
 from PyQt5.QtCore import QUrlQuery
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkDiskCache
 
+import os
+
 from Compat.CompatUrl import CompatUrl
 
 
@@ -60,7 +62,6 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
     @staticmethod
     def _preprocess_request_bind(request):
         # set boxName when binding the device to hostname
-        import os
 
         urlQuery = QUrlQuery(request.url())
         queryItems = urlQuery.queryItems()

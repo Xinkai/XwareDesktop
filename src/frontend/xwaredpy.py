@@ -6,7 +6,8 @@ from launcher import app
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 import threading, time
-import fcntl
+import fcntl, socket
+
 import constants
 
 
@@ -112,8 +113,6 @@ class XwaredPy(QObject):
 
     @staticmethod
     def __prepareSocket():
-        import socket
-
         sd = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
         try:
             sd.connect(constants.XWARED_SOCKET)
