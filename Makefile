@@ -5,6 +5,7 @@ install_xware = install -m 764
 install_exe   = install -m 775
 install       = install -m 664
 GITHASH       = "`git rev-parse master 2>/dev/null`"
+SHELL         = /bin/bash
 
 all: etmpatch.so xwared permissioncheck pyqt xwarejs.js prepareXware
 
