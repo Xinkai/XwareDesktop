@@ -135,7 +135,7 @@ class FrontendPy(QObject):
 
     @pyqtSlot(QVariant)
     def xdjsLoaded(self, payload):
-        print("xdjs loaded")
+        logging.info("xdjs loaded")
         self.isXdjsLoaded = True
         self.tryLogin()
         self.tryActivate(payload)
