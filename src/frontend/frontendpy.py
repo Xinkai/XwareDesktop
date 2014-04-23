@@ -4,7 +4,8 @@ import logging
 from launcher import app
 
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QUrl, QVariant
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QUrl, QVariant, QEvent
+from PyQt5.QtGui import QKeyEvent, QDesktopServices
 
 import collections
 
@@ -36,14 +37,6 @@ class FrontendPy(QObject):
         app.settings.applySettings.connect(self.tryLogin)
         self.queue = FrontendActionsQueue(self)
         app.sigMainWinLoaded.connect(self.connectUI)
-
-    @property
-    def mainWin(self):
-        try:
-            mainWin = app.mainWin
-        except AttributeError:
-            raise Exception("frontendpy didn't wait for mainWin.")
-        return mainWin
 
     @pyqtSlot()
     def connectUI(self):
@@ -149,12 +142,11 @@ class FrontendPy(QObject):
 
     @pyqtSlot()
     def requestFocus(self):
-        self.mainWin.restore()
-        self.mainWin.frame.setFocus()
+        app.mainWin.restore()
+        app.mainWin.frame.setFocus()
 
     @pyqtSlot(str)
     def systemOpen(self, url):
-        from PyQt5.QtGui import QDesktopServices
         url = app.mountsFaker.convertToNativePath(url)
         qurl = QUrl.fromLocalFile(url)
         QDesktopServices().openUrl(qurl)
@@ -217,18 +209,16 @@ class FrontendPy(QObject):
             if action.tasks[0].kind == actions.CreateTask.NORMAL:
                 self.sigCreateTasks.emit(taskUrls)
             else:
-                self.mainWin.page.overrideFile = taskUrls[0]
+                app.mainWin.page.overrideFile = taskUrls[0]
                 self.sigCreateTaskFromTorrentFile.emit()
 
     @pyqtSlot()
     def slotClickBtButton(self):
-        from PyQt5.QtGui import QKeyEvent
-        from PyQt5.QtCore import QEvent
         keydownEvent = QKeyEvent(QEvent.KeyPress,  # type
                                  Qt.Key_Enter,     # key
                                  Qt.NoModifier)    # modifiers
 
-        app.sendEvent(self.mainWin.webView, keydownEvent)
+        app.sendEvent(app.mainWin.webView, keydownEvent)
         self.sigCreateTaskFromTorrentFileDone.emit()
 
     def getFrontendStatus(self):
