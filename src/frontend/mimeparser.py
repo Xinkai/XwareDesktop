@@ -11,11 +11,9 @@ import re
 # qqdl, flashget, thunder, http, ftp, https, ed2k, magnet
 class UrlExtractor(QObject):
     _patterns = None
-    actionsQueue = None
 
-    def __init__(self, actionsQueue):
-        super().__init__(actionsQueue)
-        self.actionsQueue = actionsQueue
+    def __init__(self, parent):
+        super().__init__(parent)
 
         if app:
             app.settings.applySettings.connect(self.slotSettingsChanged)
