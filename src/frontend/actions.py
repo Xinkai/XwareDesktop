@@ -54,7 +54,7 @@ class FrontendActionsQueue(QObject):
     _queue = None
     _listener = None
     _clipboard = None
-    urlExtractor = None
+    _urlExtractor = None
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -68,7 +68,7 @@ class FrontendActionsQueue(QObject):
         if tasks:
             self.createTasksAction(tasks)
 
-        self.urlExtractor = UrlExtractor(self)
+        self._urlExtractor = UrlExtractor(self)
 
         self._clipboard = QApplication.clipboard()
         app.settings.applySettings.connect(self.slotWatchClipboardToggled)
@@ -103,7 +103,7 @@ class FrontendActionsQueue(QObject):
 
     def createTasksFromMimeData(self, data):
         # This method only checks text data.
-        urls = self.urlExtractor.extract(data.text())
+        urls = self._urlExtractor.extract(data.text())
         if len(urls) > 0:
             self.createTasksAction(urls)
 
