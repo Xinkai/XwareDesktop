@@ -17,19 +17,30 @@ import misc
 
 
 class FrontendAction(object):
-    def __init__(self):
-        super().__init__()
+    def __repr__(self):
+        return "FrontendAction, should be subclassed."
+
+    def consume(self):
+        raise NotImplementedError()
 
 
 class CreateTasksAction(FrontendAction):
-    tasks = None  # tasks to add in the same batch
+    _tasks = None  # tasks to add in the same batch
 
     def __init__(self, tasks):
         super().__init__()
-        self.tasks = tasks
+        self._tasks = tasks
 
     def __repr__(self):
-        return "{} [{}]".format(self.__class__.__name__, self.tasks)
+        return "{} {}".format(self.__class__.__name__, self._tasks)
+
+    def consume(self):
+        taskUrls = list(map(lambda task: task.url, self._tasks))
+        if self._tasks[0].kind == CreateTask.NORMAL:
+            app.frontendpy.sigCreateTasks.emit(taskUrls)
+        else:
+            app.mainWin.page.overrideFile = taskUrls[0]
+            app.frontendpy.sigCreateTaskFromTorrentFile.emit()
 
 
 class CreateTask(object):

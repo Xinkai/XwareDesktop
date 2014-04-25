@@ -9,7 +9,7 @@ from PyQt5.QtGui import QKeyEvent, QDesktopServices
 
 import collections
 
-import constants, actions
+import constants
 from actions import FrontendActionsQueue
 
 FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logined", "online"])
@@ -204,13 +204,7 @@ class FrontendPy(QObject):
             return
 
         print("consuming action", action)
-        if isinstance(action, actions.CreateTasksAction):
-            taskUrls = list(map(lambda task: task.url, action.tasks))
-            if action.tasks[0].kind == actions.CreateTask.NORMAL:
-                self.sigCreateTasks.emit(taskUrls)
-            else:
-                app.mainWin.page.overrideFile = taskUrls[0]
-                self.sigCreateTaskFromTorrentFile.emit()
+        action.consume()
 
     @pyqtSlot()
     def slotClickBtButton(self):
