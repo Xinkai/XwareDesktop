@@ -17,10 +17,10 @@ class AllowDrop(object):
         if mimeData.hasUrls():
             logging.info("drop action: hasUrls.")
             urls = list(map(lambda qurl: qurl.url(), mimeData.urls()))
-            app.frontendpy.queue.createTasksAction(urls)
+            app.frontendpy.taskCreationAgent.createTasksAction(urls)
         elif mimeData.hasText():
             logging.info("drop action: hasText.")
-            app.frontendpy.queue.createTasksFromMimeData(mimeData)
+            app.frontendpy.taskCreationAgent.createTasksFromMimeData(mimeData)
         else:
             pass
         qDropEvent.acceptProposedAction()

@@ -29,8 +29,7 @@ post_install() {
 }
 
 pre_upgrade() {
-    rm -rf /opt/xware_desktop/frontend/__pycache__
-    rm -rf /opt/xware_desktop/frontend/*/__pycache__
+    find /opt/xware_desktop/frontend -name "__pycache__" -print0 | xargs -0 rm -rf
 }
 
 post_upgrade() {

@@ -27,12 +27,10 @@ clean:
 	rm -rf pkg
 	rm -rf build
 	rm -rf preparedXware
-	rm -f src/frontend/ui_*.py
-	rm -f src/frontend/*/ui_*.py
-	rm -f src/frontend/*_rc.py
+	find src/frontend -name "ui_*.py" -print0 | xargs -0 rm -f
+	find src/frontend -name "*_rc.py" -print0 | xargs -0 rm -f
+	find src/frontend -name "__pycache__" -print0 | xargs -0 rm -rf
 	rm -f src/frontend/xwarejs.js
-	rm -rf src/frontend/__pycache__
-	rm -rf src/frontend/*/__pycache__
 
 pyqt:
 	pyuic5 -o src/frontend/ui_main.py     src/frontend/ui/main.ui
@@ -80,8 +78,7 @@ install: all
 
 	# frontend
 	cp -R src/frontend $(DESTDIR)$(PREFIX)
-	rm -rf             $(DESTDIR)$(PREFIX)/frontend/__pycache__
-	rm -rf             $(DESTDIR)$(PREFIX)/frontend/*/__pycache__
+	find $(DESTDIR)$(PREFIX)/frontend -name "__pycache__" -print0 | xargs -0 rm -rf
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/ui
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/tests
 	rm                 $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee

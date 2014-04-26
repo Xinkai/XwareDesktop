@@ -71,8 +71,7 @@ install -D -m 664 src/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.
 
     if [ $1 -eq 2 ]; then
         # pre_upgrade
-        rm -rf /opt/xware_desktop/frontend/__pycache__
-        rm -rf /opt/xware_desktop/frontend/*/__pycache__
+        find /opt/xware_desktop/frontend -name "__pycache__" -print0 | xargs -0 rm -rf
     fi
 
 %post

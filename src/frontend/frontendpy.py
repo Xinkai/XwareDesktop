@@ -10,9 +10,16 @@ from PyQt5.QtGui import QKeyEvent, QDesktopServices
 import collections
 
 import constants
-from actions import FrontendActionsQueue
 
 FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logined", "online"])
+
+
+class FrontendAction(object):
+    def __repr__(self):
+        return "FrontendAction, should be subclassed."
+
+    def consume(self):
+        raise NotImplementedError()
 
 
 # Together with xwarejs.js, exchange information with the browser
@@ -26,7 +33,7 @@ class FrontendPy(QObject):
     sigNotifyPeerId = pyqtSignal(str)  # let xdjs knows peerid
     sigFrontendStatusChanged = pyqtSignal()  # caused by page heartbeat/changed status/refresh page
 
-    queue = None
+    _queue = None
     _isPageMaskOn = None
     _isPageOnline = None  # property wraps them, in order to fire sigFrontendStatusChanged
     _isPageLogined = None
@@ -34,13 +41,11 @@ class FrontendPy(QObject):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self._queue = collections.deque()
         app.settings.applySettings.connect(self.tryLogin)
-        self.queue = FrontendActionsQueue(self)
-        app.sigMainWinLoaded.connect(self.connectUI)
 
-    @pyqtSlot()
-    def connectUI(self):
-        app.mainWin.action_createTask.triggered.connect(self.queue.createTasksAction)
+        from Tasks import TaskCreationAgent
+        self.taskCreationAgent = TaskCreationAgent()  # just hold a reference
 
     @property
     def isPageMaskOn(self):
@@ -86,6 +91,13 @@ class FrontendPy(QObject):
         self.sigFrontendStatusChanged.emit()
         if self._isXdjsLoaded:
             self.consumeAction("xdjs loaded")
+
+    def queueAction(self, action):
+        self._queue.append(action)
+        self.consumeAction("action newly queued")
+
+    def dequeueAction(self):
+        return self._queue.popleft()
 
     @pyqtSlot()
     def tryLogin(self):
@@ -197,7 +209,7 @@ class FrontendPy(QObject):
             return
 
         try:
-            action = self.queue.dequeueAction()
+            action = self.dequeueAction()
         except IndexError:
             print("Nothing to consume")
             # no actions

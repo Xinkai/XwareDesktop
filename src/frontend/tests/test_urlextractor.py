@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-import mimeparser
+from Tasks import mimeparser
 
 testCases = """
 迅雷专链

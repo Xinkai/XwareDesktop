@@ -76,7 +76,7 @@ class XwareDesktop(QApplication):
 
         fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT, mode = 0o666)
 
-        import actions
+        from Tasks import CommandlineClient
         try:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
@@ -85,7 +85,7 @@ class XwareDesktop(QApplication):
                 sys.exit(-1)
             else:
                 print(tasks)
-                actions.FrontendCommunicationClient(tasks)
+                CommandlineClient(tasks)
                 sys.exit(0)
 
     @staticmethod
