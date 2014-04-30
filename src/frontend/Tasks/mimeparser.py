@@ -40,35 +40,35 @@ class UrlExtractor(QObject):
         self.updatePatternRegex(patternSet)
 
     def updatePatternRegex(self, patternSet):
-        patternStr = "|".join(patternSet)
+        patternStr = "|".join(patternSet).replace(".", "\.")
         print("updated clipboard pattern regex", patternStr)
 
         self._patterns = re.compile(
-            r"(?:"
+            r"(?:(?:(?:"
             # match all private links
             r"(?:qqdl|flashget|thunder)://(?:[A-Za-z0-9+/=]{4})+"
             r")|(?:"  # http, ftp, https
             r"(?:http|ftp|https)://"                            # scheme
-            r"(?:(?:[\w]+)(?:\:[\w]+)?@)?"                      # username, password
-            r"(?:[\w|.|\-]+)"                                   # host, also works for ip address
-            r"(?:\:[0-9]{1,5})?/"                               # port, slash
-            r"(?:[\w.%=\/&\-\,\(\)])+" +                        # path + filename
+            r"(?:(?:\w+)(?::\w+)?@)?"                           # username, password
+            r"(?:[\w|\.|\-])+"                                  # host, also works for ip address
+            r"(?::[0-9]{1,5})?/"                                # port, slash
+            r"(?:[\w\.%=/&-,()]+)" +                            # path + filename
             r"(?:{})".format(patternStr) +                      # extension
-            r"(?:(?:\?[\w.\-=%&,\/]*)|(?= |\r|\n|\t|))"
+            r"(?:\?(?:[\w\.\-\=\%\&\,\/])*)?"
             r")|(?:"
             # match all ed2k
             r"ed2k://"
             r"(?:\|file\|)"                                     # type -> file
-            r"(?:[\w|_|\-|.|%]+)\|"                             # filename
+            r"(?:[\w|_|\-|\.|%]+)\|"                            # filename
             r"(?:[0-9]+)\|"                                     # filesize
             r"(?:[a-f0-9]{32})\|"                               # hash
-            r"(?:(?:[\w|\/|.|\-|:|\,|=]+)|(?= |\r|\n|\t|))"     # additional
+            r"(?:[\w|\/|\.|\-|:|\,|=]+)"                        # additional
             r")|(?:"
-            r"magnet:\?[\w|\.|\=|\:|\&|\+|%|\-|\/]+"
-            r")", re.I)
+            r"magnet:\?[\w\.\=\:\&\+%\-\/]+"
+            r"))(?=[\s|#]))", re.I)
 
     def extract(self, text):
         # extract from a raw text, and return a list of supported links
         result = re.findall(self._patterns, text)
-        print("extracted urls", result)
+        print("extracted urls", "\n".join(result))
         return result
