@@ -83,7 +83,7 @@ shouldnt match this one
 http://hackage.haskell.org/package/base-4.7.0.0/docs/Control-Arrow.html
 
 END THIS TEST WITH A LITTLE DANCE:)
-"""
+http://no.newline.at.the.end/download.txt"""
 
 _ExpectedResult = """thunder://QUFodHRwOi8vaW0uYmFpZHUuY29tL2luc3RhbGwvQmFpZHVIaS5leGVaWg==
 http://www.163.com/robots.zip
@@ -105,7 +105,7 @@ magnet:?xt=urn:btih:d8621b178ec96d703fa28d83ad16b87904f8f4d4&dn=Arch+Linux+2013.
 magnet:?xt=urn:btih:ae5097941646d4fa76c9b83f0734d76787b9aaa0&dn=Suits.S03E14.720p.HDTV.x264-REMARKABLE%5Brartv%5D&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337
 magnet:?xt=urn:btih:757fc565c56462b28b4f9c86b21ac753500eb2a7&dn=archlinux-2014.04.01-dual.iso&tr=udp://tracker.archlinux.org:6969&tr=http://tracker.archlinux.org:6969/announce
 https://piratebaytorrents.info/a9758370/Rimworld_Alpha2_(Linux).9758370.TPB.torrent
-"""
+http://no.newline.at.the.end/download.txt"""
 
 
 class TestExtractUrls(unittest.TestCase):

@@ -65,7 +65,7 @@ class UrlExtractor(QObject):
             r"(?:[\w|\/|\.|\-|:|\,|=]+)"                        # additional
             r")|(?:"
             r"magnet:\?[\w\.\=\:\&\+%\-\/]+"
-            r"))(?=[\s|#]))", re.I)
+            r"))(?:(?=[\s|#])|(?:$)))", re.I)
 
     def extract(self, text):
         # extract from a raw text, and return a list of supported links
