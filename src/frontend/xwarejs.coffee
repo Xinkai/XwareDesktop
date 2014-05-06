@@ -252,6 +252,10 @@ class XwareJS
             Data.downloader.template.item = Data.downloader.template.item.replace(/\{\{shortName\}\}/g, "{{name}}")
 
 $ ->
+    window.onerror = (event, source, lineno, colno, error) ->
+        xdpy.onJsError(event, source, lineno, colno, error)
+        return false  # allow default handler
+
     if (not window.MutationObserver) and window.WebKitMutationObserver
         window.MutationObserver = window.WebKitMutationObserver
 

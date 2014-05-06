@@ -229,3 +229,8 @@ class FrontendPy(QObject):
 
     def getFrontendStatus(self):
         return FrontendStatus(self.isXdjsLoaded, self.isPageLogined, self.isPageOnline)
+
+    @pyqtSlot(str, str, int, int, str)
+    def onJsError(self, event, source, lineno, colno, error):
+        # handle unhandled JS exceptions in PY code
+        logging.error("JSError: {source}:l{lineno}:c{colno} {event}:{error}".format(**locals()))
