@@ -45,7 +45,7 @@ class FrontendPy(QObject):
         app.settings.applySettings.connect(self.tryLogin)
 
         from Tasks import TaskCreationAgent
-        self.taskCreationAgent = TaskCreationAgent()  # just hold a reference
+        self.taskCreationAgent = TaskCreationAgent(self)  # just hold a reference
 
     @property
     def isPageMaskOn(self):

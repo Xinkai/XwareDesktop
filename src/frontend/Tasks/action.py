@@ -57,7 +57,9 @@ class TaskCreationAgent(QObject):
 
     def __init__(self, parent = None):
         super().__init__(parent)
-
+        # hold a reference to the parent, aka frontendpy.
+        # when the program is launched, app.frontendpy would be None.
+        self._frontendpy = parent
         tasks = sys.argv[1:]
         if tasks:
             self.createTasksAction(tasks)
@@ -93,9 +95,9 @@ class TaskCreationAgent(QObject):
             tasks_localtorrent = []
 
         if tasks:
-            app.frontendpy.queueAction(CreateTasksAction(tasks))
+            self._frontendpy.queueAction(CreateTasksAction(tasks))
         for task_bt in tasks_localtorrent:  # because only 1 bt-task can be added once.
-            app.frontendpy.queueAction(CreateTasksAction([task_bt]))
+            self._frontendpy.queueAction(CreateTasksAction([task_bt]))
 
     @staticmethod
     def _filterInvalidTasks(tasks):
