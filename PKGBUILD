@@ -1,6 +1,6 @@
 # Maintainer: Xinkai <yeled.nova@gmail.com>
 pkgdesc="An attempt to bring Xware (Xunlei on routers) to desktop Linux."
-url="http://www.cuoan.net/xware-desktop"
+url="https://github.com/Xinkai/XwareDesktop/wiki"
 
 _commit=""
 _md5sums=""

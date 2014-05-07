@@ -24,7 +24,7 @@ post_install() {
 
     echo "欢迎使用Xware Desktop。"
     echo "设置方法和注意事项见项目主页。"
-    echo "项目主页 http://cuoan.net/xware-desktop"
+    echo "项目主页 https://github.com/Xinkai/XwareDesktop/wiki"
     echo "Github https://github.com/Xinkai/XwareDesktop"
 }
 

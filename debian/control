@@ -13,7 +13,7 @@ Build-Depends:
  chrpath,
  findutils
 Standards-Version: 3.9.5
-Homepage: http://cuoan.net/xware-desktop
+Homepage: https://github.com/Xinkai/XwareDesktop/wiki
 Vcs-Git: git://gibhub.com/Xinkai/XwareDesktop.git
 Vcs-Browser: https://github.com/Xinkai/XwareDesktop
 

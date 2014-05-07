@@ -12,7 +12,7 @@ Summary:            An attempt to bring Xware (Xunlei on routers) to desktop Lin
 
 Group:              Applications/Internet
 License:            GPLv3
-URL:                http://cuoan.net/xware-desktop
+URL:                https://github.com/Xinkai/XwareDesktop/wiki
 Source0:            https://github.com/Xinkai/XwareDesktop/archive/%{commit}/%{commit}.tar.gz
 
 BuildRequires:      python-qt5-devel
@@ -89,7 +89,7 @@ install -D -m 664 src/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.
 
     echo "欢迎使用Xware Desktop。"
     echo "设置方法和注意事项见项目主页。"
-    echo "项目主页 http://cuoan.net/xware-desktop"
+    echo "项目主页 https://github.com/Xinkai/XwareDesktop/wiki"
     echo "Github https://github.com/Xinkai/XwareDesktop"
 
 %preun
