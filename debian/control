@@ -9,7 +9,7 @@ Build-Depends:
  coffeescript,
  libmount-dev,
  pyqt5-dev-tools,
- debhelper (>= 9),
+ debhelper,
  chrpath,
  findutils
 Standards-Version: 3.9.5
