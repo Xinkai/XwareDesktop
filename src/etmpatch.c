@@ -18,11 +18,6 @@ const char* XWARE_MOUNTS_PATH = "/opt/xware_desktop/mounts";
 #define XD_SPRINTF \
         int (*sprintf) (char *__restrict __s, const char *__restrict __format, ...) = dlsym(RTLD_NEXT, "sprintf");
 
-int xdperror(const char* s) {
-    size_t size = strlen(s);
-    return write(2, s, size); // avoid using puts/printf, which come from stdio.h.
-}
-
 int fopen64(const char* path, const char* mode) {
     XD_PRINTF;
 
@@ -86,7 +81,7 @@ int fchmod(const int fd, mode_t mode) {
 
         if (tmp > PATH_MAX) {
             new_mode = mode;
-            xdperror("Xware Desktop: readlink size insufficient\n");
+            perror("Xware Desktop: readlink size insufficient");
             goto end;
         }
 
