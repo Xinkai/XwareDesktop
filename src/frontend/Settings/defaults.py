@@ -38,7 +38,6 @@ DEFAULT_SETTINGS = {
         "username": None,
         "password": None,
         "autologin": True,
-        "autostartlocation": os.path.expanduser("~/.config/autostart/xware-desktop.desktop"),
     },
     "frontend": {
         "enabledeveloperstools": False,

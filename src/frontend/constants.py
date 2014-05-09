@@ -19,6 +19,7 @@ FRONTEND_LOCK = "/tmp/xware_frontend.lock"
 FRONTEND_SOCKET = ("/tmp/xware_frontend.socket", "AF_UNIX")
 
 CONFIG_FILE = os.path.join(BASE_DIR, "settings.ini")
+FRONTEND_AUTOSTART_FILE = os.path.expanduser("~/.config/autostart/xware-desktop.desktop")
 
 MOUNTS_FILE = os.path.join(BASE_DIR, "mounts")
 MOUNTS_FILE_HEADER = \
