@@ -8,13 +8,9 @@ from PyQt5.QtCore import QObject, pyqtSignal
 import threading, time
 import requests, json
 import collections
-import pyinotify
 from requests.exceptions import ConnectionError
 from urllib.parse import unquote
 from datetime import datetime
-
-import constants
-from misc import debounce
 
 
 class LocalCtrlNotAvailableError(BaseException):
@@ -27,23 +23,12 @@ ActivationStatus = collections.namedtuple("ActivationStatus",
 
 class EtmPy(QObject):
     sigTasksSummaryUpdated = pyqtSignal([bool], [dict])
-    sigCfgChanged = pyqtSignal()
 
-    cfg = {}
     runningTasksStat = None
     completedTasksStat = None
 
     def __init__(self, parent):
         super().__init__(parent)
-
-        self.watchManager = pyinotify.WatchManager()
-        self.notifier = pyinotify.ThreadedNotifier(self.watchManager,
-                                                   self.dispatcher)
-        self.notifier.name = "etmpy inotifier"
-        self.notifier.daemon = True
-        self.notifier.start()
-        self.onEtmCfgChanged()
-        self.watchManager.add_watch(constants.ETM_CFG_DIR, pyinotify.ALL_EVENTS)
 
         # task stats
         self.runningTasksStat = RunningTaskStatistic(self)
@@ -52,29 +37,12 @@ class EtmPy(QObject):
                                   name = "tasks polling")
         self.t.start()
 
-    @debounce(0.5, instant_first=True)
-    def onEtmCfgChanged(self):
-        with open(constants.ETM_CFG_FILE, 'r') as file:
-            lines = file.readlines()
-
-        pairs = {}
-        for line in lines:
-            eq = line.index("=")
-            k = line[:eq]
-            v = line[(eq + 1):].strip()
-            pairs[k] = v
-        self.cfg = pairs
-
-    def dispatcher(self, event):
-        if event.maskname != "IN_CLOSE_WRITE":
-            return
-
-        if event.pathname == constants.ETM_CFG_FILE:
-            self.onEtmCfgChanged()
-
     @property
     def lcontrol(self):
-        return "http://127.0.0.1:{}/".format(self.getLcPort())
+        lcPort = app.xwaredpy.lcPort
+        if not lcPort:
+            raise LocalCtrlNotAvailableError()
+        return "http://127.0.0.1:{}/".format(lcPort)
 
     def getSettings(self):
         try:
@@ -146,27 +114,11 @@ class EtmPy(QObject):
             status = -1  # error
             code = None
 
-        userid = self.cfg.get("userid", 0)
-        try:
-            userid = int(userid)
-        except ValueError:
-            userid = 0  # unbound -> 0
+        userId = app.xwaredpy.userId
+        peerId = app.xwaredpy.peerId
 
-        peerid = self.getPeerId()
-
-        result = ActivationStatus(userid, status, code, peerid)
+        result = ActivationStatus(userId, status, code, peerId)
         return result
-
-    def getPeerId(self):
-        return self.cfg.get("rc.peerid", "")
-
-    def getLcPort(self):
-        lcport = self.cfg.get("local_control.listen_port", "")
-        try:
-            lcport = int(lcport)
-        except (ValueError, TypeError):
-            raise LocalCtrlNotAvailableError
-        return lcport
 
 
 class TaskStatistic(QObject):

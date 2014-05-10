@@ -7,8 +7,11 @@ import sys, os, time, fcntl, signal, threading
 from multiprocessing.connection import Listener
 sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 
+import pyinotify
+
 from shared import constants, BackendInfo
-from .settings import SettingsAccessorBase, XWARED_DEFAULTS_SETTINGS
+from shared.misc import debounce
+from settings import SettingsAccessorBase, XWARED_DEFAULTS_SETTINGS
 
 
 class XwaredCommunicationListener(threading.Thread):
@@ -31,6 +34,11 @@ class Xwared(object):
     fdLock = None
     toRunETM = None
 
+    # Cfg watchers
+    etmCfg = dict()
+    watchManager = None
+    cfgWatcher = None
+
     def __init__(self):
         super().__init__()
         # requirements checking
@@ -48,6 +56,39 @@ class Xwared(object):
         # ipc listener
         self.listener = XwaredCommunicationListener(self)
         self.listener.start()
+
+        # using pyinotify to monitor etm.cfg changes
+        self.setupCfgWatcher()
+
+    def setupCfgWatcher(self):
+        # etm.cfg watcher
+        self.watchManager = pyinotify.WatchManager()
+        self.cfgWatcher = pyinotify.ThreadedNotifier(self.watchManager,
+                                                     self.pyinotifyDispatcher)
+        self.cfgWatcher.name = "cfgWatcher inotifier"
+        self.cfgWatcher.daemon = True
+        self.cfgWatcher.start()
+        self.watchManager.add_watch(constants.ETM_CFG_DIR, pyinotify.ALL_EVENTS)
+
+    @debounce(0.5, instant_first=True)
+    def onEtmCfgChanged(self):
+        with open(constants.ETM_CFG_FILE, 'r') as file:
+            lines = file.readlines()
+
+        pairs = {}
+        for line in lines:
+            eq = line.index("=")
+            k = line[:eq]
+            v = line[(eq + 1):].strip()
+            pairs[k] = v
+        self.etmCfg = pairs
+
+    def pyinotifyDispatcher(self, event):
+        if event.maskname != "IN_CLOSE_WRITE":
+            return
+
+        if event.pathname == constants.ETM_CFG_FILE:
+            self.onEtmCfgChanged()
 
     @staticmethod
     def checkUser():
@@ -159,8 +200,10 @@ class Xwared(object):
         raise NotImplementedError()
 
     def interface_infoPoll(self):
-        return BackendInfo(EtmPid = self.etmPid,
-                           LcPort = 9000)  # TODO: implement this
+        return BackendInfo(etmPid = self.etmPid,
+                           lcPort = int(self.etmCfg.get("local_control.listen_port", 0)),
+                           userId = int(self.etmCfg.get("userid", 0)),
+                           peerId = self.etmCfg.get("rc.peerid", ""))
 
     @staticmethod
     def tryClose(fd):

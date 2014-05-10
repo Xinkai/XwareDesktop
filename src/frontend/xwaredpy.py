@@ -5,7 +5,7 @@ from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
-import threading, time, fcntl
+import threading, time
 import constants
 from shared import BackendInfo  # This needs to be imported so that it can be unpickled.
 
@@ -85,6 +85,9 @@ class XwaredPy(QObject):
 
     etmStatus = None
     xwaredStatus = None
+    userId = None
+    peerId = None
+    lcPort = None
 
     _t = None
 
@@ -124,10 +127,16 @@ class XwaredPy(QObject):
             try:
                 backendInfo = callXwaredInterface("infoPoll")
                 self.xwaredStatus = True
-                self.etmStatus = True if backendInfo.EtmPid else False
+                self.etmStatus = True if backendInfo.etmPid else False
+                self.lcPort = backendInfo.lcPort
+                self.userId = backendInfo.userId
+                self.peerId = backendInfo.peerId
             except SocketDoesntExist:
                 self.xwaredStatus = False
                 self.etmStatus = False
+                self.lcPort = 0
+                self.userId = 0
+                self.peerId = ""
 
             self.sigXwaredStatusPolled.emit(self.xwaredStatus)
             self.sigETMStatusPolled.emit()

@@ -3,4 +3,4 @@
 import logging
 
 from collections import namedtuple
-BackendInfo = namedtuple("BackendInfo", ["EtmPid", "LcPort", ])
+BackendInfo = namedtuple("BackendInfo", ["etmPid", "lcPort", "userId", "peerId"])
