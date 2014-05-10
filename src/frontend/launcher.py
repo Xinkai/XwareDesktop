@@ -17,6 +17,7 @@ if __name__ == "__main__":
     CrashAwareThreading.installCrashReport()
     CrashAwareThreading.installThreadExceptionHandler()
 
+sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 import constants
 __all__ = ['app']
 

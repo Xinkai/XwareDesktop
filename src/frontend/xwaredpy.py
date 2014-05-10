@@ -5,10 +5,77 @@ from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
-import threading, time
-import fcntl, socket
-
+import threading, time, fcntl
 import constants
+from shared import BackendInfo  # This needs to be imported so that it can be unpickled.
+
+from multiprocessing.connection import Client
+
+
+class _XwaredCommunicationClient(object):
+    funcName = None
+    args = tuple()
+    kwargs = dict()
+    sent = False
+    conn = None
+    response = None
+    received = False
+
+    def __init__(self):
+        self.conn = Client(*constants.XWARED_SOCKET)
+
+    def send(self):
+        if not self.funcName:
+            raise ValueError("no funcName")
+        self.conn.send([self.funcName, self.args, self.kwargs])
+        self.sent = True
+        self.response = self.conn.recv()
+        self.received = True
+        self.conn.close()
+
+    def setFunc(self, funcName):
+        if self.sent:
+            raise Exception("sent already.")
+        self.funcName = funcName
+
+    def setArgs(self, args):
+        if self.sent:
+            raise Exception("sent already.")
+        self.args = args
+
+    def setKwargs(self, kwargs):
+        if self.sent:
+            raise Exception("sent already.")
+        self.kwargs = kwargs
+
+    def getReturnValue(self):
+        if not self.sent:
+            raise Exception("not sent yet.")
+        if not self.received:
+            raise Exception("not received yet.")
+        return self.response
+
+
+class SocketDoesntExist(FileNotFoundError):
+    pass
+
+
+def callXwaredInterface(funcName, *args, **kwargs):
+    try:
+        client = _XwaredCommunicationClient()
+    except FileNotFoundError as e:
+        raise SocketDoesntExist(e)
+
+    client.setFunc(funcName)
+    if args:
+        client.setArgs(args)
+    if kwargs:
+        client.setKwargs(kwargs)
+    client.send()
+    result = client.getReturnValue()
+    logging.info("{funcName} -> {result}".format(**locals()))
+    del client
+    return result
 
 
 # an interface to watch, notify, and supervise the status of xwared and ETM
@@ -38,85 +105,42 @@ class XwaredPy(QObject):
         app.mainWin.action_ETMstop.triggered.connect(self.slotStopETM)
         app.mainWin.action_ETMrestart.triggered.connect(self.slotRestartETM)
 
-    def startXware(self):
-        if app.settings.getint("xwared", "startetmwhen") == 3:
-            self.slotStartETM()
-            app.settings.setbool("xwared", "startetm", True)
-            app.settings.save()
+    @staticmethod
+    def startXware():
+        try:
+            callXwaredInterface("start")  # TODO: when remote, disable this
+        except SocketDoesntExist:
+            pass
 
-    def stopXware(self):
-        if app.settings.getint("xwared", "startetmwhen") == 3:
-            self.slotStopETM()
-            app.settings.setbool("xwared", "startetm", True)
-            app.settings.save()
+    @staticmethod
+    def stopXware():
+        try:
+            callXwaredInterface("quit")  # TODO: when remote, disable this
+        except SocketDoesntExist:
+            pass
 
     def _watcherThread(self):
         while True:
             try:
-                xwaredLockFile = open(constants.XWARED_LOCK)
-                try:
-                    fcntl.flock(xwaredLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    self.xwaredStatus = False
-                    fcntl.flock(xwaredLockFile, fcntl.LOCK_UN)
-                except BlockingIOError:
-                    self.xwaredStatus = True
-                xwaredLockFile.close()
-            except FileNotFoundError:
+                backendInfo = callXwaredInterface("infoPoll")
+                self.xwaredStatus = True
+                self.etmStatus = True if backendInfo.EtmPid else False
+            except SocketDoesntExist:
                 self.xwaredStatus = False
-
-            self.sigXwaredStatusPolled.emit(self.xwaredStatus)
-
-            try:
-                etmLockFile = open(constants.ETM_LOCK)
-                try:
-                    fcntl.flock(etmLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
-                    self.etmStatus = False
-                    fcntl.flock(etmLockFile, fcntl.LOCK_UN)
-                except BlockingIOError:
-                    self.etmStatus = True
-                etmLockFile.close()
-            except FileNotFoundError:
                 self.etmStatus = False
 
+            self.sigXwaredStatusPolled.emit(self.xwaredStatus)
             self.sigETMStatusPolled.emit()
             time.sleep(1)
 
     @pyqtSlot()
     def slotStartETM(self):
-        sd = self.__prepareSocket()
-        if sd:
-            sd.sendall(b"ETM_START\0")
-            sd.close()
-        if app.settings.getint("xwared", "startetmwhen") == 2:
-            app.settings.setbool("xwared", "startetm", True)
-            app.settings.save()
+        callXwaredInterface("startETM")
 
     @pyqtSlot()
     def slotStopETM(self):
-        sd = self.__prepareSocket()
-        if sd:
-            sd.sendall(b"ETM_STOP\0")
-            sd.close()
-        if app.settings.getint("xwared", "startetmwhen") == 2:
-            app.settings.setbool("xwared", "startetm", False)
-            app.settings.save()
+        callXwaredInterface("stopETM")
 
     @pyqtSlot()
     def slotRestartETM(self):
-        sd = self.__prepareSocket()
-        if sd:
-            sd.sendall(b"ETM_RESTART\0")
-            sd.close()
-        if app.settings.getint("xwared", "startetmwhen") == 2:
-            app.settings.setbool("xwared", "startetm", True)
-            app.settings.save()
-
-    @staticmethod
-    def __prepareSocket():
-        sd = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM, 0)
-        try:
-            sd.connect(constants.XWARED_SOCKET)
-            return sd
-        except FileNotFoundError:
-            logging.error("XWARED_SOCKET doesn't exist, check if xwared is running.")
-            return None
+        callXwaredInterface("restartETM")
