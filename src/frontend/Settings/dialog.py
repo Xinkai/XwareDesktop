@@ -115,7 +115,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.table_mounts.clearContents()
 
         permissionCheckResult = self.permissionCheck()
-        permissionCheckFailed = ["无法获得检测权限。运行/opt/xware_desktop/permissioncheck查看原因。"]
+        permissionCheckFailed = ["无法获得检测权限。运行{}查看原因。".format(constants.PERMISSIONCHECK)]
 
         mountsMapping = app.mountsFaker.getMountsMapping()
         for i, mount in enumerate(app.mountsFaker.mounts):
@@ -237,7 +237,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
     @pyqtSlot()
     def setupETM(self):
         # fill values
-        self.lineEdit_lcport.setText(app.etmpy.cfg.get("local_control.listen_port", "不可用"))
+        lcPort = app.xwaredpy.lcPort
+        self.lineEdit_lcport.setText(str(lcPort) if lcPort else "不可用")
 
         etmSettings = app.etmpy.getSettings()
         if etmSettings:

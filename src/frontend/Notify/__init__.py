@@ -9,6 +9,7 @@ from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtMultimedia import QSound
 
 import os
+import constants
 
 _DBUS_NOTIFY_SERVICE = "org.freedesktop.Notifications"
 _DBUS_NOTIFY_PATH = "/org/freedesktop/Notifications"
@@ -67,7 +68,8 @@ class Notifier(QObject):
             "Notify",
             QDBusArgument("Xware Desktop", QMetaType.QString),  # app_name
             QDBusArgument(0, QMetaType.UInt),  # replace_id
-            QDBusArgument("/opt/xware_desktop/frontend/thunder.ico", QMetaType.QString),  # app_icon
+            # app_icon
+            QDBusArgument(os.path.join(constants.FRONTEND_DIR, "thunder.ico"), QMetaType.QString),
             QDBusArgument("下载完成", QMetaType.QString),  # summary
             QDBusArgument(task["name"], QMetaType.QString),  # body
             QDBusArgument(["open", "打开", "openDir", "打开文件夹"], QMetaType.QStringList),  # actions,
