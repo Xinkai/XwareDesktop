@@ -7,7 +7,6 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 import threading, time
 import constants
-from shared import BackendInfo  # This needs to be imported so that it can be unpickled.
 
 from multiprocessing.connection import Client
 
