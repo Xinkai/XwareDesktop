@@ -189,8 +189,13 @@ class Xwared(object):
             self.settings.setbool("xwared", "startetm", True)
             self.settings.save()
 
+    def interface_getStartEtmWhen(self):
+        return self.settings.getint("xwared", "startetmwhen")
+
     def interface_setStartEtmWhen(self, startetmwhen):
         self.settings.setint("xwared", "startetmwhen", startetmwhen)
+        if startetmwhen == 1:
+            self.settings.setbool("xwared", "startetm", True)
         self.settings.save()
 
     def interface_setMounts(self, mounts):
@@ -199,11 +204,16 @@ class Xwared(object):
     def interface_getMounts(self):
         raise NotImplementedError()
 
+    def interface_permissionCheck(self):
+
+
+
     def interface_infoPoll(self):
         return BackendInfo(etmPid = self.etmPid,
                            lcPort = int(self.etmCfg.get("local_control.listen_port", 0)),
                            userId = int(self.etmCfg.get("userid", 0)),
                            peerId = self.etmCfg.get("rc.peerid", ""))
+
 
     @staticmethod
     def tryClose(fd):

@@ -2,7 +2,7 @@
 
 XWARED_DEFAULTS_SETTINGS = {
     "xwared": {
-        "startetm": 1,
+        "startetm": True,
         "startetmwhen": 1,
     },
 }

@@ -54,10 +54,6 @@ DEFAULT_SETTINGS = {
         "mainwingeometry": None,
         "monitorwingeometry": None,
     },
-    "xwared": {
-        "startetm": True,
-        "startetmwhen": 1,
-    },
     "scheduler": {
         "poweroffcmd": "",
         "hybridsleepcmd": "",

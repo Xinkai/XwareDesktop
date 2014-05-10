@@ -3,12 +3,13 @@
 from launcher import app
 
 from PyQt5.QtCore import pyqtSlot, Qt
-from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog
+from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog, QMessageBox
 from PyQt5.QtGui import QBrush
 
 import os, re, subprocess
 
 import constants
+from xwaredpy import callXwaredInterface, SocketDoesntExist
 from etmpy import EtmSetting
 from .ui_settings import Ui_Dialog
 
@@ -50,8 +51,12 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen1, 1)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
-        self.btngrp_etmStartWhen.button(app.settings.getint("xwared", "startetmwhen")) \
-            .setChecked(True)
+
+        try:
+            startEtmWhen = callXwaredInterface("getStartEtmWhen")
+            self.btngrp_etmStartWhen.button(startEtmWhen).setChecked(True)
+        except SocketDoesntExist:
+            self.group_etmStartWhen.setEnabled(False)
 
         self.btn_addMount.clicked.connect(self.slotAddMount)
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)
@@ -216,12 +221,15 @@ class SettingsDialog(QDialog, Ui_Dialog):
                              self.checkBox_watchClipboard.isChecked())
         # app.settings.set("frontend", "watchpattern",
         #                         self.plaintext_watchPattern.toPlainText())
-        app.settings.setint("xwared", "startetmwhen",
-                            self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton()))
 
-        startETMWhen = app.settings.getint("xwared", "startetmwhen")
-        if startETMWhen == 1:
-            app.settings.setbool("xwared", "startetm", True)
+        if self.group_etmStartWhen.isEnabled():
+            startEtmWhen = self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton())
+            try:
+                callXwaredInterface("setStartEtmWhen", startEtmWhen)
+            except SocketDoesntExist:
+                QMessageBox.warning(None, "Xware Desktop",
+                                    "选项未能成功设置：{}。".format(self.group_etmStartWhen.title()),
+                                    QMessageBox.Ok, QMessageBox.Ok)
 
         app.settings.save()
 
