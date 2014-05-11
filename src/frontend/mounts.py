@@ -3,6 +3,8 @@
 from collections import OrderedDict
 import os
 import uuid
+import re
+import subprocess
 
 import constants
 
@@ -80,3 +82,37 @@ class MountsFaker(object):
         except FileNotFoundError:
             pass
         return mapping
+
+    @staticmethod
+    def permissionCheck():
+        ansiEscape = re.compile(r'\x1b[^m]*m')
+
+        with subprocess.Popen([constants.PERMISSIONCHECK],
+                              stdout = subprocess.PIPE,
+                              stderr = subprocess.PIPE) as proc:
+            output = proc.stdout.read().decode("utf-8")
+            output = ansiEscape.sub('', output)
+            lines = output.split("\n")
+
+        prevLine = None
+        currMount = None
+        result = {}
+        for line in lines:
+            if len(line.strip()) == 0:
+                continue
+
+            if all(map(lambda c: c == '=', line)):
+                if currMount:
+                    result[currMount] = result[currMount][:-1]
+
+                result[prevLine] = []
+                currMount = prevLine
+                continue
+
+            if currMount:
+                if line != "正常。":
+                    result[currMount].append(line)
+
+            prevLine = line
+
+        return result

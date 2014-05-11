@@ -205,15 +205,13 @@ class Xwared(object):
         raise NotImplementedError()
 
     def interface_permissionCheck(self):
-
-
+        raise NotImplementedError()
 
     def interface_infoPoll(self):
         return BackendInfo(etmPid = self.etmPid,
                            lcPort = int(self.etmCfg.get("local_control.listen_port", 0)),
                            userId = int(self.etmCfg.get("userid", 0)),
                            peerId = self.etmCfg.get("rc.peerid", ""))
-
 
     @staticmethod
     def tryClose(fd):

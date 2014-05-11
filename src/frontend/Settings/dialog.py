@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog, QMessageBox
 from PyQt5.QtGui import QBrush
 
-import os, re, subprocess
+import os
 
 import constants
 from xwaredpy import callXwaredInterface, SocketDoesntExist
@@ -72,40 +72,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
     def doesAutoStartFileExists():
         return os.path.lexists(constants.FRONTEND_AUTOSTART_FILE)
 
-    @staticmethod
-    def permissionCheck():
-        ansiEscape = re.compile(r'\x1b[^m]*m')
-
-        with subprocess.Popen([constants.PERMISSIONCHECK],
-                              stdout = subprocess.PIPE,
-                              stderr = subprocess.PIPE) as proc:
-            output = proc.stdout.read().decode("utf-8")
-            output = ansiEscape.sub('', output)
-            lines = output.split("\n")
-
-        prevLine = None
-        currMount = None
-        result = {}
-        for line in lines:
-            if len(line.strip()) == 0:
-                continue
-
-            if all(map(lambda c: c == '=', line)):
-                if currMount:
-                    result[currMount] = result[currMount][:-1]
-
-                result[prevLine] = []
-                currMount = prevLine
-                continue
-
-            if currMount:
-                if line != "正常。":
-                    result[currMount].append(line)
-
-            prevLine = line
-
-        return result
-
     @pyqtSlot(int)
     def slotWatchClipboardToggled(self, state):
         # disable pattern settings, before
@@ -119,7 +85,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.table_mounts.setRowCount(0)
         self.table_mounts.clearContents()
 
-        permissionCheckResult = self.permissionCheck()
+        permissionCheckResult = app.mountsFaker.permissionCheck()
         permissionCheckFailed = ["无法获得检测权限。运行{}查看原因。".format(constants.PERMISSIONCHECK)]
 
         mountsMapping = app.mountsFaker.getMountsMapping()
