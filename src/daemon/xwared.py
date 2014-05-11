@@ -42,7 +42,7 @@ class Xwared(object):
     def __init__(self):
         super().__init__()
         # requirements checking
-        # self.checkUserGroup()
+        self.checkUserGroup()
         self.ensureOneInstance()
         os.umask(0o006)
 
