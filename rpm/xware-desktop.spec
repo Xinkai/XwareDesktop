@@ -68,7 +68,7 @@ install -D -m 664 src/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.
 
     if [ $1 -eq 2 ]; then
         # pre_upgrade
-        find /opt/xware_desktop/frontend -name "__pycache__" -print0 | xargs -0 rm -rf
+        find /opt/xware_desktop -name "__pycache__" -print0 | xargs -0 rm -rf
     fi
 
 %post
@@ -101,6 +101,8 @@ install -D -m 664 src/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.
         userdel xware 2>/dev/null
         echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware_desktop内所有内容。"
         rm -rf /opt/xware_desktop/frontend
+        rm -rf /opt/xware_desktop/daemon
+        rm -rf /opt/xware_desktop/shared
     fi
 
 %changelog

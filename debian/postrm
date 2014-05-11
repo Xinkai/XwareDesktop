@@ -3,6 +3,8 @@
 if [ "$1" = "remove" ]; then
     userdel xware
     rm -rf /opt/xware_desktop/frontend
+    rm -rf /opt/xware_desktop/daemon
+    rm -rf /opt/xware_desktop/shared
 fi
 
 if [ "$1" = "purge" ]; then
