@@ -100,8 +100,10 @@ class Notifier(QObject):
             openPath = os.path.join(path, name)
         elif action == "openDir":
             openPath = path
+        elif action == "default":  # Unity's notify osd always have a default action.
+            return
         else:
-            raise Exception("Unknown action from slotActionInvoked.")
+            raise Exception("Unknown action from slotActionInvoked: {}.".format(action))
 
         nativeOpenPath = app.mountsFaker.convertToNativePath(openPath)
         qUrl = QUrl.fromLocalFile(nativeOpenPath)
