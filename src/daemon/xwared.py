@@ -5,7 +5,7 @@ import logging
 
 import sys, os, time, fcntl, signal, threading
 from multiprocessing.connection import Listener
-sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
 
 import pyinotify
 
