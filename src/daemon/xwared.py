@@ -72,16 +72,19 @@ class Xwared(object):
 
     @debounce(0.5, instant_first=True)
     def onEtmCfgChanged(self):
-        with open(constants.ETM_CFG_FILE, 'r') as file:
-            lines = file.readlines()
+        try:
+            with open(constants.ETM_CFG_FILE, 'r') as file:
+                lines = file.readlines()
 
-        pairs = {}
-        for line in lines:
-            eq = line.index("=")
-            k = line[:eq]
-            v = line[(eq + 1):].strip()
-            pairs[k] = v
-        self.etmCfg = pairs
+            pairs = {}
+            for line in lines:
+                eq = line.index("=")
+                k = line[:eq]
+                v = line[(eq + 1):].strip()
+                pairs[k] = v
+            self.etmCfg = pairs
+        except FileNotFoundError:
+            print("Xware Desktop: etm.cfg not present at the moment.")
 
     def pyinotifyDispatcher(self, event):
         if event.maskname != "IN_CLOSE_WRITE":

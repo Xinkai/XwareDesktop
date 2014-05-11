@@ -14,7 +14,7 @@ from Compat.CompatUrl import CompatUrl
 def forLocalDeviceOnly(func):
     def wrapper(SELF, request):
         # Looking for Pid in query string, try matching with locally bound peerid
-        localPeerId = app.etmpy.getPeerId()
+        localPeerId = app.xwaredpy.peerId
         if not localPeerId:
             return request
 

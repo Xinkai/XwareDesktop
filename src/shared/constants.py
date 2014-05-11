@@ -11,7 +11,7 @@ XWARED_SOCKET = (os.path.join(TMP_DIR, "xware_xwared.socket"), "AF_UNIX")
 XWARED_CONFIG_FILE = os.path.join(BASE_DIR, "xwared.ini")
 
 ETM_CFG_DIR = os.path.join(BASE_DIR, "xware/cfg")
-ETM_CFG_FILE = os.path.join(BASE_DIR, "xware/cfg/etm.cfg")
+ETM_CFG_FILE = os.path.join(ETM_CFG_DIR, "etm.cfg")
 ETM_PATCH_FILE = os.path.join(BASE_DIR, "etmpatch.so")
 ETM_COMMANDLINE = (os.path.join(BASE_DIR, "xware/lib/EmbedThunderManager"), "--verbose")
 
