@@ -55,7 +55,7 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
     def _redirectToLocal(request):
         qurl = request.url()
         qurl.setHost("127.0.0.1")
-        qurl.setPort(app.etmpy.getLcPort())
+        qurl.setPort(app.xwaredpy.lcPort)
         request.setUrl(qurl)
         return request
 
