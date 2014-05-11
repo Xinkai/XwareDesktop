@@ -20,7 +20,7 @@ class Notifier(QObject):
     _conn = None
     _interface = None
     _notifications = None  # a dict of notifyId: taskDict
-
+    _capabilities = None
     _completedTasksStat = None
 
     def __init__(self, parent):
@@ -36,12 +36,14 @@ class Notifier(QObject):
         self._completedTasksStat = app.etmpy.completedTasksStat
         self._completedTasksStat.sigTaskCompleted.connect(self.notifyTask)
 
-        successful = self._conn.connect(_DBUS_NOTIFY_SERVICE,
-                                        _DBUS_NOTIFY_PATH,
-                                        _DBUS_NOTIFY_INTERFACE,
-                                        "ActionInvoked", self.slotActionInvoked)
-        if not successful:
-            logging.error("ActionInvoked connect failed.")
+        self._capabilities = self._getCapabilities()
+        if "actions" in self._capabilities:
+            successful = self._conn.connect(_DBUS_NOTIFY_SERVICE,
+                                            _DBUS_NOTIFY_PATH,
+                                            _DBUS_NOTIFY_INTERFACE,
+                                            "ActionInvoked", self.slotActionInvoked)
+            if not successful:
+                logging.error("ActionInvoked connect failed.")
 
         self._qSound_complete = QSound(":/sound/download-complete.wav", self)
 
@@ -60,9 +62,25 @@ class Notifier(QObject):
             # TODO: Also notify if errors occur
             pass
 
+    def _getCapabilities(self):
+        # get libnotify server caps and remember it.
+        qdBusMsg = self._interface.call(
+            "GetCapabilities"
+        )
+        if qdBusMsg.errorName():
+            logging.error("cannot get org.freedesktop.Notifications.GetCapabilities")
+            return []
+        else:
+            return qdBusMsg.arguments()[0]
+
     def _dbus_notify(self, task):
         if not app.settings.getbool("frontend", "popnotifications"):
             return
+
+        if "actions" in self._capabilities:
+            actions = QDBusArgument(["open", "打开", "openDir", "打开文件夹"], QMetaType.QStringList)
+        else:
+            actions = QDBusArgument([], QMetaType.QStringList)
 
         qdBusMsg = self._interface.call(
             "Notify",
@@ -72,7 +90,7 @@ class Notifier(QObject):
             QDBusArgument(os.path.join(constants.FRONTEND_DIR, "thunder.ico"), QMetaType.QString),
             QDBusArgument("下载完成", QMetaType.QString),  # summary
             QDBusArgument(task["name"], QMetaType.QString),  # body
-            QDBusArgument(["open", "打开", "openDir", "打开文件夹"], QMetaType.QStringList),  # actions,
+            actions,
             {
                 "category": "transfer.complete",
             },  # hints
