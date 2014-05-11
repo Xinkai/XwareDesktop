@@ -18,8 +18,6 @@ Source0:            https://github.com/Xinkai/XwareDesktop/archive/%{commit}/%{c
 BuildRequires:      python-qt5-devel
 BuildRequires:      glibc-devel(x86-32)
 BuildRequires:      libgcc(x86-32)
-BuildRequires:      pkgconfig(x86-32)
-BuildRequires:      glib2-devel(x86-32)
 BuildRequires:      libmount-devel
 BuildRequires:      coffee-script
 BuildRequires:      chrpath >= 0.14
@@ -28,7 +26,6 @@ BuildRequires:      findutils
 Requires:           python3 >= 3.3
 Requires:           glibc(x86-32)
 Requires:           zlib(x86-32)
-Requires:           glib2(x86-32)
 Requires:           libmount
 Requires:           python3-qt5
 Requires:           qt5-qtwebkit

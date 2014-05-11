@@ -14,16 +14,16 @@ license=("GPL" "custom")
 
 makedepends=("python-pyqt5" "coffee-script" "chrpath" "findutils")
 if test "$CARCH" == x86_64; then
-    makedepends+=("lib32-glib2" "gcc-multilib")
+    makedepends+=("gcc-multilib")
 else
-    makedepends+=("glib2" "gcc")
+    makedepends+=("gcc")
 fi
 
 depends=("python-pyqt5" "qt5-webkit" "qt5-multimedia" "libcap" "python-requests" "python-pyinotify" "desktop-file-utils")
 if test "$CARCH" == x86_64; then
-    depends+=("lib32-glibc" "lib32-zlib" "lib32-glib2")
+    depends+=("lib32-glibc" "lib32-zlib")
 else
-    depends+=("glibc" "zlib" "glib2")
+    depends+=("glibc" "zlib")
 fi
 
 if [ ! -f .localdev ]; then
