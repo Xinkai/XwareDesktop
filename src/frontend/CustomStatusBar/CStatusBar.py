@@ -106,10 +106,10 @@ class CustomStatusBar(QStatusBar):
         frontendStatus = app.frontendpy.getFrontendStatus()
         if all(frontendStatus):
             self.frontendStatus.setText(
-                "<img src=':/image/check.png' width=14 height=14><font color='green'>前端</font>")
+                "<img src=':/image/check.png' width=14 height=14><font color='green'>Web前端</font>")
         else:
             self.frontendStatus.setText(
-                "<img src=':/image/attention.png' width=14 height=14><font color='red'>前端</font>")
+                "<img src=':/image/attention.png' width=14 height=14><font color='red'>Web前端</font>")
 
         tooltipTemplate = \
             "<div style='color:{}'>页面代码已插入</div>\n" \
