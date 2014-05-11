@@ -10,7 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), "../"))
 import pyinotify
 
 from shared import constants, BackendInfo
-from shared.misc import debounce
+from shared.misc import debounce, getGroupMembership
 from settings import SettingsAccessorBase, XWARED_DEFAULTS_SETTINGS
 
 
@@ -42,7 +42,7 @@ class Xwared(object):
     def __init__(self):
         super().__init__()
         # requirements checking
-        # self.checkUser()
+        # self.checkUserGroup()
         self.ensureOneInstance()
         os.umask(0o006)
 
@@ -91,23 +91,18 @@ class Xwared(object):
             self.onEtmCfgChanged()
 
     @staticmethod
-    def checkUser():
-        from pwd import getpwnam
-        try:
-            usrInfo = getpwnam("xware")
-        except KeyError:
-            print("未找到xware用户。请重新安装。", file = sys.stderr)
+    def checkUserGroup():
+        membership = getGroupMembership("xware")
+        if not membership.groupExists:
+            print("未在本机上找到xware用户组，需要重新安装。", file = sys.stderr)
             sys.exit(-1)
 
-        xware_uid = usrInfo.pw_uid
-        xware_gid = usrInfo.pw_gid
-
-        if not os.getuid() == os.geteuid() == xware_uid:
-            print("必须以xware用户运行。", file = sys.stderr)
+        if not membership.isIn:
+            print("当前用户不在xware用户组。", file = sys.stderr)
             sys.exit(-1)
 
-        if not os.getgid() == os.getegid() == xware_gid:
-            print("必须以xware组运行。", file = sys.stderr)
+        if not membership.isEffective:
+            print("当前进程没有应用xware用户组，请注销并重登入。", file = sys.stderr)
             sys.exit(-1)
 
     def ensureOneInstance(self):

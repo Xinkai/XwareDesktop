@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from threading import Timer
+import collections
+
+
+GroupMembership = collections.namedtuple("GroupMembership", ["groupExists", "isIn", "isEffective"])
 
 
 def debounce(wait, instant_first = True):
@@ -25,3 +29,25 @@ def debounce(wait, instant_first = True):
             debounced.t.start()
         return debounced
     return debouncer
+
+
+def getGroupMembership(grpName):
+    # return GroupMembership(bool, bool, bool)
+    # first -> is the group exists
+    # second -> is the user in the group
+    # third -> is the group membership 'effective'
+    import grp, getpass, os
+    try:
+        grpInfo = grp.getgrnam(grpName)
+    except KeyError:
+        return GroupMembership(False, False, False)
+
+    gid, members = grpInfo[2], grpInfo[3]
+    if getpass.getuser() not in members:
+        return GroupMembership(True, False, False)
+
+    effectiveGroups = os.getgroups()
+    if gid not in effectiveGroups:
+        return GroupMembership(True, True, False)
+
+    return GroupMembership(True, True, True)
