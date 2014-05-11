@@ -201,6 +201,17 @@ void prepare() {
     xware_gid = usrInfo->pw_gid;
 }
 
+int getExePath(char* result) {
+    ssize_t tmp = readlink("/proc/self/exe", result, PATH_MAX);
+    if (tmp < 0) {
+        perror("readlink");
+        return 0;
+    } else if (tmp > PATH_MAX) {
+        fprintf(stderr, "readlink size insufficient\n");
+        return 0;
+    }
+    return 1;
+}
 
 int main(const int argc, const char* argv[]) {
     if (argc == 2) {
@@ -213,7 +224,17 @@ int main(const int argc, const char* argv[]) {
     clearSupplementaryGroups();
     selfCheck();
 
-    struct libmnt_table* mt = mnt_new_table_from_file("/opt/xware_desktop/mounts");
+    char mountsPath[PATH_MAX];
+    if (!getExePath(mountsPath)) {
+        exit(EXIT_FAILURE);
+    }
+
+    strncat(dirname(mountsPath), "/mounts", PATH_MAX - strlen("/mounts") - 1);
+    if (verbose_mode) {
+        printf("# [DEBUG] Loading fake mounts file: %s\n", mountsPath);
+    }
+
+    struct libmnt_table* mt = mnt_new_table_from_file(mountsPath);
     if (mt == NULL) {
         fprintf(stderr, "mnt_new_table_from_file failed.\n");
         exit(EXIT_FAILURE);
