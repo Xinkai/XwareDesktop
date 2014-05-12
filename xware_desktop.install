@@ -14,9 +14,9 @@ post_install() {
     systemctl daemon-reload
     update-desktop-database -q
 
-    touch     /opt/xware_desktop/{settings.ini,mounts}
+    touch     /opt/xware_desktop/{settings.ini,mounts,xwared.ini}
     touch     /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
-    chmod 664 /opt/xware_desktop/{settings.ini,mounts}
+    chmod 664 /opt/xware_desktop/{settings.ini,mounts,xwared.ini}
     chmod 664 /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
     python3   -O -m compileall -q /opt/xware_desktop/frontend
     chown -R xware:xware /opt/xware_desktop
