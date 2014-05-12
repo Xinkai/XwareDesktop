@@ -80,7 +80,7 @@ install: all
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/ui
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/tests
 	rm                 $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
-	rm                 $(DESTDIR)$(PREFIX)/frontend/xware_desktop.desktop
+	rm                 $(DESTDIR)$(PREFIX)/frontend/xware-desktop.desktop
 	find $(DESTDIR)$(PREFIX)/frontend -type f -print0 | xargs -0 chmod 664
 	find $(DESTDIR)$(PREFIX)/frontend -type d -print0 | xargs -0 chmod 775
 
@@ -89,9 +89,13 @@ install: all
 	chmod 775          $(DESTDIR)$(PREFIX)/frontend/CrashReport/CrashReportApp.py
 	chmod 775          $(DESTDIR)$(PREFIX)/daemon/xwared.py
 
+	# icons
+	install -d $(DESTDIR)/usr/share/icons/hicolor
+	cp -R xware/icons/* $(DESTDIR)/usr/share/icons/hicolor
+
 	# other
 	install    -m 644 src/frontend/ui/rc/thunder.ico      $(DESTDIR)$(PREFIX)/frontend/thunder.ico
-	install -D -m 644 src/frontend/xware_desktop.desktop  $(DESTDIR)/usr/share/applications/xware_desktop.desktop
+	install -D -m 644 src/frontend/xware-desktop.desktop  $(DESTDIR)/usr/share/applications/xware-desktop.desktop
 	install -d $(DESTDIR)/usr/bin
 	ln -s $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop
 	ln -s $(PREFIX)/daemon/xwared.py $(DESTDIR)$(PREFIX)/xwared

@@ -8,7 +8,7 @@ Exec=/usr/bin/xware-desktop %U
 StartupNotify=false
 Categories=Network;
 Terminal=false
-Icon=/opt/xware_desktop/frontend/thunder.ico
+Icon=xware-desktop
 MimeType=application/x-bittorrent;x-scheme-handler/magnet;x-scheme-handler/ed2k;x-scheme-handler/thunder;x-scheme-handler/qqdl;x-scheme-handler/flashget
 #Actions=Gallery;Create;
 

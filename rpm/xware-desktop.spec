@@ -50,7 +50,8 @@ install -D -m 664 src/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.
 %files
 %doc
 /opt/xware_desktop
-/usr/share/applications/xware_desktop.desktop
+/usr/share/applications/xware-desktop.desktop
+/usr/share/icons/hicolor
 /usr/lib/systemd/system/xwared.service
 /usr/bin/xware-desktop
 

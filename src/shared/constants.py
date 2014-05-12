@@ -30,6 +30,6 @@ ETM_MOUNTS_DIR = "/tmp/thunder/volumes/"  # the last slash is needed
 
 PERMISSIONCHECK = os.path.join(BASE_DIR, "permissioncheck")
 
-DESKTOP_FILE_LOCATION = "/usr/share/applications/xware_desktop.desktop"
+DESKTOP_FILE_LOCATION = "/usr/share/applications/xware-desktop.desktop"
 
 
