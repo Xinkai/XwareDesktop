@@ -2,9 +2,7 @@
 import os
 
 BASE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
-# BASE_DIR = "/opt/xware_desktop"
 TMP_DIR = "/tmp"
-
 
 XWARED_LOCK = os.path.join(TMP_DIR, "xware_xwared.lock")
 XWARED_SOCKET = (os.path.join(TMP_DIR, "xware_xwared.socket"), "AF_UNIX")
