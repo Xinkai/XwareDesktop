@@ -7,7 +7,7 @@ install       = install -m 664
 GITHASH       = "`git rev-parse master 2>/dev/null`"
 SHELL         = /bin/bash
 
-all: etmpatch.so permissioncheck pyqt xwarejs.js prepareXware
+all: etmpatch.so permissioncheck pyqt xwarejs.js prepareXware replacePath
 
 etmpatch.so: src/etmpatch.c
 	mkdir -p build
@@ -53,6 +53,11 @@ prepareXware:
 	chrpath --delete preparedXware/EmbedThunderManager
 	chrpath --delete preparedXware/portal
 	chrpath --delete preparedXware/vod_httpserver
+
+replacePath:
+	mkdir -p build
+	cat src/xwared.service.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.service
+	cat src/xwared.conf.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.conf
 
 install: all
 	install -d -m 775                               $(DESTDIR)$(PREFIX)

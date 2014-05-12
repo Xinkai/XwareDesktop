@@ -45,7 +45,7 @@ An attempt to bring Xware (Xunlei on routers) to desktop Linux.
 
 %install
 make DESTDIR=%{buildroot} install
-install -D -m 664 src/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.service
+install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.service
 
 %files
 %doc
