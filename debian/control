@@ -10,6 +10,7 @@ Build-Depends:
  pyqt5-dev-tools,
  debhelper,
  chrpath,
+ sed,
  findutils
 Standards-Version: 3.9.5
 Homepage: https://github.com/Xinkai/XwareDesktop/wiki

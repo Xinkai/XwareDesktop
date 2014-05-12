@@ -22,6 +22,7 @@ BuildRequires:      libmount-devel
 BuildRequires:      coffee-script
 BuildRequires:      chrpath >= 0.14
 BuildRequires:      findutils
+BuildRequires:      sed
 
 Requires:           python3 >= 3.3
 Requires:           glibc(x86-32)
