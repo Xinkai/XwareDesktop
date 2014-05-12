@@ -5,18 +5,51 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <limits.h>
+#include <libgen.h>
 
 const char* PROC_MOUNTS = "/proc/mounts";
-const char* XWARE_MOUNTS_PATH = "/opt/xware_desktop/mounts";
+char XWARE_MOUNTS_PATH[PATH_MAX];
+int XWARE_MOUNTS_PATH_INITIALIZED = 0;
+
+#define fd_stderr 2
 
 #define XD_PRINTF \
         int (*printf) (const char *__restrict __format, ...) = dlsym(RTLD_NEXT, "printf");
+
+#define XD_DPRINTF \
+        int (*dprintf) (int __fd, const char *__restrict __fmt, ...) __attribute__ ((__format__ (__printf__, 2, 3))) = dlsym(RTLD_NEXT, "dprintf");
 
 #define XD_PERROR \
         void (*perror) (const char *__s) = dlsym(RTLD_NEXT, "perror");
 
 #define XD_SPRINTF \
         int (*sprintf) (char *__restrict __s, const char *__restrict __format, ...) = dlsym(RTLD_NEXT, "sprintf");
+
+int __getExePath(char* result) {
+    XD_PERROR;
+    XD_DPRINTF;
+
+    ssize_t tmp = readlink("/proc/self/exe", result, PATH_MAX);
+    if (tmp < 0) {
+        perror("readlink");
+        return 0;
+    } else if (tmp > PATH_MAX) {
+        dprintf(fd_stderr, "readlink size insufficient\n");
+        return 0;
+    }
+    return 1;
+}
+
+void __init_Xware_mounts_path() {
+    XD_DPRINTF;
+
+    if (!__getExePath(XWARE_MOUNTS_PATH)) {
+        dprintf(fd_stderr, "failed to getExePath\n.");
+    }
+    strcat(dirname(dirname(dirname(XWARE_MOUNTS_PATH))), // ETM runs in BASE_DIR/xware/lib, fake mounts is ../../mounts
+           "/mounts");
+    XWARE_MOUNTS_PATH_INITIALIZED = 1;
+}
 
 int fopen64(const char* path, const char* mode) {
     XD_PRINTF;
@@ -28,6 +61,11 @@ int fopen64(const char* path, const char* mode) {
     if (strcmp(PROC_MOUNTS, path) == 0) {
         // feed xware a fake instead of the real /proc/mounts
         printf("\nXware Desktop: FOPEN64 on /proc/mounts");
+        if (!XWARE_MOUNTS_PATH_INITIALIZED) {
+            printf("\nXware Desktop: FAKE MOUNTS INIT...");
+            __init_Xware_mounts_path();
+            printf("set to %s", XWARE_MOUNTS_PATH);
+        }
         result = new_fopen64(XWARE_MOUNTS_PATH, mode);
     } else {
         // pass on this API call
