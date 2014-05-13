@@ -52,7 +52,7 @@ class UrlExtractor(QObject):
             r"(?:(?:\w+)(?::\w+)?@)?"                           # username, password
             r"(?:[\w|\.|\-])+"                                  # host, also works for ip address
             r"(?::[0-9]{1,5})?/"                                # port, slash
-            r"(?:[\w\.%=/&-,()]+)" +                            # path + filename
+            r"(?:[\w\.%=/&\-,()]+)" +                           # path + filename
             r"(?:{})".format(patternStr) +                      # extension
             r"(?:\?(?:[\w\.\-\=\%\&\,\/])*)?"
             r")|(?:"

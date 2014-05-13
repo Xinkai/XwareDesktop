@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import sys, os
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../"))
+
 import unittest
 from Tasks import mimeparser
 
@@ -9,6 +12,9 @@ thunder://QUFodHRwOi8vaW0uYmFpZHUuY29tL2luc3RhbGwvQmFpZHVIaS5leGVaWg==
 
 一般的文件
 http://www.163.com/robots.zip
+
+包含dash
+ftp://dashingdash.com/1-2.txt
 
 包含用户名
 http://username@www.263.com/robots.cab
@@ -87,6 +93,7 @@ http://no.newline.at.the.end/download.txt"""
 
 _ExpectedResult = """thunder://QUFodHRwOi8vaW0uYmFpZHUuY29tL2luc3RhbGwvQmFpZHVIaS5leGVaWg==
 http://www.163.com/robots.zip
+ftp://dashingdash.com/1-2.txt
 http://username@www.263.com/robots.cab
 http://un:pass@www.444.com:1353/robots.txt
 http://www.555.com/player.exe?ab=3
