@@ -182,7 +182,7 @@ class Xwared(object):
 
     def interface_start(self):
         if self.settings.getint("xwared", "startetmwhen") == 3:
-            self.runETM()
+            self.interface_startETM()
             self.settings.setbool("xwared", "startetm", True)
             self.settings.save()
 
