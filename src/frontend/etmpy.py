@@ -7,6 +7,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 import threading, time
 import requests, json
+from json.decoder import scanner, scanstring
 import collections
 from requests.exceptions import ConnectionError
 from urllib.parse import unquote
@@ -19,6 +20,23 @@ class LocalCtrlNotAvailableError(BaseException):
 EtmSetting = collections.namedtuple("EtmSetting", ["dLimit", "uLimit", "maxRunningTasksNum"])
 ActivationStatus = collections.namedtuple("ActivationStatus",
                                           ["userid", "status", "code", "peerid"])
+
+
+class _TaskPollingJsonDecoder(json.JSONDecoder):
+    # This class automatically unquotes URL-quoted characters like %20
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.parse_string = self.unquote_parse_string
+        # "rebuild" scan_once
+        # scanner.c_make_scanner doesn't seem to support custom parse_string.
+        self.scan_once = scanner.py_make_scanner(self)
+
+    @staticmethod
+    def unquote_parse_string(*args, **kwargs):
+        result = scanstring(*args, **kwargs)  # => (str, end_index)
+        unquotedResult = (unquote(result[0]), result[1])
+        return unquotedResult
 
 
 class EtmPy(QObject):
@@ -83,8 +101,7 @@ class EtmPy(QObject):
             req = requests.get(self.lcontrol +
                                "list?v=2&type={}&pos=0&number=99999&needUrl=1".format(kind))
             res = req.content.decode("utf-8")
-            res = unquote(res)
-            result = json.loads(res)
+            result = json.loads(res, cls = _TaskPollingJsonDecoder)
         except (ConnectionError, LocalCtrlNotAvailableError):
             result = None
         return result
