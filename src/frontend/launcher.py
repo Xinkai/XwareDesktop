@@ -1,23 +1,29 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import faulthandler
-faulthandler.enable()
+if __name__ == "__main__":
+    import faulthandler, os, logging
+    try:
+        os.mkdir(os.path.expanduser("~/.xware-desktop"))
+    except OSError:
+        pass  # already exists
 
-import logging
+    logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))
+
+    faultLogFd = open(os.path.expanduser('~/.xware-desktop/frontend.fault.log'), 'a')
+    faulthandler.enable(faultLogFd)
+
+    from CrashReport import CrashAwareThreading
+    CrashAwareThreading.installCrashReport()
+    CrashAwareThreading.installThreadExceptionHandler()
 
 from __init__ import __version__
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
 import fcntl, os, sys
-
-if __name__ == "__main__":
-    from CrashReport import CrashAwareThreading
-    CrashAwareThreading.installCrashReport()
-    CrashAwareThreading.installThreadExceptionHandler()
-
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
+
 import constants
 __all__ = ['app']
 
@@ -130,12 +136,6 @@ class XwareDesktop(QApplication):
 
 app = None
 if __name__ == "__main__":
-    try:
-        os.mkdir(os.path.expanduser("~/.xware-desktop"))
-    except OSError:
-        pass  # already exists
-    logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))
-
     app = XwareDesktop(sys.argv)
     sys.exit(app.exec())
 else:
