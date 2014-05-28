@@ -63,7 +63,11 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
                 time.sleep(self.TICK_INTERVAL)
                 if self._thread_should_stop:
                     return  # end the thread
-                self.sigTaskUpdating.emit(dict())
+                try:
+                    self.sigTaskUpdating.emit(dict())
+                except TypeError:
+                    # monitor closed
+                    return  # end the thread
 
     @pyqtSlot()
     def _setMonitorFullSpeed(self):
