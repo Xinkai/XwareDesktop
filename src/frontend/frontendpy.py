@@ -101,7 +101,7 @@ class FrontendPy(QObject):
 
     @pyqtSlot()
     def tryLogin(self):
-        if app.mainWin.page.urlMatch(constants.LOGIN_PAGE):
+        if app.mainWin.page.urlMatchIn(constants.LOGIN_PAGE):
             autologin = app.settings.getbool("account", "autologin")
             if autologin:
                 username = app.settings.get("account", "username")
@@ -110,7 +110,7 @@ class FrontendPy(QObject):
                     self.sigLogin.emit(username, password)
 
     def tryActivate(self, payload):
-        if not app.mainWin.page.urlMatch(constants.V3_PAGE):
+        if not app.mainWin.page.urlMatchIn(constants.V3_PAGE):
             return  # not v3 page
 
         if not payload["userid"]:

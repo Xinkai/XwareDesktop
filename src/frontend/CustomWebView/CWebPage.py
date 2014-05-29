@@ -55,9 +55,6 @@ class CustomWebPage(QWebPage):
         self._overrideFile = url
         print("set local torrent {}.".format(url))
 
-    def urlMatch(self, against):
-        return parse.urldefrag(self.frame.url().toString())[0] == against
-
     def urlMatchIn(self, *againsts):
         return parse.urldefrag(self.frame.url().toString())[0] in againsts
     # Local Torrent File Chooser Support Ends Here
@@ -77,7 +74,7 @@ class CustomWebPage(QWebPage):
 
     @pyqtSlot()
     def slotUrlChanged(self):
-        if self.urlMatch(constants.V2_PAGE):
+        if self.urlMatchIn(constants.V2_PAGE):
             logging.info("webView: redirect to V3.")
             self.triggerAction(QWebPage.Stop)
             self.frame.load(QUrl(constants.V3_PAGE))
