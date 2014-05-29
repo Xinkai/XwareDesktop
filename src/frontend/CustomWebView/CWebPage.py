@@ -83,8 +83,11 @@ class CustomWebPage(QWebPage):
         else:
             logging.error("Unable to handle {}".format(self.url().toString()))
 
-    @pyqtSlot()
-    def injectXwareDesktop(self):
+    @pyqtSlot(bool)
+    def injectXwareDesktop(self, ok):
+        if not ok:  # terminated prematurely
+            return
+
         # inject xdpy object
         self.frame.addToJavaScriptWindowObject("xdpy", app.frontendpy)
 
