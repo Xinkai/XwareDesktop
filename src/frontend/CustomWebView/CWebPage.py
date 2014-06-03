@@ -3,7 +3,7 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import QUrl, pyqtSlot
+from PyQt5.QtCore import QUrl, pyqtSlot, Qt
 from PyQt5.QtWebKitWidgets import QWebPage
 
 from urllib import parse
@@ -23,7 +23,7 @@ class CustomWebPage(QWebPage):
         self.applyCustomStyleSheet()
 
         self.frame.loadStarted.connect(self.slotFrameLoadStarted)
-        self.frame.urlChanged.connect(self.slotUrlChanged)
+        self.frame.urlChanged.connect(self.slotUrlChanged, Qt.QueuedConnection)
         self.frame.loadFinished.connect(self.injectXwareDesktop)
         app.sigMainWinLoaded.connect(self.connectUI)
 
