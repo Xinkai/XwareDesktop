@@ -3,12 +3,13 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QPoint
 
 import threading, time
 
 from ui_monitor import MonitorWidget, Ui_Form
 from PersistentGeometry import PersistentGeometry
+from contextmenu import ContextMenu
 
 
 class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
@@ -20,6 +21,8 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
 
     TICKS_PER_TASK = 4
     TICK_INTERVAL = 0.5  # second(s)
+
+    _contextMenu = None
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -36,6 +39,10 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
                                         daemon = True)
         self._thread.start()
         self.preserveGeometry("monitor")
+
+        self._contextMenu = ContextMenu(None)
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.showContextMenu)
 
     def updateTaskThread(self):
         while True:
@@ -78,3 +85,7 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
     def closeEvent(self, qCloseEvent):
         self._thread_should_stop = True
         super().closeEvent(qCloseEvent)
+
+    @pyqtSlot(QPoint)
+    def showContextMenu(self, qPoint):
+        self._contextMenu.exec(self.mapToGlobal(qPoint))
