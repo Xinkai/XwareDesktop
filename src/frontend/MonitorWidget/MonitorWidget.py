@@ -20,8 +20,9 @@ class MonitorWidget(QWidget, TeardownHelper):
                             Qt.WindowStaysOnTopHint)
 
     def mousePressEvent(self, qMouseEvent):
-        self._isBeingDragged = True
-        self._dragOffset = qMouseEvent.pos()
+        if qMouseEvent.button() == Qt.LeftButton:
+            self._isBeingDragged = True
+            self._dragOffset = qMouseEvent.pos()
 
     def mouseMoveEvent(self, qMouseEvent):
         if self._isBeingDragged:
