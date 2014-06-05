@@ -42,7 +42,6 @@ class Xwared(object):
     def __init__(self):
         super().__init__()
         # requirements checking
-        self.checkUserGroup()
         self.ensureOneInstance()
         os.umask(0o006)
 
@@ -92,26 +91,6 @@ class Xwared(object):
 
         if event.pathname == constants.ETM_CFG_FILE:
             self.onEtmCfgChanged()
-
-    @staticmethod
-    def checkUserGroup():
-        from pwd import getpwnam
-        try:
-            usrInfo = getpwnam("xware")
-        except KeyError:
-            print("未找到xware用户。请重新安装。", file = sys.stderr)
-            sys.exit(-1)
-
-        xware_uid = usrInfo.pw_uid
-        xware_gid = usrInfo.pw_gid
-
-        if not os.getuid() == os.geteuid() == xware_uid:
-            print("必须以xware用户运行。", file = sys.stderr)
-            sys.exit(-1)
-
-        if not os.getgid() == os.getegid() == xware_gid:
-            print("必须以xware组运行。", file = sys.stderr)
-            sys.exit(-1)
 
     def ensureOneInstance(self):
         # If one instance is already running, shout so and then exit the program

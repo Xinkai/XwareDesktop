@@ -18,7 +18,7 @@ if __name__ == "__main__":
     CrashAwareThreading.installThreadExceptionHandler()
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QMessageBox
+from PyQt5.QtWidgets import QApplication
 
 import fcntl, os, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
@@ -50,8 +50,6 @@ class XwareDesktop(QApplication):
         logging.info("XWARE DESKTOP STARTS")
         self.setApplicationName("XwareDesktop")
         self.setApplicationVersion(__version__)
-
-        self.checkUsergroup()
 
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         self.checkOneInstance()
@@ -95,25 +93,6 @@ class XwareDesktop(QApplication):
                 print(tasks)
                 CommandlineClient(tasks)
                 sys.exit(0)
-
-    @staticmethod
-    def checkUsergroup():
-        from misc import getGroupMembership
-        membership = getGroupMembership("xware")
-        if not membership.groupExists:
-            QMessageBox.warning(None, "Xware Desktop 警告", "未在本机上找到xware用户组，需要重新安装。",
-                                QMessageBox.Ok, QMessageBox.Ok)
-            sys.exit(-1)
-
-        if not membership.isIn:
-            QMessageBox.warning(None, "Xware Desktop 警告", "当前用户不在xware用户组。",
-                                QMessageBox.Ok, QMessageBox.Ok)
-            sys.exit(-1)
-
-        if not membership.isEffective:
-            QMessageBox.warning(None, "Xware Desktop 警告", "当前进程没有应用xware用户组，请注销并重登入。",
-                                QMessageBox.Ok, QMessageBox.Ok)
-            sys.exit(-1)
 
     @pyqtSlot()
     def slotCreateCloseMonitorWindow(self):
