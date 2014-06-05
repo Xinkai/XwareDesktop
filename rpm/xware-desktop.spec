@@ -59,13 +59,6 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
 %pre
     if [ $1 -eq 1 ]; then
         # pre_install
-        getent group xware >/dev/null 2>&1
-        RET=$?
-        if [ $RET -eq 0 ]; then
-            useradd --no-create-home --gid xware --shell /bin/false --system xware
-        else
-            useradd --no-create-home --user-group --shell /bin/false --system xware
-        fi    
     fi
 
     if [ $1 -eq 2 ]; then
@@ -83,8 +76,6 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
     chmod 664 /opt/xware_desktop/{settings.ini,mounts,xwared.ini}
     chmod 664 /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
     python3   -O -m compileall -q /opt/xware_desktop/frontend
-    chown -R xware:xware /opt/xware_desktop
-    setcap "CAP_SETUID=+ep CAP_SETGID=+ep" /opt/xware_desktop/permissioncheck
 
     echo "欢迎使用Xware Desktop。"
     echo "设置方法和注意事项见项目主页。"
@@ -100,7 +91,6 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
 %postun
     if [ $1 -eq 0 ]; then
         # uninstall
-        userdel xware 2>/dev/null
         echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware_desktop内所有内容。"
         rm -rf /opt/xware_desktop/frontend
         rm -rf /opt/xware_desktop/daemon

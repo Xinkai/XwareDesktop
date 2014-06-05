@@ -7,8 +7,6 @@ start on (local-filesystems and net-device-up IFACE!=lo)
 stop on runlevel [016]
 
 chdir ##PREFIX##/
-setuid xware
-setgid xware
 
 pre-start script
     rm -rf /tmp/thunder
