@@ -3,9 +3,9 @@
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 
-from __init__ import __version__, XWARE_VERSION
+from shared import __version__, XWARE_VERSION
 try:
-    from __init__ import __githash__
+    from shared import __githash__
 except ImportError:
     __githash__ = None
 from ui_about import Ui_dlg_about

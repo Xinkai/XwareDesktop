@@ -105,4 +105,4 @@ install: all
 	ln -s $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop
 	ln -s $(PREFIX)/daemon/xwared.py $(DESTDIR)$(PREFIX)/xwared
 
-	echo -e "\n__githash__ = \"$(GITHASH)\"\n" >> $(DESTDIR)$(PREFIX)/frontend/__init__.py
+	echo -e "\n__githash__ = \"$(GITHASH)\"\n" >> $(DESTDIR)$(PREFIX)/shared/__init__.py

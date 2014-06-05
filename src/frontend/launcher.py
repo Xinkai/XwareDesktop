@@ -17,12 +17,13 @@ if __name__ == "__main__":
     CrashAwareThreading.installCrashReport()
     CrashAwareThreading.installThreadExceptionHandler()
 
-from __init__ import __version__
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication, QMessageBox
 
 import fcntl, os, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
+
+from shared import __version__
 
 import constants
 __all__ = ['app']

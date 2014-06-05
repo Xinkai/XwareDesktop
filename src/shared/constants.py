@@ -2,6 +2,7 @@
 import os
 
 BASE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), "../"))
+PROFILE_DIR = os.path.expanduser("~/.xware-desktop/profile")
 TMP_DIR = "/tmp"
 
 XWARED_LOCK = os.path.join(TMP_DIR, "xware_xwared.lock")
