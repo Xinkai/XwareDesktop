@@ -1,6 +1,6 @@
 CC            = gcc
 FLAGS         = -Wall -O3
-PREFIX        = /opt/xware_desktop
+PREFIX        = /opt/xware-desktop
 install_xware = install -m 764
 install_exe   = install -m 775
 install       = install -m 664

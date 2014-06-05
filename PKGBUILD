@@ -7,9 +7,9 @@ _md5sums=""
 pkgver=""
 pkgrel=
 
-pkgname="xware_desktop-git"
+pkgname="xware-desktop-git"
 arch=("i686" "x86_64")
-conflicts=("xware_desktop")
+conflicts=("xware-desktop")
 license=("GPL" "custom")
 
 makedepends=("python-pyqt5" "coffee-script" "chrpath" "findutils" "sed")
@@ -32,7 +32,7 @@ if [ ! -f .localdev ]; then
     _nonlocal=1
 fi
 
-install=xware_desktop.install
+install=xware-desktop.install
 
 build() {
     if test $_nonlocal; then
@@ -51,5 +51,5 @@ package() {
     fi
     make DESTDIR=${pkgdir} install
     install -D -m 644 build/xwared.service ${pkgdir}/usr/lib/systemd/system/xwared.service
-    echo -e "\n__githash__ = \"${_commit}\"\n" >> ${pkgdir}/opt/xware_desktop/shared/__init__.py
+    echo -e "\n__githash__ = \"${_commit}\"\n" >> ${pkgdir}/opt/xware-desktop/shared/__init__.py
 }

@@ -50,7 +50,7 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
 
 %files
 %doc
-/opt/xware_desktop
+/opt/xware-desktop
 /usr/share/applications/xware-desktop.desktop
 /usr/share/icons/hicolor
 /usr/lib/systemd/system/xwared.service
@@ -63,7 +63,7 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
 
     if [ $1 -eq 2 ]; then
         # pre_upgrade
-        find /opt/xware_desktop -name "__pycache__" -print0 | xargs -0 rm -rf
+        find /opt/xware-desktop -name "__pycache__" -print0 | xargs -0 rm -rf
     fi
 
 %post
@@ -71,11 +71,11 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
     systemctl daemon-reload
     update-desktop-database -q
 
-    touch     /opt/xware_desktop/{settings.ini,mounts,xwared.ini}
-    touch     /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
-    chmod 664 /opt/xware_desktop/{settings.ini,mounts,xwared.ini}
-    chmod 664 /opt/xware_desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
-    python3   -O -m compileall -q /opt/xware_desktop/frontend
+    touch     /opt/xware-desktop/{settings.ini,mounts,xwared.ini}
+    touch     /opt/xware-desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+    chmod 664 /opt/xware-desktop/{settings.ini,mounts,xwared.ini}
+    chmod 664 /opt/xware-desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
+    python3   -O -m compileall -q /opt/xware-desktop/frontend
 
     echo "欢迎使用Xware Desktop。"
     echo "设置方法和注意事项见项目主页。"
@@ -91,10 +91,10 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
 %postun
     if [ $1 -eq 0 ]; then
         # uninstall
-        echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware_desktop内所有内容。"
-        rm -rf /opt/xware_desktop/frontend
-        rm -rf /opt/xware_desktop/daemon
-        rm -rf /opt/xware_desktop/shared
+        echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware-desktop内所有内容。"
+        rm -rf /opt/xware-desktop/frontend
+        rm -rf /opt/xware-desktop/daemon
+        rm -rf /opt/xware-desktop/shared
     fi
 
 %changelog

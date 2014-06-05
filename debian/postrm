@@ -1,13 +1,13 @@
 #!/bin/bash
 
 if [ "$1" = "remove" ]; then
-    rm -rf /opt/xware_desktop/frontend
-    rm -rf /opt/xware_desktop/daemon
-    rm -rf /opt/xware_desktop/shared
+    rm -rf /opt/xware-desktop/frontend
+    rm -rf /opt/xware-desktop/daemon
+    rm -rf /opt/xware-desktop/shared
 fi
 
 if [ "$1" = "purge" ]; then
-    rm -rf /opt/xware_desktop
+    rm -rf /opt/xware-desktop
 fi
 
 #DEBHELPER#
