@@ -125,9 +125,7 @@ class Xwared(object):
             print("child: pid({pid}) ppid({ppid})".format(pid = os.getpid(),
                                                           ppid = self.etmPid))
             cmd = constants.ETM_COMMANDLINE
-            etmPath = cmd[0]
-            os.chdir(os.path.dirname(etmPath))
-            os.execv(etmPath, cmd)
+            os.execv(cmd[0], cmd)
             sys.exit(-1)
         else:
             # parent
