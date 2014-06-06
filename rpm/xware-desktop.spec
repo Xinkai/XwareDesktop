@@ -72,6 +72,7 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
     update-desktop-database -q
 
     python3   -O -m compileall -q /opt/xware-desktop/frontend
+    setcap CAP_SYS_ADMIN=+ep /opt/xware-desktop/chmns
 
     echo "欢迎使用Xware Desktop。"
     echo "设置方法和注意事项见项目主页。"

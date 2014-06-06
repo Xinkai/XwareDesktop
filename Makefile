@@ -7,7 +7,7 @@ install       = install -m 664
 GITHASH       = "`git rev-parse master 2>/dev/null`"
 SHELL         = /bin/bash
 
-all: etmpatch.so permissioncheck pyqt xwarejs.js prepareXware replacePath
+all: etmpatch.so permissioncheck chmns pyqt xwarejs.js prepareXware replacePath
 
 etmpatch.so: src/etmpatch.c
 	mkdir -p build
@@ -17,6 +17,9 @@ permissioncheck: src/permissioncheck.c
 	mkdir -p build
 	$(CC) $(FLAGS) -lmount -o build/permissioncheck src/permissioncheck.c \
 	    -Xlinker -lmount
+
+chmns: src/chmns.c
+	$(CC) $(FLAGS) -o build/chmns src/chmns.c
 
 clean:
 	rm -rf pkg
@@ -73,6 +76,7 @@ install: all
 
 	# binary
 	$(install_exe)     build/permissioncheck           $(DESTDIR)$(PREFIX)/permissioncheck
+	$(install_exe)     build/chmns                     $(DESTDIR)$(PREFIX)/chmns
 	$(install_xware)   build/etmpatch.so               $(DESTDIR)$(PREFIX)/etmpatch.so
 
 	# copy py files
