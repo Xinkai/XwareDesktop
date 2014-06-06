@@ -13,7 +13,12 @@ char profileDir[PATH_MAX] = {0};
 char** cmd = NULL;
 
 void useDefaultProfileDir() {
-    struct passwd *pw = getpwuid(getuid());
+    struct passwd* pw = getpwuid(getuid()); // getuid never fail
+    if (pw == NULL) {
+        // error
+        perror("getpwuid");
+        exit(EXIT_FAILURE);
+    }
     strcpy(profileDir, pw->pw_dir);
     strcat(profileDir, "/.xware-desktop/profile");
 }
