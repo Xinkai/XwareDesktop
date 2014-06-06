@@ -116,6 +116,8 @@ class XwareDesktop(QApplication):
 
 app = None
 if __name__ == "__main__":
+    from shared.profile import profileBootstrap
+    profileBootstrap(constants.PROFILE_DIR)
     app = XwareDesktop(sys.argv)
     sys.exit(app.exec())
 else:

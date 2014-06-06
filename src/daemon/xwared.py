@@ -218,6 +218,8 @@ class Xwared(object):
         sys.exit(0)
 
 if __name__ == "__main__":
+    from shared.profile import profileBootstrap
+    profileBootstrap(constants.PROFILE_DIR)
     xwared = Xwared()
     while True:
         xwared.runETM()

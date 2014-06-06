@@ -71,10 +71,6 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
     systemctl daemon-reload
     update-desktop-database -q
 
-    touch     /opt/xware-desktop/{settings.ini,mounts,xwared.ini}
-    touch     /opt/xware-desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
-    chmod 664 /opt/xware-desktop/{settings.ini,mounts,xwared.ini}
-    chmod 664 /opt/xware-desktop/xware/cfg/{cid_store.dat,dht.cfg,download.cfg,etm.cfg,kad.cfg}
     python3   -O -m compileall -q /opt/xware-desktop/frontend
 
     echo "欢迎使用Xware Desktop。"
