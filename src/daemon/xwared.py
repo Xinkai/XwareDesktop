@@ -43,6 +43,7 @@ class Xwared(object):
         super().__init__()
         # requirements checking
         self.ensureOneInstance()
+        self.tryRemove(constants.XWARED_SOCKET[0])
 
         # initialize variables
         signal.signal(signal.SIGTERM, self.unload)
@@ -200,7 +201,7 @@ class Xwared(object):
     def tryRemove(path):
         try:
             os.remove(path)
-        except OSError:
+        except FileNotFoundError:
             pass
 
     def unload(self, sig, stackframe):
