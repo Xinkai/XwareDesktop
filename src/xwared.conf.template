@@ -6,10 +6,7 @@ description     "An attempt to bring Xware (Xunlei on routers) to desktop Linux.
 start on (local-filesystems and net-device-up IFACE!=lo)
 stop on runlevel [016]
 
-chdir ##PREFIX##/
-
 pre-start script
-    rm -rf /tmp/thunder
 end script
 
 exec ##PREFIX##/xwared
