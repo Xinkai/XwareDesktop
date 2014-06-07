@@ -183,9 +183,6 @@ class Xwared(object):
     def interface_getMounts(self):
         raise NotImplementedError()
 
-    def interface_permissionCheck(self):
-        raise NotImplementedError()
-
     def interface_infoPoll(self):
         return BackendInfo(etmPid = self.etmPid,
                            lcPort = int(self.etmCfg.get("local_control.listen_port", 0)),

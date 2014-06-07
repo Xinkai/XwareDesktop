@@ -33,8 +33,4 @@ MOUNTS_FILE_HEADER = \
 # the last slash is needed
 ETM_MOUNTS_DIR = os.path.normpath(os.path.join(TMP_DIR, "thunder/volumes")) + "/"
 
-PERMISSIONCHECK = os.path.join(BASE_DIR, "permissioncheck")
-
 DESKTOP_FILE_LOCATION = "/usr/share/applications/xware-desktop.desktop"
-
-

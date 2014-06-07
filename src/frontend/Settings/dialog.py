@@ -85,9 +85,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.table_mounts.setRowCount(0)
         self.table_mounts.clearContents()
 
-        permissionCheckResult = app.mountsFaker.permissionCheck()
-        permissionCheckFailed = ["无法获得检测权限。运行{}查看原因。".format(constants.PERMISSIONCHECK)]
-
         mountsMapping = app.mountsFaker.getMountsMapping()
         for i, mount in enumerate(app.mountsFaker.mounts):
             # mounts = ['/path/to/1', 'path/to/2', ...]
@@ -99,10 +96,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
             # drive2: the drive letter it actually is assigned to
             drive2 = mountsMapping.get(mount, "无")
 
-            # check 1: permission
-            errors = permissionCheckResult.get(mount, permissionCheckFailed)
+            errors = []
 
-            # check 2: mapping
+            # check: mapping
             if drive1 != drive2:
                 errors.append(
                     "警告：盘符映射在'{actual}'，而不是'{should}'。需要重启后端修复。".format(
