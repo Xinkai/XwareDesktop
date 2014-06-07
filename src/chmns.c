@@ -56,7 +56,7 @@ void mountDirs() {
 
 void run() {
     int ret;
-    ret = setenv("XWARE-DESTKOP-CHMNS", "TRUE", 1);
+    ret = setenv("XWARE-DESKTOP-CHMNS", "TRUE", 1);
     if (ret) {
         perror("setenv");
     }
@@ -80,7 +80,7 @@ void usage() {
 
 int main(int argc, char** argv) {
     // prevent execute in a nested chmns
-    char* nestedMark = getenv("XWARE-DESTKOP-CHMNS");
+    char* nestedMark = getenv("XWARE-DESKTOP-CHMNS");
     if (nestedMark == NULL) {
         if (errno != 0) {
             perror("getenv");
