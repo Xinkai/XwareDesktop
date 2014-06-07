@@ -80,10 +80,8 @@ make DESTDIR=%{buildroot} install
 %postun
     if [ $1 -eq 0 ]; then
         # uninstall
-        echo "Xware Desktop卸载完成。配置文件未删除，你可以手动删除/opt/xware-desktop内所有内容。"
-        rm -rf /opt/xware-desktop/frontend
-        rm -rf /opt/xware-desktop/daemon
-        rm -rf /opt/xware-desktop/shared
+        echo "Xware Desktop卸载完成。"
+        echo "用户配置文件位于~/.xware-desktop，并未删除。"
     fi
 
 %changelog

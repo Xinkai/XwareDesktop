@@ -1,9 +1,6 @@
 CC            = gcc
 FLAGS         = -Wall -O3
 PREFIX        = /opt/xware-desktop
-install_xware = install -m 764
-install_exe   = install -m 775
-install       = install -m 664
 GITHASH       = "`git rev-parse master 2>/dev/null`"
 SHELL         = /bin/bash
 
@@ -58,20 +55,19 @@ replacePath:
 	cat src/xwared.conf.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.conf
 
 install: all
-	install -d -m 775                               $(DESTDIR)$(PREFIX)
-	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware
-	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware/lib
-	install -d -m 775                               $(DESTDIR)$(PREFIX)/xware/cfg
+	install -d $(DESTDIR)$(PREFIX)
+	install -d $(DESTDIR)$(PREFIX)/xware
+	install -d $(DESTDIR)$(PREFIX)/xware/lib
 
 	# xware
-	$(install_xware) preparedXware/ETMDaemon           $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
-	$(install_xware) preparedXware/EmbedThunderManager $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
-	$(install_xware) preparedXware/vod_httpserver      $(DESTDIR)$(PREFIX)/xware/lib/vod_httpserver
-	$(install_xware) preparedXware/portal              $(DESTDIR)$(PREFIX)/xware/portal
+	install preparedXware/ETMDaemon           $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
+	install preparedXware/EmbedThunderManager $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
+	install preparedXware/vod_httpserver      $(DESTDIR)$(PREFIX)/xware/lib/vod_httpserver
+	install preparedXware/portal              $(DESTDIR)$(PREFIX)/xware/portal
 
 	# binary
-	$(install_exe)     build/chmns                     $(DESTDIR)$(PREFIX)/chmns
-	$(install_xware)   build/etmpatch.so               $(DESTDIR)$(PREFIX)/etmpatch.so
+	install build/chmns       $(DESTDIR)$(PREFIX)/chmns
+	install build/etmpatch.so $(DESTDIR)$(PREFIX)/etmpatch.so
 
 	# copy py files
 	cp -R src/frontend $(DESTDIR)$(PREFIX)
@@ -83,21 +79,14 @@ install: all
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/tests
 	rm                 $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
 	rm                 $(DESTDIR)$(PREFIX)/frontend/xware-desktop.desktop
-	find $(DESTDIR)$(PREFIX)/frontend -type f -print0 | xargs -0 chmod 664
-	find $(DESTDIR)$(PREFIX)/frontend -type d -print0 | xargs -0 chmod 775
-
-	# mark executables
-	chmod 775          $(DESTDIR)$(PREFIX)/frontend/launcher.py
-	chmod 775          $(DESTDIR)$(PREFIX)/frontend/CrashReport/CrashReportApp.py
-	chmod 775          $(DESTDIR)$(PREFIX)/daemon/xwared.py
 
 	# icons
 	install -d $(DESTDIR)/usr/share/icons/hicolor
 	cp -R xware/icons/* $(DESTDIR)/usr/share/icons/hicolor
 
 	# other
-	install    -m 644 src/frontend/ui/rc/thunder.ico      $(DESTDIR)$(PREFIX)/frontend/thunder.ico
-	install -D -m 644 src/frontend/xware-desktop.desktop  $(DESTDIR)/usr/share/applications/xware-desktop.desktop
+	install    src/frontend/ui/rc/thunder.ico      $(DESTDIR)$(PREFIX)/frontend/thunder.ico
+	install -D src/frontend/xware-desktop.desktop  $(DESTDIR)/usr/share/applications/xware-desktop.desktop
 	install -d $(DESTDIR)/usr/bin
 	ln -s $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop
 	ln -s $(PREFIX)/daemon/xwared.py $(DESTDIR)$(PREFIX)/xwared
@@ -107,3 +96,17 @@ install: all
 	# regenerate .pyo files
 	find $(DESTDIR)$(PREFIX) -name "__pycache__" -print0 | xargs -0 rm -rf
 	python3 -OO -m compileall -q $(DESTDIR)$(PREFIX)
+
+	# fix permissions
+	find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
+	find $(DESTDIR) -type d -print0 | xargs -0 chmod 755
+
+	# mark executables
+	chmod +x $(DESTDIR)$(PREFIX)/frontend/launcher.py
+	chmod +x $(DESTDIR)$(PREFIX)/frontend/CrashReport/CrashReportApp.py
+	chmod +x $(DESTDIR)$(PREFIX)/daemon/xwared.py
+	chmod +x $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
+	chmod +x $(DESTDIR)$(PREFIX)/xware/lib/ETMDaemon
+	chmod +x $(DESTDIR)$(PREFIX)/xware/lib/vod_httpserver
+	chmod +x $(DESTDIR)$(PREFIX)/xware/portal
+	chmod +x $(DESTDIR)$(PREFIX)/chmns
