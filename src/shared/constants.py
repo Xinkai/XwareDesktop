@@ -23,7 +23,6 @@ FRONTEND_LOCK = os.path.join(TMP_DIR, "xware_frontend.lock")
 FRONTEND_SOCKET = (os.path.join(TMP_DIR, "xware_frontend.socket"), "AF_UNIX")
 
 CONFIG_FILE = os.path.join(PROFILE_DIR, "etc/frontend.ini")
-FRONTEND_AUTOSTART_FILE = os.path.expanduser("~/.config/autostart/xware-desktop.desktop")
 
 MOUNTS_FILE = os.path.join(PROFILE_DIR, "etc/mounts")
 MOUNTS_FILE_HEADER = \
@@ -34,3 +33,6 @@ MOUNTS_FILE_HEADER = \
 ETM_MOUNTS_DIR = os.path.normpath(os.path.join(TMP_DIR, "thunder/volumes")) + "/"
 
 DESKTOP_FILE_LOCATION = "/usr/share/applications/xware-desktop.desktop"
+
+_XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
+FRONTEND_AUTOSTART_FILE = os.path.join(_XDG_CONFIG_HOME, "autostart/xware-desktop.desktop")
