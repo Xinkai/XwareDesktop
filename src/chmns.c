@@ -52,13 +52,36 @@ void mountDirs() {
         perror("mount (bind:/tmp)");
         exit(EXIT_FAILURE);
     }
+
+    ret = chdir(tmpDir);
+    if (ret) {
+        perror("chdir");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void run() {
     int ret;
-    ret = setenv("XWARE-DESKTOP-CHMNS", "TRUE", 1);
+
+    // save CHMNS_LD_PRELOAD as LD_PRELOAD
+    char* ld_preload = getenv("CHMNS_LD_PRELOAD");
+    if (ld_preload == NULL) {
+        if (errno != 0) {
+            perror("getenv(CHMNS_LD_PRELOAD)\n");
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        ret = setenv("LD_PRELOAD", ld_preload, 1);
+        if (ret) {
+            perror("setenv(LD_PRELOAD)");
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    ret = setenv("XWARE-DESKTOP-CHMNS", profileDir, 1);
     if (ret) {
-        perror("setenv");
+        perror("setenv(XWARE-DESKTOP-CHMNS)");
+        exit(EXIT_FAILURE);
     }
 
     ret = execvp(cmd[0], cmd);

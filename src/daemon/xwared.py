@@ -121,7 +121,7 @@ class Xwared(object):
 
         if self.etmPid == 0:
             # child
-            os.putenv("LD_PRELOAD", constants.ETM_PATCH_FILE)
+            os.putenv("CHMNS_LD_PRELOAD", constants.ETM_PATCH_FILE)
             print("child: pid({pid}) ppid({ppid})".format(pid = os.getpid(),
                                                           ppid = self.etmPid))
             cmd = constants.ETM_COMMANDLINE
