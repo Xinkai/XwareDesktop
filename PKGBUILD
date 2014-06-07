@@ -7,9 +7,10 @@ _md5sums=""
 pkgver=""
 pkgrel=
 
-pkgname="xware-desktop-git"
+pkgname="xware-desktop"
 arch=("i686" "x86_64")
-conflicts=("xware-desktop")
+conflicts=("xware_desktop-git" "xware_desktop")
+replaces=("xware_desktop-git" "xware_desktop")
 license=("GPL" "custom")
 
 makedepends=("python-pyqt5" "coffee-script" "chrpath" "findutils" "sed")
