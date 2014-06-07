@@ -94,7 +94,7 @@ class Xwared(object):
     def ensureOneInstance(self):
         # If one instance is already running, shout so and then exit the program
         # otherwise, a) hold the lock to xwared, b) prepare etm lock
-        self.fdLock = os.open(constants.XWARED_LOCK, os.O_CREAT | os.O_RDWR, 0o666)
+        self.fdLock = os.open(constants.XWARED_LOCK, os.O_CREAT | os.O_RDWR)
         try:
             fcntl.flock(self.fdLock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:

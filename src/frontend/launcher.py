@@ -80,7 +80,7 @@ class XwareDesktop(QApplication):
     def checkOneInstance():
         tasks = sys.argv[1:]
 
-        fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT, mode = 0o666)
+        fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT)
 
         from Tasks import CommandlineClient
         try:
