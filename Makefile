@@ -79,7 +79,6 @@ install: all
 	cp -R src/daemon   $(DESTDIR)$(PREFIX)
 
 	# remove unwanted files
-	find $(DESTDIR)$(PREFIX) -name "__pycache__" -print0 | xargs -0 rm -rf
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/ui
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/tests
 	rm                 $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
@@ -104,3 +103,7 @@ install: all
 	ln -s $(PREFIX)/daemon/xwared.py $(DESTDIR)$(PREFIX)/xwared
 
 	echo -e "\n__githash__ = \"$(GITHASH)\"\n" >> $(DESTDIR)$(PREFIX)/shared/__init__.py
+
+	# regenerate .pyo files
+	find $(DESTDIR)$(PREFIX) -name "__pycache__" -print0 | xargs -0 rm -rf
+	python3 -OO -m compileall -q $(DESTDIR)$(PREFIX)

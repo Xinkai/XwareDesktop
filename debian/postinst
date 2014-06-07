@@ -2,7 +2,6 @@
 set -e
 
 if [ "$1" = "configure" ]; then
-    python3   -O -m compileall -q /opt/xware-desktop/frontend
     setcap CAP_SYS_ADMIN=+ep /opt/xware-desktop/chmns
 
     echo "欢迎使用Xware Desktop。"

@@ -61,7 +61,6 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
 
     if [ $1 -eq 2 ]; then
         # pre_upgrade
-        find /opt/xware-desktop -name "__pycache__" -print0 | xargs -0 rm -rf
     fi
 
 %post
@@ -69,7 +68,6 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
     systemctl daemon-reload
     update-desktop-database -q
 
-    python3   -O -m compileall -q /opt/xware-desktop/frontend
     setcap CAP_SYS_ADMIN=+ep /opt/xware-desktop/chmns
 
     echo "欢迎使用Xware Desktop。"
