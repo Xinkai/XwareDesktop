@@ -43,7 +43,6 @@ class Xwared(object):
         super().__init__()
         # requirements checking
         self.ensureOneInstance()
-        os.umask(0o006)
 
         # initialize variables
         signal.signal(signal.SIGTERM, self.unload)
