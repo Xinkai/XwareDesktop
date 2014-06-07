@@ -13,7 +13,7 @@ Xware Desktop的目标是提供与Windows平台上迅雷相当的功能。你可
 支持的发行版
 ------------
 
-Archlinux： 支持。安装[xware-desktop-git包]。
+Archlinux： 支持。安装位于`AUR`的[xware-desktop包]。
 
 Ubuntu：支持13.10及以上版本。需自行打包，见[Ubuntu上编译安装说明]。
 
@@ -29,7 +29,7 @@ Fedora: 支持21及以上版本。需[自行打包]。
 * 迅雷协议 -- Xware部分
 
 [xware]:http://luyou.xunlei.com/forum-51-1.html
-[xware-desktop-git包]:https://aur.archlinux.org/packages/xware-desktop-git/
+[xware-desktop包]:https://aur.archlinux.org/packages/xware-desktop/
 [使用说明]:https://github.com/Xinkai/XwareDesktop/wiki/使用说明
 [自行打包]:https://github.com/Xinkai/XwareDesktop/wiki/发行版支持情况
 [手动安装编译]:https://github.com/Xinkai/XwareDesktop/wiki/手动安装编译
