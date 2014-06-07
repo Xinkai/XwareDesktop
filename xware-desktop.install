@@ -4,7 +4,6 @@ pre_install() {
 
 post_install() {
     # Arch specific
-    systemctl daemon-reload
     update-desktop-database -q
 
     setcap CAP_SYS_ADMIN=+ep /opt/xware-desktop/chmns
@@ -24,7 +23,7 @@ post_upgrade() {
 }
 
 pre_remove() {
-    systemctl stop xwared
+
 }
 
 post_remove() {

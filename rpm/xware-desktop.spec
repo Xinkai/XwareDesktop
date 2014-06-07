@@ -44,14 +44,12 @@ An attempt to bring Xware (Xunlei on routers) to desktop Linux.
 
 %install
 make DESTDIR=%{buildroot} install
-install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xwared.service
 
 %files
 %doc
 /opt/xware-desktop
 /usr/share/applications/xware-desktop.desktop
 /usr/share/icons/hicolor
-/usr/lib/systemd/system/xwared.service
 /usr/bin/xware-desktop
 
 %pre
@@ -65,7 +63,6 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
 
 %post
     # Fedora specific, same as Arch
-    systemctl daemon-reload
     update-desktop-database -q
 
     setcap CAP_SYS_ADMIN=+ep /opt/xware-desktop/chmns
@@ -78,7 +75,6 @@ install -D -m 664 build/xwared.service %{buildroot}/usr/lib/systemd/system/xware
 %preun
     if [ $1 -eq 0 ]; then
         # uninstall
-        systemctl stop xwared
     fi
 
 %postun
