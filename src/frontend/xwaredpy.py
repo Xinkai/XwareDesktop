@@ -155,15 +155,13 @@ class XwaredPy(QObject):
     def slotRestartETM(self):
         callXwaredInterface("restartETM")
 
-    @staticmethod
     @property
-    def managedBySystemd():
+    def managedBySystemd(self):
         return os.path.lexists(constants.SYSTEMD_SERVICE_ENABLED_USERFILE) and \
             os.path.lexists(constants.SYSTEMD_SERVICE_USERFILE)
 
-    @staticmethod
     @managedBySystemd.setter
-    def managedBySystemd(on):
+    def managedBySystemd(self, on):
         if on:
             tryMkdir(os.path.dirname(constants.SYSTEMD_SERVICE_ENABLED_USERFILE))
 
@@ -176,14 +174,12 @@ class XwaredPy(QObject):
             tryRemove(constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
             tryRemove(constants.SYSTEMD_SERVICE_USERFILE)
 
-    @staticmethod
     @property
-    def managedByUpstart():
+    def managedByUpstart(self):
         return os.path.lexists(constants.UPSTART_SERVICE_USERFILE)
 
-    @staticmethod
     @managedByUpstart.setter
-    def managedByUpstart(on):
+    def managedByUpstart(self, on):
         if on:
             tryMkdir(os.path.dirname(constants.UPSTART_SERVICE_USERFILE))
 
@@ -192,14 +188,12 @@ class XwaredPy(QObject):
         else:
             tryRemove(constants.UPSTART_SERVICE_USERFILE)
 
-    @staticmethod
     @property
-    def managedByAutostart():
+    def managedByAutostart(self):
         return os.path.lexists(constants.AUTOSTART_DESKTOP_USERFILE)
 
-    @staticmethod
     @managedByAutostart.setter
-    def managedByAutostart(on):
+    def managedByAutostart(self, on):
         if on:
             tryMkdir(constants.AUTOSTART_DESKTOP_USERFILE)
 
