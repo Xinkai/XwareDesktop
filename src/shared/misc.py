@@ -55,4 +55,7 @@ def tryClose(fd):
 
 def tryMkdir(pathstr):
     # mimics "mkdir -p"
-    Path(pathstr).mkdir(parents = True)
+    try:
+        Path(pathstr).mkdir(parents = True)
+    except FileExistsError:
+        pass

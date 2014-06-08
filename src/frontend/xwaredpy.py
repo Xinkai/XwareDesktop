@@ -195,7 +195,7 @@ class XwaredPy(QObject):
     @managedByAutostart.setter
     def managedByAutostart(self, on):
         if on:
-            tryMkdir(constants.AUTOSTART_DESKTOP_USERFILE)
+            tryMkdir(os.path.dirname(constants.AUTOSTART_DESKTOP_USERFILE))
 
             trySymlink(constants.AUTOSTART_DESKTOP_FILE,
                        constants.AUTOSTART_DESKTOP_USERFILE)

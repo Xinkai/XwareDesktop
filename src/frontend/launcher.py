@@ -1,12 +1,12 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
+
 if __name__ == "__main__":
-    import faulthandler, os, logging
-    try:
-        os.mkdir(os.path.expanduser("~/.xware-desktop"))
-    except OSError:
-        pass  # already exists
+    import faulthandler, misc, logging
+    misc.tryMkdir(os.path.expanduser("~/.xware-desktop"))
 
     logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))
 
@@ -20,8 +20,7 @@ if __name__ == "__main__":
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
-import fcntl, os, sys
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
+import fcntl
 
 from shared import __version__
 

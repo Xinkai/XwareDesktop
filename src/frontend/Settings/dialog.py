@@ -27,6 +27,17 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_autoLogin.setChecked(app.settings.getbool("account", "autologin"))
         self.checkBox_autoStartFrontend.setChecked(self.doesAutoStartFileExists())
 
+        # Xwared Management
+        managedBySystemd = app.xwaredpy.managedBySystemd
+        managedByUpstart = app.xwaredpy.managedByUpstart
+        managedByAutostart = app.xwaredpy.managedByAutostart
+
+        self.radio_managedBySystemd.setChecked(managedBySystemd)
+        self.radio_managedByUpstart.setChecked(managedByUpstart)
+        self.radio_managedByAutostart.setChecked(managedByAutostart)
+        self.radio_managedByNothing.setChecked(
+            not (managedBySystemd or managedByUpstart or managedByAutostart))
+
         self.checkBox_enableDevelopersTools.setChecked(
             app.settings.getbool("frontend", "enabledeveloperstools"))
         self.checkBox_allowFlash.setChecked(app.settings.getbool("frontend", "allowflash"))
@@ -61,7 +72,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.btn_addMount.clicked.connect(self.slotAddMount)
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)
-        self.btn_refreshMount.clicked.connect(self.setupMounts)
 
         # Mounts
         self.setupMounts()
@@ -88,12 +98,14 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         mountsMapping = app.mountsFaker.getMountsMapping()
         for i, mount in enumerate(app.mountsFaker.mounts):
-            # mounts = ['/path/to/1', 'path/to/2', ...]
             self.table_mounts.insertRow(i)
-            self.table_mounts.setItem(i, 0, QTableWidgetItem(mount))
             # drive1: the drive letter it should map to, by alphabetical order
             drive1 = chr(ord('C') + i) + ":"
-            self.table_mounts.setItem(i, 1, QTableWidgetItem(drive1))
+            self.table_mounts.setItem(i, 0, QTableWidgetItem(drive1))
+
+            # mounts = ['/path/to/1', 'path/to/2', ...]
+            self.table_mounts.setItem(i, 1, QTableWidgetItem(mount))
+
             # drive2: the drive letter it actually is assigned to
             drive2 = mountsMapping.get(mount, "无")
 
@@ -157,6 +169,10 @@ class SettingsDialog(QDialog, Ui_Dialog):
                        constants.DESKTOP_AUTOSTART_FILE)
         else:
             tryRemove(constants.DESKTOP_AUTOSTART_FILE)
+
+        app.xwaredpy.managedBySystemd = self.radio_managedBySystemd.isChecked()
+        app.xwaredpy.managedByUpstart = self.radio_managedByUpstart.isChecked()
+        app.xwaredpy.managedByAutostart = self.radio_managedByAutostart.isChecked()
 
         app.settings.setbool("frontend", "enabledeveloperstools",
                              self.checkBox_enableDevelopersTools.isChecked())
