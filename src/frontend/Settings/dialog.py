@@ -114,9 +114,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
             # check: mapping
             if drive1 != drive2:
                 errors.append(
-                    "错误：盘符映射在'{actual}'，而不是'{should}'。重启后端可能会修复此问题。".format(
-                        actual = drive2,
-                        should = drive1))
+                    "错误：盘符映射在'{actual}'，而不是'{should}'。\n"
+                    "如果这是个新挂载的文件夹，请尝试稍等，或重启后端，可能会修复此问题。"
+                    .format(actual = drive2, should = drive1))
 
             brush = QBrush()
             if errors:

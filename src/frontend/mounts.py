@@ -2,7 +2,6 @@
 
 from collections import OrderedDict
 import os
-import uuid
 
 import constants
 from misc import trySymlink, tryMkdir
@@ -30,31 +29,31 @@ class MountsFaker(object):
                     continue  # comment
 
                 parts = line.split()
-                path, uuid_ = parts[1], parts[0][len("UUID="):]
+                localPath, mntPath = parts[0], parts[1]
 
-                self._mounts[path] = uuid_
+                self._mounts[mntPath] = localPath
 
     @property
     def mounts(self):
-        # encapsulate self._mounts, which is an ordereddict of <path:uuid>
-        # only expose a list of <path>
-        return list(map(self._getLocalPath, self._mounts.keys()))
+        # encapsulate self._mounts, which is an ordereddict of <mntPath:localPath>
+        # only expose a list of <localPath>
+        return list(self._mounts.values())
 
     @mounts.setter
     def mounts(self, paths):
         newMounts = OrderedDict()
-        for unixPath in paths:
-            mntPath = self._mountBootstrap(unixPath)
-            newMounts[mntPath] = self._mounts.get(mntPath, str(uuid.uuid1()))
+        for localPath in paths:
+            mntPath = self._mountBootstrap(localPath)
+            newMounts[mntPath] = localPath
 
         # write mount file
         buffer = list()
         buffer.append(constants.MOUNTS_FILE_HEADER)
 
-        for path, uuid_ in newMounts.items():
+        for mntPath, localPath in newMounts.items():
             # we only care about the first two columns
-            buffer.append("UUID={uuid} {path} auto defaults,rw 0 0".format(uuid = uuid_,
-                                                                           path = path))
+            buffer.append("{localPath} {mntPath} auto defaults,rw 0 0"
+                          .format(localPath = localPath, mntPath = mntPath))
 
         buffer.append("")
 
@@ -81,15 +80,14 @@ class MountsFaker(object):
 
         return resolvedLocalPath
 
-    @staticmethod
-    def getMountsMapping():
+    def getMountsMapping(self):
         # checks when ETM really uses
         mapping = {}
         try:
             for drive in os.listdir(constants.ETM_MOUNTS_DIR_WITHOUT_CHMNS):
                 # drive is like "C:", "D:"
                 realpath = os.path.realpath(constants.ETM_MOUNTS_DIR_WITHOUT_CHMNS + drive)
-                mapping[realpath] = drive
+                mapping[self._mounts[realpath]] = drive
         except FileNotFoundError:
             pass
         return mapping
@@ -116,10 +114,3 @@ class MountsFaker(object):
         trySymlink(localPath, tddownloadDir)
 
         return mntDir
-
-    @staticmethod
-    def _getLocalPath(mntPath):
-        # takes an mnt path, and returns a local path
-        mntPath = os.path.normpath(mntPath)
-        part = mntPath[mntPath.rindex("/"):]
-        return part.replace("\\", "/")
