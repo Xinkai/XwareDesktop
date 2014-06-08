@@ -100,8 +100,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         for i, mount in enumerate(app.mountsFaker.mounts):
             self.table_mounts.insertRow(i)
             # drive1: the drive letter it should map to, by alphabetical order
-            drive1 = chr(ord('C') + i) + ":"
-            self.table_mounts.setItem(i, 0, QTableWidgetItem(drive1))
+            drive1 = app.mountsFaker.driveIndexToLetter(i)
+            self.table_mounts.setItem(i, 0, QTableWidgetItem(drive1 + "\\TDDOWNLOAD"))
 
             # mounts = ['/path/to/1', 'path/to/2', ...]
             self.table_mounts.setItem(i, 1, QTableWidgetItem(mount))
@@ -114,7 +114,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
             # check: mapping
             if drive1 != drive2:
                 errors.append(
-                    "警告：盘符映射在'{actual}'，而不是'{should}'。需要重启后端修复。".format(
+                    "错误：盘符映射在'{actual}'，而不是'{should}'。重启后端可能会修复此问题。".format(
                         actual = drive2,
                         should = drive1))
 
@@ -146,8 +146,10 @@ class SettingsDialog(QDialog, Ui_Dialog):
                 return
             row = self.table_mounts.rowCount()
             self.table_mounts.insertRow(row)
-            self.table_mounts.setItem(row, 0, QTableWidgetItem(selected))
-            self.table_mounts.setItem(row, 1, QTableWidgetItem("新近添加"))
+            self.table_mounts.setItem(
+                row, 0,
+                QTableWidgetItem(app.mountsFaker.driveIndexToLetter(row) + "\\TDDOWNLOAD"))
+            self.table_mounts.setItem(row, 1, QTableWidgetItem(selected))
             self.table_mounts.setItem(row, 2, QTableWidgetItem("新近添加"))
 
     @pyqtSlot()
@@ -216,7 +218,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @property
     def newMounts(self):
-        return list(map(lambda row: self.table_mounts.item(row, 0).text(),
+        return list(map(lambda row: self.table_mounts.item(row, 1).text(),
                         range(self.table_mounts.rowCount())))
 
     @pyqtSlot()

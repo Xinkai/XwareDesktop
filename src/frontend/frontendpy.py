@@ -159,7 +159,7 @@ class FrontendPy(QObject):
 
     @pyqtSlot(str)
     def systemOpen(self, url):
-        url = app.mountsFaker.convertToNativePath(url)
+        url = app.mountsFaker.convertToLocalPath(url)
         qurl = QUrl.fromLocalFile(url)
         QDesktopServices().openUrl(qurl)
 

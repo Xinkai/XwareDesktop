@@ -123,6 +123,6 @@ class Notifier(QObject):
         else:
             raise Exception("Unknown action from slotActionInvoked: {}.".format(action))
 
-        nativeOpenPath = app.mountsFaker.convertToNativePath(openPath)
-        qUrl = QUrl.fromLocalFile(nativeOpenPath)
+        localOpenPath = app.mountsFaker.convertToLocalPath(openPath)
+        qUrl = QUrl.fromLocalFile(localOpenPath)
         QDesktopServices().openUrl(qUrl)
