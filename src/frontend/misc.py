@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import base64
+import subprocess
+
 from shared.misc import *
 
 
@@ -37,3 +39,19 @@ def decodePrivateLink(link):
         return decoded
     else:
         raise Exception("Cannot decode private link {}.".format(link))
+
+INIT_SYSTEMD = 1
+INIT_UPSTART = 2
+INIT_UNKNOWN = 3
+
+
+def getInitSystemType():
+    with subprocess.Popen(["init", "--version"], stdout = subprocess.PIPE) as proc:
+        initVersion = str(proc.stdout.read())
+
+    if "systemd" in initVersion:
+        return INIT_SYSTEMD
+    elif "upstart" in initVersion:
+        return INIT_UPSTART
+    else:
+        return INIT_UNKNOWN

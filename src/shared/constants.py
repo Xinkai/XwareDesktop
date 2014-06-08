@@ -32,7 +32,4 @@ MOUNTS_FILE_HEADER = \
 # the last slash is needed
 ETM_MOUNTS_DIR = os.path.normpath(os.path.join(TMP_DIR, "thunder/volumes")) + "/"
 
-DESKTOP_FILE_LOCATION = "/usr/share/applications/xware-desktop.desktop"
-
-_XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))
-FRONTEND_AUTOSTART_FILE = os.path.join(_XDG_CONFIG_HOME, "autostart/xware-desktop.desktop")
+XDG_CONFIG_HOME = os.environ.get("XDG_CONFIG_HOME", os.path.expanduser("~/.config"))

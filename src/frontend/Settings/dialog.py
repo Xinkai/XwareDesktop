@@ -70,7 +70,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @staticmethod
     def doesAutoStartFileExists():
-        return os.path.lexists(constants.FRONTEND_AUTOSTART_FILE)
+        return os.path.lexists(constants.DESKTOP_AUTOSTART_FILE)
 
     @pyqtSlot(int)
     def slotWatchClipboardToggled(self, state):
@@ -151,13 +151,13 @@ class SettingsDialog(QDialog, Ui_Dialog):
         if self.checkBox_autoStartFrontend.isChecked() and not doesAutoStartFileExists:
             # mkdir if autostart dir doesn't exist
             try:
-                os.mkdir(os.path.dirname(constants.FRONTEND_AUTOSTART_FILE))
+                os.mkdir(os.path.dirname(constants.DESKTOP_AUTOSTART_FILE))
             except OSError:
                 pass  # already exists
-            os.symlink(constants.DESKTOP_FILE_LOCATION,
-                       constants.FRONTEND_AUTOSTART_FILE)
+            os.symlink(constants.DESKTOP_FILE,
+                       constants.DESKTOP_AUTOSTART_FILE)
         elif (not self.checkBox_autoStartFrontend.isChecked()) and doesAutoStartFileExists:
-            os.remove(constants.FRONTEND_AUTOSTART_FILE)
+            os.remove(constants.DESKTOP_AUTOSTART_FILE)
 
         app.settings.setbool("frontend", "enabledeveloperstools",
                              self.checkBox_enableDevelopersTools.isChecked())

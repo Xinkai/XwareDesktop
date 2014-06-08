@@ -152,3 +152,27 @@ class XwaredPy(QObject):
     @pyqtSlot()
     def slotRestartETM(self):
         callXwaredInterface("restartETM")
+
+    @property
+    def managedBySystemd(self):
+        raise NotImplementedError
+
+    @managedBySystemd.setter
+    def managedBySystemd(self, on):
+        raise NotImplementedError
+
+    @property
+    def managedByUpstart(self):
+        raise NotImplementedError
+
+    @managedByUpstart.setter
+    def managedByUpstart(self, on):
+        raise NotImplementedError
+
+    @property
+    def managedByAutostart(self):
+        raise NotImplementedError
+
+    @managedByAutostart.setter
+    def managedByAutostart(self, on):
+        raise NotImplementedError
