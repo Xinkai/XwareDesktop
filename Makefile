@@ -53,6 +53,7 @@ replacePath:
 	mkdir -p build
 	cat src/xwared.service.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.service
 	cat src/xwared.conf.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.conf
+	cat src/xwared.desktop.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.desktop
 
 install: all
 	install -d $(DESTDIR)$(PREFIX)
@@ -89,6 +90,7 @@ install: all
 	install -D src/frontend/xware-desktop.desktop  $(DESTDIR)/usr/share/applications/xware-desktop.desktop
 	install    build/xwared.conf    $(DESTDIR)$(PREFIX)/frontend/xwared.conf
 	install    build/xwared.service $(DESTDIR)$(PREFIX)/frontend/xwared.service
+	install    build/xwared.desktop $(DESTDIR)$(PREFIX)/frontend/xwared.desktop
 	install -d $(DESTDIR)/usr/bin
 	ln -s $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop
 	ln -s $(PREFIX)/daemon/xwared.py $(DESTDIR)$(PREFIX)/xwared

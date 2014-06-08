@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Xwared
+Comment=桌面化迅雷固件(后端)
+TryExec=##PREFIX##/xwared
+Exec=##PREFIX##/xwared
+StartupNotify=false
+Categories=Network;
+Terminal=false
+Icon=xware-desktop
