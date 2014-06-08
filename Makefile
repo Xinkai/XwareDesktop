@@ -87,6 +87,8 @@ install: all
 	# other
 	install    src/frontend/ui/rc/thunder.ico      $(DESTDIR)$(PREFIX)/frontend/thunder.ico
 	install -D src/frontend/xware-desktop.desktop  $(DESTDIR)/usr/share/applications/xware-desktop.desktop
+	install    build/xwared.conf    $(DESTDIR)$(PREFIX)/frontend/xwared.conf
+	install    build/xwared.service $(DESTDIR)$(PREFIX)/frontend/xwared.service
 	install -d $(DESTDIR)/usr/bin
 	ln -s $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop
 	ln -s $(PREFIX)/daemon/xwared.py $(DESTDIR)$(PREFIX)/xwared

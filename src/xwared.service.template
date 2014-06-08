@@ -7,4 +7,4 @@ Type=simple
 ExecStart=##PREFIX##/xwared
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
