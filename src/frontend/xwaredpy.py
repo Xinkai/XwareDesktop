@@ -6,6 +6,8 @@ from launcher import app
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 import threading, time
+import os
+from misc import tryRemove, trySymlink, tryMkdir
 import constants
 
 from multiprocessing.connection import Client
@@ -153,26 +155,55 @@ class XwaredPy(QObject):
     def slotRestartETM(self):
         callXwaredInterface("restartETM")
 
+    @staticmethod
     @property
-    def managedBySystemd(self):
-        raise NotImplementedError
+    def managedBySystemd():
+        return os.path.lexists(constants.SYSTEMD_SERVICE_ENABLED_USERFILE) and \
+            os.path.lexists(constants.SYSTEMD_SERVICE_USERFILE)
 
+    @staticmethod
     @managedBySystemd.setter
-    def managedBySystemd(self, on):
-        raise NotImplementedError
+    def managedBySystemd(on):
+        if on:
+            tryMkdir(os.path.dirname(constants.SYSTEMD_SERVICE_ENABLED_USERFILE))
 
+            trySymlink(constants.SYSTEMD_SERVICE_FILE,
+                       constants.SYSTEMD_SERVICE_USERFILE)
+
+            trySymlink(constants.SYSTEMD_SERVICE_USERFILE,
+                       constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
+        else:
+            tryRemove(constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
+            tryRemove(constants.SYSTEMD_SERVICE_USERFILE)
+
+    @staticmethod
     @property
-    def managedByUpstart(self):
-        raise NotImplementedError
+    def managedByUpstart():
+        return os.path.lexists(constants.UPSTART_SERVICE_USERFILE)
 
+    @staticmethod
     @managedByUpstart.setter
-    def managedByUpstart(self, on):
-        raise NotImplementedError
+    def managedByUpstart(on):
+        if on:
+            tryMkdir(os.path.dirname(constants.UPSTART_SERVICE_USERFILE))
 
+            trySymlink(constants.UPSTART_SERVICE_FILE,
+                       constants.UPSTART_SERVICE_USERFILE)
+        else:
+            tryRemove(constants.UPSTART_SERVICE_USERFILE)
+
+    @staticmethod
     @property
-    def managedByAutostart(self):
-        raise NotImplementedError
+    def managedByAutostart():
+        return os.path.lexists(constants.AUTOSTART_DESKTOP_USERFILE)
 
+    @staticmethod
     @managedByAutostart.setter
-    def managedByAutostart(self, on):
-        raise NotImplementedError
+    def managedByAutostart(on):
+        if on:
+            tryMkdir(constants.AUTOSTART_DESKTOP_USERFILE)
+
+            trySymlink(constants.AUTOSTART_DESKTOP_FILE,
+                       constants.AUTOSTART_DESKTOP_USERFILE)
+        else:
+            tryRemove(constants.AUTOSTART_DESKTOP_USERFILE)

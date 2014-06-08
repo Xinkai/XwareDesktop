@@ -10,7 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../")
 import pyinotify
 
 from shared import constants, BackendInfo
-from shared.misc import debounce
+from shared.misc import debounce, tryRemove, tryClose
 from settings import SettingsAccessorBase, XWARED_DEFAULTS_SETTINGS
 
 
@@ -43,7 +43,7 @@ class Xwared(object):
         super().__init__()
         # requirements checking
         self.ensureOneInstance()
-        self.tryRemove(constants.XWARED_SOCKET[0])
+        tryRemove(constants.XWARED_SOCKET[0])
 
         # initialize variables
         signal.signal(signal.SIGTERM, self.unload)
@@ -190,26 +190,12 @@ class Xwared(object):
                            userId = int(self.etmCfg.get("userid", 0)),
                            peerId = self.etmCfg.get("rc.peerid", ""))
 
-    @staticmethod
-    def tryClose(fd):
-        try:
-            os.close(fd)
-        except OSError:
-            pass
-
-    @staticmethod
-    def tryRemove(path):
-        try:
-            os.remove(path)
-        except FileNotFoundError:
-            pass
-
     def unload(self, sig, stackframe):
         print("unloading...")
         self.stopETM(False)
 
-        self.tryClose(self.fdLock)
-        self.tryRemove(constants.XWARED_LOCK)
+        tryClose(self.fdLock)
+        tryRemove(constants.XWARED_LOCK)
         self.settings.save()
 
         sys.exit(0)

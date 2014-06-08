@@ -7,6 +7,7 @@ from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog
 from PyQt5.QtGui import QBrush
 
 import os
+from misc import tryMkdir, trySymlink, tryRemove
 
 import constants
 from xwaredpy import callXwaredInterface, SocketDoesntExist
@@ -147,17 +148,15 @@ class SettingsDialog(QDialog, Ui_Dialog):
         app.settings.set("account", "username", self.lineEdit_loginUsername.text())
         app.settings.set("account", "password", self.lineEdit_loginPassword.text())
         app.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
-        doesAutoStartFileExists = self.doesAutoStartFileExists()
-        if self.checkBox_autoStartFrontend.isChecked() and not doesAutoStartFileExists:
+
+        if self.checkBox_autoStartFrontend.isChecked():
             # mkdir if autostart dir doesn't exist
-            try:
-                os.mkdir(os.path.dirname(constants.DESKTOP_AUTOSTART_FILE))
-            except OSError:
-                pass  # already exists
-            os.symlink(constants.DESKTOP_FILE,
+            tryMkdir(os.path.dirname(constants.DESKTOP_AUTOSTART_FILE))
+
+            trySymlink(constants.DESKTOP_FILE,
                        constants.DESKTOP_AUTOSTART_FILE)
-        elif (not self.checkBox_autoStartFrontend.isChecked()) and doesAutoStartFileExists:
-            os.remove(constants.DESKTOP_AUTOSTART_FILE)
+        else:
+            tryRemove(constants.DESKTOP_AUTOSTART_FILE)
 
         app.settings.setbool("frontend", "enabledeveloperstools",
                              self.checkBox_enableDevelopersTools.isChecked())
