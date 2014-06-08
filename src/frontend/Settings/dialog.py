@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog
 from PyQt5.QtGui import QBrush
 
 import os
-from misc import tryMkdir, trySymlink, tryRemove
+from misc import tryMkdir, trySymlink, tryRemove, getInitSystemType, INIT_SYSTEMD, INIT_UPSTART
 
 import constants
 from xwaredpy import callXwaredInterface, SocketDoesntExist
@@ -38,6 +38,11 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.radio_managedByNothing.setChecked(
             not (managedBySystemd or managedByUpstart or managedByAutostart))
 
+        initSysType = getInitSystemType()
+        self.radio_managedBySystemd.setEnabled(initSysType == INIT_SYSTEMD)
+        self.radio_managedByUpstart.setEnabled(initSysType == INIT_UPSTART)
+
+        # frontend
         self.checkBox_enableDevelopersTools.setChecked(
             app.settings.getbool("frontend", "enabledeveloperstools"))
         self.checkBox_allowFlash.setChecked(app.settings.getbool("frontend", "allowflash"))
@@ -53,6 +58,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
             app.settings.getbool("frontend", "showmonitorwindow"))
         self.spinBox_monitorFullSpeed.setValue(
             app.settings.getint("frontend", "monitorfullspeed"))
+
         # clipboard related
         self.checkBox_watchClipboard.stateChanged.connect(self.slotWatchClipboardToggled)
         self.checkBox_watchClipboard.setChecked(app.settings.getbool("frontend", "watchclipboard"))
