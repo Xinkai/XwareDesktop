@@ -55,7 +55,7 @@ replacePath:
 	cat src/xwared.conf.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.conf
 	cat src/xwared.desktop.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.desktop
 
-install: all
+install:
 	install -d $(DESTDIR)$(PREFIX)
 	install -d $(DESTDIR)$(PREFIX)/xware
 	install -d $(DESTDIR)$(PREFIX)/xware/lib
