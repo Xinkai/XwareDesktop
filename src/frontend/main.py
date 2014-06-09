@@ -22,7 +22,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         # UI
         self.setupUi(self)
         self.connectUI()
-        self.preserveGeometry("main")
+        self.preserveGeometry()
 
     def connectUI(self):
         # connect UI related signal/slot

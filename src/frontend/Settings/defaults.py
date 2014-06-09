@@ -61,7 +61,7 @@ DEFAULT_SETTINGS = {
     "internal": {
         "dlspeedlimit": 512,
         "ulspeedlimit": 50,
-        "mainwingeometry": None,
-        "monitorwingeometry": None,
+        "mainwindowgeometry": None,
+        "monitorwindowgeometry": None,
     },
 }

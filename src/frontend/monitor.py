@@ -7,12 +7,12 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QPoint
 
 import threading, time
 
-from ui_monitor import MonitorWidget, Ui_Form
+from ui_monitor import MonitorWidget, Ui_MonitorWindow
 from PersistentGeometry import PersistentGeometry
 from contextmenu import ContextMenu
 
 
-class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
+class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
     sigTaskUpdating = pyqtSignal(dict)
 
     _stat = None
@@ -38,7 +38,7 @@ class MonitorWindow(MonitorWidget, Ui_Form, PersistentGeometry):
                                         name = "monitor task updating",
                                         daemon = True)
         self._thread.start()
-        self.preserveGeometry("monitor")
+        self.preserveGeometry()
 
         self._contextMenu = ContextMenu(None)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
