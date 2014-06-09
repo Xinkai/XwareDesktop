@@ -12,7 +12,7 @@ class PersistentGeometry(object):
     _persistent_geometry_name = None
 
     def preserveGeometry(self, keyname):
-        savedGeometry = app.settings.getobj("frontend", "{}wingeometry".format(keyname))
+        savedGeometry = app.settings.getobj("internal", "{}wingeometry".format(keyname))
         if savedGeometry:
             self.restoreGeometry(savedGeometry)
         self._persistent_geometry_name = keyname
@@ -20,7 +20,7 @@ class PersistentGeometry(object):
     @debounce(0.2, instant_first = False)
     def _setGeometry(self):
         app.settings.setobj(
-            "frontend",
+            "internal",
             "{}wingeometry".format(self._persistent_geometry_name),
             self.saveGeometry())
 

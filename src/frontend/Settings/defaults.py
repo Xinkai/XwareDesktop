@@ -51,8 +51,6 @@ DEFAULT_SETTINGS = {
         "monitorfullspeed": 512,
         "watchclipboard": True,
         "watchpattern": _DEFAULT_PATTERN,
-        "mainwingeometry": None,
-        "monitorwingeometry": None,
     },
     "scheduler": {
         "poweroffcmd": "",
@@ -63,5 +61,7 @@ DEFAULT_SETTINGS = {
     "internal": {
         "dlspeedlimit": 512,
         "ulspeedlimit": 50,
+        "mainwingeometry": None,
+        "monitorwingeometry": None,
     },
 }
