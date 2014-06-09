@@ -3,8 +3,8 @@
 author          "Xinkai Chen <yeled.nova@gmail.com>"
 description     "An attempt to bring Xware (Xunlei on routers) to desktop Linux."
 
-start on (local-filesystems and net-device-up IFACE!=lo)
-stop on runlevel [016]
+start on startup
+stop on session-end
 
 pre-start script
 end script
