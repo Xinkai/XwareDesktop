@@ -62,5 +62,6 @@ DEFAULT_SETTINGS = {
         "ulspeedlimit": 50,
         "mainwindowgeometry": None,
         "monitorwindowgeometry": None,
+        "previousversion": "0.8",
     },
 }
