@@ -7,9 +7,8 @@ from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog
 from PyQt5.QtGui import QBrush
 
 import os
-from misc import tryMkdir, trySymlink, tryRemove, getInitSystemType, INIT_SYSTEMD, INIT_UPSTART
+from misc import getInitSystemType, INIT_SYSTEMD, INIT_UPSTART
 
-import constants
 from xwaredpy import callXwaredInterface, SocketDoesntExist
 from etmpy import EtmSetting
 from .ui_settings import Ui_Dialog
@@ -25,7 +24,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.lineEdit_loginUsername.setText(app.settings.get("account", "username"))
         self.lineEdit_loginPassword.setText(app.settings.get("account", "password"))
         self.checkBox_autoLogin.setChecked(app.settings.getbool("account", "autologin"))
-        self.checkBox_autoStartFrontend.setChecked(self.doesAutoStartFileExists())
+        self.checkBox_autoStartFrontend.setChecked(app.autoStart)
 
         # Xwared Management
         managedBySystemd = app.xwaredpy.managedBySystemd
@@ -84,10 +83,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         # backend setting is a different thing!
         self.setupETM()
-
-    @staticmethod
-    def doesAutoStartFileExists():
-        return os.path.lexists(constants.DESKTOP_AUTOSTART_FILE)
 
     @pyqtSlot(int)
     def slotWatchClipboardToggled(self, state):
@@ -165,14 +160,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         app.settings.set("account", "password", self.lineEdit_loginPassword.text())
         app.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
 
-        if self.checkBox_autoStartFrontend.isChecked():
-            # mkdir if autostart dir doesn't exist
-            tryMkdir(os.path.dirname(constants.DESKTOP_AUTOSTART_FILE))
-
-            trySymlink(constants.DESKTOP_FILE,
-                       constants.DESKTOP_AUTOSTART_FILE)
-        else:
-            tryRemove(constants.DESKTOP_AUTOSTART_FILE)
+        app.autoStart = self.checkBox_autoStartFrontend.isChecked()
 
         app.xwaredpy.managedBySystemd = self.radio_managedBySystemd.isChecked()
         app.xwaredpy.managedByUpstart = self.radio_managedByUpstart.isChecked()

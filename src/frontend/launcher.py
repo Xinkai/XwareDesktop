@@ -113,6 +113,22 @@ class XwareDesktop(QApplication):
             else:
                 pass  # not shown, do nothing
 
+    @property
+    def autoStart(self):
+        return os.path.lexists(constants.DESKTOP_AUTOSTART_FILE)
+
+    @autoStart.setter
+    def autoStart(self, on):
+        if on:
+            # mkdir if autostart dir doesn't exist
+            misc.tryMkdir(os.path.dirname(constants.DESKTOP_AUTOSTART_FILE))
+
+            misc.trySymlink(constants.DESKTOP_FILE,
+                            constants.DESKTOP_AUTOSTART_FILE)
+        else:
+            misc.tryRemove(constants.DESKTOP_AUTOSTART_FILE)
+
+
 app = None
 if __name__ == "__main__":
     from shared.profile import profileBootstrap
