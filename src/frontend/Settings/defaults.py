@@ -2,8 +2,7 @@
 
 import os
 
-_DEFAULT_PATTERN = """; 试验功能，暂不允许更改此设置
-; packages
+_DEFAULT_PATTERN = """; packages
 *.zip;*.tar;*.tgz;*.tar.gz;*.tbz;*.tbz2;*.tb2;*.tar.bz2;*.taz;*.tar.Z;*.tlz;*.tar.lz;*.tar.lzma;*.txz;*.tar.xz;*.cab;*.rar;*.7z;*.iso;*.dmg;*.img;
 
 ; documents

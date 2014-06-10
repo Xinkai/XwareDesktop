@@ -91,10 +91,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot(int)
     def slotWatchClipboardToggled(self, state):
-        # disable pattern settings, before
-        # 1. complete patterns
-        # 2. test glib key file compatibility
-        self.plaintext_watchPattern.setReadOnly(True)
         self.plaintext_watchPattern.setEnabled(state)
 
     @pyqtSlot()
@@ -204,8 +200,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
                             self.spinBox_monitorFullSpeed.value())
         app.settings.setbool("frontend", "watchclipboard",
                              self.checkBox_watchClipboard.isChecked())
-        # app.settings.set("frontend", "watchpattern",
-        #                         self.plaintext_watchPattern.toPlainText())
+        app.settings.set("frontend", "watchpattern",
+                         self.plaintext_watchPattern.toPlainText())
 
         if self.group_etmStartWhen.isEnabled():
             startEtmWhen = self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton())
