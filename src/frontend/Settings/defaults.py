@@ -2,33 +2,33 @@
 
 import os
 
-_DEFAULT_PATTERN = """; packages
+_DEFAULT_PATTERN = """// packages
 *.zip;*.tar;*.tgz;*.tar.gz;*.tbz;*.tbz2;*.tb2;*.tar.bz2;*.taz;*.tar.Z;*.tlz;*.tar.lz;*.tar.lzma;*.txz;*.tar.xz;*.cab;*.rar;*.7z;*.iso;*.dmg;*.img;
 
-; documents
+// documents
 *.pdf;*.doc;*.docx;*.docm;*.xlt;*.xltx;*.xlsm;*.ppt;*.pptx;*.pptm;*.epub;*.chm;*.wps;*.odt;*.rtf;*.txt
 
-; audio
+// audio
 *.mp1;*.mp2;*.mp3;*.mp4;*.flac;*.ape;*.webm;*.ogg;*.wav;*.wv;*.wma;*.aac;*.m4a;*.ra
 
-; video
+// video
 *.mp4;*.mkv;*.rm;*.rmvb;*.avi;*.flv;*.3gp;*.3g2;*.wmv;*.mov;*.vob
 
-; media-related
+// media-related
 *.srt;*.cue;*.m3u;*.sub
 
-; programming
+// programming
 *.jar;*.apk;
 
-; Linux
+// Linux
 *.deb;*.rpm
 
-; Windows
+// Windows
 *.exe;*.msi;
 
-; Mac
+// Mac
 
-; misc
+// misc
 *.rom;*.ttf;*.bin;*.torrent
 """
 

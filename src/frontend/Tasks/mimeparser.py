@@ -25,7 +25,7 @@ class UrlExtractor(QObject):
         patternLines = app.settings.get("frontend", "watchpattern").split("\n")
         patternList = []
         for line in patternLines:
-            if len(line) == 0 or line[0] == ";":
+            if len(line) == 0 or line.startswith("//"):
                 continue
 
             extensions = line.split(";")
