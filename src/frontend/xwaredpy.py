@@ -187,6 +187,7 @@ class XwaredPy(QObject):
                        constants.UPSTART_SERVICE_USERFILE)
         else:
             tryRemove(constants.UPSTART_SERVICE_USERFILE)
+        os.system("initctl --user reload-configuration")
 
     @property
     def managedByAutostart(self):
