@@ -37,7 +37,6 @@ class CustomWebPage(QWebPage):
 
     # Local Torrent File Chooser Support
     def chooseFile(self, parentFrame, suggestFile):
-        print("custom page::chooseFile", parentFrame, suggestFile)
         if self._overrideFile:
             return self.overrideFile
         else:
@@ -45,7 +44,6 @@ class CustomWebPage(QWebPage):
 
     @property
     def overrideFile(self):
-        print("read overrideFile, then clear it.")
         result = self._overrideFile
         self._overrideFile = None
         return result
@@ -53,7 +51,6 @@ class CustomWebPage(QWebPage):
     @overrideFile.setter
     def overrideFile(self, url):
         self._overrideFile = url
-        print("set local torrent {}.".format(url))
 
     def urlMatchIn(self, *againsts):
         return parse.urldefrag(self.frame.url().toString())[0] in againsts

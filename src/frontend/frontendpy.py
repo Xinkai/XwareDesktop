@@ -193,29 +193,23 @@ class FrontendPy(QObject):
     def consumeAction(self, reason):
         print("Try to consume, because {}.".format(reason))
         if not self.isPageOnline:
-            print("Xdjs says device not online, no consuming")
             return
 
         if self.isPageMaskOn:
-            print("Mask on, no consuming")
             return
 
         if not self.isXdjsLoaded:
-            print("Xdjs not ready, no consuming")
             return
 
         if not self.isPageLogined:
-            print("page not logined, no consuming")
             return
 
         try:
             action = self.dequeueAction()
         except IndexError:
-            print("Nothing to consume")
             # no actions
             return
 
-        print("consuming action", action)
         action.consume()
 
     @pyqtSlot()

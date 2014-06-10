@@ -9,7 +9,6 @@ class AllowDrop(object):
         self.setAcceptDrops(True)
 
     def dropEvent(self, qDropEvent):
-        print("event drop")
         if qDropEvent.source() is not None:
             return  # drag starts within the application
         mimeData = qDropEvent.mimeData()
@@ -30,5 +29,4 @@ class AllowDrop(object):
         pass
 
     def dragEnterEvent(self, dragEnterEvent):
-        print("dragenter", dragEnterEvent.proposedAction())
         dragEnterEvent.acceptProposedAction()
