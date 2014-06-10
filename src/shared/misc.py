@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from threading import Timer
+import os
+from pathlib import Path
 
 
 def debounce(wait, instant_first = True):
@@ -25,3 +27,35 @@ def debounce(wait, instant_first = True):
             debounced.t.start()
         return debounced
     return debouncer
+
+
+def trySymlink(src, dest):
+    # ignores the exception when dest is already there.
+    try:
+        os.symlink(src, dest)
+    except FileExistsError:
+        pass
+
+
+def tryRemove(path):
+    # ignores the exception when path doesn't exist.
+    try:
+        os.remove(path)
+    except FileNotFoundError:
+        pass
+
+
+def tryClose(fd):
+    # ignores OSError, useful when exiting the program and we no longer care.
+    try:
+        os.close(fd)
+    except OSError:
+        pass
+
+
+def tryMkdir(pathstr):
+    # mimics "mkdir -p"
+    try:
+        Path(pathstr).mkdir(parents = True)
+    except FileExistsError:
+        pass

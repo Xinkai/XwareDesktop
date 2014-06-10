@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import collections, base64
-from shared.misc import *
+import base64
+import subprocess
 
-GroupMembership = collections.namedtuple("GroupMembership", ["groupExists", "isIn", "isEffective"])
+from shared.misc import *
 
 
 def getHumanBytesNumber(byteNum):
@@ -40,24 +40,18 @@ def decodePrivateLink(link):
     else:
         raise Exception("Cannot decode private link {}.".format(link))
 
+INIT_SYSTEMD = 1
+INIT_UPSTART = 2
+INIT_UNKNOWN = 3
 
-def getGroupMembership(grpName):
-    # return GroupMembership(bool, bool, bool)
-    # first -> is the group exists
-    # second -> is the user in the group
-    # third -> is the group membership 'effective'
-    import grp, getpass, os
-    try:
-        grpInfo = grp.getgrnam(grpName)
-    except KeyError:
-        return GroupMembership(False, False, False)
 
-    gid, members = grpInfo[2], grpInfo[3]
-    if getpass.getuser() not in members:
-        return GroupMembership(True, False, False)
+def getInitSystemType():
+    with subprocess.Popen(["init", "--version"], stdout = subprocess.PIPE) as proc:
+        initVersion = str(proc.stdout.read())
 
-    effectiveGroups = os.getgroups()
-    if gid not in effectiveGroups:
-        return GroupMembership(True, True, False)
-
-    return GroupMembership(True, True, True)
+    if "systemd" in initVersion:
+        return INIT_SYSTEMD
+    elif "upstart" in initVersion:
+        return INIT_UPSTART
+    else:
+        return INIT_UNKNOWN

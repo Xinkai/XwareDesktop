@@ -50,6 +50,10 @@ class QuickSpeedLimitForm(QWidget, Ui_Form_quickSpeedLimit):
     def loadSetting(self):
         etmSettings = app.etmpy.getSettings()
 
+        self.setEnabled(bool(etmSettings))
+        if not self.isEnabled():
+            return
+
         if etmSettings.dLimit == -1:
             self.checkBox_dlSpeedLimit.setChecked(False)
             self.spinBox_dlSpeedLimit.setValue(app.settings.getint("internal", "dlspeedlimit"))
@@ -65,6 +69,9 @@ class QuickSpeedLimitForm(QWidget, Ui_Form_quickSpeedLimit):
             self.spinBox_ulSpeedLimit.setValue(etmSettings.uLimit)
 
     def saveSetting(self):
+        if not self.isEnabled():
+            return
+
         # called by parent menu's saveSettings.
         if self.checkBox_ulSpeedLimit.isChecked():
             ulSpeedLimit = self.spinBox_ulSpeedLimit.value()

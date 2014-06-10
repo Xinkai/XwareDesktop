@@ -1,14 +1,12 @@
 #!/bin/bash
 
 if [ "$1" = "remove" ]; then
-    userdel xware
-    rm -rf /opt/xware_desktop/frontend
-    rm -rf /opt/xware_desktop/daemon
-    rm -rf /opt/xware_desktop/shared
+    return 0
 fi
 
 if [ "$1" = "purge" ]; then
-    rm -rf /opt/xware_desktop
+    echo "Xware Desktop卸载完成。"
+    echo "用户配置文件位于~/.xware-desktop，并未删除。"
 fi
 
 #DEBHELPER#

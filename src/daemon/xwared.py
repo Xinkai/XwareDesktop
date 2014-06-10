@@ -10,7 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../")
 import pyinotify
 
 from shared import constants, BackendInfo
-from shared.misc import debounce
+from shared.misc import debounce, tryRemove, tryClose
 from settings import SettingsAccessorBase, XWARED_DEFAULTS_SETTINGS
 
 
@@ -42,9 +42,8 @@ class Xwared(object):
     def __init__(self):
         super().__init__()
         # requirements checking
-        self.checkUserGroup()
         self.ensureOneInstance()
-        os.umask(0o006)
+        tryRemove(constants.XWARED_SOCKET[0])
 
         # initialize variables
         signal.signal(signal.SIGTERM, self.unload)
@@ -93,30 +92,10 @@ class Xwared(object):
         if event.pathname == constants.ETM_CFG_FILE:
             self.onEtmCfgChanged()
 
-    @staticmethod
-    def checkUserGroup():
-        from pwd import getpwnam
-        try:
-            usrInfo = getpwnam("xware")
-        except KeyError:
-            print("未找到xware用户。请重新安装。", file = sys.stderr)
-            sys.exit(-1)
-
-        xware_uid = usrInfo.pw_uid
-        xware_gid = usrInfo.pw_gid
-
-        if not os.getuid() == os.geteuid() == xware_uid:
-            print("必须以xware用户运行。", file = sys.stderr)
-            sys.exit(-1)
-
-        if not os.getgid() == os.getegid() == xware_gid:
-            print("必须以xware组运行。", file = sys.stderr)
-            sys.exit(-1)
-
     def ensureOneInstance(self):
         # If one instance is already running, shout so and then exit the program
         # otherwise, a) hold the lock to xwared, b) prepare etm lock
-        self.fdLock = os.open(constants.XWARED_LOCK, os.O_CREAT | os.O_RDWR, 0o666)
+        self.fdLock = os.open(constants.XWARED_LOCK, os.O_CREAT | os.O_RDWR)
         try:
             fcntl.flock(self.fdLock, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
@@ -142,13 +121,11 @@ class Xwared(object):
 
         if self.etmPid == 0:
             # child
-            os.putenv("LD_PRELOAD", constants.ETM_PATCH_FILE)
+            os.putenv("CHMNS_LD_PRELOAD", constants.ETM_PATCH_FILE)
             print("child: pid({pid}) ppid({ppid})".format(pid = os.getpid(),
                                                           ppid = self.etmPid))
             cmd = constants.ETM_COMMANDLINE
-            etmPath = cmd[0]
-            os.chdir(os.path.dirname(etmPath))
-            os.execv(etmPath, cmd)
+            os.execv(cmd[0], cmd)
             sys.exit(-1)
         else:
             # parent
@@ -207,40 +184,25 @@ class Xwared(object):
     def interface_getMounts(self):
         raise NotImplementedError()
 
-    def interface_permissionCheck(self):
-        raise NotImplementedError()
-
     def interface_infoPoll(self):
         return BackendInfo(etmPid = self.etmPid,
                            lcPort = int(self.etmCfg.get("local_control.listen_port", 0)),
                            userId = int(self.etmCfg.get("userid", 0)),
                            peerId = self.etmCfg.get("rc.peerid", ""))
 
-    @staticmethod
-    def tryClose(fd):
-        try:
-            os.close(fd)
-        except OSError:
-            pass
-
-    @staticmethod
-    def tryRemove(path):
-        try:
-            os.remove(path)
-        except OSError:
-            pass
-
     def unload(self, sig, stackframe):
         print("unloading...")
         self.stopETM(False)
 
-        self.tryClose(self.fdLock)
-        self.tryRemove(constants.XWARED_LOCK)
+        tryClose(self.fdLock)
+        tryRemove(constants.XWARED_LOCK)
         self.settings.save()
 
         sys.exit(0)
 
 if __name__ == "__main__":
+    from shared.profile import profileBootstrap
+    profileBootstrap(constants.PROFILE_DIR)
     xwared = Xwared()
     while True:
         xwared.runETM()

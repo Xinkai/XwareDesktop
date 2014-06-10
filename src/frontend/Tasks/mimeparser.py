@@ -25,7 +25,7 @@ class UrlExtractor(QObject):
         patternLines = app.settings.get("frontend", "watchpattern").split("\n")
         patternList = []
         for line in patternLines:
-            if len(line) == 0 or line[0] == ";":
+            if len(line) == 0 or line.startswith("//"):
                 continue
 
             extensions = line.split(";")
@@ -41,7 +41,6 @@ class UrlExtractor(QObject):
 
     def updatePatternRegex(self, patternSet):
         patternStr = "|".join(patternSet).replace(".", "\.")
-        print("updated clipboard pattern regex", patternStr)
 
         self._patterns = re.compile(
             r"(?:(?:(?:"
@@ -70,5 +69,4 @@ class UrlExtractor(QObject):
     def extract(self, text):
         # extract from a raw text, and return a list of supported links
         result = re.findall(self._patterns, text)
-        print("extracted urls", "\n".join(result))
         return result

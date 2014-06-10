@@ -50,21 +50,21 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="tab_general">
+     <widget class="QWidget" name="tab_loginAndStart">
       <attribute name="title">
-       <string>一般</string>
+       <string>启动与登录</string>
       </attribute>
       <widget class="QGroupBox" name="group_etmStartWhen">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>150</y>
-         <width>331</width>
-         <height>131</height>
+         <x>610</x>
+         <y>10</y>
+         <width>280</width>
+         <height>271</height>
         </rect>
        </property>
        <property name="title">
-        <string>后端什么时候启动</string>
+        <string>ETM何时启动</string>
        </property>
        <property name="flat">
         <bool>true</bool>
@@ -74,8 +74,8 @@
          <rect>
           <x>10</x>
           <y>30</y>
-          <width>311</width>
-          <height>86</height>
+          <width>261</width>
+          <height>201</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -85,7 +85,7 @@
             <string>Xware开机后即上线开始下载。适用于长期挂机的用户。</string>
            </property>
            <property name="text">
-            <string>后端随xwared启动</string>
+            <string>随xwared启动</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -98,7 +98,7 @@
             <string>后端开启与否由前端控制。做出的选项重启电脑后依然保持。</string>
            </property>
            <property name="text">
-            <string>后端启动状态维持手动设定</string>
+            <string>启动状态维持手动设定</string>
            </property>
           </widget>
          </item>
@@ -108,20 +108,20 @@
             <string>这是Windows上的迅雷的标准行为。图形界面关闭后停止下载。</string>
            </property>
            <property name="text">
-            <string>后端随前端启动而启动，随前端退出而退出</string>
+            <string>随前端启动而启动，随前端退出而退出</string>
            </property>
           </widget>
          </item>
         </layout>
        </widget>
       </widget>
-      <widget class="QGroupBox" name="groupBox_2">
+      <widget class="QGroupBox" name="group_frontend">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>331</width>
-         <height>131</height>
+         <width>280</width>
+         <height>271</height>
         </rect>
        </property>
        <property name="title">
@@ -135,7 +135,7 @@
          <rect>
           <x>12</x>
           <y>33</y>
-          <width>206</width>
+          <width>218</width>
           <height>89</height>
          </rect>
         </property>
@@ -200,6 +200,62 @@
         </layout>
        </widget>
       </widget>
+      <widget class="QGroupBox" name="group_initManaged">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>10</y>
+         <width>280</width>
+         <height>271</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>xwared托管</string>
+       </property>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>30</y>
+          <width>261</width>
+          <height>201</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QRadioButton" name="radio_managedBySystemd">
+           <property name="toolTip">
+            <string>systemd 用户会话</string>
+           </property>
+           <property name="text">
+            <string>由用户态systemd托管</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_managedByUpstart">
+           <property name="text">
+            <string>由用户态upstart托管</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_managedByAutostart">
+           <property name="text">
+            <string>简单的自动启动(不推荐)</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QRadioButton" name="radio_managedByNothing">
+           <property name="text">
+            <string>不托管(不推荐)</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_frontend">
       <attribute name="title">
@@ -226,7 +282,7 @@
         <rect>
          <x>12</x>
          <y>12</y>
-         <width>217</width>
+         <width>231</width>
          <height>170</height>
         </rect>
        </property>
@@ -396,17 +452,17 @@
        </attribute>
        <column>
         <property name="text">
+         <string>Windows路径</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string>Unix路径</string>
         </property>
        </column>
        <column>
         <property name="text">
-         <string>对应盘符</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>状态检查</string>
+         <string>状态</string>
         </property>
        </column>
       </widget>
@@ -415,7 +471,7 @@
         <rect>
          <x>10</x>
          <y>260</y>
-         <width>255</width>
+         <width>261</width>
          <height>27</height>
         </rect>
        </property>
@@ -447,13 +503,6 @@
            <iconset theme="list-remove">
             <normaloff/>
            </iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btn_refreshMount">
-          <property name="text">
-           <string>再次状态检查</string>
           </property>
          </widget>
         </item>
@@ -642,25 +691,32 @@
   <tabstop>lineEdit_loginUsername</tabstop>
   <tabstop>lineEdit_loginPassword</tabstop>
   <tabstop>checkBox_autoLogin</tabstop>
+  <tabstop>checkBox_autoStartFrontend</tabstop>
+  <tabstop>radio_managedBySystemd</tabstop>
+  <tabstop>radio_managedByUpstart</tabstop>
+  <tabstop>radio_managedByAutostart</tabstop>
+  <tabstop>radio_managedByNothing</tabstop>
   <tabstop>radio_backendStartWhen1</tabstop>
   <tabstop>radio_backendStartWhen2</tabstop>
   <tabstop>radio_backendStartWhen3</tabstop>
-  <tabstop>buttonBox</tabstop>
   <tabstop>checkBox_allowFlash</tabstop>
   <tabstop>checkBox_minimizeToSystray</tabstop>
   <tabstop>checkBox_closeToMinimize</tabstop>
   <tabstop>checkBox_showMonitorWindow</tabstop>
+  <tabstop>checkBox_popNotifications</tabstop>
+  <tabstop>checkBox_notifyBySound</tabstop>
+  <tabstop>spinBox_monitorFullSpeed</tabstop>
   <tabstop>checkBox_enableDevelopersTools</tabstop>
   <tabstop>checkBox_watchClipboard</tabstop>
   <tabstop>plaintext_watchPattern</tabstop>
+  <tabstop>table_mounts</tabstop>
+  <tabstop>btn_addMount</tabstop>
+  <tabstop>btn_removeMount</tabstop>
   <tabstop>spinBox_maxRunningTasksNum</tabstop>
   <tabstop>spinBox_dSpeedLimit</tabstop>
   <tabstop>spinBox_uSpeedLimit</tabstop>
   <tabstop>lineEdit_lcport</tabstop>
-  <tabstop>btn_refreshMount</tabstop>
-  <tabstop>btn_removeMount</tabstop>
-  <tabstop>btn_addMount</tabstop>
-  <tabstop>table_mounts</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>
   <include location="rc/resource.qrc"/>
@@ -673,8 +729,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>9</x>
-     <y>643</y>
+     <x>18</x>
+     <y>364</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -689,8 +745,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>9</x>
-     <y>643</y>
+     <x>18</x>
+     <y>364</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>

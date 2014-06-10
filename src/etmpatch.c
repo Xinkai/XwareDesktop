@@ -6,9 +6,11 @@
 #include <unistd.h>
 #include <limits.h>
 #include <libgen.h>
+#include <stdlib.h> // getenv
+#include <errno.h>
 
 const char* PROC_MOUNTS = "/proc/mounts";
-char XWARE_MOUNTS_PATH[PATH_MAX];
+char XWARE_MOUNTS_PATH[PATH_MAX] = {0};
 int XWARE_MOUNTS_PATH_INITIALIZED = 0;
 
 #define fd_stderr 2
@@ -25,11 +27,28 @@ int XWARE_MOUNTS_PATH_INITIALIZED = 0;
 #define XD_SPRINTF \
         int (*sprintf) (char *__restrict __s, const char *__restrict __format, ...) = dlsym(RTLD_NEXT, "sprintf");
 
-int __getExePath(char* result) {
+int __init_xware_mounts_path() {
+    XD_DPRINTF;
+
+    char* tmp = getenv("XWARE-DESKTOP-CHMNS");
+    if (tmp) {
+        strcpy(XWARE_MOUNTS_PATH, tmp);
+        strcat(XWARE_MOUNTS_PATH, "/etc/mounts");
+        XWARE_MOUNTS_PATH_INITIALIZED = 1;
+        return 1;
+    } else {
+        if (errno != 0) {
+            dprintf(fd_stderr, "getenv with errno %d", errno);
+        }
+        return 0;
+    }
+}
+
+int __resolve(const char* symlink, char* result) {
     XD_PERROR;
     XD_DPRINTF;
 
-    ssize_t tmp = readlink("/proc/self/exe", result, PATH_MAX);
+    ssize_t tmp = readlink(symlink, result, PATH_MAX);
     if (tmp < 0) {
         perror("readlink");
         return 0;
@@ -40,36 +59,33 @@ int __getExePath(char* result) {
     return 1;
 }
 
-void __init_Xware_mounts_path() {
-    XD_DPRINTF;
+int __resolve_fd(const int fd, char* result) {
+    XD_SPRINTF;
 
-    if (!__getExePath(XWARE_MOUNTS_PATH)) {
-        dprintf(fd_stderr, "failed to getExePath\n.");
-    }
-    strcat(dirname(dirname(dirname(XWARE_MOUNTS_PATH))), // ETM runs in BASE_DIR/xware/lib, fake mounts is ../../mounts
-           "/mounts");
-    XWARE_MOUNTS_PATH_INITIALIZED = 1;
+    char symlink[PATH_MAX] = {0};
+    sprintf(symlink, "/proc/self/fd/%u", fd);
+    return __resolve(symlink, result);
 }
 
 int fopen64(const char* path, const char* mode) {
     XD_PRINTF;
 
-    int (*new_fopen64) (const char* path, const char* mode);
+    int (*real_fopen64) (const char* path, const char* mode);
     int result;
 
-    new_fopen64 = dlsym(RTLD_NEXT, "fopen64");
+    real_fopen64 = dlsym(RTLD_NEXT, "fopen64");
     if (strcmp(PROC_MOUNTS, path) == 0) {
         // feed xware a fake instead of the real /proc/mounts
         printf("\nXware Desktop: FOPEN64 on /proc/mounts");
         if (!XWARE_MOUNTS_PATH_INITIALIZED) {
             printf("\nXware Desktop: FAKE MOUNTS INIT...");
-            __init_Xware_mounts_path();
+            __init_xware_mounts_path();
             printf("set to %s", XWARE_MOUNTS_PATH);
         }
-        result = new_fopen64(XWARE_MOUNTS_PATH, mode);
+        result = real_fopen64(XWARE_MOUNTS_PATH, mode);
     } else {
         // pass on this API call
-        result = new_fopen64(path, mode);
+        result = real_fopen64(path, mode);
     }
 
     return result;
@@ -78,69 +94,27 @@ int fopen64(const char* path, const char* mode) {
 mode_t umask(mode_t mask) {
     XD_PRINTF;
 
-    mode_t (*new_umask) (mode_t mask);
-    mode_t result;
-    printf("Xware Desktop: UMASK %o to 006\n", mask);
-    new_umask = dlsym(RTLD_NEXT, "umask");
-    result = new_umask(006);
-    return result;
+    printf("Xware Desktop: denied umask(%o)\n", mask);
+    return 0;
 }
 
 int fchmod(const int fd, mode_t mode) {
     XD_PRINTF;
-    XD_PERROR;
-    XD_SPRINTF;
 
-    int (*new_fchmod) (const int fd, mode_t mode);
-    int result;
-
-    new_fchmod = dlsym(RTLD_NEXT, "fchmod");
-    mode_t new_mode;
-    // find out what this fd points to
-    struct stat fdstat;
-
-    if (fstat(fd, &fdstat)) {
-        new_mode = mode;
-        perror("Xware Desktop: fstat inside fchmod");
-        goto end;
-
+    char filename[PATH_MAX] = {0};
+    int ok = __resolve_fd(fd, filename);
+    if (ok) {
+        printf("Xware Desktop: denied fchmod(%s(%d), %o)\n", filename, fd, mode);
     } else {
-        // successfully get fd stat
-        char fd_link_path[PATH_MAX];
-        sprintf(fd_link_path, "/proc/self/fd/%u", fd);
-
-        char fd_link_resolved_path[PATH_MAX] = {0};
-        ssize_t tmp = readlink(fd_link_path, fd_link_resolved_path, PATH_MAX);
-        if (tmp < 0) {
-            new_mode = mode;
-            perror("Xware Desktop: readlink");
-            goto end;
-        }
-
-        if (tmp > PATH_MAX) {
-            new_mode = mode;
-            perror("Xware Desktop: readlink size insufficient");
-            goto end;
-        }
-
-        if (S_ISREG(fdstat.st_mode)) {
-            new_mode = mode & 0660;
-            printf("Xware Desktop: FCHMOD on file (%o->%o)  %s\n", mode, new_mode, fd_link_resolved_path);
-            goto end;
-
-        } else if (S_ISDIR(fdstat.st_mode)) {
-            new_mode = mode & 0771;
-            printf("Xware Desktop: FCHMOD on dir (%o->%o)  %s\n", mode, new_mode, fd_link_resolved_path);
-            goto end;
-
-        } else {
-            // for non-file, non-dir file-like objects like sockets, don't do anything
-            new_mode = mode;
-            goto end;
-        }
+        printf("Xware Desktop: denied fchmod(fd, %o), but cannot resolve\n", mode);
     }
 
-end:
-    result = new_fchmod(fd, new_mode);
-    return result;
+    return 0;
+}
+
+int chmod(const char* path, mode_t mode) {
+    XD_PRINTF;
+
+    printf("Xware Desktop: denied chmod(%s, %d)\n", path, mode);
+    return 0;
 }

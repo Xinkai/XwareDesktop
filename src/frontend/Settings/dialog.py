@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog
 from PyQt5.QtGui import QBrush
 
 import os
+from misc import getInitSystemType, INIT_SYSTEMD, INIT_UPSTART
 
-import constants
 from xwaredpy import callXwaredInterface, SocketDoesntExist
 from etmpy import EtmSetting
 from .ui_settings import Ui_Dialog
@@ -24,8 +24,24 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.lineEdit_loginUsername.setText(app.settings.get("account", "username"))
         self.lineEdit_loginPassword.setText(app.settings.get("account", "password"))
         self.checkBox_autoLogin.setChecked(app.settings.getbool("account", "autologin"))
-        self.checkBox_autoStartFrontend.setChecked(self.doesAutoStartFileExists())
+        self.checkBox_autoStartFrontend.setChecked(app.autoStart)
 
+        # Xwared Management
+        managedBySystemd = app.xwaredpy.managedBySystemd
+        managedByUpstart = app.xwaredpy.managedByUpstart
+        managedByAutostart = app.xwaredpy.managedByAutostart
+
+        self.radio_managedBySystemd.setChecked(managedBySystemd)
+        self.radio_managedByUpstart.setChecked(managedByUpstart)
+        self.radio_managedByAutostart.setChecked(managedByAutostart)
+        self.radio_managedByNothing.setChecked(
+            not (managedBySystemd or managedByUpstart or managedByAutostart))
+
+        initSysType = getInitSystemType()
+        self.radio_managedBySystemd.setEnabled(initSysType == INIT_SYSTEMD)
+        self.radio_managedByUpstart.setEnabled(initSysType == INIT_UPSTART)
+
+        # frontend
         self.checkBox_enableDevelopersTools.setChecked(
             app.settings.getbool("frontend", "enabledeveloperstools"))
         self.checkBox_allowFlash.setChecked(app.settings.getbool("frontend", "allowflash"))
@@ -41,6 +57,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
             app.settings.getbool("frontend", "showmonitorwindow"))
         self.spinBox_monitorFullSpeed.setValue(
             app.settings.getint("frontend", "monitorfullspeed"))
+
         # clipboard related
         self.checkBox_watchClipboard.stateChanged.connect(self.slotWatchClipboardToggled)
         self.checkBox_watchClipboard.setChecked(app.settings.getbool("frontend", "watchclipboard"))
@@ -60,7 +77,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.btn_addMount.clicked.connect(self.slotAddMount)
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)
-        self.btn_refreshMount.clicked.connect(self.setupMounts)
 
         # Mounts
         self.setupMounts()
@@ -68,16 +84,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         # backend setting is a different thing!
         self.setupETM()
 
-    @staticmethod
-    def doesAutoStartFileExists():
-        return os.path.lexists(constants.FRONTEND_AUTOSTART_FILE)
-
     @pyqtSlot(int)
     def slotWatchClipboardToggled(self, state):
-        # disable pattern settings, before
-        # 1. complete patterns
-        # 2. test glib key file compatibility
-        self.plaintext_watchPattern.setReadOnly(True)
         self.plaintext_watchPattern.setEnabled(state)
 
     @pyqtSlot()
@@ -85,29 +93,27 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.table_mounts.setRowCount(0)
         self.table_mounts.clearContents()
 
-        permissionCheckResult = app.mountsFaker.permissionCheck()
-        permissionCheckFailed = ["无法获得检测权限。运行{}查看原因。".format(constants.PERMISSIONCHECK)]
-
         mountsMapping = app.mountsFaker.getMountsMapping()
         for i, mount in enumerate(app.mountsFaker.mounts):
-            # mounts = ['/path/to/1', 'path/to/2', ...]
             self.table_mounts.insertRow(i)
-            self.table_mounts.setItem(i, 0, QTableWidgetItem(mount))
             # drive1: the drive letter it should map to, by alphabetical order
-            drive1 = chr(ord('C') + i) + ":"
-            self.table_mounts.setItem(i, 1, QTableWidgetItem(drive1))
+            drive1 = app.mountsFaker.driveIndexToLetter(i)
+            self.table_mounts.setItem(i, 0, QTableWidgetItem(drive1 + "\\TDDOWNLOAD"))
+
+            # mounts = ['/path/to/1', 'path/to/2', ...]
+            self.table_mounts.setItem(i, 1, QTableWidgetItem(mount))
+
             # drive2: the drive letter it actually is assigned to
             drive2 = mountsMapping.get(mount, "无")
 
-            # check 1: permission
-            errors = permissionCheckResult.get(mount, permissionCheckFailed)
+            errors = []
 
-            # check 2: mapping
+            # check: mapping
             if drive1 != drive2:
                 errors.append(
-                    "警告：盘符映射在'{actual}'，而不是'{should}'。需要重启后端修复。".format(
-                        actual = drive2,
-                        should = drive1))
+                    "错误：盘符映射在'{actual}'，而不是'{should}'。\n"
+                    "如果这是个新挂载的文件夹，请尝试稍等，或重启后端，可能会修复此问题。"
+                    .format(actual = drive2, should = drive1))
 
             brush = QBrush()
             if errors:
@@ -137,8 +143,10 @@ class SettingsDialog(QDialog, Ui_Dialog):
                 return
             row = self.table_mounts.rowCount()
             self.table_mounts.insertRow(row)
-            self.table_mounts.setItem(row, 0, QTableWidgetItem(selected))
-            self.table_mounts.setItem(row, 1, QTableWidgetItem("新近添加"))
+            self.table_mounts.setItem(
+                row, 0,
+                QTableWidgetItem(app.mountsFaker.driveIndexToLetter(row) + "\\TDDOWNLOAD"))
+            self.table_mounts.setItem(row, 1, QTableWidgetItem(selected))
             self.table_mounts.setItem(row, 2, QTableWidgetItem("新近添加"))
 
     @pyqtSlot()
@@ -151,17 +159,12 @@ class SettingsDialog(QDialog, Ui_Dialog):
         app.settings.set("account", "username", self.lineEdit_loginUsername.text())
         app.settings.set("account", "password", self.lineEdit_loginPassword.text())
         app.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
-        doesAutoStartFileExists = self.doesAutoStartFileExists()
-        if self.checkBox_autoStartFrontend.isChecked() and not doesAutoStartFileExists:
-            # mkdir if autostart dir doesn't exist
-            try:
-                os.mkdir(os.path.dirname(constants.FRONTEND_AUTOSTART_FILE))
-            except OSError:
-                pass  # already exists
-            os.symlink(constants.DESKTOP_FILE_LOCATION,
-                       constants.FRONTEND_AUTOSTART_FILE)
-        elif (not self.checkBox_autoStartFrontend.isChecked()) and doesAutoStartFileExists:
-            os.remove(constants.FRONTEND_AUTOSTART_FILE)
+
+        app.autoStart = self.checkBox_autoStartFrontend.isChecked()
+
+        app.xwaredpy.managedBySystemd = self.radio_managedBySystemd.isChecked()
+        app.xwaredpy.managedByUpstart = self.radio_managedByUpstart.isChecked()
+        app.xwaredpy.managedByAutostart = self.radio_managedByAutostart.isChecked()
 
         app.settings.setbool("frontend", "enabledeveloperstools",
                              self.checkBox_enableDevelopersTools.isChecked())
@@ -185,8 +188,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
                             self.spinBox_monitorFullSpeed.value())
         app.settings.setbool("frontend", "watchclipboard",
                              self.checkBox_watchClipboard.isChecked())
-        # app.settings.set("frontend", "watchpattern",
-        #                         self.plaintext_watchPattern.toPlainText())
+        app.settings.set("frontend", "watchpattern",
+                         self.plaintext_watchPattern.toPlainText())
 
         if self.group_etmStartWhen.isEnabled():
             startEtmWhen = self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton())
@@ -205,7 +208,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @property
     def newMounts(self):
-        return list(map(lambda row: self.table_mounts.item(row, 0).text(),
+        return list(map(lambda row: self.table_mounts.item(row, 1).text(),
                         range(self.table_mounts.rowCount())))
 
     @pyqtSlot()

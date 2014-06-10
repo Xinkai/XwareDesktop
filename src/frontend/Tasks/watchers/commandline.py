@@ -8,6 +8,7 @@ from multiprocessing.connection import Listener, Client
 import os, threading
 
 import constants
+from misc import tryRemove
 
 
 class CommandlineClient(object):
@@ -26,10 +27,7 @@ class CommandlineWatcher(QObject):
 
     def listenerThread(self):
         # clean if previous run crashes
-        try:
-            os.remove(constants.FRONTEND_SOCKET[0])
-        except FileNotFoundError:
-            pass
+        tryRemove(constants.FRONTEND_SOCKET[0])
 
         with Listener(*constants.FRONTEND_SOCKET) as listener:
             while True:

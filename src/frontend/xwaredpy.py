@@ -6,6 +6,8 @@ from launcher import app
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 import threading, time
+import os
+from misc import tryRemove, trySymlink, tryMkdir
 import constants
 
 from multiprocessing.connection import Client
@@ -152,3 +154,50 @@ class XwaredPy(QObject):
     @pyqtSlot()
     def slotRestartETM(self):
         callXwaredInterface("restartETM")
+
+    @property
+    def managedBySystemd(self):
+        return os.path.lexists(constants.SYSTEMD_SERVICE_ENABLED_USERFILE) and \
+            os.path.lexists(constants.SYSTEMD_SERVICE_USERFILE)
+
+    @managedBySystemd.setter
+    def managedBySystemd(self, on):
+        if on:
+            tryMkdir(os.path.dirname(constants.SYSTEMD_SERVICE_ENABLED_USERFILE))
+
+            trySymlink(constants.SYSTEMD_SERVICE_FILE,
+                       constants.SYSTEMD_SERVICE_USERFILE)
+
+            trySymlink(constants.SYSTEMD_SERVICE_USERFILE,
+                       constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
+        else:
+            tryRemove(constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
+            tryRemove(constants.SYSTEMD_SERVICE_USERFILE)
+
+    @property
+    def managedByUpstart(self):
+        return os.path.lexists(constants.UPSTART_SERVICE_USERFILE)
+
+    @managedByUpstart.setter
+    def managedByUpstart(self, on):
+        if on:
+            tryMkdir(os.path.dirname(constants.UPSTART_SERVICE_USERFILE))
+
+            trySymlink(constants.UPSTART_SERVICE_FILE,
+                       constants.UPSTART_SERVICE_USERFILE)
+        else:
+            tryRemove(constants.UPSTART_SERVICE_USERFILE)
+
+    @property
+    def managedByAutostart(self):
+        return os.path.lexists(constants.AUTOSTART_DESKTOP_USERFILE)
+
+    @managedByAutostart.setter
+    def managedByAutostart(self, on):
+        if on:
+            tryMkdir(os.path.dirname(constants.AUTOSTART_DESKTOP_USERFILE))
+
+            trySymlink(constants.AUTOSTART_DESKTOP_FILE,
+                       constants.AUTOSTART_DESKTOP_USERFILE)
+        else:
+            tryRemove(constants.AUTOSTART_DESKTOP_USERFILE)
