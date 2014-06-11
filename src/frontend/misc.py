@@ -42,7 +42,8 @@ def decodePrivateLink(link):
 
 INIT_SYSTEMD = 1
 INIT_UPSTART = 2
-INIT_UNKNOWN = 3
+INIT_UPSTART_WITHOUT_USER_SESSION = 3
+INIT_UNKNOWN = 4
 
 
 def getInitSystemType():
@@ -52,6 +53,9 @@ def getInitSystemType():
     if "systemd" in initVersion:
         return INIT_SYSTEMD
     elif "upstart" in initVersion:
-        return INIT_UPSTART
+        if "UPSTART_SESSION" in os.environ:
+            return INIT_UPSTART
+        else:
+            return INIT_UPSTART_WITHOUT_USER_SESSION
     else:
         return INIT_UNKNOWN
