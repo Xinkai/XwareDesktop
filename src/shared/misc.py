@@ -2,7 +2,11 @@
 
 from threading import Timer
 import os
-from pathlib import Path
+
+try:
+    from pathlib import Path
+except ImportError:
+    from shared.backports.pathlib import Path
 
 
 def debounce(wait, instant_first = True):
