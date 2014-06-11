@@ -19,8 +19,15 @@ ftp://dashingdash.com/1-2.txt
 包含用户名
 http://username@www.263.com/robots.cab
 
-包含中文用户名、密码 复合扩展名
-http://用户:pass@www.w3c.com/spec.tar.gz
+包含用户名、密码及复合扩展名
+http://user-name+1.23_ok:pass@www.w3c.com/spec.tar.gz
+http://user:pa+ss-wo_rd1.23@www.w3c.com/1.tar.gz
+
+用户名、密码：以下几种情况不应匹配
+ftp://用户@253.com/5555.txt
+ftp://user:中文密码@253.com/5555.txt
+ftp://user:%20%65@253.com/5555.txt
+ftp://user: pass @253.com/5555.txt
 
 包含用户名、密码、端口
 http://un:pass@www.444.com:1353/robots.txt
@@ -95,6 +102,8 @@ _ExpectedResult = """thunder://QUFodHRwOi8vaW0uYmFpZHUuY29tL2luc3RhbGwvQmFpZHVIa
 http://www.163.com/robots.zip
 ftp://dashingdash.com/1-2.txt
 http://username@www.263.com/robots.cab
+http://user-name+1.23_ok:pass@www.w3c.com/spec.tar.gz
+http://user:pa+ss-wo_rd1.23@www.w3c.com/1.tar.gz
 http://un:pass@www.444.com:1353/robots.txt
 http://www.555.com/player.exe?ab=3
 http://666.com/player.exe?ab=3&cd=opq
@@ -119,7 +128,7 @@ class TestExtractUrls(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.extractor = mimeparser.UrlExtractor(None)
-        cls.extractor.updatePatternRegex({".zip", ".cab", ".exe", ".txt", ".torrent", ".doc"})
+        cls.extractor.updatePatternRegex({".zip", ".cab", ".exe", ".txt", ".torrent", ".doc", ".tar.gz"})
 
     def test_extract(self):
         results = self.extractor.extract(testCases)

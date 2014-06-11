@@ -40,6 +40,8 @@ class UrlExtractor(QObject):
         self.updatePatternRegex(patternSet)
 
     def updatePatternRegex(self, patternSet):
+        # http://www.w3.org/Addressing/URL/url-spec.txt
+
         patternStr = "|".join(patternSet).replace(".", "\.")
 
         self._patterns = re.compile(
@@ -48,7 +50,7 @@ class UrlExtractor(QObject):
             r"(?:qqdl|flashget|thunder)://(?:[A-Za-z0-9+/=]{4})+"
             r")|(?:"  # http, ftp, https
             r"(?:http|ftp|https)://"                            # scheme
-            r"(?:(?:\w+)(?::\w+)?@)?"                           # username, password
+            r"(?:(?:[a-zA-Z0-9\-_\.\+]+)(?::[a-zA-Z0-9\-_\.\+]+)?@)?"  # username, password
             r"(?:[\w|\.|\-])+"                                  # host, also works for ip address
             r"(?::[0-9]{1,5})?/"                                # port, slash
             r"(?:[\w\.%=/&\-,()]+)" +                           # path + filename
