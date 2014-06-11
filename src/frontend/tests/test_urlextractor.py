@@ -44,6 +44,9 @@ ip地址、中文路径名
 http://71.35.264.35/测试.7zip
 http://71.35.264.35/测试.cab
 
+特殊符号 u3010, u3011
+https://1.2.3.4/【1】.zip
+
 https、下划线、逗号、横线，网址编码
 https://localhost:8000/test_page.zip?ab=3-5,5-6&cd=%20&callback=foo_bar
 
@@ -108,6 +111,7 @@ http://un:pass@www.444.com:1353/robots.txt
 http://www.555.com/player.exe?ab=3
 http://666.com/player.exe?ab=3&cd=opq
 http://71.35.264.35/测试.cab
+https://1.2.3.4/【1】.zip
 https://localhost:8000/test_page.zip?ab=3-5,5-6&cd=%20&callback=foo_bar
 http://127.0.0.1/bar.php.zip
 HtTP://test.com/foo.zIP

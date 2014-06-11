@@ -44,6 +44,9 @@ class UrlExtractor(QObject):
 
         patternStr = "|".join(patternSet).replace(".", "\.")
 
+        # u3010 【
+        # u3011 】
+
         self._patterns = re.compile(
             r"(?:(?:(?:"
             # match all private links
@@ -53,7 +56,7 @@ class UrlExtractor(QObject):
             r"(?:(?:[a-zA-Z0-9\-_\.\+]+)(?::[a-zA-Z0-9\-_\.\+]+)?@)?"  # username, password
             r"(?:[\w|\.|\-])+"                                  # host, also works for ip address
             r"(?::[0-9]{1,5})?/"                                # port, slash
-            r"(?:[\w\.%=/&\-,()]+)" +                           # path + filename
+            r"(?:[\w\.%=/&\-,()\u3010\u3011]+)" +               # path + filename
             r"(?:{})".format(patternStr) +                      # extension
             r"(?:\?(?:[\w\.\-\=\%\&\,\/])*)?"
             r")|(?:"
