@@ -33,7 +33,7 @@ pyqt:
 	pyrcc5 -o src/frontend/resource_rc.py src/frontend/ui/rc/resource.qrc
 
 pep8:
-	find src/frontend -name "*.py" -print0 | xargs -0 pep8 --exclude "ui_*.py,*_rc.py" --statistics --ignore "E251,E401"
+	find src -name "*.py" -not -path "src/shared/backports/*" -print0 | xargs -0 pep8 --exclude "ui_*.py,*_rc.py,test_*.py" --statistics --ignore "E251,E401"
 
 xwarejs.js: src/frontend/xwarejs.coffee
 	coffee -c src/frontend/xwarejs.coffee
