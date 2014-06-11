@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 import threading, time
 import os
-from misc import tryRemove, trySymlink, tryMkdir
+from misc import tryRemove, trySymlink, tryMkdir, getInitSystemType, INIT_UPSTART
 import constants
 
 from multiprocessing.connection import Client
@@ -187,7 +187,8 @@ class XwaredPy(QObject):
                        constants.UPSTART_SERVICE_USERFILE)
         else:
             tryRemove(constants.UPSTART_SERVICE_USERFILE)
-        os.system("initctl --user reload-configuration")
+        if getInitSystemType() == INIT_UPSTART:
+            os.system("initctl --user reload-configuration")
 
     @property
     def managedByAutostart(self):
