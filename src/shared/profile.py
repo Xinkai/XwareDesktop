@@ -13,7 +13,7 @@ def profileBootstrap(targetDir):
     try:
         (profilePath / "cfg").mkdir(parents = True)
         (profilePath / "etc").mkdir(parents = True)
-        (profilePath / "mntlinks").mkdir(parents = True)
+        (profilePath / "mnt").mkdir(parents = True)
         (profilePath / "tmp" / "thunder").mkdir(parents = True)
     except FileExistsError:
         pass
