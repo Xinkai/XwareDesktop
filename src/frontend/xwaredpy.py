@@ -57,15 +57,16 @@ class _XwaredCommunicationClient(object):
         return self.response
 
 
-class SocketDoesntExist(FileNotFoundError):
+class InvalidSocket(FileNotFoundError, ConnectionRefusedError):
     pass
 
 
 def callXwaredInterface(funcName, *args, **kwargs):
     try:
         client = _XwaredCommunicationClient()
-    except FileNotFoundError as e:
-        raise SocketDoesntExist(e)
+    except (FileNotFoundError, ConnectionRefusedError) as e:
+        logging.error("XwaredInterface InvalidSocket with method {}".format(funcName))
+        raise InvalidSocket(e)
 
     client.setFunc(funcName)
     if args:
@@ -113,15 +114,28 @@ class XwaredPy(QObject):
     def startXware():
         try:
             callXwaredInterface("start")  # TODO: when remote, disable this
-        except SocketDoesntExist:
+        except InvalidSocket:
             pass
 
     @staticmethod
     def stopXware():
         try:
             callXwaredInterface("quit")  # TODO: when remote, disable this
-        except SocketDoesntExist:
+        except InvalidSocket:
             pass
+
+    @property
+    def startEtmWhen(self):
+        # return None if cannot get the value
+
+        try:
+            return callXwaredInterface("getStartEtmWhen")
+        except InvalidSocket:
+            return None
+
+    @startEtmWhen.setter
+    def startEtmWhen(self, value):
+        callXwaredInterface("setStartEtmWhen", value)
 
     def _watcherThread(self):
         while True:
@@ -132,7 +146,7 @@ class XwaredPy(QObject):
                 self.lcPort = backendInfo.lcPort
                 self.userId = backendInfo.userId
                 self.peerId = backendInfo.peerId
-            except SocketDoesntExist:
+            except InvalidSocket:
                 self.xwaredStatus = False
                 self.etmStatus = False
                 self.lcPort = 0

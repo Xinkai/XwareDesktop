@@ -9,7 +9,7 @@ from PyQt5.QtGui import QBrush
 import os
 from misc import getInitSystemType, INIT_SYSTEMD, INIT_UPSTART
 
-from xwaredpy import callXwaredInterface, SocketDoesntExist
+from xwaredpy import InvalidSocket
 from etmpy import EtmSetting
 from .ui_settings import Ui_Dialog
 
@@ -69,10 +69,10 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
 
-        try:
-            startEtmWhen = callXwaredInterface("getStartEtmWhen")
+        startEtmWhen = app.xwaredpy.startEtmWhen
+        if startEtmWhen:
             self.btngrp_etmStartWhen.button(startEtmWhen).setChecked(True)
-        except SocketDoesntExist:
+        else:
             self.group_etmStartWhen.setEnabled(False)
 
         self.btn_addMount.clicked.connect(self.slotAddMount)
@@ -194,8 +194,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         if self.group_etmStartWhen.isEnabled():
             startEtmWhen = self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton())
             try:
-                callXwaredInterface("setStartEtmWhen", startEtmWhen)
-            except SocketDoesntExist:
+                app.xwaredpy.startEtmWhen = startEtmWhen
+            except InvalidSocket:
                 QMessageBox.warning(None, "Xware Desktop",
                                     "选项未能成功设置：{}。".format(self.group_etmStartWhen.title()),
                                     QMessageBox.Ok, QMessageBox.Ok)
