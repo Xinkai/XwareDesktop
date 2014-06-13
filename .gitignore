@@ -2,10 +2,20 @@
 __pycache__/
 *.py[cod]
 
+# Editor temp
+*~
+
 # IDE
 .cproject
 .project
 .idea/
+
+# Qt Creator
+XwareDesktop.config
+XwareDesktop.creator
+XwareDesktop.creator.user
+XwareDesktop.files
+XwareDesktop.includes
 
 # Build/Prepared
 build/
@@ -32,3 +42,8 @@ xwarejs.js
 # my building environment flag
 .localdev
 unused/
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
