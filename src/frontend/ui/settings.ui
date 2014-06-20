@@ -423,9 +423,6 @@
        <property name="contextMenuPolicy">
         <enum>Qt::NoContextMenu</enum>
        </property>
-       <property name="styleSheet">
-        <string notr="true">Q</string>
-       </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
