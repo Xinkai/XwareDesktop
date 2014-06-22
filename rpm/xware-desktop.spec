@@ -23,7 +23,7 @@ BuildRequires:      chrpath >= 0.14
 BuildRequires:      findutils
 BuildRequires:      sed
 
-Requires:           python3 >= 3.3
+Requires:           python3 >= 3.4
 Requires:           glibc(x86-32)
 Requires:           zlib(x86-32)
 Requires:           python3-qt5
