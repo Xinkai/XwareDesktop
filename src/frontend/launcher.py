@@ -84,20 +84,33 @@ class XwareDesktop(QApplication):
 
     @staticmethod
     def checkOneInstance():
-        tasks = sys.argv[1:]
-
         fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT)
 
-        from Tasks import CommandlineClient
         try:
             fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
-            if len(tasks) == 0:
-                print("You already have an Xware Desktop instance running.")
+            def showStartErrorAndExit():
+                from PyQt5.QtWidgets import QMessageBox
+                QMessageBox.warning(None, "Xware Desktop 启动失败",
+                                    "Xware Desktop已经运行，或其没有正常退出。\n"
+                                    "请检查：\n"
+                                    "    1. 没有Xware Desktop正在运行\n"
+                                    "    2. 上次运行的Xware Desktop没有残留"
+                                    "（使用进程管理器查看名为python3或xware-desktop或launcher.py的进程）\n",
+                                    QMessageBox.Ok, QMessageBox.Ok)
                 sys.exit(-1)
+
+            tasks = sys.argv[1:]
+            if len(tasks) == 0:
+                showStartErrorAndExit()
             else:
-                print(tasks)
-                CommandlineClient(tasks)
+                from Tasks import CommandlineClient
+                try:
+                    CommandlineClient(tasks)
+                except FileNotFoundError:
+                    showStartErrorAndExit()
+                except ConnectionRefusedError:
+                    showStartErrorAndExit()
                 sys.exit(0)
 
     @pyqtSlot()
