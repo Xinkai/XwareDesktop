@@ -26,9 +26,9 @@ BuildRequires:      sed
 Requires:           python3 >= 3.4
 Requires:           glibc(x86-32)
 Requires:           zlib(x86-32)
-Requires:           python3-qt5
-Requires:           qt5-qtwebkit
-Requires:           qt5-qtmultimedia
+Requires:           python3-qt5 >= 5.2
+Requires:           qt5-qtwebkit >= 5.2
+Requires:           qt5-qtmultimedia >= 5.2
 Requires:           python3-requests
 Requires:           python3-inotify
 Requires(post):     desktop-file-utils
