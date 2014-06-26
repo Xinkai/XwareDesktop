@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog
 from PyQt5.QtGui import QBrush
 
 import os
-from misc import getInitSystemType, INIT_SYSTEMD, INIT_UPSTART
+from misc import getInitType, InitType
 
 from xwaredpy import InvalidSocket
 from etmpy import EtmSetting
@@ -37,9 +37,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.radio_managedByNothing.setChecked(
             not (managedBySystemd or managedByUpstart or managedByAutostart))
 
-        initSysType = getInitSystemType()
-        self.radio_managedBySystemd.setEnabled(initSysType == INIT_SYSTEMD)
-        self.radio_managedByUpstart.setEnabled(initSysType == INIT_UPSTART)
+        initType = getInitType()
+        self.radio_managedBySystemd.setEnabled(initType == InitType.SYSTEMD)
+        self.radio_managedByUpstart.setEnabled(initType == InitType.UPSTART)
 
         # frontend
         self.checkBox_enableDevelopersTools.setChecked(
