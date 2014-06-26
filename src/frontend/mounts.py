@@ -66,7 +66,9 @@ class MountsFaker(object):
         # takes a path like "/tmp/thunder/volumes/C:/TDDOWNLOAD/1.zip"
         # returns a local path "/home/user/Download/1.zip"
 
-        assert path[:len(constants.ETM_MOUNTS_DIR)] == constants.ETM_MOUNTS_DIR
+        tmp1 = path[:len(constants.ETM_MOUNTS_DIR)]
+        tmp2 = constants.ETM_MOUNTS_DIR
+        assert tmp1 == tmp2, (tmp1, tmp2)
 
         path = path[len(constants.ETM_MOUNTS_DIR):]  # remove "/tmp/thunder/volumes/" prefix
         parts = path.split("/")  # ["C:", "TDDOWNLOAD", "1.zip"]
