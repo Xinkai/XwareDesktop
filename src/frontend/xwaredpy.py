@@ -187,6 +187,8 @@ class XwaredPy(QObject):
         else:
             tryRemove(constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
             tryRemove(constants.SYSTEMD_SERVICE_USERFILE)
+        if getInitType() == InitType.SYSTEMD:
+            os.system("systemctl --user daemon-reload")
 
     @property
     def managedByUpstart(self):
