@@ -2,6 +2,7 @@
 
 import base64
 import subprocess
+import enum
 
 from shared.misc import *
 
@@ -40,22 +41,25 @@ def decodePrivateLink(link):
     else:
         raise Exception("Cannot decode private link {}.".format(link))
 
-INIT_SYSTEMD = 1
-INIT_UPSTART = 2
-INIT_UPSTART_WITHOUT_USER_SESSION = 3
-INIT_UNKNOWN = 4
+
+@enum.unique
+class InitType(enum.Enum):
+    SYSTEMD = 1
+    UPSTART = 2
+    UPSTART_WITHOUT_USER_SESSION = 3
+    UNKNOWN = 4
 
 
-def getInitSystemType():
+def getInitType():
     with subprocess.Popen(["init", "--version"], stdout = subprocess.PIPE) as proc:
         initVersion = str(proc.stdout.read())
 
     if "systemd" in initVersion:
-        return INIT_SYSTEMD
+        return InitType.SYSTEMD
     elif "upstart" in initVersion:
         if "UPSTART_SESSION" in os.environ:
-            return INIT_UPSTART
+            return InitType.UPSTART
         else:
-            return INIT_UPSTART_WITHOUT_USER_SESSION
+            return InitType.UPSTART_WITHOUT_USER_SESSION
     else:
-        return INIT_UNKNOWN
+        return InitType.UNKNOWN

@@ -8,8 +8,6 @@ from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkDiskCache
 
 import os
 
-from Compat.CompatUrl import CompatUrl
-
 
 def forLocalDeviceOnly(func):
     def wrapper(SELF, request):
@@ -39,7 +37,7 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
         self.setCache(self._cachePath)
 
     def createRequest(self, op, request, device = None):
-        qurl = CompatUrl(request.url())
+        qurl = request.url()
         if qurl.host() == "homecloud.yuancheng.xunlei.com":
             path = qurl.fileName()
             preprocessor = self.getPreprocessorFor(path)

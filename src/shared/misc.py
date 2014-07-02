@@ -3,10 +3,7 @@
 from threading import Timer
 import os
 
-try:
-    from pathlib import Path
-except ImportError:
-    from shared.backports.pathlib import Path
+from pathlib import Path
 
 
 def debounce(wait, instant_first = True):

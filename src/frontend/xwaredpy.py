@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 import threading, time
 import os
-from misc import tryRemove, trySymlink, tryMkdir, getInitSystemType, INIT_UPSTART
+from misc import tryRemove, trySymlink, tryMkdir, getInitType, InitType
 import constants
 
 from multiprocessing.connection import Client
@@ -187,6 +187,8 @@ class XwaredPy(QObject):
         else:
             tryRemove(constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
             tryRemove(constants.SYSTEMD_SERVICE_USERFILE)
+        if getInitType() == InitType.SYSTEMD:
+            os.system("systemctl --user daemon-reload")
 
     @property
     def managedByUpstart(self):
@@ -201,7 +203,7 @@ class XwaredPy(QObject):
                        constants.UPSTART_SERVICE_USERFILE)
         else:
             tryRemove(constants.UPSTART_SERVICE_USERFILE)
-        if getInitSystemType() == INIT_UPSTART:
+        if getInitType() == InitType.UPSTART:
             os.system("initctl --user reload-configuration")
 
     @property

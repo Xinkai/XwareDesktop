@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
-try:
-    from pathlib import Path
-except ImportError:
-    from shared.backports.pathlib import Path
+from pathlib import Path
 
 
 def profileBootstrap(targetDir):

@@ -7,7 +7,6 @@ from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon
 
-from Compat.CompatSystemTrayIcon import CompatSystemTrayIcon
 from contextmenu import ContextMenu
 
 
@@ -21,7 +20,7 @@ class Systray(QObject):
 
         icon = QIcon(":/image/thunder.ico")
 
-        self.trayIcon = CompatSystemTrayIcon(self)
+        self.trayIcon = QSystemTrayIcon(self)
         self.trayIcon.setIcon(icon)
         self.trayIcon.setContextMenu(self.trayIconMenu)
         self.trayIcon.setVisible(True)

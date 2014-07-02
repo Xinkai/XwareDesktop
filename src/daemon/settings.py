@@ -5,6 +5,10 @@ XWARED_DEFAULTS_SETTINGS = {
         "startetm": True,
         "startetmwhen": 1,
     },
+    "etm": {
+        "shortlivedthreshold": 30,
+        "samplenumberoflongevity": 3,
+    },
 }
 
 from shared.config import SettingsAccessorBase

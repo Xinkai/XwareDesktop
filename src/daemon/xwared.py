@@ -4,6 +4,7 @@
 import logging
 
 import sys, os, time, fcntl, signal, threading
+import collections
 from multiprocessing.connection import Listener
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
 
@@ -33,6 +34,8 @@ class Xwared(object):
     etmPid = 0
     fdLock = None
     toRunETM = None
+    etmStartedAt = None
+    etmLongevities = None
 
     # Cfg watchers
     etmCfg = dict()
@@ -51,6 +54,7 @@ class Xwared(object):
         self.settings = SettingsAccessorBase(constants.XWARED_CONFIG_FILE,
                                              XWARED_DEFAULTS_SETTINGS)
         self.toRunETM = self.settings.getbool("xwared", "startetm")
+        self._resetEtmLongevities()
 
         # ipc listener
         self.listener = XwaredCommunicationListener(self)
@@ -129,13 +133,32 @@ class Xwared(object):
             sys.exit(-1)
         else:
             # parent
+            self.etmStartedAt = time.monotonic()
             print("parent: pid({pid}) cpid({cpid})".format(pid = os.getpid(),
                                                            cpid = self.etmPid))
             self._watchETM()
 
+    def _resetEtmLongevities(self):
+        sampleNumber = self.settings.getint("etm", "samplenumberoflongevity")
+        if not isinstance(self.etmLongevities, collections.deque):
+            self.etmLongevities = collections.deque(maxlen = sampleNumber)
+
+        for i in range(sampleNumber):
+            self.etmLongevities.append(float("inf"))
+
     def _watchETM(self):
         os.waitpid(self.etmPid, 0)
         self.etmPid = 0
+
+        longevity = time.monotonic() - self.etmStartedAt
+        self.etmLongevities.append(longevity)
+        threshold = self.settings.getint("etm", "shortlivedthreshold")
+        if all(map(lambda l: l <= threshold, self.etmLongevities)):
+            print("xwared: ETM持续时间连续{number}次不超过{threshold}秒，终止执行ETM"
+                  .format(number = self.etmLongevities.maxlen,
+                          threshold = threshold),
+                  file = sys.stderr)
+            self.toRunETM = False
 
     def stopETM(self, restart):
         if self.etmPid:
@@ -149,12 +172,15 @@ class Xwared(object):
 
     # frontend end interfaces
     def interface_startETM(self):
+        self._resetEtmLongevities()
         self.toRunETM = True
 
     def interface_stopETM(self):
+        self._resetEtmLongevities()
         self.stopETM(False)
 
     def interface_restartETM(self):
+        self._resetEtmLongevities()
         self.stopETM(True)
 
     def interface_start(self):

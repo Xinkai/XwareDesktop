@@ -97,7 +97,7 @@
      </widget>
     </item>
     <item>
-     <widget class="CompatComboBox" name="comboBox_action">
+     <widget class="QComboBox" name="comboBox_action">
       <property name="minimumSize">
        <size>
         <width>80</width>
@@ -139,7 +139,7 @@
      </widget>
     </item>
     <item>
-     <widget class="CompatComboBox" name="comboBox_actWhen"/>
+     <widget class="QComboBox" name="comboBox_actWhen"/>
     </item>
     <item>
      <widget class="QLabel" name="label_4">
@@ -154,13 +154,6 @@
    </layout>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CompatComboBox</class>
-   <extends>QComboBox</extends>
-   <header>Compat/CompatComboBox</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>comboBox_actWhen</tabstop>
   <tabstop>listWidget_tasks</tabstop>
