@@ -15,7 +15,7 @@ Xware Desktop的目标是提供与Windows平台上迅雷相当的功能。你可
 
 Archlinux： 支持。安装位于`AUR`的[xware-desktop包]。
 
-Ubuntu：支持13.10及以上版本。需自行打包，见[Ubuntu上编译安装说明]。
+Ubuntu：支持14.04及以上版本。需自行打包，见[Ubuntu上编译安装说明]。
 
 Fedora: 支持21及以上版本。需[自行打包]。
 
