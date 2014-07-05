@@ -115,6 +115,6 @@ int fchmod(const int fd, mode_t mode) {
 int chmod(const char* path, mode_t mode) {
     XD_PRINTF;
 
-    printf("Xware Desktop: denied chmod(%s, %d)\n", path, mode);
+    printf("Xware Desktop: denied chmod(%s, %o)\n", path, mode);
     return 0;
 }
