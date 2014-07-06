@@ -52,11 +52,11 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
                     for i in range(self.TICKS_PER_TASK):
                         task = app.etmpy.runningTasksStat.getTask(tid)
 
+                        time.sleep(self.TICK_INTERVAL)
                         if self._thread_should_stop:
                             return  # end the thread
 
                         logging.debug("updateSpeedsThread, deadlock incoming, maybe")
-                        time.sleep(self.TICK_INTERVAL)
                         try:
                             self.sigTaskUpdating.emit(task)
                         except TypeError:
