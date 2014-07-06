@@ -9,8 +9,8 @@ pkgrel=
 
 pkgname="xware-desktop"
 arch=("i686" "x86_64")
-conflicts=("xware_desktop-git" "xware_desktop")
-replaces=("xware_desktop-git" "xware_desktop")
+conflicts=("xware_desktop-git" "xware_desktop" "xware-desktop-git")
+replaces=("xware_desktop-git" "xware_desktop" "xware-desktop-git")
 license=("GPL" "custom")
 
 makedepends=("python-pyqt5" "coffee-script" "chrpath" "findutils" "sed")
