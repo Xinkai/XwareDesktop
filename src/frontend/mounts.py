@@ -4,7 +4,7 @@ from collections import OrderedDict
 import os
 
 import constants
-from misc import trySymlink, tryMkdir
+from utils.misc import trySymlink, tryMkdir
 
 
 class MountsFaker(object):

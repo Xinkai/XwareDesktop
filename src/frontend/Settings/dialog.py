@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog
 from PyQt5.QtGui import QBrush
 
 import os
-from misc import getInitType, InitType
+from utils.misc import getInitType, InitType
 
 from xwaredpy import InvalidSocket
 from etmpy import EtmSetting

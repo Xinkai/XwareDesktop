@@ -5,10 +5,10 @@ import logging
 from PyQt5.QtCore import QObject
 from multiprocessing.connection import Listener, Client
 
-import os, threading
+import threading
 
 import constants
-from misc import tryRemove
+from utils.misc import tryRemove
 
 
 class CommandlineClient(object):

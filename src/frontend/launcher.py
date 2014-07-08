@@ -5,7 +5,8 @@ import os, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
 
 if __name__ == "__main__":
-    import faulthandler, misc, logging
+    import faulthandler, logging
+    from utils import misc
     misc.tryMkdir(os.path.expanduser("~/.xware-desktop"))
 
     logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))

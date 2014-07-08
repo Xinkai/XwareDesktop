@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QStatusBar
 from .CStatusBarLabel import CustomStatusBarLabel
 from Schedule.SchedulerButton import SchedulerButton
 from Settings.QuickSpeedLimit import QuickSpeedLimitBtn
-from misc import debounce, getHumanBytesNumber
+from utils.misc import debounce, getHumanBytesNumber
 
 
 class CustomStatusBar(QStatusBar):

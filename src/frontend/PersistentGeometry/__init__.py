@@ -3,7 +3,7 @@
 import logging
 from launcher import app
 
-from misc import debounce
+from utils.misc import debounce
 
 
 # A helper to automatically preserve the geometry of windows.

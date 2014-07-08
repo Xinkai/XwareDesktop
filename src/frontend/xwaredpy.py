@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
 import threading, time
 import os
-from misc import tryRemove, trySymlink, tryMkdir, getInitType, InitType
+from utils.misc import tryRemove, trySymlink, tryMkdir, getInitType, InitType
 import constants
 
 from multiprocessing.connection import Client

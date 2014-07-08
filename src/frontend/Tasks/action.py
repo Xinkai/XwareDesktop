@@ -9,7 +9,7 @@ import sys
 from urllib import parse
 
 from frontendpy import FrontendAction
-import misc
+from utils import misc
 from .mimeparser import UrlExtractor
 from .watchers.clipboard import ClipboardWatcher
 from .watchers.commandline import CommandlineWatcher
