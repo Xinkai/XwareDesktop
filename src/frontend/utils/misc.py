@@ -5,6 +5,7 @@ import subprocess
 import enum
 
 from shared.misc import *
+from .decorators import simplecache
 
 
 def getHumanBytesNumber(byteNum):
@@ -50,6 +51,7 @@ class InitType(enum.Enum):
     UNKNOWN = 4
 
 
+@simplecache
 def getInitType():
     with subprocess.Popen(["init", "--version"], stdout = subprocess.PIPE) as proc:
         initVersion = str(proc.stdout.read())
