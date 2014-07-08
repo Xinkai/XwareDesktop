@@ -37,7 +37,7 @@ ui_*.py
 *_rc.py
 
 # coffeescript generated
-xwarejs.js
+*.js
 
 # my building environment flag
 .localdev

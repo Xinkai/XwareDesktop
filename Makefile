@@ -4,7 +4,7 @@ PREFIX        = /opt/xware-desktop
 GITHASH       = "`git rev-parse master 2>/dev/null`"
 SHELL         = /bin/bash
 
-all: etmpatch.so chmns pyqt xwarejs.js prepareXware replacePath
+all: etmpatch.so chmns pyqt coffee prepareXware replacePath
 
 etmpatch.so: src/etmpatch.c
 	mkdir -p build
@@ -20,7 +20,7 @@ clean:
 	find src/frontend -name "ui_*.py" -print0 | xargs -0 rm -f
 	find src/frontend -name "*_rc.py" -print0 | xargs -0 rm -f
 	find src -name "__pycache__" -print0 | xargs -0 rm -rf
-	rm -f src/frontend/xwarejs.js
+	find src/frontend -name "*.coffee" -print0 | xargs -0 rm -f
 
 pyqt:
 	pyuic5 -o src/frontend/ui_main.py     src/frontend/ui/main.ui
@@ -35,8 +35,8 @@ pyqt:
 pep8:
 	find src -name "*.py" -print0 | xargs -0 pep8 --exclude "ui_*.py,*_rc.py,test_*.py" --statistics --ignore "E251,E401"
 
-xwarejs.js: src/frontend/xwarejs.coffee
-	coffee -c src/frontend/xwarejs.coffee
+coffee:
+	find src -name "*.coffee" -print0 | xargs -0 coffee -bc
 
 prepareXware:
 	mkdir -p preparedXware
@@ -78,7 +78,7 @@ install:
 	# remove unwanted files
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/ui
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/tests
-	rm                 $(DESTDIR)$(PREFIX)/frontend/xwarejs.coffee
+	find $(DESTDIR)$(PREFIX) -name "*.coffee" -print0 | xargs -0 rm
 	rm                 $(DESTDIR)$(PREFIX)/frontend/xware-desktop.desktop
 
 	# icons
