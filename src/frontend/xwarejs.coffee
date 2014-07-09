@@ -262,3 +262,5 @@ $ ->
         window.MutationObserver = window.WebKitMutationObserver
 
     window.xdjs = new XwareJS()
+
+null # fix issue 64, by making Qt not cast the last statement's return value into a Qt type.
