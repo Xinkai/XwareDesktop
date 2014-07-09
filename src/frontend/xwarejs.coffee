@@ -212,9 +212,9 @@ class XwareJS
                 console.log("set logined", v)
         })
 
-        if typeof _online is "boolean"
+        if typeof _online is "number"
             xdpy.slotSetOnline(_online)
-        if typeof _logined is "boolean"
+        if typeof _logined is "number"
             xdpy.slotSetLogined(_logined)
 
     slotWaitToBindDeviceObserver: (boundPeerId) ->
