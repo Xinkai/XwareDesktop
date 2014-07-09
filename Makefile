@@ -20,7 +20,7 @@ clean:
 	find src/frontend -name "ui_*.py" -print0 | xargs -0 rm -f
 	find src/frontend -name "*_rc.py" -print0 | xargs -0 rm -f
 	find src -name "__pycache__" -print0 | xargs -0 rm -rf
-	find src/frontend -name "*.coffee" -print0 | xargs -0 rm -f
+	find src/frontend -name "*.js" -print0 | xargs -0 rm -f
 
 pyqt:
 	pyuic5 -o src/frontend/ui_main.py     src/frontend/ui/main.ui
