@@ -212,8 +212,10 @@ class XwareJS
                 console.log("set logined", v)
         })
 
-        xdpy.slotSetOnline(_online)
-        xdpy.slotSetLogined(_logined)
+        if typeof _online is "boolean"
+            xdpy.slotSetOnline(_online)
+        if typeof _logined is "boolean"
+            xdpy.slotSetLogined(_logined)
 
     slotWaitToBindDeviceObserver: (boundPeerId) ->
         # This method exists because the peerids are loaded by an ajax request,
