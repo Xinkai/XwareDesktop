@@ -51,6 +51,7 @@ DEFAULT_SETTINGS = {
         "watchclipboard": True,
         "watchpattern": _DEFAULT_PATTERN,
         "webviewminsizeoverride": None,
+        "webviewzoom": None,
     },
     "scheduler": {
         "poweroffcmd": "",

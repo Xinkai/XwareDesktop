@@ -21,6 +21,10 @@ class CustomWebView(QWebView):
         self.setPage(self._customPage)
         app.settings.applySettings.connect(self.slotApplySettings)
         self.load(QUrl(constants.LOGIN_PAGE))
+        zoom = app.settings.get("frontend", "webviewzoom")
+        if zoom:
+            zoom = float(zoom)
+            self.setZoomFactor(zoom)
 
     @pyqtSlot(QDropEvent)
     def dropEvent(self, qEvent):
