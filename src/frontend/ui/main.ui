@@ -46,12 +46,6 @@
     </property>
     <item>
      <widget class="CustomWebView" name="webView">
-      <property name="minimumSize">
-       <size>
-        <width>1008</width>
-        <height>715</height>
-       </size>
-      </property>
       <property name="styleSheet">
        <string notr="true">background-color: white;</string>
       </property>

@@ -3,7 +3,7 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import pyqtSlot, QEvent, Qt, QSize
+from PyQt5.QtCore import pyqtSlot, QEvent, Qt
 from PyQt5.QtWidgets import QMainWindow
 
 from ui_main import Ui_MainWindow
@@ -21,10 +21,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
 
         # UI
         self.setupUi(self)
-        minimumSizeOverride = app.settings.get("frontend", "webviewminsizeoverride")
-        if minimumSizeOverride:
-            w, h = minimumSizeOverride.split(",")
-            self.webView.setMinimumSize(QSize(int(w), int(h)))
         self.connectUI()
         self.preserveGeometry()
 
