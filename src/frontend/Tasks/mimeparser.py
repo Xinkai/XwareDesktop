@@ -63,7 +63,7 @@ class UrlExtractor(QObject):
             # match all ed2k
             r"ed2k://"
             r"(?:\|file\|)"                                     # type -> file
-            r"(?:[\w|_|\-|\.|%]+)\|"                            # filename
+            r"(?:[\w|_|\-|\.|%|&|'|\[|\]]+)\|"                  # filename
             r"(?:[0-9]+)\|"                                     # filesize
             r"(?:[a-f0-9]{32})\|"                               # hash
             r"(?:[\w|\/|\.|\-|:|\,|=]+)"                        # additional
