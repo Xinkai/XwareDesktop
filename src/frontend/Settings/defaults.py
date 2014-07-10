@@ -50,6 +50,7 @@ DEFAULT_SETTINGS = {
         "monitorfullspeed": 512,
         "watchclipboard": True,
         "watchpattern": _DEFAULT_PATTERN,
+        "webviewminsizeoverride": None,
     },
     "scheduler": {
         "poweroffcmd": "",
