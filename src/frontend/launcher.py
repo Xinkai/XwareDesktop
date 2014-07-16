@@ -6,10 +6,16 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../")
 
 if __name__ == "__main__":
     import faulthandler, logging
+    from logging import handlers
     from utils import misc
     misc.tryMkdir(os.path.expanduser("~/.xware-desktop"))
 
-    logging.basicConfig(filename = os.path.expanduser("~/.xware-desktop/log.txt"))
+    loggingHandler = logging.handlers.RotatingFileHandler(
+        os.path.expanduser("~/.xware-desktop/log.txt"),
+        maxBytes = 1024 * 1024 * 5,
+        backupCount = 5)
+    logging.basicConfig(handlers = (loggingHandler,),
+                        format = "%(asctime)s %(levelname)s:%(name)s:%(message)s")
 
     faultLogFd = open(os.path.expanduser('~/.xware-desktop/frontend.fault.log'), 'a')
     faulthandler.enable(faultLogFd)
