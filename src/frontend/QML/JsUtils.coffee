@@ -3,10 +3,10 @@
 "use strict"
 
 humanBytes = (bytes, fragDigits = 2) ->
-    kilo = 2 ** 10
-    mega = 2 ** 20
-    giga = 2 ** 30
-    tera = 2 ** 40
+    kilo = Math.pow(2, 10)
+    mega = Math.pow(2, 20)
+    giga = Math.pow(2, 30)
+    tera = Math.pow(2, 40)
 
     if bytes >= tera
         (bytes / tera).toFixed(fragDigits) + "TiB"
