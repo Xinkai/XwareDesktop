@@ -107,6 +107,7 @@ install:
 
 	# mark executables
 	chmod +x $(DESTDIR)$(PREFIX)/frontend/launcher.py
+	chmod +x $(DESTDIR)$(PREFIX)/frontend/morula.py
 	chmod +x $(DESTDIR)$(PREFIX)/frontend/CrashReport/CrashReportApp.py
 	chmod +x $(DESTDIR)$(PREFIX)/daemon/xwared.py
 	chmod +x $(DESTDIR)$(PREFIX)/xware/lib/EmbedThunderManager
