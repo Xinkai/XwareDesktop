@@ -1,4 +1,6 @@
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
+
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
 
@@ -8,6 +10,8 @@ from PyQt5.QtGui import QGuiApplication
 
 from Widgets import CustomQuickView
 
+import constants
+
 
 class QmlMain(CustomQuickView):
     def __init__(self, parent):
@@ -16,7 +20,7 @@ class QmlMain(CustomQuickView):
 
         self.setTitle("Xware Desktop with QML (experimental)")
         self.setResizeMode(QQuickView.SizeRootObjectToView)
-        self.qmlUrl = QUrl.fromLocalFile("QML/Main.qml")
+        self.qmlUrl = QUrl.fromLocalFile(os.path.join(constants.FRONTEND_DIR, "QML/Main.qml"))
         self.rootContext().setContextProperty("adapters", app.adapterManager)
         self.rootContext().setContextProperty("taskModel", app.proxyModel)
         self.setSource(self.qmlUrl)
