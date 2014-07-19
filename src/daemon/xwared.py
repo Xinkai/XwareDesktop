@@ -168,6 +168,9 @@ class Xwared(object):
                   .format(number = self.etmLongevities.maxlen,
                           threshold = threshold),
                   file = sys.stderr)
+            print("这极有可能是xware本身的bug引起的，更多信息请看 "
+                  "https://github.com/Xinkai/XwareDesktop/wiki/故障排查和意见反馈"
+                  "#etm持续时间连续3次不超过30秒终止执行etm的调试方法", file = sys.stderr)
             self.toRunETM = False
 
     def stopETM(self, restart):
