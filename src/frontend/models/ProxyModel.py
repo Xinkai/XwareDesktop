@@ -12,6 +12,7 @@ class ProxyModel(QSortFilterProxyModel):
         super().__init__(parent)
         self.setDynamicSortFilter(True)
         self.sort(0, Qt.DescendingOrder)
+        self.setFilterCaseSensitivity(False)
 
     @pyqtSlot(QModelIndex, QModelIndex, "QVector<int>")
     def _slotSrcDataChanged(self, topLeft, bottomRight, roles):
@@ -38,6 +39,13 @@ class ProxyModel(QSortFilterProxyModel):
 
     def _getSourceModelIndice(self, rowIds):
         return map(self.mapToSource, self._getModelIndice(rowIds))
+
+    @pyqtSlot(str, result = "void")
+    def setNameFilter(self, name):
+        if name:
+            self.setFilterFixedString(name)
+        else:
+            self.setFilterFixedString(None)
 
     @pyqtSlot("QVariantMap", result = "void")
     def pauseTasks(self, options):

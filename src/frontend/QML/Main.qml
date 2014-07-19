@@ -12,6 +12,13 @@ Rectangle {
         Text {
             text: "TOP BAR"
         }
+        TextField {
+            text: ""
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            onTextChanged: taskModel.setNameFilter(text)
+            placeholderText: "搜索任务名"
+        }
     }
 
     Rectangle {
