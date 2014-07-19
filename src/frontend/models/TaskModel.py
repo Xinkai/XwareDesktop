@@ -5,14 +5,15 @@ from launcher import app
 from collections import defaultdict
 from itertools import groupby
 
-from PyQt5.QtCore import QAbstractListModel, Qt, pyqtSlot, pyqtSignal, QModelIndex
+from PyQt5.QtCore import QAbstractTableModel, Qt, pyqtSlot, pyqtSignal, QModelIndex, QDateTime
 from .TaskManager import TaskManager
 
 
 TaskDataRole = Qt.UserRole + 100
+CreationTimeRole = Qt.UserRole + 101
 
 
-class TaskModel(QAbstractListModel):
+class TaskModel(QAbstractTableModel):
     sigBeforeInsert = pyqtSignal(int)
     sigAfterInsert = pyqtSignal()
     sigBeforeModify = pyqtSignal()
@@ -49,8 +50,8 @@ class TaskModel(QAbstractListModel):
 
     @pyqtSlot(int, int)
     def slotAfterModify(self, i0, i1):
-        self.dataChanged.emit(self.index(i0),
-                              self.index(i1),
+        self.dataChanged.emit(self.index(i0, 0),
+                              self.index(i1, 0),
                               [TaskDataRole])
 
     @pyqtSlot(int)
@@ -66,24 +67,26 @@ class TaskModel(QAbstractListModel):
         return len(self.taskManager)
 
     def columnCount(self, *args, **kwargs):
-        raise NotImplementedError()
+        return len(self.roleNames())
 
     def roleNames(self):
         return {
             Qt.DisplayRole: "display",
             TaskDataRole: "taskData",
+            CreationTimeRole: "creationTime",
         }
 
     def data(self, qModelIndex, role = None):
-        # assert role == Qt.DisplayRole, "data(role={})".format(role)
         assert qModelIndex.row() >= 0, "row = {}".format(qModelIndex.row())
         if role == TaskDataRole:
-            # self._lock.acquire()
             result = self.taskManager.at(qModelIndex.row())
-            # self._lock.release()
             return result
         elif role == Qt.DisplayRole:
             return self.data(qModelIndex, role = TaskDataRole)["name"]
+        elif role == CreationTimeRole:
+            dt = QDateTime.fromTime_t(int(
+                self.data(qModelIndex, role = TaskDataRole)["createTime"]))
+            return dt
 
     def get(self, qModelIndex):
         return self.data(qModelIndex, TaskDataRole)

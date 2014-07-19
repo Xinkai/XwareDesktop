@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QModelIndex, QSortFilterProxyModel
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QModelIndex, QSortFilterProxyModel, Qt
+
+from .TaskModel import CreationTimeRole
 
 
 class ProxyModel(QSortFilterProxyModel):
@@ -8,6 +10,8 @@ class ProxyModel(QSortFilterProxyModel):
 
     def __init__(self, parent = None):
         super().__init__(parent)
+        self.setDynamicSortFilter(True)
+        self.sort(0, Qt.DescendingOrder)
 
     @pyqtSlot(QModelIndex, QModelIndex, "QVector<int>")
     def _slotSrcDataChanged(self, topLeft, bottomRight, roles):
@@ -16,6 +20,7 @@ class ProxyModel(QSortFilterProxyModel):
     def setSourceModel(self, model):
         model.dataChanged.connect(self._slotSrcDataChanged)
         super().setSourceModel(model)
+        self.setSortRole(CreationTimeRole)
 
     @pyqtSlot(int, result = "QVariantMap")
     def get(self, i: int):
