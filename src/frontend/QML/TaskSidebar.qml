@@ -156,17 +156,25 @@ Rectangle {
         }
 
         Text {
+            visible: taskData && taskData.createTime ? true : false
             text: {
-                if (taskData && taskData.createTime) {
-                    return JsUtils.humanDatetime(taskData.createTime)
+                if (visible) {
+                    "添加于" + JsUtils.humanTimeElapse(taskData.createTime)
                 } else {
-                    "NO CREATETIME"
+                    ""
                 }
             }
         }
 
         Text {
-            text: taskData && taskData.completeTime ? JsUtils.humanDatetime(taskData.completeTime) : "NO COMPLETETIME"
+            visible: taskData && taskData.completeTime ? true : false
+            text: {
+                if (visible) {
+                    "完成于" + JsUtils.humanTimeElapse(taskData.completeTime)
+                } else {
+                    ""
+                }
+            }
         }
     }
 }

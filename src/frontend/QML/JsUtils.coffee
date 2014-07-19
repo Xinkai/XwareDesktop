@@ -32,3 +32,24 @@ humanSeconds = (seconds) ->
 
 humanDatetime = (timestamp) ->
     new Date(timestamp * 1000).toString()
+
+humanTimeElapse = (timestamp) ->
+    elapse_ms = Date.now() - new Date(timestamp * 1000)
+    elapse = (elapse_ms / 1000) | 0  # to seconds
+
+    year = elapse / (60 * 60 * 24 * 365) | 0
+    if year
+        return "#{year}年前"
+    month = elapse / (60 * 60 * 24 * 30) | 0
+    if month
+        return "#{month}月前"
+    day = elapse / (60 * 60 * 24) | 0
+    if day
+        return "#{day}天前"
+    hour = elapse / (60 * 60) | 0
+    if hour
+        return "#{hour}小时前"
+    minute = elapse / 60 | 0
+    if minute
+        return "#{minute}分钟前"
+    return "刚才"
