@@ -12,6 +12,7 @@ import pyinotify
 
 from shared import constants, BackendInfo
 from shared.misc import debounce, tryRemove, tryClose
+from shared.profile import profileBootstrap
 from settings import SettingsAccessorBase, XWARED_DEFAULTS_SETTINGS
 
 
@@ -45,7 +46,10 @@ class Xwared(object):
     def __init__(self):
         super().__init__()
         # requirements checking
+        self.ensureNonRoot()
         self.ensureOneInstance()
+
+        profileBootstrap(constants.PROFILE_DIR)
         tryRemove(constants.XWARED_SOCKET[0])
 
         # initialize variables
@@ -95,6 +99,12 @@ class Xwared(object):
 
         if event.pathname == constants.ETM_CFG_FILE:
             self.onEtmCfgChanged()
+
+    @staticmethod
+    def ensureNonRoot():
+        if os.getuid() == 0 or os.geteuid() == 0:
+            print("拒绝以root运行", file = sys.stderr)
+            sys.exit(-1)
 
     def ensureOneInstance(self):
         # If one instance is already running, shout so and then exit the program
@@ -227,8 +237,6 @@ class Xwared(object):
         sys.exit(0)
 
 if __name__ == "__main__":
-    from shared.profile import profileBootstrap
-    profileBootstrap(constants.PROFILE_DIR)
     xwared = Xwared()
     while True:
         xwared.runETM()
