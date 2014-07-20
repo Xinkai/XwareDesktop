@@ -3,6 +3,7 @@
 import logging
 from launcher import app
 
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget, QWidgetAction
 
 from etmpy import EtmSetting
@@ -21,10 +22,11 @@ class QuickSpeedLimitBtn(CustomStatusBarToolButton):
         self.setText("限速")
 
         # Should be disabled when ETM not running
-        app.xwaredpy.sigETMStatusPolled.connect(self.slotToggleEnableFlag)
-        self.slotToggleEnableFlag()
+        app.xwaredpy.statusUpdated.connect(self.slotXwareStatusChanged)
+        self.slotXwareStatusChanged()
 
-    def slotToggleEnableFlag(self):
+    @pyqtSlot()
+    def slotXwareStatusChanged(self):
         self.setEnabled(app.xwaredpy.etmStatus)
 
 

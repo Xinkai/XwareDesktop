@@ -42,16 +42,17 @@ class CustomStatusBar(QStatusBar):
         self.dlStatus = CustomStatusBarLabel(self)
         self.ulStatus = CustomStatusBarLabel(self)
 
-        app.xwaredpy.sigXwaredStatusPolled.connect(self.slotXwaredStatusPolled)
-        app.xwaredpy.sigETMStatusPolled.connect(self.slotETMStatusPolled)
+        app.xwaredpy.statusUpdated.connect(self.slotXwaredStatusUpdated)
         app.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
         app.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
         app.etmpy.sigTasksSummaryUpdated[dict].connect(self.slotTasksSummaryUpdated)
 
-    @pyqtSlot(bool)
-    def slotXwaredStatusPolled(self, enabled):
-        app.mainWin.menu_backend.setEnabled(enabled)
-        if enabled:
+    @pyqtSlot()
+    def slotXwaredStatusUpdated(self):
+        xwaredStatus = app.xwaredpy.xwaredStatus
+
+        app.mainWin.menu_backend.setEnabled(xwaredStatus)
+        if xwaredStatus:
             self.xwaredStatus.setText(
                 "<img src=':/image/check.png' width=14 height=14>"
                 "<font color='green'>xwared</font>")
@@ -62,17 +63,15 @@ class CustomStatusBar(QStatusBar):
                 "<font color='red'>xwared</font>")
             self.xwaredStatus.setToolTip("<div style='color:red'>xwared未启动</div>")
 
-    @pyqtSlot()
-    def slotETMStatusPolled(self):
-        enabled = app.xwaredpy.etmStatus
+        etmStatus = app.xwaredpy.etmStatus
 
-        app.mainWin.action_ETMstart.setEnabled(not enabled)
-        app.mainWin.action_ETMstop.setEnabled(enabled)
-        app.mainWin.action_ETMrestart.setEnabled(enabled)
+        app.mainWin.action_ETMstart.setEnabled(not etmStatus)
+        app.mainWin.action_ETMstop.setEnabled(etmStatus)
+        app.mainWin.action_ETMrestart.setEnabled(etmStatus)
 
         overallCheck = False
         tooltips = []
-        if enabled:
+        if etmStatus:
             activationStatus = app.etmpy.getActivationStatus()
             tooltips.append("<div style='color:green'>ETM运行中</div>")
             if activationStatus.status == 1:

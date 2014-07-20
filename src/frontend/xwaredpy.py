@@ -3,7 +3,7 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot, pyqtProperty
 
 import threading, time
 import os
@@ -83,14 +83,13 @@ def callXwaredInterface(funcName, *args, **kwargs):
 
 # an interface to watch, notify, and supervise the status of xwared and ETM
 class XwaredPy(QObject):
-    sigXwaredStatusPolled = pyqtSignal(bool)
-    sigETMStatusPolled = pyqtSignal()
+    statusUpdated = pyqtSignal()
 
-    etmStatus = None
-    xwaredStatus = None
-    userId = None
-    peerId = None
-    lcPort = None
+    _etmStatus = None
+    _xwaredStatus = None
+    _userId = None
+    _peerId = None
+    _lcPort = None
 
     _t = None
 
@@ -104,6 +103,34 @@ class XwaredPy(QObject):
         self._t.start()
         app.sigMainWinLoaded.connect(self.connectUI)
 
+    @pyqtProperty(bool, notify = statusUpdated)
+    def etmStatus(self):
+        return self._etmStatus
+
+    @pyqtProperty(bool, notify = statusUpdated)
+    def xwaredStatus(self):
+        return self._xwaredStatus
+
+    @pyqtProperty(str, notify = statusUpdated)
+    def userId(self):
+        return self._userId
+
+    @pyqtProperty(str, notify = statusUpdated)
+    def peerId(self):
+        return self._peerId
+
+    @pyqtProperty(int, notify = statusUpdated)
+    def lcPort(self):
+        return self._lcPort
+
+    def _statusUpdate(self, etmStatus, xwaredStatus, userId, peerId, lcPort):
+        self._etmStatus = etmStatus
+        self._xwaredStatus = xwaredStatus
+        self._userId = userId
+        self._peerId = peerId
+        self._lcPort = lcPort
+        self.statusUpdated.emit()
+
     @pyqtSlot()
     def connectUI(self):
         # Note: The menu actions enable/disable toggling are handled by statusbar.
@@ -114,21 +141,20 @@ class XwaredPy(QObject):
     @staticmethod
     def startXware():
         try:
-            callXwaredInterface("start")  # TODO: when remote, disable this
+            callXwaredInterface("start")
         except InvalidSocket:
             pass
 
     @staticmethod
     def stopXware():
         try:
-            callXwaredInterface("quit")  # TODO: when remote, disable this
+            callXwaredInterface("quit")
         except InvalidSocket:
             pass
 
     @property
     def startEtmWhen(self):
         # return None if cannot get the value
-
         try:
             return callXwaredInterface("getStartEtmWhen")
         except InvalidSocket:
@@ -142,20 +168,18 @@ class XwaredPy(QObject):
         while True:
             try:
                 backendInfo = callXwaredInterface("infoPoll")
-                self.xwaredStatus = True
-                self.etmStatus = True if backendInfo.etmPid else False
-                self.lcPort = backendInfo.lcPort
-                self.userId = backendInfo.userId
-                self.peerId = backendInfo.peerId
+                self._statusUpdate(etmStatus = True if backendInfo.etmPid else False,
+                                   xwaredStatus = True,
+                                   userId = backendInfo.userId,
+                                   peerId = backendInfo.peerId,
+                                   lcPort = backendInfo.lcPort)
             except InvalidSocket:
-                self.xwaredStatus = False
-                self.etmStatus = False
-                self.lcPort = 0
-                self.userId = 0
-                self.peerId = ""
+                self._statusUpdate(etmStatus = False,
+                                   xwaredStatus = False,
+                                   userId = 0,
+                                   peerId = "",
+                                   lcPort = 0)
 
-            self.sigXwaredStatusPolled.emit(self.xwaredStatus)
-            self.sigETMStatusPolled.emit()
             time.sleep(1)
 
     @pyqtSlot()
