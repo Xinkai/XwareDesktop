@@ -4,6 +4,7 @@ __pycache__/
 
 # Editor temp
 *~
+*.autosave
 
 # IDE
 .cproject
