@@ -48,6 +48,30 @@ class DummyApp(QGuiApplication):
         self.qmlWin = QmlMain(None)
         self.qmlWin.show()
 
+from PyQt5.QtCore import QtMsgType, QMessageLogContext, QtDebugMsg, QtWarningMsg, QtCriticalMsg, \
+    QtFatalMsg
+
+
+def installQtMsgHandler(msgType: QtMsgType, context: QMessageLogContext, msg: str):
+    strType = {
+        QtDebugMsg: "DEBUG",
+        QtWarningMsg: "WARN",
+        QtCriticalMsg: "CRITICAL",
+        QtFatalMsg: "FATAL"
+    }[msgType]
+
+    print("Qt[{strType}] {category} {function} in {file}, on line {line}\n"
+          "    {msg}".format(strType = strType,
+                             category = context.category,
+                             function = context.function,
+                             file = context.file,
+                             line = context.line,
+                             msg = msg),
+          file = sys.stdout if msgType in (QtDebugMsg, QtWarningMsg) else sys.stderr)
+
+
 if __name__ == "__main__":
+    from PyQt5.QtCore import qInstallMessageHandler
+    qInstallMessageHandler(installQtMsgHandler)
     app = DummyApp(sys.argv)
     sys.exit(app.exec())
