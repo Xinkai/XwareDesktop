@@ -95,14 +95,15 @@ Rectangle {
 
                 TableViewColumn {
                     role: "taskData"
+                    delegate: TaskDelegate {}
                 }
 
                 rowDelegate: Item {
                     height: 60
                 }
 
-                itemDelegate: TaskDelegate {
-
+                onActivated: {
+                    console.log("TODO")
                 }
             }
 
@@ -110,28 +111,43 @@ Rectangle {
                 id: metaSideBar
                 Loader {
                     id: metaSideBarLoader
+                    visible: status === Loader.Ready
                     source: {
                         if (tableView.currentRow >= 0) return "TaskSidebar.qml"
 
                         return "AboutSidebar.qml"
                     }
 
-                    property variant taskData: {
-                        tableView.currentRow >= 0 ? taskModel.get(tableView.currentRow): null
+                    property var taskData: null
+                    readonly property var buddyView: tableView
+
+                    function setTaskData() {
+                        var currentRow = tableView.currentRow
+                        if (currentRow >= 0) {
+                            metaSideBarLoader.taskData = taskModel.get(currentRow)
+                        } else {
+                            metaSideBarLoader.taskData = null
+                        }
                     }
 
-                    readonly property var buddyView: tableView
                     Connections {
                         target: taskModel
 
                         function handleSrcDataChanged(row1, row2) {
-                            console.log(row1, row2, tableView.currentRow)
-                            if ((row1 <= tableView.currentRow) && (tableView.currentRow <= row2)) {
-                                metaSideBarLoader.taskData = taskModel.get(tableView.currentRow)
+                            var currentRow = tableView.currentRow
+                            if ((row1 <= currentRow) && (currentRow <= row2)) {
+                                metaSideBarLoader.setTaskData()
                             }
                         }
 
                         onSrcDataChanged: handleSrcDataChanged(arguments[0], arguments[1])
+                    }
+
+                    Connections {
+                        target: tableView.selection
+                        onSelectionChanged: {
+                            metaSideBarLoader.setTaskData()
+                        }
                     }
                 }
             }
