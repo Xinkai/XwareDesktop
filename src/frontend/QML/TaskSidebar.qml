@@ -13,12 +13,14 @@ Rectangle {
         Text {
             text: {
                 var selectionCount = buddyView.selection.count
+                if ((!taskData) || (selectionCount === 0)) {
+                    return "无文件选中"
+                }
+
                 if (selectionCount === 1) {
                     taskData.name
                 } else if (selectionCount > 1) {
                     [taskData.name, "等", selectionCount, "项内容"].join("")
-                } else {
-                    "无文件选中"
                 }
             }
         }
