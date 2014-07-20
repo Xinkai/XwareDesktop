@@ -86,8 +86,8 @@ Rectangle {
 
             TableView {
                 id: tableView
-                width: parent.width * 0.618
                 Layout.minimumWidth: parent.width * 0.618
+                Layout.maximumWidth: parent.width * 0.75
                 height: parent.height
                 model: taskModel
                 headerVisible: false
@@ -109,6 +109,10 @@ Rectangle {
 
             Item {
                 id: metaSideBar
+                Layout.maximumWidth: 0.382 * splitView.width
+                Layout.minimumWidth: 0.25 * splitView.width
+                height: splitView.height
+
                 Loader {
                     id: metaSideBarLoader
                     visible: status === Loader.Ready

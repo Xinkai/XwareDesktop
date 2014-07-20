@@ -5,10 +5,6 @@ import "JsUtils.js" as JsUtils
 
 Rectangle {
     id: item
-    Layout.maximumWidth: 0.382 * parent.width
-    width: 0.382 * parent.width
-    height: parent.height
-
     ColumnLayout {
         Text {
             text: {
