@@ -39,6 +39,12 @@ class TaskState(IntEnum):
     FAILED_ON_SUBMISSION = 3
 
 
+@unique
+class UrlCheckType(IntEnum):
+    Url = 1  # ed2k/magnet/http ...
+    BitTorrentFile = 2
+
+
 # see definitions http://g.xunlei.com/forum.php?mod=viewthread&tid=30
 GetSysInfo = namedtuple("GetSysInfo", ["Return",  # 0 -> success
                                        "Network",  # 1 -> ok
@@ -155,26 +161,28 @@ class XwareClient(object):
         return result
 
     @asyncio.coroutine
-    def post(self, parts):
+    def post(self, parts, *args, data = None):
+        assert not args, args
         self._readyCheck()
         res = yield from aiohttp.request(
             "POST",
             "http://{host}:{port}/{parts}".format(
                 host = self._options["host"], port = self._options["port"], parts = parts),
+            data = data,
             connector = self._connector)
         assert res.status == 200
         body = yield from res.read_and_close()
         return body
 
     @asyncio.coroutine
-    def postJson(self, parts):
-        content = yield from self.post(parts)
+    def postJson(self, parts, **kwargs):
+        content = yield from self.post(parts, **kwargs)
         res = content.decode("utf-8")
         return json.loads(res, cls = UnquotingJsonDecoder)
 
     @asyncio.coroutine
-    def postJsonP(self, parts):
-        content = yield from self.post(parts)
+    def postJsonP(self, parts, **kwargs):
+        content = yield from self.post(parts, **kwargs)
         res = content.decode("utf-8")
         l = res.index("(") + 1
         r = res.rindex(")")
@@ -182,15 +190,15 @@ class XwareClient(object):
         return json.loads(res, cls = UnquotingJsonDecoder)
 
     @asyncio.coroutine
-    def postJson2(self, parts):
-        result = yield from self.postJson(parts)
+    def postJson2(self, parts, **kwargs):
+        result = yield from self.postJson(parts, **kwargs)
         rtn = result["rtn"]
         assert rtn == 0, rtn
         return result
 
     @asyncio.coroutine
-    def postJsonP2(self, parts):
-        result = yield from self.postJsonP(parts)
+    def postJsonP2(self, parts, **kwargs):
+        result = yield from self.postJsonP(parts, **kwargs)
         rtn = result["rtn"]
         assert rtn == 0, rtn
         return result
@@ -239,8 +247,22 @@ class XwareClient(object):
         return result
 
     @asyncio.coroutine
-    def get_resolve(self):
+    def post_urlCheck(self):
         pass
+
+    @asyncio.coroutine
+    def post_btCheck(self, filepath):
+        # xware doesn't seem to support chunked uploading, which aiohttp always uses.
+        # See the bug I opened: https://github.com/KeepSafe/aiohttp/issues/126
+        files = {
+            "file": open(filepath, 'rb'),
+        }
+        result = yield from self.postJsonP2(
+            "urlCheck?v=2&pid=ignore&callback=ignore&type={urlCheckType}&upload=1".format(
+                urlCheckType = int(UrlCheckType.BitTorrentFile)),
+            data = files)
+
+        return result
 
     @asyncio.coroutine
     def post_unbind(self):
