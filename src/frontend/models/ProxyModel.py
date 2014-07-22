@@ -30,6 +30,7 @@ class ProxyModel(QSortFilterProxyModel):
         if value != self._taskClassFilter:
             self._taskClassFilter = value
             self.taskClassFilterChanged.emit()
+            self.invalidateFilter()
 
     def filterAcceptsRow(self, srcRow: int, srcParent: QModelIndex):
         result = super().filterAcceptsRow(srcRow, srcParent)

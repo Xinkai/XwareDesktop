@@ -33,44 +33,20 @@ Rectangle {
         }
 
         Column {
-            Rectangle {
-                width: leftBar.width
-                height: 50
-                readonly property bool highlighted: taskModel.taskClassFilter & TaskModel.RUNNING
-                color: highlighted ? "red" : "lightgrey"
-                Text {
-                    text: "正在下载"
-                }
+            TaskClassSelector {
+                klass: TaskModel.RUNNING
             }
 
-            Rectangle {
-                width: leftBar.width
-                height: 50
-                readonly property bool highlighted: taskModel.taskClassFilter & TaskModel.COMPLETED
-                color: highlighted ? "red" : "lightgrey"
-                Text {
-                    text: "已完成"
-                }
+            TaskClassSelector {
+                klass: TaskModel.COMPLETED
             }
 
-            Rectangle {
-                width: leftBar.width
-                height: 50
-                readonly property bool highlighted: taskModel.taskClassFilter & TaskModel.RECYCLED
-                color: highlighted ? "red" : "lightgrey"
-                Text {
-                    text: "垃圾箱"
-                }
+            TaskClassSelector {
+                klass: TaskModel.RECYCLED
             }
 
-            Rectangle {
-                width: leftBar.width
-                height: 50
-                readonly property bool highlighted: taskModel.taskClassFilter & TaskModel.FAILED
-                color: highlighted ? "red" : "lightgrey"
-                Text {
-                    text: "失败的"
-                }
+            TaskClassSelector {
+                klass: TaskModel.FAILED
             }
         }
     }
