@@ -3,6 +3,8 @@ import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.1
 import "JsUtils.js" as JsUtils
 
+import TaskModel 1.0
+
 Rectangle {
     Rectangle {
         id: topBar
@@ -34,7 +36,7 @@ Rectangle {
             Rectangle {
                 width: leftBar.width
                 height: 50
-                readonly property bool highlighted: taskModel.taskClassFilter & 1
+                readonly property bool highlighted: taskModel.taskClassFilter & TaskModel.RUNNING
                 color: highlighted ? "red" : "lightgrey"
                 Text {
                     text: "正在下载"
@@ -44,7 +46,7 @@ Rectangle {
             Rectangle {
                 width: leftBar.width
                 height: 50
-                readonly property bool highlighted: taskModel.taskClassFilter & 2
+                readonly property bool highlighted: taskModel.taskClassFilter & TaskModel.COMPLETED
                 color: highlighted ? "red" : "lightgrey"
                 Text {
                     text: "已完成"
@@ -54,7 +56,7 @@ Rectangle {
             Rectangle {
                 width: leftBar.width
                 height: 50
-                readonly property bool highlighted: taskModel.taskClassFilter & 4
+                readonly property bool highlighted: taskModel.taskClassFilter & TaskModel.RECYCLED
                 color: highlighted ? "red" : "lightgrey"
                 Text {
                     text: "垃圾箱"
@@ -64,7 +66,7 @@ Rectangle {
             Rectangle {
                 width: leftBar.width
                 height: 50
-                readonly property bool highlighted: taskModel.taskClassFilter & 8
+                readonly property bool highlighted: taskModel.taskClassFilter & TaskModel.FAILED
                 color: highlighted ? "red" : "lightgrey"
                 Text {
                     text: "失败的"

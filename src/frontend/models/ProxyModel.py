@@ -2,7 +2,9 @@
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QModelIndex, QSortFilterProxyModel, Qt, Q_ENUMS, \
     pyqtProperty
+from PyQt5.QtQml import qmlRegisterUncreatableType
 
+from utils.misc import dropPy34Enum
 from .TaskModel import CreationTimeRole, TaskClass, TaskClassRole
 
 
@@ -10,7 +12,7 @@ class ProxyModel(QSortFilterProxyModel):
     srcDataChanged = pyqtSignal(int, int)  # row1, row2
     taskClassFilterChanged = pyqtSignal()
 
-    Q_ENUMS(TaskClass)
+    Q_ENUMS(dropPy34Enum(TaskClass))
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -108,3 +110,6 @@ class ProxyModel(QSortFilterProxyModel):
     def viewMultipleTasks(self, rowIds):
         srcIndice = list(self._getSourceModelIndice(rowIds))
         self.sourceModel().viewMultipleTasks(srcIndice)
+
+qmlRegisterUncreatableType(ProxyModel, 'TaskModel', 1, 0, 'TaskModel',
+                           "TaskModel cannot be created.")

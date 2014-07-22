@@ -3,7 +3,7 @@
 import base64
 
 from shared.misc import *
-
+from enum import IntEnum
 
 def getHumanBytesNumber(byteNum):
     kilo = 1024
@@ -38,3 +38,15 @@ def decodePrivateLink(link):
         return decoded
     else:
         raise Exception("Cannot decode private link {}.".format(link))
+
+
+def dropPy34Enum(pyenum: IntEnum):
+    # convert a python 3.4 IntEnum class to a plain class that can be used with Q_ENUMS
+    assert issubclass(pyenum, IntEnum)
+    name = pyenum.__class__.__name__
+    d = {}
+    for member in pyenum.__members__:
+        d[member] = int(getattr(pyenum, member))
+
+    klass = type(name, (object,), d)
+    return klass
