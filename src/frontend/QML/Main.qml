@@ -34,7 +34,8 @@ Rectangle {
             Rectangle {
                 width: leftBar.width
                 height: 50
-                color: "lightgrey"
+                readonly property bool highlighted: taskModel.taskClassFilter & 1
+                color: highlighted ? "red" : "lightgrey"
                 Text {
                     text: "正在下载"
                 }
@@ -43,7 +44,8 @@ Rectangle {
             Rectangle {
                 width: leftBar.width
                 height: 50
-                color: "lightgrey"
+                readonly property bool highlighted: taskModel.taskClassFilter & 2
+                color: highlighted ? "red" : "lightgrey"
                 Text {
                     text: "已完成"
                 }
@@ -52,7 +54,8 @@ Rectangle {
             Rectangle {
                 width: leftBar.width
                 height: 50
-                color: "lightgrey"
+                readonly property bool highlighted: taskModel.taskClassFilter & 4
+                color: highlighted ? "red" : "lightgrey"
                 Text {
                     text: "垃圾箱"
                 }
@@ -61,9 +64,10 @@ Rectangle {
             Rectangle {
                 width: leftBar.width
                 height: 50
-                color: "lightgrey"
+                readonly property bool highlighted: taskModel.taskClassFilter & 8
+                color: highlighted ? "red" : "lightgrey"
                 Text {
-                    text: "提交失败"
+                    text: "失败的"
                 }
             }
         }

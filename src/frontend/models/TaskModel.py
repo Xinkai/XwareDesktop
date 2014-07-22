@@ -3,6 +3,7 @@
 from launcher import app
 
 from collections import defaultdict
+import enum
 from itertools import groupby
 
 from PyQt5.QtCore import QAbstractTableModel, Qt, pyqtSlot, pyqtSignal, QModelIndex, QDateTime
@@ -11,6 +12,16 @@ from .TaskManager import TaskManager
 
 TaskDataRole = Qt.UserRole + 100
 CreationTimeRole = Qt.UserRole + 101
+TaskClassRole = Qt.UserRole + 102
+
+
+@enum.unique
+class TaskClass(enum.IntEnum):
+    RUNNING = 1
+    COMPLETED = 2
+    RECYCLED = 4
+    FAILED = 8
+    ALL = RUNNING | COMPLETED | RECYCLED | FAILED
 
 
 class TaskModel(QAbstractTableModel):
@@ -74,6 +85,7 @@ class TaskModel(QAbstractTableModel):
             Qt.DisplayRole: "display",
             TaskDataRole: "taskData",
             CreationTimeRole: "creationTime",
+            TaskClassRole: "taskClass",
         }
 
     def data(self, qModelIndex, role = None):
@@ -87,6 +99,10 @@ class TaskModel(QAbstractTableModel):
             dt = QDateTime.fromTime_t(int(
                 self.data(qModelIndex, role = TaskDataRole)["createTime"]))
             return dt
+        elif role == TaskClassRole:
+            data = self.data(qModelIndex, TaskDataRole)
+            ns = data["ns"]
+            return app.adapterManager.adapter(ns).getTaskClass(data)
 
     def get(self, qModelIndex):
         return self.data(qModelIndex, TaskDataRole)

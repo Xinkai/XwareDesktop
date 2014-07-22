@@ -40,6 +40,22 @@ class TaskState(IntEnum):
 
 
 @unique
+class TaskClass(IntEnum):
+    DOWNLOADING = 0
+    WAITING = 8
+    STOPPED = 9
+    PAUSED = 10
+    FINISHED = 11
+    FAILED = 12
+    UPLOADING = 13
+    SUBMITTING = 14
+    DELETED = 15
+    RECYCLED = 16
+    SUSPENDED = 37
+    ERROR = 38
+
+
+@unique
 class UrlCheckType(IntEnum):
     Url = 1  # ed2k/magnet/http ...
     BitTorrentFile = 2

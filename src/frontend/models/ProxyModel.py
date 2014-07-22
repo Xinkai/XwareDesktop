@@ -1,18 +1,45 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QModelIndex, QSortFilterProxyModel, Qt
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QModelIndex, QSortFilterProxyModel, Qt, Q_ENUMS, \
+    pyqtProperty
 
-from .TaskModel import CreationTimeRole
+from .TaskModel import CreationTimeRole, TaskClass, TaskClassRole
 
 
 class ProxyModel(QSortFilterProxyModel):
     srcDataChanged = pyqtSignal(int, int)  # row1, row2
+    taskClassFilterChanged = pyqtSignal()
+
+    Q_ENUMS(TaskClass)
 
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setDynamicSortFilter(True)
         self.sort(0, Qt.DescendingOrder)
         self.setFilterCaseSensitivity(False)
+        self._taskClassFilter = TaskClass.RUNNING
+
+    @pyqtProperty(int, notify = taskClassFilterChanged)
+    def taskClassFilter(self):
+        return self._taskClassFilter
+
+    @taskClassFilter.setter
+    def taskClassFilter(self, value):
+        if value != self._taskClassFilter:
+            self._taskClassFilter = value
+            self.taskClassFilterChanged.emit()
+
+    def filterAcceptsRow(self, srcRow: int, srcParent: QModelIndex):
+        result = super().filterAcceptsRow(srcRow, srcParent)
+        if result:
+            srcModel = self.sourceModel()
+            klass = srcModel.data(srcModel.index(srcRow, 0), TaskClassRole)
+            if klass & self.taskClassFilter:
+                return True
+            else:
+                return False
+
+        return result
 
     @pyqtSlot(QModelIndex, QModelIndex, "QVector<int>")
     def _slotSrcDataChanged(self, topLeft, bottomRight, roles):

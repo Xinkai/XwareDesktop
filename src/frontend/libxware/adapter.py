@@ -7,9 +7,11 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import threading, uuid
 
+from models.ProxyModel import TaskClass
 from utils.system import systemOpen, viewOneFile, viewMultipleFiles
 
 from .vanilla import TaskState, XwareClient
+from .vanilla import TaskClass as XwareTaskClass
 from .map import Tasks
 
 _POLLING_INTERVAL = 1
@@ -52,6 +54,24 @@ class XwareAdapter(object):
 
     def updateOptions(self, clientOptions):
         self._xwareClient.updateOptions(clientOptions)
+
+    @staticmethod
+    def getTaskClass(data):
+        d = {
+            XwareTaskClass.DOWNLOADING: TaskClass.RUNNING,
+            XwareTaskClass.WAITING: TaskClass.RUNNING,
+            XwareTaskClass.STOPPED: TaskClass.RUNNING,
+            XwareTaskClass.PAUSED: TaskClass.RUNNING,
+            XwareTaskClass.FINISHED: TaskClass.COMPLETED,
+            XwareTaskClass.FAILED: TaskClass.FAILED,
+            XwareTaskClass.UPLOADING: TaskClass.RUNNING,
+            XwareTaskClass.SUBMITTING: TaskClass.RUNNING,
+            XwareTaskClass.DELETED: TaskClass.RECYCLED,
+            XwareTaskClass.RECYCLED: TaskClass.RECYCLED,
+            XwareTaskClass.SUSPENDED: TaskClass.RUNNING,
+            XwareTaskClass.ERROR: TaskClass.FAILED,
+        }
+        return d[data["state"]]
 
     # =========================== PUBLIC ===========================
     @asyncio.coroutine
