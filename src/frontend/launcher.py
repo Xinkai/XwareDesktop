@@ -157,8 +157,51 @@ class XwareDesktop(QApplication):
             misc.tryRemove(constants.DESKTOP_AUTOSTART_FILE)
 
 
+def doQtIntegrityCheck():
+    if os.path.lexists("/usr/bin/qt.conf"):
+        # Detect 115wangpan, see #80
+        import tkinter as tk
+        import tkinter.ttk as ttk
+
+        class QtIntegrityAlert(ttk.Frame):
+            def __init__(self, master):
+                super().__init__(master)
+                self.pack(expand = True)
+
+                url = "http://www.ubuntukylin.com/ukylin/forum.php?mod=viewthread&tid=9508"
+                self.mainText = ttk.Label(
+                    self,
+                    font=("Sans Serif", 12),
+                    text = """检测到系统中可能安装了115网盘。它会导致Xware Desktop和其它的基于Qt的程序无法使用。请
+
+* 卸载115网盘 或
+* 按照{url}的方法解决此问题
+""".format(url = url))
+                self.mainText.pack(side = "top", fill = "both", expand = True, padx = 20,
+                                   pady = (25, 0))
+
+                self.viewThreadBtn = ttk.Button(
+                    self,
+                    text = "我要保留115网盘，查看解决方法",
+                    command = lambda: os.system("xdg-open '{}'".format(url)))
+                self.viewThreadBtn.pack(side = "bottom", fill = "none", expand = True, pady = 10)
+
+                self.closeBtn = ttk.Button(
+                    self,
+                    text = "我要卸载115网盘，关闭这个窗口",
+                    command = lambda: root.destroy())
+                self.closeBtn.pack(side = "bottom", fill = "none", expand = True, pady = 10)
+
+        root = tk.Tk()
+        root.title("Xware Desktop 提示")
+        tkapp = QtIntegrityAlert(master = root)
+        sys.exit(tkapp.mainloop())
+
+
 app = None
 if __name__ == "__main__":
+    doQtIntegrityCheck()
+
     from shared.profile import profileBootstrap
     profileBootstrap(constants.PROFILE_DIR)
     app = XwareDesktop(sys.argv)
