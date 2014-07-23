@@ -5,6 +5,7 @@ import base64
 from shared.misc import *
 from enum import IntEnum
 
+
 def getHumanBytesNumber(byteNum):
     kilo = 1024
     mega = kilo * kilo
