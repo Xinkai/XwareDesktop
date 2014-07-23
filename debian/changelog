@@ -1,5 +1,5 @@
-xware-desktop (1:0.10.20140702) saucy; urgency=low
+xware-desktop (1:0.10.20140723) trusty; urgency=low
 
-  * Initial release
+  * 请看 https://github.com/Xinkai/XwareDesktop/wiki/更新列表
 
- -- Xinkai Chen <yeled.nova@gmail.com>  Sat, 01 Mar 2014 10:17:54 -0800
+ -- Xinkai Chen <yeled.nova@gmail.com>  Wed, 23 July 2014 10:17:54 -0800
