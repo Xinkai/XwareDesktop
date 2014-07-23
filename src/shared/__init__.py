@@ -2,7 +2,7 @@
 
 import logging
 
-__version__ = "0.10"
+__version__ = "0.11"
 
 XWARE_VERSION = "1.0.26"
 

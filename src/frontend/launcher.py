@@ -87,7 +87,8 @@ class XwareDesktop(QApplication):
             from PyQt5.QtCore import QUrl
             from PyQt5.QtGui import QDesktopServices
             QDesktopServices.openUrl(QUrl("https://github.com/Xinkai/XwareDesktop/wiki/使用说明"))
-            self.settings.set("internal", "previousversion", __version__)
+
+        self.settings.set("internal", "previousversion", __version__)
 
     @staticmethod
     def checkOneInstance():
