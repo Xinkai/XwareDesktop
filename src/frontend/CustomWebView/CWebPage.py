@@ -78,7 +78,7 @@ class CustomWebPage(QWebPage):
         elif self.urlMatchIn(constants.V3_PAGE, constants.LOGIN_PAGE):
             pass
         else:
-            logging.error("Unable to handle {}".format(self.url().toString()))
+            logging.error("Unable to handle {}".format(self.frame.url().toString()))
 
     @pyqtSlot(bool)
     def injectXwareDesktop(self, ok):
