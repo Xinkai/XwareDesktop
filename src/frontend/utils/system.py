@@ -6,7 +6,7 @@ from PyQt5.QtGui import QDesktopServices
 import enum
 from collections import defaultdict
 from itertools import groupby
-import os, subprocess
+import os, subprocess, errno
 
 from .decorators import simplecache
 
@@ -32,6 +32,20 @@ def getInitType():
         else:
             return InitType.UPSTART_WITHOUT_USER_SESSION
     else:
+        # On Fedora "init --version" gives an error
+        # Use an alternative method
+        try:
+            realInitPath = os.readlink("/usr/sbin/init")
+            if realInitPath.endswith("systemd"):
+                return InitType.SYSTEMD
+        except FileNotFoundError:
+            pass
+        except OSError as e:
+            if e.errno == errno.EINVAL:
+                pass  # Not a symlink
+            else:
+                raise e  # rethrow
+
         return InitType.UNKNOWN
 
 
