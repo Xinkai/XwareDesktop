@@ -41,6 +41,7 @@ An attempt to bring Xware (Xunlei on routers) to desktop Linux.
 %autosetup -n %{reponame}-%{commit}
 
 %build
+make all
 
 %install
 make DESTDIR=%{buildroot} install
