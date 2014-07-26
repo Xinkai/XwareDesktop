@@ -56,10 +56,12 @@ make DESTDIR=%{buildroot} install
 %pre
     if [ $1 -eq 1 ]; then
         # pre_install
+        return 0
     fi
 
     if [ $1 -eq 2 ]; then
         # pre_upgrade
+        return 0
     fi
 
 %post
@@ -76,6 +78,7 @@ make DESTDIR=%{buildroot} install
 %preun
     if [ $1 -eq 0 ]; then
         # uninstall
+        return 0
     fi
 
 %postun
