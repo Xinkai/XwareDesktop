@@ -30,6 +30,7 @@ pyqt:
 	pyuic5 -o src/frontend/Schedule/ui_scheduler.py  src/frontend/ui/scheduler.ui
 	pyuic5 -o src/frontend/Settings/ui_quickspeedlimit.py  src/frontend/ui/quickspeedlimit.ui
 	pyuic5 -o src/frontend/CrashReport/ui_crashreport.py  src/frontend/ui/crashreport.ui
+	pyuic5 -o src/frontend/Widgets/ui_taskproperty.py  src/frontend/ui/taskproperty.ui
 	pyrcc5 -o src/frontend/resource_rc.py src/frontend/ui/rc/resource.qrc
 
 pep8:
