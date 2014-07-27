@@ -138,7 +138,7 @@ class XwareClient(object):
                 host = self._options["host"], port = self._options["port"], parts = parts),
             connector = self._connector)
         assert res.status == 200
-        body = yield from res.read_and_close()
+        body = yield from res.read()
         return body
 
     @asyncio.coroutine
@@ -187,7 +187,7 @@ class XwareClient(object):
             data = data,
             connector = self._connector)
         assert res.status == 200
-        body = yield from res.read_and_close()
+        body = yield from res.read()
         return body
 
     @asyncio.coroutine
