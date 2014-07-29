@@ -9,6 +9,9 @@ Rectangle {
     readonly property bool highlighted: taskModel.taskClassFilter & klass
     color: highlighted ? "red" : "lightgrey"
     Text {
+        anchors.fill: parent
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         text: {
             switch (klass) {
             case TaskModel.RUNNING:

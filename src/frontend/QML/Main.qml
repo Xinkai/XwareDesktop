@@ -1,5 +1,6 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
+import QtQuick.Controls.Styles 1.1
 import QtQuick.Layouts 1.1
 import "JsUtils.js" as JsUtils
 
@@ -9,132 +10,65 @@ Rectangle {
     Rectangle {
         id: topBar
         color: "orange"
-        height: 80
+        height: 10
         width: parent.width
-        Text {
-            text: "TOP BAR"
-        }
-        TextField {
-            text: ""
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            onTextChanged: taskModel.setNameFilter(text)
-            placeholderText: "搜索任务名"
-        }
     }
 
-    Rectangle {
-        id: leftBar
-        color: "lightgreen"
-        width: 120
+    TabView {
         anchors {
             top: topBar.bottom
             bottom: statusBar.top
+            left: parent.left
+            right: parent.right
         }
 
-        Column {
-            TaskClassSelector {
-                klass: TaskModel.RUNNING
-            }
-
-            TaskClassSelector {
-                klass: TaskModel.COMPLETED
-            }
-
-            TaskClassSelector {
-                klass: TaskModel.RECYCLED
-            }
-
-            TaskClassSelector {
-                klass: TaskModel.FAILED
-            }
-        }
-    }
-
-    Rectangle {
-        id: mainArea
-
-        anchors {
-            left: leftBar.right
-            top: topBar.bottom
-            bottom: statusBar.top
-            right: topBar.right
+        Tab {
+            id: tabMain
+            title: "任务"
+            source: "Tasks.qml"
         }
 
-        SplitView {
-            id: splitView
-            anchors.fill: parent
-            orientation: Qt.Horizontal
+        Tab {
+            id: tabSetting
+            title: "设置"
+            source: "Settings.qml"
+        }
 
-            TableView {
-                id: tableView
-                Layout.minimumWidth: parent.width * 0.618
-                Layout.maximumWidth: parent.width * 0.75
-                height: parent.height
-                model: taskModel
-                headerVisible: false
-                selectionMode: SelectionMode.ExtendedSelection
+        Tab {
+            id: tabFeedback
+            title: "反馈"
+            source: "Feedback.qml"
+        }
 
-                TableViewColumn {
-                    role: "taskData"
-                    delegate: TaskDelegate {}
-                }
+        Tab {
+            id: tabAbout
+            source: "About.qml"
+            title: "关于"
+        }
 
-                rowDelegate: Item {
-                    height: 60
-                }
-
-                onActivated: {
-                    console.log("TODO")
+        style: TabViewStyle {
+            tabBar: Rectangle {
+                color: "orange"
+                height: 180
+                TextField {
+                    text: ""
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    onTextChanged: taskModel.setNameFilter(text)
+                    placeholderText: "搜索任务名"
                 }
             }
-
-            Item {
-                id: metaSideBar
-                Layout.maximumWidth: 0.382 * splitView.width
-                Layout.minimumWidth: 0.25 * splitView.width
-                height: splitView.height
-
-                Loader {
-                    id: metaSideBarLoader
-                    visible: status === Loader.Ready
-                    source: {
-                        if (tableView.currentRow >= 0) return "TaskSidebar.qml"
-
-                        return "AboutSidebar.qml"
-                    }
-
-                    property var taskData: null
-                    readonly property var buddyView: tableView
-
-                    function setTaskData() {
-                        var currentRow = tableView.currentRow
-                        if (currentRow >= 0) {
-                            metaSideBarLoader.taskData = taskModel.get(currentRow)
-                        } else {
-                            metaSideBarLoader.taskData = null
-                        }
-                    }
-
-                    Connections {
-                        target: taskModel
-
-                        function handleSrcDataChanged(row1, row2) {
-                            var currentRow = tableView.currentRow
-                            if ((row1 <= currentRow) && (currentRow <= row2)) {
-                                metaSideBarLoader.setTaskData()
-                            }
-                        }
-
-                        onSrcDataChanged: handleSrcDataChanged(arguments[0], arguments[1])
-                    }
-
-                    Connections {
-                        target: tableView.selection
-                        onSelectionChanged: {
-                            metaSideBarLoader.setTaskData()
-                        }
-                    }
+            tab: Rectangle {
+                color: styleData.selected ? "steelblue" :"lightsteelblue"
+                border.color:  "steelblue"
+                implicitWidth: 80
+                implicitHeight: 28
+                Text {
+                    id: text
+                    anchors.centerIn: parent
+                    text: styleData.title
+                    color: styleData.selected ? "white" : "black"
+                    font.bold: styleData.selected
                 }
             }
         }
