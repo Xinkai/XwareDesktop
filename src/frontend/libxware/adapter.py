@@ -8,7 +8,7 @@ from functools import partial
 import threading, uuid
 
 from PyQt5.QtCore import QObject, pyqtSignal
-from .vanilla import TaskState, XwareClient
+from .vanilla import TaskClass, XwareClient
 from .map import Tasks
 
 _POLLING_INTERVAL = 1
@@ -60,21 +60,21 @@ class XwareAdapter(QObject):
         # main() handles non-stop polling
 
         runningId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskState.RUNNING))
+            Tasks(self, TaskClass.RUNNING))
         completedId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskState.COMPLETED))
+            Tasks(self, TaskClass.COMPLETED))
         recycledId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskState.RECYCLED))
+            Tasks(self, TaskClass.RECYCLED))
         failedOnSubmissionId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskState.FAILED_ON_SUBMISSION))
+            Tasks(self, TaskClass.FAILED_ON_SUBMISSION))
         self._mapIds = (runningId, completedId, recycledId, failedOnSubmissionId)
 
         while True:
             self._loop.call_soon(self.get_getsysinfo)
-            self._loop.call_soon(self.get_list, TaskState.RUNNING)
-            self._loop.call_soon(self.get_list, TaskState.COMPLETED)
-            self._loop.call_soon(self.get_list, TaskState.RECYCLED)
-            self._loop.call_soon(self.get_list, TaskState.FAILED_ON_SUBMISSION)
+            self._loop.call_soon(self.get_list, TaskClass.RUNNING)
+            self._loop.call_soon(self.get_list, TaskClass.COMPLETED)
+            self._loop.call_soon(self.get_list, TaskClass.RECYCLED)
+            self._loop.call_soon(self.get_list, TaskClass.FAILED_ON_SUBMISSION)
             self._loop.call_soon(self.get_settings)
 
             yield from asyncio.sleep(_POLLING_INTERVAL)
@@ -100,7 +100,7 @@ class XwareAdapter(QObject):
     def _donecb_get_list(self, state, future):
         result = future.result()
 
-        if state == TaskState.RUNNING:
+        if state == TaskClass.RUNNING:
             self.ulSpeed = result["upSpeed"]
             self.dlSpeed = result["dlSpeed"]
         mapId = self._mapIds[int(state)]

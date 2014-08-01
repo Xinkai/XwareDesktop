@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import OrderedDict
-from .vanilla import TaskState
+from .vanilla import TaskClass
 from .item import XwareTaskItem as Item
 
 
@@ -11,11 +11,11 @@ _RUNNING_SPEED_SAMPLE_COUNT = 25
 class Tasks(OrderedDict):
     """TaskModel underlying data"""
 
-    def __init__(self, adapter, state):
+    def __init__(self, adapter, klass):
         super().__init__()
-        assert isinstance(state, TaskState)
+        assert isinstance(klass, TaskClass)
         self.adapter = adapter
-        self._state = state
+        self._klass = klass
 
     def updateData(self, updatingList = None):
         updating = dict(zip(
@@ -31,7 +31,7 @@ class Tasks(OrderedDict):
         removedKeys = currentKeys - updatingKeys
 
         for k in modifiedKeys:
-            self[k].update(updating[k], self._state)
+            self[k].update(updating[k], self._klass)
 
         for k in addedKeys:
             # Note: __setitem__ is overridden
@@ -48,10 +48,10 @@ class Tasks(OrderedDict):
         if ret:
             if isinstance(ret, Item):
                 item = ret
-                item.update(value, self._state)
+                item.update(value, self._klass)
             else:
                 item = Item(adapter = self.adapter)
-                item.update(value, self._state)
+                item.update(value, self._klass)
             super().__setitem__(key, item)
             self.afterInsert()
 

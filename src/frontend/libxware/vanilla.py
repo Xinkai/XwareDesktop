@@ -32,7 +32,7 @@ class UnquotingJsonDecoder(JSONDecoder):
 
 
 @unique
-class TaskState(IntEnum):
+class TaskClass(IntEnum):
     RUNNING = 0
     COMPLETED = 1
     RECYCLED = 2
@@ -40,7 +40,7 @@ class TaskState(IntEnum):
 
 
 @unique
-class TaskClass(IntEnum):
+class TaskState(IntEnum):
     DOWNLOADING = 0
     WAITING = 8
     STOPPED = 9
@@ -160,11 +160,11 @@ class XwareClient(object):
         assert result.Return == 0
         return result
 
-    def get_list(self, state, starting = 0, count = 999999, abs_path = True, fixed_id = False):
-        assert isinstance(state, TaskState)
-        result = self.getJson2("list?v=2&type={state}&pos={starting}&number={count}&needUrl=1"
+    def get_list(self, klass, starting = 0, count = 999999, abs_path = True, fixed_id = False):
+        assert isinstance(klass, TaskClass)
+        result = self.getJson2("list?v=2&type={klass}&pos={starting}&number={count}&needUrl=1"
                                "&abs_path={abs_path}&fixed_id={fixed_id}"
-                               .format(state = int(state),
+                               .format(klass = int(klass),
                                        starting = starting,
                                        count = count,
                                        abs_path = int(abs_path),
