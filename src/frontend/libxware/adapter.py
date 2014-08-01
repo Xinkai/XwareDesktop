@@ -97,13 +97,13 @@ class XwareAdapter(QObject):
     def _donecb_get_getsysinfo(self, future):
         pass
 
-    def _donecb_get_list(self, state, future):
+    def _donecb_get_list(self, klass, future):
         result = future.result()
 
-        if state == TaskClass.RUNNING:
+        if klass == TaskClass.RUNNING:
             self.ulSpeed = result["upSpeed"]
             self.dlSpeed = result["dlSpeed"]
-        mapId = self._mapIds[int(state)]
+        mapId = self._mapIds[int(klass)]
         self.update.emit(mapId, result["tasks"])
 
     def _donecb_get_settings(self, future):
