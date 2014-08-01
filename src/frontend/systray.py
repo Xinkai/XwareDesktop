@@ -18,7 +18,7 @@ class Systray(QObject):
 
         self.trayIconMenu = ContextMenu(None)
 
-        icon = QIcon(":/image/thunder.ico")
+        icon = QIcon.fromTheme("xware-desktop")
 
         self.trayIcon = QSystemTrayIcon(self)
         self.trayIcon.setIcon(icon)

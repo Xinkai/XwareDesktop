@@ -9,7 +9,6 @@
     <file>up.png</file>
     <file>down.png</file>
     <file>disconnected.png</file>
-    <file>thunder.ico</file>
   </qresource>
   <qresource prefix="sound">
     <file>download-complete.wav</file>

@@ -49,7 +49,7 @@ class TaskTreeModel(QAbstractItemModel):
         elif role == Qt.DecorationRole and index.column() == TaskTreeColumn.FileName:
             # TODO: use with real icons
             from PyQt5.QtGui import QIcon
-            return QIcon("/opt/xware-desktop/frontend/thunder.ico")
+            return QIcon.fromTheme("xware-desktop")
 
         return None
 

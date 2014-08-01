@@ -38,8 +38,7 @@
    <string>关于 Xware Desktop</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="rc/resource.qrc">
-    <normaloff>:/image/thunder.ico</normaloff>:/image/thunder.ico</iconset>
+   <iconset theme="xware-desktop"/>
   </property>
   <property name="locale">
    <locale language="Chinese" country="China"/>
