@@ -126,12 +126,12 @@ class XwareTaskItem(QObject):
     updated = pyqtSignal()
     errorOccurred = pyqtSignal()
 
-    def __init__(self, *, adapter, state):
+    def __init__(self, *, adapter):
         super().__init__(None)
         self._initialized = False
         self._adapter = adapter
-        self._state = state
         self._namespace = self._adapter.namespace
+        self._klass = None
 
         self._id = None
         self._name = None
@@ -228,24 +228,32 @@ class XwareTaskItem(QObject):
 
     @pyqtProperty(int, notify = updated)
     def klass(self):
-        return {
-            XwareTaskClass.DOWNLOADING: TaskClass.RUNNING,
-            XwareTaskClass.WAITING: TaskClass.RUNNING,
-            XwareTaskClass.STOPPED: TaskClass.RUNNING,
-            XwareTaskClass.PAUSED: TaskClass.RUNNING,
-            XwareTaskClass.FINISHED: TaskClass.COMPLETED,
-            XwareTaskClass.FAILED: TaskClass.FAILED,
-            XwareTaskClass.UPLOADING: TaskClass.RUNNING,
-            XwareTaskClass.SUBMITTING: TaskClass.RUNNING,
-            XwareTaskClass.DELETED: TaskClass.RECYCLED,
-            XwareTaskClass.RECYCLED: TaskClass.RECYCLED,
-            XwareTaskClass.SUSPENDED: TaskClass.RUNNING,
-            XwareTaskClass.ERROR: TaskClass.FAILED,
-        }[self.state]
+        # _klass is xware class[0-3],
+        # return Xware Desktop task class
+        return 1 << self._klass
 
-    def update(self, data):
+        # Xware Local Control doesn't always return reliable state,
+        # needs to use class directly
+
+        # return {
+        #     XwareTaskClass.DOWNLOADING: TaskClass.RUNNING,
+        #     XwareTaskClass.WAITING: TaskClass.RUNNING,
+        #     XwareTaskClass.STOPPED: TaskClass.RUNNING,
+        #     XwareTaskClass.PAUSED: TaskClass.RUNNING,
+        #     XwareTaskClass.FINISHED: TaskClass.COMPLETED,
+        #     XwareTaskClass.FAILED: TaskClass.FAILED,
+        #     XwareTaskClass.UPLOADING: TaskClass.RUNNING,
+        #     XwareTaskClass.SUBMITTING: TaskClass.RUNNING,
+        #     XwareTaskClass.DELETED: TaskClass.RECYCLED,
+        #     XwareTaskClass.RECYCLED: TaskClass.RECYCLED,
+        #     XwareTaskClass.SUSPENDED: TaskClass.RUNNING,
+        #     XwareTaskClass.ERROR: TaskClass.FAILED,
+        # }[self.state]
+
+    def update(self, data, klass):
+        self._klass = klass
+
         self.speed = data.get("speed")
-
         self._remainingTime = data.get("remainTime")
         self._state = data.get("state")
         self._completionTime = data.get("completeTime")

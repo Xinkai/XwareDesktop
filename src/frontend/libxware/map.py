@@ -31,7 +31,7 @@ class Tasks(OrderedDict):
         removedKeys = currentKeys - updatingKeys
 
         for k in modifiedKeys:
-            self[k].update(updating[k])
+            self[k].update(updating[k], self._state)
 
         for k in addedKeys:
             # Note: __setitem__ is overridden
@@ -41,17 +41,6 @@ class Tasks(OrderedDict):
             # Note: __delitem__ is overridden
             del self[k]
 
-    @staticmethod
-    def _composeNewSpeeds(oldSpeeds, newSpeed):
-        return oldSpeeds[1:] + [newSpeed]
-
-    def _getSpeeds(self, key):
-        try:
-            result = self[key]["speeds"]
-        except KeyError:
-            result = [0] * _RUNNING_SPEED_SAMPLE_COUNT
-        return result
-
     def __setitem__(self, key, value, **kwargs):
         if key in self:
             raise ValueError("__setitem__ is specialized for inserting.")
@@ -59,11 +48,10 @@ class Tasks(OrderedDict):
         if ret:
             if isinstance(ret, Item):
                 item = ret
-                item.update(value)
+                item.update(value, self._state)
             else:
-                item = Item(adapter = self.adapter,
-                            state = self._state)
-                item.update(value)
+                item = Item(adapter = self.adapter)
+                item.update(value, self._state)
             super().__setitem__(key, item)
             self.afterInsert()
 
