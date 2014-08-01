@@ -11,9 +11,9 @@ from PyQt5.QtCore import QModelIndex
 
 
 class TaskManager(collections.MutableMapping):
-    _mapNamespaces = collections.defaultdict(list)  # {"xware-0123": [0, 1, 2, 3], ...}
-
     def __init__(self, model):
+        self._mapNamespaces = collections.defaultdict(list)  # {"xware-0123": [0, 1, 2, 3], ...}
+        self._stash = {}
         self._maps = []
         self._model = model
 
@@ -42,7 +42,6 @@ class TaskManager(collections.MutableMapping):
         for nsmap in self._mapsForNamespace(ns):
             try:
                 result = nsmap[key]
-                result["ns"] = ns
                 return result
             except KeyError:
                 pass
@@ -77,7 +76,6 @@ class TaskManager(collections.MutableMapping):
                 inmapIndex = index - mapLIndex
                 itr = islice(self._maps[mapId].values(), inmapIndex, inmapIndex + 1)
                 result = next(itr)
-                result["ns"] = self._maps[mapId].namespace
                 return result
         raise IndexError("Out of range: index({})".format(index))
 
@@ -88,7 +86,7 @@ class TaskManager(collections.MutableMapping):
         if not isinstance(map_, collections.OrderedDict):
             raise ValueError("Can only register OrderedDict")
 
-        namespace = getattr(map_, "namespace")
+        namespace = getattr(map_, "adapter").namespace
         if not namespace:
             raise ValueError("Map must have a namespace property")
 
@@ -100,9 +98,8 @@ class TaskManager(collections.MutableMapping):
         # implement map's model related methods
         map_.beforeInsert = partial(self.beforeInsert, mapId)
         map_.afterInsert = self.afterInsert
-        map_.beforeModify = partial(self.beforeModify, mapId)
-        map_.afterModify = partial(self.afterModify, mapId)
         map_.beforeDelete = partial(self.beforeDelete, mapId)
+        map_.moveToStash = self.moveToStash
         map_.afterDelete = self.afterDelete
 
         self._mapNamespaces[namespace].append(mapId)
@@ -111,28 +108,22 @@ class TaskManager(collections.MutableMapping):
     def updateMap(self, mapId, updating):
         self._maps[mapId].updateData(updating)
 
-    def beforeInsert(self, mapId, key):
+    def beforeInsert(self, mapId, key) -> {False: "deferred",
+                                           True: "goahead",
+                                           "item": "Found key in stash"}:
         if key in self:
             print("deferred", key)
-            return False  # deferred
+            return False
         baseIndex = self._baseIndexForMap(mapId)
         size = len(self._maps[mapId])
         i = baseIndex + size
 
         self._model.sigBeforeInsert.emit(i)
-        return True
+
+        return self._stash.pop(key, True)
 
     def afterInsert(self):
         self._model.sigAfterInsert.emit()
-
-    def beforeModify(self, mapId):
-        pass
-
-    def afterModify(self, mapId, index0, index1):
-        baseIndex = self._baseIndexForMap(mapId)
-        i0 = baseIndex + index0
-        i1 = baseIndex + index1 - 1
-        self._model.sigAfterModify.emit(i0, i1)
 
     def beforeDelete(self, mapId, index):
         baseIndex = self._baseIndexForMap(mapId)
@@ -140,6 +131,9 @@ class TaskManager(collections.MutableMapping):
 
         self._model.beginRemoveRows(QModelIndex(), i, i)
         return True
+
+    def moveToStash(self, item):
+        self._stash[item.id] = item
 
     def afterDelete(self):
         self._model.endRemoveRows()

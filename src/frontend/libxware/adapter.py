@@ -7,23 +7,21 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import threading, uuid
 
-from models.ProxyModel import TaskClass
-from utils.system import systemOpen, viewOneFile, viewMultipleFiles
-
+from PyQt5.QtCore import QObject, pyqtSignal
 from .vanilla import TaskState, XwareClient
-from .vanilla import TaskClass as XwareTaskClass
 from .map import Tasks
 
 _POLLING_INTERVAL = 1
 
 
-class XwareAdapter(object):
-    _mapIds = None
-    _ulSpeed = 0
-    _dlSpeed = 0
+class XwareAdapter(QObject):
+    update = pyqtSignal(int, list)
 
     def __init__(self, clientOptions):
         super().__init__()
+        self._mapIds = None
+        self._ulSpeed = 0
+        self._dlSpeed = 0
         self._loop = asyncio.get_event_loop()
         self._uuid = uuid.uuid1().hex
         self._xwareClient = XwareClient(clientOptions)
@@ -55,24 +53,6 @@ class XwareAdapter(object):
     def updateOptions(self, clientOptions):
         self._xwareClient.updateOptions(clientOptions)
 
-    @staticmethod
-    def getTaskClass(data):
-        d = {
-            XwareTaskClass.DOWNLOADING: TaskClass.RUNNING,
-            XwareTaskClass.WAITING: TaskClass.RUNNING,
-            XwareTaskClass.STOPPED: TaskClass.RUNNING,
-            XwareTaskClass.PAUSED: TaskClass.RUNNING,
-            XwareTaskClass.FINISHED: TaskClass.COMPLETED,
-            XwareTaskClass.FAILED: TaskClass.FAILED,
-            XwareTaskClass.UPLOADING: TaskClass.RUNNING,
-            XwareTaskClass.SUBMITTING: TaskClass.RUNNING,
-            XwareTaskClass.DELETED: TaskClass.RECYCLED,
-            XwareTaskClass.RECYCLED: TaskClass.RECYCLED,
-            XwareTaskClass.SUSPENDED: TaskClass.RUNNING,
-            XwareTaskClass.ERROR: TaskClass.FAILED,
-        }
-        return d[data["state"]]
-
     # =========================== PUBLIC ===========================
     @asyncio.coroutine
     def main(self):
@@ -80,13 +60,13 @@ class XwareAdapter(object):
         # main() handles non-stop polling
 
         runningId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self.namespace, TaskState.RUNNING))
+            Tasks(self, TaskState.RUNNING))
         completedId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self.namespace, TaskState.COMPLETED))
+            Tasks(self, TaskState.COMPLETED))
         recycledId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self.namespace, TaskState.RECYCLED))
+            Tasks(self, TaskState.RECYCLED))
         failedOnSubmissionId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self.namespace, TaskState.FAILED_ON_SUBMISSION))
+            Tasks(self, TaskState.FAILED_ON_SUBMISSION))
         self._mapIds = (runningId, completedId, recycledId, failedOnSubmissionId)
 
         while True:
@@ -124,50 +104,34 @@ class XwareAdapter(object):
             self.ulSpeed = result["upSpeed"]
             self.dlSpeed = result["dlSpeed"]
         mapId = self._mapIds[int(state)]
-        app.taskModel.taskManager.updateMap(mapId, result["tasks"])
+        self.update.emit(mapId, result["tasks"])
 
     def _donecb_get_settings(self, future):
         pass
 
     def do_pauseTasks(self, tasks, options):
-        taskIds = map(lambda t: t["id"], tasks)
+        taskIds = map(lambda t: t.realid, tasks)
         self._loop.call_soon_threadsafe(self.post_pause, taskIds)
 
     def do_startTasks(self, tasks, options):
-        taskIds = map(lambda t: t["id"], tasks)
+        taskIds = map(lambda t: t.realid, tasks)
         self._loop.call_soon_threadsafe(self.post_start, taskIds)
 
-    def do_openLixianChannel(self, task, enable: bool):
-        taskId = task["id"]
+    def do_openLixianChannel(self, taskItem, enable: bool):
+        taskId = taskItem.realid
         self._loop.call_soon_threadsafe(self.post_openLixianChannel, taskId, enable)
 
-    def do_openVipChannel(self, task):
-        taskId = task["id"]
+    def do_openVipChannel(self, taskItem):
+        taskId = taskItem.realid
         self._loop.call_soon_threadsafe(self.post_openVipChannel, taskId)
-
-    @staticmethod
-    def do_systemOpen(task):
-        filename = task["path"] + task["name"]
-        systemOpen(filename)
-
-    @staticmethod
-    def do_viewOneTask(task):
-        filename = task["path"] + task["name"]
-        viewOneFile(filename)
-
-    @staticmethod
-    def do_viewMultipleTasks(tasks):
-        filenames = map(lambda t: t["path"] + t["name"], tasks)
-        viewMultipleFiles(filenames)
 
 
 class XwareAdapterThread(threading.Thread):
-    _loop = None
-    _loop_executor = None
-    _adapter = None
-
     def __init__(self, options):
         super().__init__(name = "XwareAdapterEventLoop", daemon = True)
+        self._loop = None
+        self._loop_executor = None
+        self._adapter = None
         self._options = options
 
     def run(self):

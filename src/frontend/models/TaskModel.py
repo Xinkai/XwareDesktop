@@ -7,6 +7,8 @@ import enum
 from itertools import groupby
 
 from PyQt5.QtCore import QAbstractTableModel, Qt, pyqtSlot, pyqtSignal, QModelIndex, QDateTime
+from utils.system import systemOpen, viewOneFile, viewMultipleFiles
+
 from .TaskManager import TaskManager
 
 
@@ -27,8 +29,6 @@ class TaskClass(enum.IntEnum):
 class TaskModel(QAbstractTableModel):
     sigBeforeInsert = pyqtSignal(int)
     sigAfterInsert = pyqtSignal()
-    sigBeforeModify = pyqtSignal()
-    sigAfterModify = pyqtSignal(int, int)  # allow modify range
     sigBeforeRemove = pyqtSignal(int)
     sigAfterRemove = pyqtSignal()
 
@@ -40,8 +40,6 @@ class TaskModel(QAbstractTableModel):
         # unpredictable data corruption.
         self.sigBeforeInsert.connect(self.slotBeforeInsert, Qt.BlockingQueuedConnection)
         self.sigAfterInsert.connect(self.slotAfterInsert, Qt.BlockingQueuedConnection)
-        self.sigBeforeModify.connect(self.slotBeforeModify, Qt.BlockingQueuedConnection)
-        self.sigAfterModify.connect(self.slotAfterModify, Qt.BlockingQueuedConnection)
         self.sigBeforeRemove.connect(self.slotBeforeRemove, Qt.BlockingQueuedConnection)
         self.sigAfterRemove.connect(self.slotAfterRemove, Qt.BlockingQueuedConnection)
 
@@ -54,16 +52,6 @@ class TaskModel(QAbstractTableModel):
     @pyqtSlot()
     def slotAfterInsert(self):
         self.endInsertRows()
-
-    @pyqtSlot()
-    def slotBeforeModify(self):
-        raise NotImplementedError()
-
-    @pyqtSlot(int, int)
-    def slotAfterModify(self, i0, i1):
-        self.dataChanged.emit(self.index(i0, 0),
-                              self.index(i1, 0),
-                              [TaskDataRole])
 
     @pyqtSlot(int)
     def slotBeforeRemove(self, i):
@@ -94,15 +82,13 @@ class TaskModel(QAbstractTableModel):
             result = self.taskManager.at(qModelIndex.row())
             return result
         elif role == Qt.DisplayRole:
-            return self.data(qModelIndex, role = TaskDataRole)["name"]
+            return self.data(qModelIndex, role = TaskDataRole).name
         elif role == CreationTimeRole:
-            dt = QDateTime.fromTime_t(int(
-                self.data(qModelIndex, role = TaskDataRole)["createTime"]))
+            dt = QDateTime.fromTime_t(
+                self.data(qModelIndex, role = TaskDataRole).creationTime)
             return dt
         elif role == TaskClassRole:
-            data = self.data(qModelIndex, TaskDataRole)
-            ns = data["ns"]
-            return app.adapterManager.adapter(ns).getTaskClass(data)
+            return self.data(qModelIndex, TaskDataRole).klass
 
     def get(self, qModelIndex):
         return self.data(qModelIndex, TaskDataRole)
@@ -116,7 +102,7 @@ class TaskModel(QAbstractTableModel):
         taskDatas = map(self.get, tasks)
 
         result = defaultdict(list)
-        for ns, tasks_ in groupby(taskDatas, key = lambda task: task["ns"]):
+        for ns, tasks_ in groupby(taskDatas, key = lambda task: task.namespace):
             for task_ in tasks_:
                 result[ns].append(task_)
         return result
@@ -130,29 +116,29 @@ class TaskModel(QAbstractTableModel):
         for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
             app.adapterManager.adapter(ns).do_startTasks(taskDatas, options)
 
-    def viewMultipleTasks(self, tasks: "list<QModelIndex>"):
-        for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
-            app.adapterManager.adapter(ns).do_viewMultipleTasks(taskDatas)
-
     # =============== The following methods hand taskData directly to the adapter ===============
+    def openLixianChannel(self, task: QModelIndex, enable: bool):
+        taskItem = self.get(task)
+        ns = taskItem.namespace
+        assert ns.startswith("xware")
+        app.adapterManager.adapter(ns).do_openLixianChannel(taskItem, enable)
+
+    def openVipChannel(self, task: QModelIndex):
+        taskItem = self.get(task)
+        ns = taskItem.namespace
+        assert ns.startswith("xware")
+        app.adapterManager.adapter(ns).do_openVipChannel(taskItem)
+
+    # ============================= Adapter-independent operations =============================
     def systemOpen(self, task: QModelIndex):
         taskData = self.get(task)
-        ns = taskData["ns"]
-        app.adapterManager.adapter(ns).do_systemOpen(taskData)
+        systemOpen(taskData.fullpath)
 
     def viewOneTask(self, task: QModelIndex):
         taskData = self.get(task)
-        ns = taskData["ns"]
-        app.adapterManager.adapter(ns).do_viewOneTask(taskData)
+        viewOneFile(taskData.fullpath)
 
-    def openLixianChannel(self, task: QModelIndex, enable: bool):
-        taskData = self.get(task)
-        ns = taskData["ns"]
-        assert ns.startswith("xware")
-        app.adapterManager.adapter(ns).do_openLixianChannel(taskData, enable)
-
-    def openVipChannel(self, task: QModelIndex):
-        taskData = self.get(task)
-        ns = taskData["ns"]
-        assert ns.startswith("xware")
-        app.adapterManager.adapter(ns).do_openVipChannel(taskData)
+    def viewMultipleTasks(self, tasks: "list<QModelIndex>"):
+        taskDatas = map(self.get, tasks)
+        fullpaths = map(lambda task: task.fullpath, taskDatas)
+        viewMultipleFiles(fullpaths)

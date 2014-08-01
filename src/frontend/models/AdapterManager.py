@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from launcher import app
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
 
 from collections import OrderedDict
@@ -24,6 +25,7 @@ class AdapterManager(QObject):
     def registerAdapter(self, adapter):
         ns = adapter.namespace
         assert ns not in self._adapters
+        adapter.update.connect(app.taskModel.taskManager.updateMap)
         self._adapters[ns] = adapter
 
     def adapter(self, ns):

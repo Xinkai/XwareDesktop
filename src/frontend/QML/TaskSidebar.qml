@@ -134,7 +134,7 @@ Rectangle {
                     if (!taskData.vipChannel.available) {
                         return "不可用"
                     }
-                    var state = taskData.vipChannel.opened
+                    var state = taskData.vipChannel.state
                     switch (state) {
                     case 0:
                         return "未开启"
@@ -154,10 +154,10 @@ Rectangle {
         }
 
         Text {
-            visible: taskData && taskData.createTime ? true : false
+            visible: taskData && taskData.creationTime ? true : false
             text: {
                 if (visible) {
-                    "添加于" + JsUtils.humanTimeElapse(taskData.createTime)
+                    "添加于" + JsUtils.humanTimeElapse(taskData.creationTime)
                 } else {
                     ""
                 }
@@ -165,10 +165,10 @@ Rectangle {
         }
 
         Text {
-            visible: taskData && taskData.completeTime ? true : false
+            visible: taskData && taskData.completionTime ? true : false
             text: {
                 if (visible) {
-                    "完成于" + JsUtils.humanTimeElapse(taskData.completeTime)
+                    "完成于" + JsUtils.humanTimeElapse(taskData.completionTime)
                 } else {
                     ""
                 }

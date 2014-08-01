@@ -53,7 +53,7 @@ class ProxyModel(QSortFilterProxyModel):
         super().setSourceModel(model)
         self.setSortRole(CreationTimeRole)
 
-    @pyqtSlot(int, result = "QVariantMap")
+    @pyqtSlot(int, result = "QVariant")
     def get(self, i: int):
         index = self.mapToSource(self.index(i, 0))
         return self.sourceModel().get(index)
