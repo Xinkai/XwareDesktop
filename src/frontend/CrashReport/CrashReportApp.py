@@ -30,7 +30,7 @@ class CrashReportForm(QDialog, Ui_Dialog):
 
         self.textBrowser.setHtml(
             "发行版: {lsb_release}<br />"
-            "桌面环境: {desktop_sesion}<br />"
+            "桌面环境: {xdg_current_desktop}/{desktop_session}<br />"
             "版本: {githash}<br /><br />"
             "<b style='color: orange'>补充描述计算机。</b><br />可留空。<br /><br />"
 
@@ -43,7 +43,8 @@ class CrashReportForm(QDialog, Ui_Dialog):
             "</pre>```<br />"
             "======================== 结束 ========================<br />"
             .format(lsb_release = self.lsb_release(),
-                    desktop_sesion = os.getenv("DESKTOP_SESSION"),
+                    xdg_current_desktop = os.environ.get("XDG_CURRENT_DESKTOP", "未知"),
+                    desktop_session = os.environ.get("DESKTOP_SESSION", "未知"),
                     githash = githash,
                     threadName = payload["thread"],
                     traceback = html.escape(payload["traceback"]))
