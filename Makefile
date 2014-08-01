@@ -84,7 +84,7 @@ install:
 
 	# icons
 	install -d $(DESTDIR)/usr/share/icons/hicolor
-	cp -R xware/icons/* $(DESTDIR)/usr/share/icons/hicolor
+	cp -R src/frontend/ui/icons/* $(DESTDIR)/usr/share/icons/hicolor
 
 	# other
 	install -D src/frontend/xware-desktop.desktop  $(DESTDIR)/usr/share/applications/xware-desktop.desktop
