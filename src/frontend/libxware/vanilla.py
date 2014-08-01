@@ -151,6 +151,12 @@ class XwareClient(object):
     def getJson2(self, parts):
         result = yield from self.getJson(parts)
         assert result["rtn"] == 0
+        del result["rtn"]
+
+        if "msg" in result:
+            assert result["msg"] == ""
+            del result["msg"]
+
         return result
 
     @asyncio.coroutine
@@ -210,6 +216,7 @@ class XwareClient(object):
         result = yield from self.postJson(parts, **kwargs)
         rtn = result["rtn"]
         assert rtn == 0, rtn
+        del result["rtn"]
         return result
 
     @asyncio.coroutine
@@ -217,6 +224,7 @@ class XwareClient(object):
         result = yield from self.postJsonP(parts, **kwargs)
         rtn = result["rtn"]
         assert rtn == 0, rtn
+        del result["rtn"]
         return result
 
     @asyncio.coroutine

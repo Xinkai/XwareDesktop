@@ -7,11 +7,55 @@ from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import threading, uuid
 
-from PyQt5.QtCore import QObject, pyqtSignal
-from .vanilla import TaskClass, XwareClient
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
+from .vanilla import TaskClass, XwareClient, Settings
 from .map import Tasks
 
 _POLLING_INTERVAL = 1
+
+
+class XwareSettings(QObject):
+    updated = pyqtSignal()
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self._settings = None
+
+    @pyqtProperty(int, notify = updated)
+    def downloadSpeedLimit(self):
+        return self._settings.downloadSpeedLimit
+
+    @pyqtProperty(int, notify = updated)
+    def uploadSpeedLimit(self):
+        return self._settings.uploadSpeedLimit
+
+    @pyqtProperty(int, notify = updated)
+    def slStartTime(self):
+        return self._settings.slStartTime
+
+    @pyqtProperty(int, notify = updated)
+    def slEndTime(self):
+        return self._settings.slEndTime
+
+    @pyqtProperty(int, notify = updated)
+    def maxRunTaskNumber(self):
+        return self._settings.maxRunTaskNumber
+
+    @pyqtProperty(int, notify = updated)
+    def autoOpenLixian(self):
+        return self._settings.autoOpenLixian
+
+    @pyqtProperty(int, notify = updated)
+    def autoOpenVip(self):
+        return self._settings.autoOpenVip
+
+    @pyqtProperty(int, notify = updated)
+    def autoDlSubtitle(self):
+        return self._settings.autoDlSubtitle
+
+    def update(self, settings: Settings):
+        self._settings = settings
+        self.updated.emit()
 
 
 class XwareAdapter(QObject):
@@ -22,6 +66,7 @@ class XwareAdapter(QObject):
         self._mapIds = None
         self._ulSpeed = 0
         self._dlSpeed = 0
+        self._xwareSettings = XwareSettings(self)
         self._loop = asyncio.get_event_loop()
         self._uuid = uuid.uuid1().hex
         self._xwareClient = XwareClient(clientOptions)
@@ -49,6 +94,10 @@ class XwareAdapter(QObject):
         if value != self._dlSpeed:
             self._dlSpeed = value
             app.adapterManager.dlSpeedChanged.emit()
+
+    @property
+    def backendSettings(self):
+        return self._xwareSettings
 
     def updateOptions(self, clientOptions):
         self._xwareClient.updateOptions(clientOptions)
@@ -107,7 +156,8 @@ class XwareAdapter(QObject):
         self.update.emit(mapId, result["tasks"])
 
     def _donecb_get_settings(self, future):
-        pass
+        result = future.result()
+        self._xwareSettings.update(result)
 
     def do_pauseTasks(self, tasks, options):
         taskIds = map(lambda t: t.realid, tasks)
