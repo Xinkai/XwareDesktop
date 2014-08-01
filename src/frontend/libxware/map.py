@@ -57,7 +57,9 @@ class Tasks(OrderedDict):
 
     def __delitem__(self, key, **kwargs):
         if self.beforeDelete(self.index(key)):
-            self.moveToStash(self.pop(key))
+            popped = self[key]
+            super().__delitem__(key)
+            self.moveToStash(popped)
             self.afterDelete()
 
     def index(self, key):
