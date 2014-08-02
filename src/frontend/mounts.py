@@ -9,12 +9,10 @@ from utils.misc import trySymlink, tryMkdir
 
 
 class MountsFaker(object):
-    # Terminlogies:
+    # Terminologies:
     # local path: a path that the user sets
     # mnt path: the path which is mapped from a local path
     #           for example, PROFILE/mnt/mnt\unix
-
-    _mounts = None
 
     def __init__(self):
         self._mounts = OrderedDict()
