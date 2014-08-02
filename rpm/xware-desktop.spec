@@ -6,7 +6,7 @@
 %global __python        %{__python3}
 
 Name:               xware-desktop
-Version:            0.11
+Version:            0.12
 Release:            1%{?dist}
 Summary:            An attempt to bring Xware (Xunlei on routers) to desktop Linux.
 
