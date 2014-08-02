@@ -26,7 +26,12 @@ def decodePrivateLink(link):
     assert len(path) == 1, "Invalid private link {}.".format(link)
 
     path = path[0].encode("utf-8")
-    decoded = base64.urlsafe_b64decode(path).decode("utf-8")
+
+    toDecode = base64.urlsafe_b64decode(path)
+    try:
+        decoded = toDecode.decode("utf-8")
+    except UnicodeDecodeError:
+        decoded = toDecode.decode("gb18030")
 
     scheme = scheme.lower()
     if scheme == "thunder":
