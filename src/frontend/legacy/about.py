@@ -8,7 +8,7 @@ try:
     from shared import __githash__
 except ImportError:
     __githash__ = None
-from ui_about import Ui_dlg_about
+from .ui_about import Ui_dlg_about
 
 
 class AboutDialog(QDialog, Ui_dlg_about):

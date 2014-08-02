@@ -7,8 +7,8 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget, QWidgetAction
 
 from etmpy import EtmSetting
-from CustomStatusBar.CStatusButton import CustomStatusBarToolButton
-from .ui_quickspeedlimit import Ui_Form_quickSpeedLimit
+from legacy.CustomStatusBar.CStatusButton import CustomStatusBarToolButton
+from legacy.ui_quickspeedlimit import Ui_Form_quickSpeedLimit
 from .menu import SettingMenu
 
 

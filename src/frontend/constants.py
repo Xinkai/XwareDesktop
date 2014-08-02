@@ -8,8 +8,8 @@ LOGIN_PAGE = "http://yuancheng.xunlei.com/login.html"
 V2_PAGE = "http://yuancheng.xunlei.com/"
 V3_PAGE = "http://yuancheng.xunlei.com/3/"
 
-XWAREJS_FILE = os.path.join(FRONTEND_DIR, "xwarejs.js")
-XWARESTYLE_FILE = os.path.join(FRONTEND_DIR, "style.css")
+XWAREJS_FILE = os.path.join(FRONTEND_DIR, "legacy/xwarejs.js")
+XWARESTYLE_FILE = os.path.join(FRONTEND_DIR, "legacy/style.css")
 
 SYSTEMD_SERVICE_FILE = os.path.join(FRONTEND_DIR, "xwared.service")
 SYSTEMD_SERVICE_USERFILE = os.path.join(XDG_CONFIG_HOME, "systemd/user/xwared.service")

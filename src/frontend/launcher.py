@@ -43,14 +43,18 @@ class XwareDesktop(QApplication):
     def __init__(self, *args):
         super().__init__(*args)
 
-        import main
+        from legacy import main
+        from legacy.frontendpy import FrontendPy
+
         from Settings import SettingsAccessor, DEFAULT_SETTINGS
+
+        from Widgets.systray import Systray
+
         from xwaredpy import XwaredPy
         from etmpy import EtmPy
-        from systray import Systray
         import mounts
+
         from Notify import Notifier
-        from frontendpy import FrontendPy
         from Schedule import Scheduler
 
         logging.info("XWARE DESKTOP STARTS")
@@ -125,7 +129,7 @@ class XwareDesktop(QApplication):
     def slotCreateCloseMonitorWindow(self):
         logging.debug("slotCreateCloseMonitorWindow")
         show = self.settings.getbool("frontend", "showmonitorwindow")
-        import monitor
+        from Widgets import monitor
         if show:
             if self.monitorWin:
                 pass  # already shown, do nothing

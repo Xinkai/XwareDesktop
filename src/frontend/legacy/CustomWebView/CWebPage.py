@@ -13,11 +13,9 @@ from .CNetworkAccessManager import CustomNetworkAccessManager
 
 
 class CustomWebPage(QWebPage):
-    _overrideFile = None
-    _networkAccessManager = None
-
     def __init__(self, parent):
         super().__init__(parent)
+        self._overrideFile = None
         self._networkAccessManager = CustomNetworkAccessManager()
         self.setNetworkAccessManager(self._networkAccessManager)
         self.applyCustomStyleSheet()

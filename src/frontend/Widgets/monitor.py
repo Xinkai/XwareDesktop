@@ -7,9 +7,9 @@ from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QPoint
 
 import threading, time
 
-from ui_monitor import MonitorWidget, Ui_MonitorWindow
+from .ui_monitor import MonitorWidget, Ui_MonitorWindow
 from PersistentGeometry import PersistentGeometry
-from contextmenu import ContextMenu
+from .contextmenu import ContextMenu
 
 
 class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):

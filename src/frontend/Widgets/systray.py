@@ -7,12 +7,10 @@ from PyQt5.QtCore import pyqtSlot, QObject
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon
 
-from contextmenu import ContextMenu
+from .contextmenu import ContextMenu
 
 
 class Systray(QObject):
-    trayIconMenu = None
-
     def __init__(self, parent):
         super().__init__(parent)
 

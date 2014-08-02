@@ -6,18 +6,18 @@ from launcher import app
 from PyQt5.QtCore import pyqtSlot, QEvent, Qt
 from PyQt5.QtWidgets import QMainWindow
 
-from ui_main import Ui_MainWindow
 from PersistentGeometry import PersistentGeometry
-from about import AboutDialog
-from Settings import SettingsDialog
+
+from .about import AboutDialog
+from .settings import SettingsDialog
+from .ui_main import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
-    settingsDialog = None
-    aboutDialog = None
-
     def __init__(self, parent):
         super().__init__(parent)
+        self.settingsDialog = None
+        self.aboutDialog = None
 
         # UI
         self.setupUi(self)

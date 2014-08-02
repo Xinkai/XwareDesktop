@@ -33,15 +33,13 @@ class FrontendPy(QObject):
     sigNotifyPeerId = pyqtSignal(str)  # let xdjs knows peerid
     sigFrontendStatusChanged = pyqtSignal()  # caused by page heartbeat/changed status/refresh page
 
-    _queue = None
-    _isPageMaskOn = None
-    _isPageOnline = None  # property wraps them, in order to fire sigFrontendStatusChanged
-    _isPageLogined = None
-    _isXdjsLoaded = None
-
     def __init__(self, parent):
         super().__init__(parent)
         self._queue = collections.deque()
+        self._isPageMaskOn = None
+        self._isPageOnline = None  # property wraps them, in order to fire sigFrontendStatusChanged
+        self._isPageLogined = None
+        self._isXdjsLoaded = None
         app.settings.applySettings.connect(self.tryLogin)
 
         from Tasks import TaskCreationAgent

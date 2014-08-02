@@ -10,8 +10,6 @@ from DragDrop import AllowDrop
 
 
 class MonitorGraphicsView(QGraphicsView, AllowDrop):
-    monitorWin = None
-
     SIZE = (50.0, 50.0)
     FULLSPEED = 512 * 1024  # 512 in kb/s
 

@@ -20,16 +20,9 @@ ACTION_SUSPEND = 4
 
 
 class PowerAction(object):
-    # defines a power action
-    manager = None
-    actionId = None
-    displayName = None
-    internalName = None
-    availability = None
-    command = None
-
     def __init__(self, manager, actionId, displayName, internalName):
         super().__init__()
+        # defines a power action
         self.manager = manager
         self.actionId = actionId
         self.displayName = displayName
@@ -70,12 +63,8 @@ class PowerAction(object):
 
 
 class PowerActionManager(QObject):
-    # manages power actions, and act them.
-    _conn = None
-    _interface = None
-    actions = None
-
     def __init__(self, parent = None):
+        # manages power actions, and act them.
         super().__init__(parent)
         self._conn = QDBusConnection("Xware Desktop").systemBus()
         self._interface = QDBusInterface(_DBUS_POWER_SERVICE,

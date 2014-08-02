@@ -5,8 +5,8 @@ from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtSlot
 
-from Schedule.SchedulerCountdown import CountdownMessageBox
-from Schedule.PowerAction import PowerActionManager, ACTION_NONE
+from .SchedulerCountdown import CountdownMessageBox
+from .PowerAction import PowerActionManager, ACTION_NONE
 
 ALL_TASKS_COMPLETED = 0
 SELECTED_TASKS_COMPLETED = 1

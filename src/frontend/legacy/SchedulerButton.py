@@ -6,8 +6,8 @@ from launcher import app
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QIcon
 
-from Schedule.SchedulerWin import SchedulerWindow
-from CustomStatusBar.CStatusButton import CustomStatusBarButton
+from .SchedulerWin import SchedulerWindow
+from .CustomStatusBar.CStatusButton import CustomStatusBarButton
 
 
 class SchedulerButton(CustomStatusBarButton):

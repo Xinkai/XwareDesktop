@@ -7,7 +7,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QStatusBar
 
 from .CStatusBarLabel import CustomStatusBarLabel
-from Schedule.SchedulerButton import SchedulerButton
+from legacy.SchedulerButton import SchedulerButton
 from Settings.QuickSpeedLimit import QuickSpeedLimitBtn
 from utils.misc import debounce, getHumanBytesNumber
 

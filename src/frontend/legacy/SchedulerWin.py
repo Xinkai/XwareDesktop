@@ -6,34 +6,31 @@ from launcher import app
 from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 
-from .ui_scheduler import Ui_Dialog
+from legacy.ui_scheduler import Ui_Dialog
 import Schedule
 
 
 class SchedulerWindow(QDialog, Ui_Dialog):
-    scheduler = None
-
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setupUi(self)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
-        self.scheduler = app.scheduler
         self.loadFromScheduler()
 
     def loadFromScheduler(self):
         # actWhen ComboBox
-        for row, pair in enumerate(self.scheduler.POSSIBLE_ACTWHENS):
+        for row, pair in enumerate(app.scheduler.POSSIBLE_ACTWHENS):
             self.comboBox_actWhen.addItem(pair[1])
             self.comboBox_actWhen.setItemData(row, pair[0])
 
-        self.slotActWhenChanged(self.scheduler.actWhen)
-        self.comboBox_actWhen.setCurrentIndex(self.scheduler.actWhen)
+        self.slotActWhenChanged(app.scheduler.actWhen)
+        self.comboBox_actWhen.setCurrentIndex(app.scheduler.actWhen)
         self.comboBox_actWhen.activated[int].connect(self.slotActWhenChanged)
 
         # tasks list
         runningTasks = app.etmpy.runningTasksStat.getTasks()
-        waitingTaskIds = self.scheduler.waitingTaskIds
+        waitingTaskIds = app.scheduler.waitingTaskIds
         for rTaskId, rTask in runningTasks.items():
             item = QListWidgetItem(rTask["name"])
             item.setData(Qt.UserRole, rTaskId)
@@ -47,12 +44,12 @@ class SchedulerWindow(QDialog, Ui_Dialog):
 
         # action comboBox
         selectedIndex = None
-        for action in self.scheduler.actions:
+        for action in app.scheduler.actions:
             if action.command or action.availability == "yes":
                 self.comboBox_action.addItem(action.displayName)
                 row = self.comboBox_action.count() - 1
                 self.comboBox_action.setItemData(row, action.actionId)
-                if self.scheduler.actionId == action.actionId:
+                if app.scheduler.actionId == action.actionId:
                     selectedIndex = row
         self.comboBox_action.setCurrentIndex(selectedIndex)
 
@@ -72,5 +69,5 @@ class SchedulerWindow(QDialog, Ui_Dialog):
                           self.listWidget_tasks.selectedItems()))
         actionId = self.comboBox_action.currentData()
 
-        self.scheduler.set(actWhen, taskIds, actionId)
+        app.scheduler.set(actWhen, taskIds, actionId)
         self.close()

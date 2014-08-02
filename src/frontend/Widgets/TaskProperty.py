@@ -3,7 +3,7 @@
 from launcher import app
 
 from PyQt5.QtWidgets import QDialog
-from Widgets.ui_taskproperty import Ui_Dialog
+from .ui_taskproperty import Ui_Dialog
 
 
 class TaskPropertyDialog(QDialog, Ui_Dialog):
