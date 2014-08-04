@@ -23,6 +23,7 @@ class QmlMain(CustomQuickView):
         self.qmlUrl = QUrl.fromLocalFile(os.path.join(constants.FRONTEND_DIR, "QML/Main.qml"))
         self.rootContext().setContextProperty("adapters", app.adapterManager)
         self.rootContext().setContextProperty("taskModel", app.proxyModel)
+        self.rootContext().setContextProperty("schedulerModel", app.schedulerModel)
         self.setSource(self.qmlUrl)
         self.resize(QSize(800, 600))
 
@@ -33,10 +34,13 @@ class DummyApp(QGuiApplication):
 
         from models import TaskModel, AdapterManager, ProxyModel
         from libxware import XwareAdapter
+        from Schedule.model import SchedulerModel
 
         self.taskModel = TaskModel()
         self.proxyModel = ProxyModel()
         self.proxyModel.setSourceModel(self.taskModel)
+        self.schedulerModel = SchedulerModel(self)
+        self.schedulerModel.setSourceModel(self.taskModel)
 
         self.adapterManager = AdapterManager()
         self.adapter = XwareAdapter({
