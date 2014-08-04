@@ -10,7 +10,7 @@ PROFILE_DIR = os.path.join(APP_USER_DIR, "profile")
 TMP_DIR = os.path.join(PROFILE_DIR, "tmp")
 
 XWARED_LOCK = os.path.join(TMP_DIR, "xware_xwared.lock")
-XWARED_SOCKET = (os.path.join(TMP_DIR, "xware_xwared.socket"), "AF_UNIX")
+XWARED_SOCKET = os.path.join(TMP_DIR, "xware_xwared.socket")
 XWARED_CONFIG_FILE = os.path.join(PROFILE_DIR, "etc/xwared.ini")
 
 ETM_CFG_DIR = os.path.join(PROFILE_DIR, "cfg")

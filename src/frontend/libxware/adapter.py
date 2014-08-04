@@ -2,14 +2,18 @@
 
 from launcher import app
 
-import asyncio
+import asyncio, os
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import threading, uuid
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
+import constants
+from utils.misc import tryRemove, trySymlink, tryMkdir
+from utils.system import getInitType, InitType
 from .vanilla import TaskClass, XwareClient, Settings
 from .map import Tasks
+from .daemon import callXwared
 
 _POLLING_INTERVAL = 1
 
@@ -60,16 +64,49 @@ class XwareSettings(QObject):
 
 class XwareAdapter(QObject):
     update = pyqtSignal(int, list)
+    xwaredUpdated = pyqtSignal()
 
-    def __init__(self, clientOptions):
-        super().__init__()
+    def __init__(self, clientOptions, parent = None):
+        super().__init__(parent)
+        # Prepare XwareClient Variables
         self._mapIds = None
         self._ulSpeed = 0
         self._dlSpeed = 0
         self._xwareSettings = XwareSettings(self)
-        self._loop = asyncio.get_event_loop()
         self._uuid = uuid.uuid1().hex
+
+        import constants
+        self.xwaredSocket = constants.XWARED_SOCKET
+
+        useXwared = True  # TODO
+        if useXwared:
+            app.aboutToQuit.connect(self.daemon_stopXware)
+            self.daemon_startXware()
+
+        # Prepare XwaredClient Variables
+        self._xwaredRunning = False
+        self._etmPid = 0
+        self._lcPort = 0
+        self._peerId = ""
+
+        self._loop = None
+        self._loop_thread = None
+        self._loop_executor = None
+        self._xwareClient = None
+        self._loop_thread = threading.Thread(daemon = True,
+                                             target = self._startEventLoop,
+                                             args = (clientOptions,))
+        self._loop_thread.start()
+
+    def _startEventLoop(self, clientOptions):
+        self._loop = asyncio.new_event_loop()
+        self._loop.set_debug(True)
+        self._loop_executor = ThreadPoolExecutor(max_workers = 1)
+        self._loop.set_default_executor(self._loop_executor)
+        asyncio.events.set_event_loop(self._loop)
         self._xwareClient = XwareClient(clientOptions)
+        asyncio.async(self.main())
+        self._loop.run_forever()
 
     @property
     def namespace(self):
@@ -125,20 +162,27 @@ class XwareAdapter(QObject):
             self._loop.call_soon(self.get_list, TaskClass.RECYCLED)
             self._loop.call_soon(self.get_list, TaskClass.FAILED_ON_SUBMISSION)
             self._loop.call_soon(self.get_settings)
-
+            self._loop.call_soon(self.daemon_infoPoll)
             yield from asyncio.sleep(_POLLING_INTERVAL)
 
     # =========================== META-PROGRAMMING MAGICS ===========================
     def __getattr__(self, name):
         if name.startswith("get_") or name.startswith("post_"):
             def method(*args):
-                clientMethod = getattr(self._xwareClient, name)(*args)
-                clientMethod = asyncio.async(clientMethod)
+                clientMethod = getattr(self._xwareClient, name)
+                clientMethod = asyncio.async(clientMethod(*args))
 
                 donecb = getattr(self, "_donecb_" + name, None)
                 if donecb:
                     curried = partial(donecb, *args)
                     clientMethod.add_done_callback(curried)
+            setattr(self, name, method)
+            return method
+        elif name.startswith("daemon_"):
+            def method(*args):
+                curried = partial(callXwared, self)
+                clientMethodName = name[len("daemon_"):]
+                asyncio.async(curried(clientMethodName, args))
             setattr(self, name, method)
             return method
         raise AttributeError("XwareAdapter doesn't have a {name}.".format(**locals()))
@@ -175,23 +219,85 @@ class XwareAdapter(QObject):
         taskId = taskItem.realid
         self._loop.call_soon_threadsafe(self.post_openVipChannel, taskId)
 
+    # ==================== DAEMON ====================
+    @pyqtProperty(bool, notify = xwaredUpdated)
+    def xwaredRunning(self):
+        return self._xwaredRunning
 
-class XwareAdapterThread(threading.Thread):
-    def __init__(self, options):
-        super().__init__(name = "XwareAdapterEventLoop", daemon = True)
-        self._loop = None
-        self._loop_executor = None
-        self._adapter = None
-        self._options = options
+    @pyqtProperty(int, notify = xwaredUpdated)
+    def etmPid(self):
+        return self._etmPid
 
-    def run(self):
-        self._loop = asyncio.new_event_loop()
-        self._loop.set_debug(True)
-        self._loop_executor = ThreadPoolExecutor(max_workers = 1)
-        self._loop.set_default_executor(self._loop_executor)
-        asyncio.events.set_event_loop(self._loop)
+    @pyqtProperty(str, notify = xwaredUpdated)
+    def peerId(self):
+        return self._peerId
 
-        self._adapter = XwareAdapter(self._options)
-        app.adapterManager.registerAdapter(self._adapter)
-        asyncio.async(self._adapter.main())
-        self._loop.run_forever()
+    @pyqtProperty(int, notify = xwaredUpdated)
+    def lcPort(self):
+        return self._lcPort
+
+    def _donecb_daemon_infoPoll(self, data):
+        error = data.get("error")
+        if not error:
+            result = data.get("result")
+            self._xwaredRunning = True
+            self._etmPid = result.get("etmPid")
+            self._peerId = result.get("peerId")
+            self._lcPort = result.get("lcPort")
+        else:
+            self._xwaredRunning = False
+            self._etmPid = 0
+            self._peerId = ""
+            self._lcPort = 0
+        self.xwaredUpdated.emit()
+
+    @property
+    def daemonManagedBySystemd(self):
+        return os.path.lexists(constants.SYSTEMD_SERVICE_ENABLED_USERFILE) and \
+            os.path.lexists(constants.SYSTEMD_SERVICE_USERFILE)
+
+    @daemonManagedBySystemd.setter
+    def daemonManagedBySystemd(self, on):
+        if on:
+            tryMkdir(os.path.dirname(constants.SYSTEMD_SERVICE_ENABLED_USERFILE))
+
+            trySymlink(constants.SYSTEMD_SERVICE_FILE,
+                       constants.SYSTEMD_SERVICE_USERFILE)
+
+            trySymlink(constants.SYSTEMD_SERVICE_USERFILE,
+                       constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
+        else:
+            tryRemove(constants.SYSTEMD_SERVICE_ENABLED_USERFILE)
+            tryRemove(constants.SYSTEMD_SERVICE_USERFILE)
+        if getInitType() == InitType.SYSTEMD:
+            os.system("systemctl --user daemon-reload")
+
+    @property
+    def daemonManagedByUpstart(self):
+        return os.path.lexists(constants.UPSTART_SERVICE_USERFILE)
+
+    @daemonManagedByUpstart.setter
+    def daemonManagedByUpstart(self, on):
+        if on:
+            tryMkdir(os.path.dirname(constants.UPSTART_SERVICE_USERFILE))
+
+            trySymlink(constants.UPSTART_SERVICE_FILE,
+                       constants.UPSTART_SERVICE_USERFILE)
+        else:
+            tryRemove(constants.UPSTART_SERVICE_USERFILE)
+        if getInitType() == InitType.UPSTART:
+            os.system("initctl --user reload-configuration")
+
+    @property
+    def daemonManagedByAutostart(self):
+        return os.path.lexists(constants.AUTOSTART_DESKTOP_USERFILE)
+
+    @daemonManagedByAutostart.setter
+    def daemonManagedByAutostart(self, on):
+        if on:
+            tryMkdir(os.path.dirname(constants.AUTOSTART_DESKTOP_USERFILE))
+
+            trySymlink(constants.AUTOSTART_DESKTOP_FILE,
+                       constants.AUTOSTART_DESKTOP_USERFILE)
+        else:
+            tryRemove(constants.AUTOSTART_DESKTOP_USERFILE)

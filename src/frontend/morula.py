@@ -32,18 +32,18 @@ class DummyApp(QGuiApplication):
         super().__init__(*args)
 
         from models import TaskModel, AdapterManager, ProxyModel
-        from libxware import XwareAdapterThread
+        from libxware import XwareAdapter
 
         self.taskModel = TaskModel()
         self.proxyModel = ProxyModel()
         self.proxyModel.setSourceModel(self.taskModel)
 
         self.adapterManager = AdapterManager()
-        self.xwareAdapterThread = XwareAdapterThread({
+        self.adapter = XwareAdapter({
             "host": "127.0.0.1",
             "port": 9000,
-        })
-        self.xwareAdapterThread.start()
+        }, parent = self)
+        self.adapterManager.registerAdapter(self.adapter)
 
         self.qmlWin = QmlMain(None)
         self.qmlWin.show()

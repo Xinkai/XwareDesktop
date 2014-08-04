@@ -85,22 +85,20 @@ def callXwaredInterface(funcName, *args, **kwargs):
 class XwaredPy(QObject):
     statusUpdated = pyqtSignal()
 
-    _etmStatus = None
-    _xwaredStatus = None
-    _userId = None
-    _peerId = None
-    _lcPort = None
-
-    _t = None
-
     def __init__(self, parent):
         super().__init__(parent)
+        self._etmStatus = None
+        self._xwaredStatus = None
+        self._userId = None
+        self._peerId = None
+        self._lcPort = None
 
         app.aboutToQuit.connect(self.stopXware)
         self.startXware()
-        self._t = threading.Thread(target = self._watcherThread, daemon = True,
-                                   name = "xwared/etm watch thread")
-        self._t.start()
+        self._thread = threading.Thread(target = self._watcherThread,
+                                        daemon = True,
+                                        name = "xwared/etm watch thread")
+        self._thread.start()
         app.sigMainWinLoaded.connect(self.connectUI)
 
     @pyqtProperty(bool, notify = statusUpdated)
@@ -113,6 +111,8 @@ class XwaredPy(QObject):
 
     @pyqtProperty(str, notify = statusUpdated)
     def userId(self):
+        import warnings
+        warnings.warn("XwareClient getsysinfo can do this", DeprecationWarning)
         return self._userId
 
     @pyqtProperty(str, notify = statusUpdated)
