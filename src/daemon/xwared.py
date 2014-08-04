@@ -21,6 +21,9 @@ class XwaredServer(asyncio.Protocol):
         self._transport = None
         self._data = b''
 
+    def connection_made(self, transport):
+        self._transport = transport
+
     def data_received(self, data):
         self._data += data
 

@@ -22,12 +22,12 @@ class QuickSpeedLimitBtn(CustomStatusBarToolButton):
         self.setText("限速")
 
         # Should be disabled when ETM not running
-        app.xwaredpy.statusUpdated.connect(self.slotXwareStatusChanged)
+        app.adapterManager[0].infoUpdated.connect(self.slotXwareStatusChanged)
         self.slotXwareStatusChanged()
 
     @pyqtSlot()
     def slotXwareStatusChanged(self):
-        self.setEnabled(app.xwaredpy.etmStatus)
+        self.setEnabled(app.adapterManager[0].etmPid != 0)
 
 
 class SpeedLimitingWidgetAction(QWidgetAction):

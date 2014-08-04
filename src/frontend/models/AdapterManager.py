@@ -31,3 +31,8 @@ class AdapterManager(QObject):
 
     def adapter(self, ns):
         return self._adapters[ns]
+
+    def __getitem__(self, item):
+        assert item == 0
+        index = list(self._adapters.keys())
+        return self._adapters[index[0]]

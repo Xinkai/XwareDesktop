@@ -42,6 +42,18 @@ class XwareDesktop(QApplication):
 
     def __init__(self, *args):
         super().__init__(*args)
+        from models import TaskModel, AdapterManager, ProxyModel
+        from libxware import XwareAdapter
+        self.taskModel = TaskModel()
+        self.proxyModel = ProxyModel()
+        self.proxyModel.setSourceModel(self.taskModel)
+
+        self.adapterManager = AdapterManager()
+        self.adapter = XwareAdapter({
+            "host": "127.0.0.1",
+            "port": 9000,
+        }, parent = self)
+        self.adapterManager.registerAdapter(self.adapter)
 
         from legacy import main
         from legacy.frontendpy import FrontendPy
@@ -50,7 +62,6 @@ class XwareDesktop(QApplication):
 
         from Widgets.systray import Systray
 
-        from xwaredpy import XwaredPy
         from etmpy import EtmPy
         import mounts
 
@@ -69,7 +80,6 @@ class XwareDesktop(QApplication):
                                          defaultDict = DEFAULT_SETTINGS)
 
         # components
-        self.xwaredpy = XwaredPy(self)
         self.etmpy = EtmPy(self)
         self.mountsFaker = mounts.MountsFaker()
         self.dbusNotify = Notifier(self)

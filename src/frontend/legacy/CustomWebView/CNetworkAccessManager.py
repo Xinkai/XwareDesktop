@@ -12,7 +12,7 @@ import os
 def forLocalDeviceOnly(func):
     def wrapper(SELF, request):
         # Looking for Pid in query string, try matching with locally bound peerid
-        localPeerId = app.xwaredpy.peerId
+        localPeerId = app.adapterManager[0].peerId
         if not localPeerId:
             return request
 
@@ -51,7 +51,7 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
     def _redirectToLocal(request):
         qurl = request.url()
         qurl.setHost("127.0.0.1")
-        qurl.setPort(app.xwaredpy.lcPort)
+        qurl.setPort(app.adapterManager[0].lcPort)
         request.setUrl(qurl)
         return request
 

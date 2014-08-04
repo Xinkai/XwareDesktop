@@ -2,7 +2,7 @@
 
 from launcher import app
 
-import asyncio, os
+import asyncio, os, sys
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import threading, uuid
@@ -64,7 +64,7 @@ class XwareSettings(QObject):
 
 class XwareAdapter(QObject):
     update = pyqtSignal(int, list)
-    xwaredUpdated = pyqtSignal()
+    infoUpdated = pyqtSignal()
 
     def __init__(self, clientOptions, parent = None):
         super().__init__(parent)
@@ -72,6 +72,10 @@ class XwareAdapter(QObject):
         self._mapIds = None
         self._ulSpeed = 0
         self._dlSpeed = 0
+        from .vanilla import GetSysInfo
+        self._sysInfo = GetSysInfo(Return = 0, Network = 0, unknown1 = 0, Bound = 0,
+                                   ActivateCode = "", Mount = 0, InternalVersion = "",
+                                   Nickname = "", unknown2 = "", UserId = 0, unknown3 = 0)
         self._xwareSettings = XwareSettings(self)
         self._uuid = uuid.uuid1().hex
 
@@ -187,8 +191,13 @@ class XwareAdapter(QObject):
             return method
         raise AttributeError("XwareAdapter doesn't have a {name}.".format(**locals()))
 
+    @property
+    def sysInfo(self):
+        return self._sysInfo
+
     def _donecb_get_getsysinfo(self, future):
-        pass
+        result = future.result()
+        self._sysInfo = result
 
     def _donecb_get_list(self, klass, future):
         result = future.result()
@@ -220,21 +229,29 @@ class XwareAdapter(QObject):
         self._loop.call_soon_threadsafe(self.post_openVipChannel, taskId)
 
     # ==================== DAEMON ====================
-    @pyqtProperty(bool, notify = xwaredUpdated)
+    @pyqtProperty(bool, notify = infoUpdated)
     def xwaredRunning(self):
         return self._xwaredRunning
 
-    @pyqtProperty(int, notify = xwaredUpdated)
+    @pyqtProperty(int, notify = infoUpdated)
     def etmPid(self):
         return self._etmPid
 
-    @pyqtProperty(str, notify = xwaredUpdated)
+    @pyqtProperty(str, notify = infoUpdated)
     def peerId(self):
         return self._peerId
 
-    @pyqtProperty(int, notify = xwaredUpdated)
+    @pyqtProperty(int, notify = infoUpdated)
     def lcPort(self):
         return self._lcPort
+
+    @pyqtProperty(int, notify = infoUpdated)
+    def startEtmWhen(self):
+        return self._startEtmWhen
+
+    @startEtmWhen.setter
+    def startEtmWhen(self, value):
+        self._loop.call_soon_threadsafe(self.daemon_setStartEtmWhen, value)
 
     def _donecb_daemon_infoPoll(self, data):
         error = data.get("error")
@@ -244,12 +261,24 @@ class XwareAdapter(QObject):
             self._etmPid = result.get("etmPid")
             self._peerId = result.get("peerId")
             self._lcPort = result.get("lcPort")
+            self._startEtmWhen = result.get("startEtmWhen")
         else:
             self._xwaredRunning = False
             self._etmPid = 0
             self._peerId = ""
             self._lcPort = 0
-        self.xwaredUpdated.emit()
+            self._startEtmWhen = 1
+            print("infoPoll failed with error", error, file = sys.stderr)
+        self.infoUpdated.emit()
+
+    def do_daemon_start(self):
+        self._loop.call_soon_threadsafe(self.daemon_startETM)
+
+    def do_daemon_restart(self):
+        self._loop.call_soon_threadsafe(self.daemon_restartETM)
+
+    def do_daemon_stop(self):
+        self._loop.call_soon_threadsafe(self.daemon_stopETM)
 
     @property
     def daemonManagedBySystemd(self):

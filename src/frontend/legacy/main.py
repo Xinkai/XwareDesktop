@@ -29,6 +29,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.action_exit.triggered.connect(self.slotExit)
         self.action_setting.triggered.connect(self.slotSetting)
         self.action_showAbout.triggered.connect(self.slotShowAbout)
+        self.action_ETMstart.triggered.connect(app.adapterManager[0].do_daemon_start)
+        self.action_ETMstop.triggered.connect(app.adapterManager[0].do_daemon_stop)
+        self.action_ETMrestart.triggered.connect(app.adapterManager[0].do_daemon_restart)
 
     # shorthand
     @property

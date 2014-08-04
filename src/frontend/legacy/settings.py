@@ -9,7 +9,6 @@ from PyQt5.QtGui import QBrush
 import os
 from utils.system import getInitType, InitType
 
-from xwaredpy import InvalidSocket
 from etmpy import EtmSetting
 from .ui_settings import Ui_Dialog
 
@@ -27,9 +26,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_autoStartFrontend.setChecked(app.autoStart)
 
         # Xwared Management
-        managedBySystemd = app.xwaredpy.managedBySystemd
-        managedByUpstart = app.xwaredpy.managedByUpstart
-        managedByAutostart = app.xwaredpy.managedByAutostart
+        managedBySystemd = app.adapterManager[0].daemonManagedBySystemd
+        managedByUpstart = app.adapterManager[0].daemonManagedByUpstart
+        managedByAutostart = app.adapterManager[0].daemonManagedByAutostart
 
         self.radio_managedBySystemd.setChecked(managedBySystemd)
         self.radio_managedByUpstart.setChecked(managedByUpstart)
@@ -69,7 +68,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
         self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
 
-        startEtmWhen = app.xwaredpy.startEtmWhen
+        startEtmWhen = app.adapterManager[0].startEtmWhen
         if startEtmWhen:
             self.btngrp_etmStartWhen.button(startEtmWhen).setChecked(True)
         else:
@@ -162,9 +161,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         app.autoStart = self.checkBox_autoStartFrontend.isChecked()
 
-        app.xwaredpy.managedBySystemd = self.radio_managedBySystemd.isChecked()
-        app.xwaredpy.managedByUpstart = self.radio_managedByUpstart.isChecked()
-        app.xwaredpy.managedByAutostart = self.radio_managedByAutostart.isChecked()
+        app.adapterManager[0].daemonManagedBySystemd = self.radio_managedBySystemd.isChecked()
+        app.adapterManager[0].daemonManagedByUpstart = self.radio_managedByUpstart.isChecked()
+        app.adapterManager[0].daemonManagedByAutostart = self.radio_managedByAutostart.isChecked()
 
         app.settings.setbool("frontend", "enabledeveloperstools",
                              self.checkBox_enableDevelopersTools.isChecked())
@@ -193,12 +192,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         if self.group_etmStartWhen.isEnabled():
             startEtmWhen = self.btngrp_etmStartWhen.id(self.btngrp_etmStartWhen.checkedButton())
-            try:
-                app.xwaredpy.startEtmWhen = startEtmWhen
-            except InvalidSocket:
-                QMessageBox.warning(None, "Xware Desktop",
-                                    "选项未能成功设置：{}。".format(self.group_etmStartWhen.title()),
-                                    QMessageBox.Ok, QMessageBox.Ok)
+            app.adapterManager[0].startEtmWhen = startEtmWhen
 
         app.settings.save()
 
@@ -214,7 +208,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
     @pyqtSlot()
     def setupETM(self):
         # fill values
-        lcPort = app.xwaredpy.lcPort
+        lcPort = app.adapterManager[0].lcPort
         self.lineEdit_lcport.setText(str(lcPort) if lcPort else "不可用")
 
         etmSettings = app.etmpy.getSettings()

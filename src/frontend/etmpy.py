@@ -57,7 +57,7 @@ class EtmPy(QObject):
 
     @property
     def lcontrol(self):
-        lcPort = app.xwaredpy.lcPort
+        lcPort = app.adapterManager[0].lcPort
         if not lcPort:
             raise LocalCtrlNotAvailableError()
         return "http://127.0.0.1:{}/".format(lcPort)
@@ -131,8 +131,8 @@ class EtmPy(QObject):
             status = -1  # error
             code = None
 
-        userId = app.xwaredpy.userId
-        peerId = app.xwaredpy.peerId
+        userId = int(app.adapterManager[0].sysInfo.UserId)
+        peerId = app.adapterManager[0].peerId
 
         result = ActivationStatus(userId, status, code, peerId)
         return result
