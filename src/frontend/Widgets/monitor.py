@@ -45,19 +45,20 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
     def _runningTasksIterator(self):
         taskManager = app.taskModel.taskManager
         while True:
+            found = False
             for id_, item in taskManager.items():
                 if item.klass == TaskClass.RUNNING:
                     for i in range(self.TICKS_PER_TASK):
+                        found = True
                         yield item
+            if not found:
+                yield None
 
     @pyqtSlot()
     def _setMonitorFullSpeed(self):
         fullSpeed = app.settings.getint("frontend", "monitorfullspeed")
         logging.info("monitor full speed -> {}".format(fullSpeed))
         self.graphicsView.FULLSPEED = 1024 * fullSpeed
-
-    def closeEvent(self, qCloseEvent):
-        super().closeEvent(qCloseEvent)
 
     @pyqtSlot(QPoint)
     def showContextMenu(self, qPoint):
