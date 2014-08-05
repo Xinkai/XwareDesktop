@@ -27,35 +27,35 @@ class XwareSettings(QObject):
 
     @pyqtProperty(int, notify = updated)
     def downloadSpeedLimit(self):
-        return self._settings.downloadSpeedLimit
+        return self._settings.get("downloadSpeedLimit")
 
     @pyqtProperty(int, notify = updated)
     def uploadSpeedLimit(self):
-        return self._settings.uploadSpeedLimit
+        return self._settings.get("uploadSpeedLimit")
 
     @pyqtProperty(int, notify = updated)
     def slStartTime(self):
-        return self._settings.slStartTime
+        return self._settings.get("slStartTime")
 
     @pyqtProperty(int, notify = updated)
     def slEndTime(self):
-        return self._settings.slEndTime
+        return self._settings.get("slEndTime")
 
     @pyqtProperty(int, notify = updated)
     def maxRunTaskNumber(self):
-        return self._settings.maxRunTaskNumber
+        return self._settings.get("maxRunTaskNumber")
 
     @pyqtProperty(int, notify = updated)
     def autoOpenLixian(self):
-        return self._settings.autoOpenLixian
+        return self._settings.get("autoOpenLixian")
 
     @pyqtProperty(int, notify = updated)
     def autoOpenVip(self):
-        return self._settings.autoOpenVip
+        return self._settings.get("autoOpenVip")
 
     @pyqtProperty(int, notify = updated)
     def autoDlSubtitle(self):
-        return self._settings.autoDlSubtitle
+        return self._settings.get("autoDlSubtitle")
 
     def update(self, settings: Settings):
         self._settings = settings
@@ -227,6 +227,17 @@ class XwareAdapter(QObject):
     def do_openVipChannel(self, taskItem):
         taskId = taskItem.realid
         self._loop.call_soon_threadsafe(self.post_openVipChannel, taskId)
+
+    def do_applySettings(self, settings: dict):
+        dLimit = settings.get("downloadSpeedLimit", -1)
+        uLimit = settings.get("uploadSpeedLimit", -1)
+
+        if dLimit != -1:
+            app.settings.setint("internal", "dlspeedlimit", dLimit)
+        if uLimit != -1:
+            app.settings.setint("internal", "ulspeedlimit", uLimit)
+
+        self._loop.call_soon_threadsafe(self.post_settings, settings)
 
     # ==================== DAEMON ====================
     @pyqtProperty(bool, notify = infoUpdated)

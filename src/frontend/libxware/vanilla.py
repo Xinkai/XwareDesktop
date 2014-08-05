@@ -239,9 +239,12 @@ class XwareClient(object):
     @asyncio.coroutine
     def post_settings(self, settings: dict):
         assert isinstance(settings, dict)
+        params = []
         for key, value in settings.items():
             assert key in Settings._fields
-        raise NotImplementedError()
+            params.append("{k}={v}".format(k = key, v = value))
+        result = yield from self.postJsonP2("settings?v=2&" + "&".join(params))
+        return result
 
     @asyncio.coroutine
     def post_pause(self, tasks: "iterable of id"):

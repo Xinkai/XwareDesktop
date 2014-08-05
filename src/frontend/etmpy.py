@@ -17,7 +17,6 @@ from datetime import datetime
 class LocalCtrlNotAvailableError(BaseException):
     pass
 
-EtmSetting = collections.namedtuple("EtmSetting", ["dLimit", "uLimit", "maxRunningTasksNum"])
 ActivationStatus = collections.namedtuple("ActivationStatus",
                                           ["userid", "status", "code", "peerid"])
 
@@ -61,40 +60,6 @@ class EtmPy(QObject):
         if not lcPort:
             raise LocalCtrlNotAvailableError()
         return "http://127.0.0.1:{}/".format(lcPort)
-
-    def getSettings(self):
-        try:
-            req = requests.get(self.lcontrol + "getspeedlimit")
-            limits = req.json()[1:]  # not sure about what first element means, ignore for now
-
-            req = requests.get(self.lcontrol + "getrunningtaskslimit")
-            maxRunningTasksNum = req.json()[1]
-
-            return EtmSetting(dLimit = limits[0], uLimit = limits[1],
-                              maxRunningTasksNum = maxRunningTasksNum)
-        except (ConnectionError, LocalCtrlNotAvailableError):
-            return False
-
-    def saveSettings(self, newsettings):
-        # save limits before disabling
-        if newsettings.dLimit != -1:
-            app.settings.setint("internal", "dlspeedlimit", newsettings.dLimit)
-        if newsettings.uLimit != -1:
-            app.settings.setint("internal", "ulspeedlimit", newsettings.uLimit)
-
-        try:
-            if newsettings.maxRunningTasksNum:
-                requests.post(self.lcontrol +
-                              "settings?downloadSpeedLimit={}"
-                              "&uploadSpeedLimit={}"
-                              "&maxRunTaskNumber={}".format(*newsettings))
-            else:
-                requests.post(self.lcontrol +
-                              "settings?downloadSpeedLimit={}"
-                              "&uploadSpeedLimit={}".format(newsettings.dLimit,
-                                                            newsettings.uLimit))
-        except (ConnectionError, LocalCtrlNotAvailableError):
-            logging.error("trying to set etm settings, but failed.")
 
     def _requestPollTasks(self, kind):  # kind means type, but type is a python reserved word.
         try:

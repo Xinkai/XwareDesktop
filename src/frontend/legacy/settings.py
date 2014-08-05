@@ -9,7 +9,6 @@ from PyQt5.QtGui import QBrush
 import os
 from utils.system import getInitType, InitType
 
-from etmpy import EtmSetting
 from .ui_settings import Ui_Dialog
 
 
@@ -211,11 +210,13 @@ class SettingsDialog(QDialog, Ui_Dialog):
         lcPort = app.adapterManager[0].lcPort
         self.lineEdit_lcport.setText(str(lcPort) if lcPort else "不可用")
 
-        etmSettings = app.etmpy.getSettings()
-        if etmSettings:
-            self.spinBox_dSpeedLimit.setValue(etmSettings.dLimit)
-            self.spinBox_uSpeedLimit.setValue(etmSettings.uLimit)
-            self.spinBox_maxRunningTasksNum.setValue(etmSettings.maxRunningTasksNum)
+        adapter = app.adapterManager[0]
+        settings = adapter.backendSettings
+        enabled = adapter.etmPid != 0
+        if enabled:
+            self.spinBox_dSpeedLimit.setValue(settings.downloadSpeedLimit)
+            self.spinBox_uSpeedLimit.setValue(settings.uploadSpeedLimit)
+            self.spinBox_maxRunningTasksNum.setValue(settings.maxRunTaskNumber)
 
             # connect signals
             self.accepted.connect(self.saveETM)
@@ -226,8 +227,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot()
     def saveETM(self):
-        newsettings = EtmSetting(dLimit = self.spinBox_dSpeedLimit.value(),
-                                 uLimit = self.spinBox_uSpeedLimit.value(),
-                                 maxRunningTasksNum = self.spinBox_maxRunningTasksNum.value())
-
-        app.etmpy.saveSettings(newsettings)
+        adapter = app.adapterManager[0]
+        adapter.do_applySettings({
+            "downloadSpeedLimit": self.spinBox_dSpeedLimit.value(),
+            "uploadSpeedLimit": self.spinBox_uSpeedLimit.value(),
+            "maxRunTaskNumber": self.spinBox_maxRunningTasksNum.value(),
+        })
