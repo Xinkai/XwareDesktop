@@ -111,7 +111,8 @@ def viewMultipleFiles(files: "list<str of file paths>"):
 
     if fileManager == FileManagerType.Dolphin:
         for path in d:
-            os.system("dolphin --select {}".format(" ".join(d[path])))
+            # TODO: escape filenames
+            runAsIndependentProcess("dolphin --select {}".format(" ".join(d[path])))
     else:
         # Thunar, PCManFM, Nemo don't support select at all!
         # Nautilus doesn't support selecting multiple files.
@@ -122,6 +123,7 @@ def viewMultipleFiles(files: "list<str of file paths>"):
 
 def viewOneFile(file: "str of file path"):
     fileManager = getFileManagerType()
+    # TODO: escape filename
     if fileManager == FileManagerType.Dolphin:
         runAsIndependentProcess("dolphin --select {}".format(file))
     elif fileManager == FileManagerType.Nautilus:
