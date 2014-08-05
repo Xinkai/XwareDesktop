@@ -3,26 +3,16 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QPoint
+from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QPoint, QTimer
 
-import threading, time
-
+from models.TaskModel import TaskClass
 from .ui_monitor import MonitorWidget, Ui_MonitorWindow
 from PersistentGeometry import PersistentGeometry
 from .contextmenu import ContextMenu
 
 
 class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
-    sigTaskUpdating = pyqtSignal(dict)
-
-    _stat = None
-    _thread = None
-    _thread_should_stop = False
-
-    TICKS_PER_TASK = 4
-    TICK_INTERVAL = 0.5  # second(s)
-
-    _contextMenu = None
+    sigTaskUpdating = pyqtSignal("QObject")
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -31,50 +21,34 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
         self.setAttribute(Qt.WA_TranslucentBackground)
         self.setAttribute(Qt.WA_DeleteOnClose)
 
+        self.TICKS_PER_TASK = 4
+        self.TICK_INTERVAL = 1000  # in milliseconds
+
         app.settings.applySettings.connect(self._setMonitorFullSpeed)
         self._setMonitorFullSpeed()
 
-        self._thread = threading.Thread(target = self.updateTaskThread,
-                                        name = "monitor task updating",
-                                        daemon = True)
-        self._thread.start()
         self.preserveGeometry()
-
         self._contextMenu = ContextMenu(None)
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self.showContextMenu)
 
-    def updateTaskThread(self):
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(self.advance)
+        self._timer.start(self.TICK_INTERVAL)
+        self._taskIterator = self._runningTasksIterator()
+
+    @pyqtSlot()
+    def advance(self):
+        task = next(self._taskIterator)
+        self.sigTaskUpdating.emit(task)
+
+    def _runningTasksIterator(self):
+        taskManager = app.taskModel.taskManager
         while True:
-            runningTaskIds = app.etmpy.runningTasksStat.getTIDs()
-            if runningTaskIds:
-                for tid in runningTaskIds:
+            for id_, item in taskManager.items():
+                if item.klass == TaskClass.RUNNING:
                     for i in range(self.TICKS_PER_TASK):
-                        task = app.etmpy.runningTasksStat.getTask(tid)
-
-                        time.sleep(self.TICK_INTERVAL)
-                        if self._thread_should_stop:
-                            return  # end the thread
-
-                        logging.debug("updateSpeedsThread, deadlock incoming, maybe")
-                        try:
-                            self.sigTaskUpdating.emit(task)
-                        except TypeError:
-                            # monitor closed
-                            return  # end the thread
-
-                        # FIXME: move the sleep function ahead, before sigTaskUpdating.emit
-                        # it seems to make the deadlock go away.
-                        # time.sleep(self.TICK_INTERVAL)
-            else:
-                time.sleep(self.TICK_INTERVAL)
-                if self._thread_should_stop:
-                    return  # end the thread
-                try:
-                    self.sigTaskUpdating.emit(dict())
-                except TypeError:
-                    # monitor closed
-                    return  # end the thread
+                        yield item
 
     @pyqtSlot()
     def _setMonitorFullSpeed(self):
@@ -83,7 +57,6 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
         self.graphicsView.FULLSPEED = 1024 * fullSpeed
 
     def closeEvent(self, qCloseEvent):
-        self._thread_should_stop = True
         super().closeEvent(qCloseEvent)
 
     @pyqtSlot(QPoint)

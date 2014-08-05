@@ -34,7 +34,8 @@ class TaskManager(collections.MutableMapping):
         raise NotImplementedError()
 
     def items(self):
-        raise NotImplementedError()
+        for taskId in self:
+            yield (taskId, self[taskId])
 
     def __getitem__(self, key):
         # faster than ChainMap's implementation
@@ -48,6 +49,7 @@ class TaskManager(collections.MutableMapping):
         raise KeyError("key {} cannot be found.".format(key))
 
     def __iter__(self):
+        # gives an iterator of TaskIds
         for map_ in self._maps:
             yield from map_
 

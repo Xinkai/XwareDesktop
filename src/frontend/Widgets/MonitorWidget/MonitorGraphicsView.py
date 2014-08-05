@@ -13,13 +13,13 @@ class MonitorGraphicsView(QGraphicsView, AllowDrop):
     SIZE = (50.0, 50.0)
     FULLSPEED = 512 * 1024  # 512 in kb/s
 
-    _progressText = None
-    _speedsPolygon = None
-    _speedsPen = None
-    _speedsBrush = None
-
     def __init__(self, parent = None):
         super().__init__(parent)
+        self._progressText = None
+        self._speedsPolygon = None
+        self._speedsPen = None
+        self._speedsBrush = None
+
         self.monitorWin = parent
         if self.monitorWin:
             self.monitorWin.sigTaskUpdating.connect(self.slotTaskUpdate)
@@ -77,11 +77,11 @@ class MonitorGraphicsView(QGraphicsView, AllowDrop):
     def _translateSpeedToPosY(self, speed):
         return self.SIZE[1] * (1.0 - speed / self.FULLSPEED)
 
-    @pyqtSlot(dict)
+    @pyqtSlot("QObject")
     def slotTaskUpdate(self, task):
         if task:
-            self._setProgress(task["progress"])
-            self._setSpeeds(task["speeds"])
+            self._setProgress(task.progress)
+            self._setSpeeds(task.speeds)
         else:
             self._setProgress(None)
             self._setSpeeds([0.0])
