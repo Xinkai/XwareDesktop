@@ -33,8 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.action_ETMstop.triggered.connect(app.adapterManager[0].do_daemon_stop)
         self.action_ETMrestart.triggered.connect(app.adapterManager[0].do_daemon_restart)
 
-        app.systray.requestRestore.connect(self.restore)
-        app.systray.requestMinimize.connect(self.minimize)
+        app.systray.toggleMinimized.connect(self.toggleMinimized)
 
     # shorthand
     @property
@@ -82,3 +81,10 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
             self.minimize()
         else:
             qCloseEvent.accept()
+
+    @pyqtSlot()
+    def toggleMinimized(self):
+        if self.isHidden() or self.isMinimized():
+            self.restore()
+        else:
+            self.minimize()

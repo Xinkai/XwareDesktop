@@ -11,8 +11,7 @@ from .contextmenu import ContextMenu
 
 
 class Systray(QObject):
-    requestRestore = pyqtSignal()
-    requestMinimize = pyqtSignal()
+    toggleMinimized = pyqtSignal()
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -37,7 +36,4 @@ class Systray(QObject):
         elif reason == QSystemTrayIcon.DoubleClick:  # double click
             pass
         elif reason == QSystemTrayIcon.Trigger:  # left
-            if app.mainWin.isHidden() or app.mainWin.isMinimized():
-                self.requestRestore.emit()
-            else:
-                self.requestMinimize.emit()
+            self.toggleMinimized.emit()
