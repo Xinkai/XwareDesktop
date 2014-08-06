@@ -3,7 +3,7 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import pyqtSlot, QObject
+from PyQt5.QtCore import pyqtSlot, QObject, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon
 
@@ -11,6 +11,9 @@ from .contextmenu import ContextMenu
 
 
 class Systray(QObject):
+    requestRestore = pyqtSignal()
+    requestMinimize = pyqtSignal()
+
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -35,6 +38,6 @@ class Systray(QObject):
             pass
         elif reason == QSystemTrayIcon.Trigger:  # left
             if app.mainWin.isHidden() or app.mainWin.isMinimized():
-                app.mainWin.restore()
+                self.requestRestore.emit()
             else:
-                app.mainWin.minimize()
+                self.requestMinimize.emit()

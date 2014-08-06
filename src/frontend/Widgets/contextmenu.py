@@ -3,6 +3,7 @@
 import logging
 
 from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction
 
 from launcher import app
@@ -35,6 +36,14 @@ class ToggleMonitorWinAction(QAction):
         app.settings.applySettings.emit()
 
 
+class ExitAppAction(QAction):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setText("退出")
+        self.setIcon(QIcon.fromTheme("application-exit"))
+        self.triggered.connect(app.quit)
+
+
 class ContextMenu(SettingMenu):
     def __init__(self, parent):
         super().__init__(parent)
@@ -45,4 +54,5 @@ class ContextMenu(SettingMenu):
         self._toggleMonitorWinAction = ToggleMonitorWinAction(self)
         self.addAction(self._toggleMonitorWinAction)
 
-        self.addAction(app.mainWin.action_exit)
+        self._exitAppAction = ExitAppAction(self)
+        self.addAction(self._exitAppAction)

@@ -33,6 +33,9 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.action_ETMstop.triggered.connect(app.adapterManager[0].do_daemon_stop)
         self.action_ETMrestart.triggered.connect(app.adapterManager[0].do_daemon_restart)
 
+        app.systray.requestRestore.connect(self.restore)
+        app.systray.requestMinimize.connect(self.minimize)
+
     # shorthand
     @property
     def page(self):

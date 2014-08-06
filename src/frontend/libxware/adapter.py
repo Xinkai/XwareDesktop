@@ -88,6 +88,13 @@ class XwareAdapter(QObject):
             app.aboutToQuit.connect(self.daemon_stopXware)
             self.daemon_startXware()
 
+        isLocal = True  # TODO
+        if isLocal:
+            from .mounts import MountsFaker
+            self.mountsFaker = MountsFaker()
+        else:
+            self.mountsFaker = None
+
         # Prepare XwaredClient Variables
         self._xwaredRunning = False
         self._etmPid = 0

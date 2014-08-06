@@ -36,63 +36,56 @@ __all__ = ['app']
 
 
 class XwareDesktop(QApplication):
-    mainWin = None
-    monitorWin = None
     sigMainWinLoaded = pyqtSignal()
 
     def __init__(self, *args):
         super().__init__(*args)
+        logging.info("XWARE DESKTOP STARTS")
+        self.setApplicationName("XwareDesktop")
+        self.setApplicationVersion(__version__)
+        os.chdir(os.path.dirname(os.path.abspath(__file__)))
+        self.checkOneInstance()
+
+        from Settings import SettingsAccessor, DEFAULT_SETTINGS
+        self.settings = SettingsAccessor(self,
+                                         configFilePath = constants.CONFIG_FILE,
+                                         defaultDict = DEFAULT_SETTINGS)
+
         from models import TaskModel, AdapterManager, ProxyModel
         from libxware import XwareAdapter
         self.taskModel = TaskModel()
         self.proxyModel = ProxyModel()
         self.proxyModel.setSourceModel(self.taskModel)
 
-        self.adapterManager = AdapterManager()
+        self.adapterManager = AdapterManager(self)
         self.adapter = XwareAdapter({
             "host": "127.0.0.1",
             "port": 9000,
         }, parent = self)
         self.adapterManager.registerAdapter(self.adapter)
 
-        from legacy import main
-        from legacy.frontendpy import FrontendPy
-
-        from Settings import SettingsAccessor, DEFAULT_SETTINGS
-
-        from Widgets.systray import Systray
-
+        # Etmpy will be gone!
         from etmpy import EtmPy
-        import mounts
+        self.etmpy = EtmPy(self)
 
+        # components
+        from Widgets.systray import Systray
         from Notify import Notifier
         from Schedule import Scheduler
 
-        logging.info("XWARE DESKTOP STARTS")
-        self.setApplicationName("XwareDesktop")
-        self.setApplicationVersion(__version__)
-
-        os.chdir(os.path.dirname(os.path.abspath(__file__)))
-        self.checkOneInstance()
-
-        self.settings = SettingsAccessor(self,
-                                         configFilePath = constants.CONFIG_FILE,
-                                         defaultDict = DEFAULT_SETTINGS)
-
-        # components
-        self.etmpy = EtmPy(self)
-        self.mountsFaker = mounts.MountsFaker()
+        self.systray = Systray(self)
         self.notifier = Notifier(self)
-        self.frontendpy = FrontendPy(self)
         self.scheduler = Scheduler(self)
-
+        self.monitorWin = None
         self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
 
+        # Legacy parts
+        from legacy import main
+        from legacy.frontendpy import FrontendPy
+        self.frontendpy = FrontendPy(self)
         self.mainWin = main.MainWindow(None)
         self.mainWin.show()
         self.sigMainWinLoaded.emit()
-
-        self.systray = Systray(self)
 
         self.settings.applySettings.emit()
 

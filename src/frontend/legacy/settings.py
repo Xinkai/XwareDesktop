@@ -91,11 +91,11 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.table_mounts.setRowCount(0)
         self.table_mounts.clearContents()
 
-        mountsMapping = app.mountsFaker.getMountsMapping()
-        for i, mount in enumerate(app.mountsFaker.mounts):
+        mountsMapping = app.adapterManager[0].mountsFaker.getMountsMapping()
+        for i, mount in enumerate(app.adapterManager[0].mountsFaker.mounts):
             self.table_mounts.insertRow(i)
             # drive1: the drive letter it should map to, by alphabetical order
-            drive1 = app.mountsFaker.driveIndexToLetter(i)
+            drive1 = app.adapterManager[0].mountsFaker.driveIndexToLetter(i)
             self.table_mounts.setItem(i, 0, QTableWidgetItem(drive1 + "\\TDDOWNLOAD"))
 
             # mounts = ['/path/to/1', 'path/to/2', ...]
@@ -143,7 +143,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
             self.table_mounts.insertRow(row)
             self.table_mounts.setItem(
                 row, 0,
-                QTableWidgetItem(app.mountsFaker.driveIndexToLetter(row) + "\\TDDOWNLOAD"))
+                QTableWidgetItem(app.adapterManager[0].mountsFaker.driveIndexToLetter(row) +
+                                 "\\TDDOWNLOAD"))
             self.table_mounts.setItem(row, 1, QTableWidgetItem(selected))
             self.table_mounts.setItem(row, 2, QTableWidgetItem("新近添加"))
 
@@ -195,7 +196,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         app.settings.save()
 
-        app.mountsFaker.mounts = self.newMounts
+        app.adapterManager[0].mountsFaker.mounts = self.newMounts
         app.settings.applySettings.emit()
         super().accept()
 
