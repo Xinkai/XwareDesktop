@@ -265,7 +265,7 @@ class XwareTaskItem(QObject):
 
     @staticmethod
     def _xwareClassToClass(klass: int):
-        return klass << 1
+        return 1 << klass
 
     def update(self, data, klass):
         self.speed = data.get("speed")
