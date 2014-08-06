@@ -114,7 +114,11 @@ class FrontendPy(QObject):
         if not payload["userid"]:
             return  # not logged in
 
-        userid, status, code, peerid = app.etmpy.getActivationStatus()
+        adapter = app.adapterManager[0]
+        userid = int(adapter.sysInfo.UserId)
+        status = adapter.sysInfo.Bound
+        code = adapter.sysInfo.ActivateCode
+        peerid = adapter.peerId
 
         if userid == 0:
             # unbound

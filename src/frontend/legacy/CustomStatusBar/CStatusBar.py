@@ -49,7 +49,8 @@ class CustomStatusBar(QStatusBar):
 
     @pyqtSlot()
     def slotXwaredStatusUpdated(self):
-        xwaredStatus = app.adapterManager[0].xwaredRunning
+        adapter = app.adapterManager[0]
+        xwaredStatus = adapter.xwaredRunning
 
         app.mainWin.menu_backend.setEnabled(xwaredStatus)
         if xwaredStatus:
@@ -63,7 +64,7 @@ class CustomStatusBar(QStatusBar):
                 "<font color='red'>xwared</font>")
             self.xwaredStatus.setToolTip("<div style='color:red'>xwared未启动</div>")
 
-        etmStatus = app.adapterManager[0].etmPid != 0
+        etmStatus = adapter.etmPid != 0
 
         app.mainWin.action_ETMstart.setEnabled(not etmStatus)
         app.mainWin.action_ETMstop.setEnabled(etmStatus)
@@ -72,9 +73,9 @@ class CustomStatusBar(QStatusBar):
         overallCheck = False
         tooltips = []
         if etmStatus:
-            activationStatus = app.etmpy.getActivationStatus()
+            activated = adapter.sysInfo.Bound
             tooltips.append("<div style='color:green'>ETM运行中</div>")
-            if activationStatus.status == 1:
+            if activated == 1:
                 overallCheck = True
                 tooltips.append(
                     "<div style='color:green'>"

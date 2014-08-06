@@ -8,7 +8,6 @@ from PyQt5.QtCore import QObject, pyqtSignal
 import threading, time
 import requests, json
 from json.decoder import scanner, scanstring
-import collections
 from requests.exceptions import ConnectionError
 from urllib.parse import unquote
 from datetime import datetime
@@ -16,9 +15,6 @@ from datetime import datetime
 
 class LocalCtrlNotAvailableError(BaseException):
     pass
-
-ActivationStatus = collections.namedtuple("ActivationStatus",
-                                          ["userid", "status", "code", "peerid"])
 
 
 class _TaskPollingJsonDecoder(json.JSONDecoder):
@@ -85,22 +81,6 @@ class EtmPy(QObject):
             else:
                 self.sigTasksSummaryUpdated[bool].emit(False)
             time.sleep(0.5)
-
-    def getActivationStatus(self):
-        try:
-            req = requests.get(self.lcontrol + "getsysinfo")
-            res = req.json()
-            status = res[3]  # 1 - bound, 0 - unbound
-            code = res[4]
-        except (ConnectionError, LocalCtrlNotAvailableError):
-            status = -1  # error
-            code = None
-
-        userId = int(app.adapterManager[0].sysInfo.UserId)
-        peerId = app.adapterManager[0].peerId
-
-        result = ActivationStatus(userId, status, code, peerId)
-        return result
 
 
 class TaskStatistic(QObject):
