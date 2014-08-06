@@ -2,9 +2,9 @@
 
 from launcher import app
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
-from models.ProxyModel import TaskClass
+from datetime import datetime
 
-from .vanilla import TaskClass as XwareTaskClass
+from models.ProxyModel import TaskClass
 
 _SPEED_SAMPLE_COUNT = 50
 
@@ -131,7 +131,7 @@ class XwareTaskItem(QObject):
         self._initialized = False
         self._adapter = adapter
         self._namespace = self._adapter.namespace
-        self._klass = None
+        self._klass = TaskClass.INVALID
 
         self._id = None
         self._name = None
@@ -230,11 +230,11 @@ class XwareTaskItem(QObject):
     def klass(self):
         # _klass is xware class[0-3],
         # return Xware Desktop task class
-        return 1 << self._klass
-
+        return self._xwareClassToClass(self._klass)
         # Xware Local Control doesn't always return reliable state,
         # needs to use class directly
 
+        # from .vanilla import TaskClass as XwareTaskClass
         # return {
         #     XwareTaskClass.DOWNLOADING: TaskClass.RUNNING,
         #     XwareTaskClass.WAITING: TaskClass.RUNNING,
@@ -250,9 +250,24 @@ class XwareTaskItem(QObject):
         #     XwareTaskClass.ERROR: TaskClass.FAILED,
         # }[self.state]
 
-    def update(self, data, klass):
-        self._klass = klass
+    @klass.setter
+    def klass(self, value):
+        oldClass = self.klass
+        self._klass = value
+        newClass = self._xwareClassToClass(value)
+        if oldClass == newClass:
+            return
 
+        if newClass == TaskClass.COMPLETED:
+            timestamp = datetime.timestamp(datetime.now())
+            if 0 <= timestamp - self.completionTime <= 10:
+                app.taskModel.taskCompleted.emit(self)
+
+    @staticmethod
+    def _xwareClassToClass(klass: int):
+        return klass << 1
+
+    def update(self, data, klass):
         self.speed = data.get("speed")
         self._remainingTime = data.get("remainTime")
         self._state = data.get("state")
@@ -272,4 +287,5 @@ class XwareTaskItem(QObject):
             self._initialized = True
             self.initialized.emit()
 
+        self.klass = klass
         self.updated.emit()

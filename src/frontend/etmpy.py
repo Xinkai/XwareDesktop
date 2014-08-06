@@ -10,7 +10,6 @@ import requests, json
 from json.decoder import scanner, scanstring
 from requests.exceptions import ConnectionError
 from urllib.parse import unquote
-from datetime import datetime
 
 
 class LocalCtrlNotAvailableError(BaseException):
@@ -37,15 +36,11 @@ class _TaskPollingJsonDecoder(json.JSONDecoder):
 class EtmPy(QObject):
     sigTasksSummaryUpdated = pyqtSignal([bool], [dict])
 
-    runningTasksStat = None
-    completedTasksStat = None
-
     def __init__(self, parent):
         super().__init__(parent)
 
         # task stats
         self.runningTasksStat = RunningTaskStatistic(self)
-        self.completedTasksStat = CompletedTaskStatistic(self)
         self.t = threading.Thread(target = self.pollTasks, daemon = True,
                                   name = "tasks polling")
         self.t.start()
@@ -72,9 +67,6 @@ class EtmPy(QObject):
             resRunning = self._requestPollTasks(0)
             self.runningTasksStat.update(resRunning)
 
-            resCompleted = self._requestPollTasks(1)
-            self.completedTasksStat.update(resCompleted)
-
             # emit summary, it doesn't matter using resRunning or resCompleted
             if resRunning is not None:
                 self.sigTasksSummaryUpdated[dict].emit(resRunning)
@@ -84,29 +76,11 @@ class EtmPy(QObject):
 
 
 class TaskStatistic(QObject):
-    _tasks = None  # copy from _stat_mod upon it's done.
-    _tasks_mod = None  # make changes to this one.
-
-    TASK_STATES = {
-        0: ("dload", "下载中"),
-        8: ("wait", "等待中"),
-        9: ("pause", "已停止"),
-        10: ("pause", "已暂停"),
-        11: ("finish", "已完成"),
-        12: ("delete", "下载失败"),
-        13: ("finish", "上传中"),
-        14: ("wait", "提交中"),
-        15: ("delete", "已删除"),
-        16: ("delete", "已移至回收站"),
-        37: ("wait", "已挂起"),
-        38: ("delete", "发生错误"),
-    }
-    _initialized = False  # when the application starts up, it shouldn't fire.
-
     def __init__(self, parent):
         super().__init__(parent)
-        self._tasks = {}
-        self._tasks_mod = {}
+        self._tasks = {}  # copy from _stat_mod upon it's done.
+        self._tasks_mod = {}  # make changes to this one.
+        self._initialized = False  # when the application starts up, it shouldn't fire.
 
     def getTIDs(self):
         tids = list(self._tasks.keys())
@@ -121,41 +95,6 @@ class TaskStatistic(QObject):
 
     def getTasks(self):
         return self._tasks.copy()
-
-
-class CompletedTaskStatistic(TaskStatistic):
-    sigTaskCompleted = pyqtSignal(int)
-
-    def __init__(self, parent = None):
-        super().__init__(parent)
-
-    def update(self, data):
-        if data is None:
-            return
-
-        # make a list of id of recent finished tasks
-        completed = []
-
-        self._tasks_mod.clear()
-        for task in data["tasks"]:
-            tid = task["id"]
-            self._tasks_mod[tid] = task
-
-            if tid not in self._tasks:
-                completed.append(tid)
-
-        self._tasks = self._tasks_mod.copy()
-        if self._initialized:
-            # prevent already-completed tasks firing sigTaskCompleted
-            #   when ETM starting later than frontend
-            # by comparing `completeTime` with `timestamp`
-            # threshold: 10 secs
-            timestamp = datetime.timestamp(datetime.now())
-            for completedId in completed:
-                if 0 <= timestamp - self._tasks[completedId]["completeTime"] <= 10:
-                    self.sigTaskCompleted.emit(completedId)
-        else:
-            self._initialized = True
 
 
 class RunningTaskStatistic(TaskStatistic):

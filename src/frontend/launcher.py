@@ -82,7 +82,7 @@ class XwareDesktop(QApplication):
         # components
         self.etmpy = EtmPy(self)
         self.mountsFaker = mounts.MountsFaker()
-        self.dbusNotify = Notifier(self)
+        self.notifier = Notifier(self)
         self.frontendpy = FrontendPy(self)
         self.scheduler = Scheduler(self)
 

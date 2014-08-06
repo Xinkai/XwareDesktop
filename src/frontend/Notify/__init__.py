@@ -3,12 +3,11 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import QObject, pyqtSlot, QMetaType, QUrl
+from PyQt5.QtCore import QObject, pyqtSlot, QMetaType, QUrl, Qt
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusArgument, QDBusMessage
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtMultimedia import QSound
 
-import os
 
 _DBUS_NOTIFY_SERVICE = "org.freedesktop.Notifications"
 _DBUS_NOTIFY_PATH = "/org/freedesktop/Notifications"
@@ -16,12 +15,6 @@ _DBUS_NOTIFY_INTERFACE = "org.freedesktop.Notifications"
 
 
 class Notifier(QObject):
-    _conn = None
-    _interface = None
-    _notifications = None  # a dict of notifyId: taskDict
-    _capabilities = None
-    _completedTasksStat = None
-
     def __init__(self, parent):
         super().__init__(parent)
         self._conn = QDBusConnection("Xware Desktop").sessionBus()
@@ -31,9 +24,8 @@ class Notifier(QObject):
                                          _DBUS_NOTIFY_INTERFACE,
                                          self._conn)
 
-        self._notifications = {}
-        self._completedTasksStat = app.etmpy.completedTasksStat
-        self._completedTasksStat.sigTaskCompleted.connect(self.notifyTask)
+        self._notified = {}  # a dict of notifyId: taskDict
+        app.taskModel.taskCompleted.connect(self.notifyTaskCompleted, Qt.DirectConnection)
 
         self._capabilities = self._getCapabilities()
         if "actions" in self._capabilities:
@@ -50,16 +42,15 @@ class Notifier(QObject):
     def isConnected(self):
         return self._conn.isConnected()
 
-    def notifyTask(self, taskId):
-        task = self._completedTasksStat.getTask(taskId)
+    @pyqtSlot("QObject", result = "void")
+    def notifyTaskCompleted(self, taskItem):
+        if app.settings.getbool("frontend", "notifybysound"):
+            self._qSound_complete.play()
 
-        if task.get("state", None) == 11:  # see definitions in class TaskStatistic.
-            if app.settings.getbool("frontend", "notifybysound"):
-                self._qSound_complete.play()
-            self._dbus_notify(task)
-        else:
-            # TODO: Also notify if errors occur
-            pass
+        if not app.settings.getbool("frontend", "popnotifications"):
+            return
+
+        self._dbus_notifyCompleted(taskItem)
 
     def _getCapabilities(self):
         # get libnotify server caps and remember it.
@@ -72,10 +63,7 @@ class Notifier(QObject):
         else:
             return qdBusMsg.arguments()[0]
 
-    def _dbus_notify(self, task):
-        if not app.settings.getbool("frontend", "popnotifications"):
-            return
-
+    def _dbus_notifyCompleted(self, task: "TaskItem"):
         if "actions" in self._capabilities:
             actions = QDBusArgument(["open", "打开", "openDir", "打开文件夹"], QMetaType.QStringList)
         else:
@@ -87,7 +75,7 @@ class Notifier(QObject):
             QDBusArgument(0, QMetaType.UInt),  # replace_id
             QDBusArgument("xware-desktop", QMetaType.QString),  # app_icon
             QDBusArgument("下载完成", QMetaType.QString),  # summary
-            QDBusArgument(task["name"], QMetaType.QString),  # body
+            QDBusArgument(task.name, QMetaType.QString),  # body
             actions,
             {
                 "category": "transfer.complete",
@@ -100,20 +88,27 @@ class Notifier(QObject):
                                                            qdBusMsg.errorMessage()))
         else:
             # add it to the dict
-            self._notifications[qdBusMsg.arguments()[0]] = task
+            notificationId = qdBusMsg.arguments()[0]
+            self._notified[notificationId] = task.id
 
     @pyqtSlot(QDBusMessage)
     def slotActionInvoked(self, msg):
         notifyId, action = msg.arguments()
-        task = self._notifications.get(notifyId, None)
-        if not task:
+        taskId = self._notified.get(notifyId, None)
+        if not taskId:
             # other applications' notifications
             return
-        name = task["name"]  # filename
-        path = task["path"]  # location
+
+        taskItem = app.taskModel.taskManager.get(taskId, None)
+        if not taskItem:
+            logging.debug("taskItem cannot be found anymore in TaskModel.")
+            return
+
+        fullpath = taskItem.fullpath  # path + name
+        path = taskItem.path  # location
 
         if action == "open":
-            openPath = os.path.join(path, name)
+            openPath = fullpath
         elif action == "openDir":
             openPath = path
         elif action == "default":  # Unity's notify osd always have a default action.
@@ -121,6 +116,5 @@ class Notifier(QObject):
         else:
             raise Exception("Unknown action from slotActionInvoked: {}.".format(action))
 
-        localOpenPath = app.mountsFaker.convertToLocalPath(openPath)
-        qUrl = QUrl.fromLocalFile(localOpenPath)
-        QDesktopServices().openUrl(qUrl)
+        qUrl = QUrl.fromLocalFile(openPath)
+        QDesktopServices.openUrl(qUrl)

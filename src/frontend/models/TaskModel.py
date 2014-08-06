@@ -23,6 +23,7 @@ class TaskClass(enum.IntEnum):
     COMPLETED = 2
     RECYCLED = 4
     FAILED = 8
+    INVALID = 16
     ALL = RUNNING | COMPLETED | RECYCLED | FAILED
 
 
@@ -31,6 +32,8 @@ class TaskModel(QAbstractTableModel):
     sigAfterInsert = pyqtSignal()
     sigBeforeRemove = pyqtSignal(int)
     sigAfterRemove = pyqtSignal()
+
+    taskCompleted = pyqtSignal("QObject")  # emits from TaskItem
 
     def __init__(self, parent = None):
         super().__init__(parent)
