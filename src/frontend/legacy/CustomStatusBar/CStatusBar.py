@@ -44,8 +44,7 @@ class CustomStatusBar(QStatusBar):
 
         app.adapterManager[0].infoUpdated.connect(self.slotXwaredStatusUpdated)
         app.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
-        app.etmpy.sigTasksSummaryUpdated[bool].connect(self.slotTasksSummaryUpdated)
-        app.etmpy.sigTasksSummaryUpdated[dict].connect(self.slotTasksSummaryUpdated)
+        app.adapterManager.summaryUpdated.connect(self.slotTasksSummaryUpdated)
 
     @pyqtSlot()
     def slotXwaredStatusUpdated(self):
@@ -121,25 +120,18 @@ class CustomStatusBar(QStatusBar):
         self.frontendStatus.setToolTip(tooltip)
         logging.info(frontendStatus)
 
-    @pyqtSlot(bool)
-    @pyqtSlot(dict)
-    def slotTasksSummaryUpdated(self, summary):
-        if not summary:
-            self.dlStatus.setText(
-                "<img src=':/image/down.png' height=14 width=14>获取下载状态失败"
-            )
-            self.dlStatus.setToolTip("")
-            self.ulStatus.setText(
-                "<img src=':/image/up.png' height=14 width=14>获取上传状态失败"
-            )
-            return
+    @pyqtSlot()
+    def slotTasksSummaryUpdated(self):
+        runningCount = app.adapterManager.runningTaskCount
+        ulSpeed = app.adapterManager.ulSpeed
+        dlSpeed = app.adapterManager.dlSpeed
 
         self.dlStatus.setText(
             "<img src=':/image/down.png' height=14 width=14>{}/s".format(
-                getHumanBytesNumber(summary["dlSpeed"])))
-        self.dlStatus.setToolTip("{}任务下载中".format(summary["dlNum"]))
+                getHumanBytesNumber(dlSpeed)))
+        self.dlStatus.setToolTip("{}任务下载中".format(runningCount))
 
         self.ulStatus.setText(
             "<img src=':/image/up.png' height=14 width=14>{}/s".format(
-                getHumanBytesNumber(summary["upSpeed"]))
+                getHumanBytesNumber(ulSpeed))
         )

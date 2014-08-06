@@ -72,6 +72,7 @@ class XwareAdapter(QObject):
         self._mapIds = None
         self._ulSpeed = 0
         self._dlSpeed = 0
+        self._runningTaskCount = 0
         from .vanilla import GetSysInfo
         self._sysInfo = GetSysInfo(Return = 0, Network = 0, unknown1 = 0, Bound = 0,
                                    ActivateCode = "", Mount = 0, InternalVersion = "",
@@ -120,21 +121,13 @@ class XwareAdapter(QObject):
     def ulSpeed(self):
         return self._ulSpeed
 
-    @ulSpeed.setter
-    def ulSpeed(self, value):
-        if value != self._ulSpeed:
-            self._ulSpeed = value
-            app.adapterManager.ulSpeedChanged.emit()
-
     @property
     def dlSpeed(self):
         return self._dlSpeed
 
-    @dlSpeed.setter
-    def dlSpeed(self, value):
-        if value != self._dlSpeed:
-            self._dlSpeed = value
-            app.adapterManager.dlSpeedChanged.emit()
+    @property
+    def runningTaskCount(self):
+        return self._runningTaskCount
 
     @property
     def backendSettings(self):
@@ -203,8 +196,10 @@ class XwareAdapter(QObject):
         result = future.result()
 
         if klass == TaskClass.RUNNING:
-            self.ulSpeed = result["upSpeed"]
-            self.dlSpeed = result["dlSpeed"]
+            self._ulSpeed = result["upSpeed"]
+            self._dlSpeed = result["dlSpeed"]
+            self._runningTaskCount = result["dlNum"]
+            app.adapterManager.summaryUpdated.emit()
         mapId = self._mapIds[int(klass)]
         self.update.emit(mapId, result["tasks"])
 

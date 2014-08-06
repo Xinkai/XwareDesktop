@@ -34,8 +34,6 @@ class _TaskPollingJsonDecoder(json.JSONDecoder):
 
 
 class EtmPy(QObject):
-    sigTasksSummaryUpdated = pyqtSignal([bool], [dict])
-
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -66,12 +64,6 @@ class EtmPy(QObject):
         while True:
             resRunning = self._requestPollTasks(0)
             self.runningTasksStat.update(resRunning)
-
-            # emit summary, it doesn't matter using resRunning or resCompleted
-            if resRunning is not None:
-                self.sigTasksSummaryUpdated[dict].emit(resRunning)
-            else:
-                self.sigTasksSummaryUpdated[bool].emit(False)
             time.sleep(0.5)
 
 

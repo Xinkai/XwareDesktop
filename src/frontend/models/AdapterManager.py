@@ -7,20 +7,23 @@ from collections import OrderedDict
 
 
 class AdapterManager(QObject):
-    ulSpeedChanged = pyqtSignal()
-    dlSpeedChanged = pyqtSignal()
+    summaryUpdated = pyqtSignal()
 
     def __init__(self, parent = None):
         super().__init__(parent)
         self._adapters = OrderedDict()
 
-    @pyqtProperty(int, notify = ulSpeedChanged)
+    @pyqtProperty(int, notify = summaryUpdated)
     def ulSpeed(self):
         return sum(map(lambda a: a.ulSpeed, self._adapters.values()))
 
-    @pyqtProperty(int, notify = dlSpeedChanged)
+    @pyqtProperty(int, notify = summaryUpdated)
     def dlSpeed(self):
         return sum(map(lambda a: a.dlSpeed, self._adapters.values()))
+
+    @pyqtProperty(int, notify = summaryUpdated)
+    def runningTaskCount(self):
+        return sum(map(lambda a: a.runningTaskCount, self._adapters.values()))
 
     def registerAdapter(self, adapter):
         ns = adapter.namespace
