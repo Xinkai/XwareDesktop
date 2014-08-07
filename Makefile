@@ -4,13 +4,26 @@ PREFIX        = /opt/xware-desktop
 GITHASH       = "`git rev-parse master 2>/dev/null`"
 SHELL         = /bin/bash
 
-all: etmpatch.so chmns pyqt coffee prepareXware replacePath
+UNAME_O      := $(shell uname -o)
 
-etmpatch.so: src/etmpatch.c
+ifeq ($(UNAME_O),Cygwin)
+    pyuic5   := pyuic5.bat
+    pyrcc5   := pyrcc5.exe
+    python3  := python3.exe
+    all: pyqt coffee
+else
+    pyuic5   := pyuic5
+    pyrcc5   := pyrcc5
+    python3  := python3
+
+    all: build/etmpatch.so build/chmns pyqt coffee prepareXware replacePath
+endif
+
+build/etmpatch.so: src/etmpatch.c
 	mkdir -p build
 	$(CC) $(FLAGS) -m32 -o build/etmpatch.so -fPIC -shared -ldl src/etmpatch.c
 
-chmns: src/chmns.c
+build/chmns: src/chmns.c
 	$(CC) $(FLAGS) -o build/chmns src/chmns.c
 
 clean:
@@ -23,15 +36,15 @@ clean:
 	find src/frontend -name "*.js" -print0 | xargs -0 rm -f
 
 pyqt:
-	pyuic5 -o src/frontend/legacy/ui_main.py     src/frontend/ui/main.ui
-	pyuic5 -o src/frontend/legacy/ui_settings.py src/frontend/ui/settings.ui
-	pyuic5 -o src/frontend/legacy/ui_about.py    src/frontend/ui/about.ui
-	pyuic5 -o src/frontend/legacy/ui_scheduler.py  src/frontend/ui/scheduler.ui
-	pyuic5 -o src/frontend/legacy/ui_quickspeedlimit.py  src/frontend/ui/quickspeedlimit.ui
-	pyuic5 -o src/frontend/CrashReport/ui_crashreport.py  src/frontend/ui/crashreport.ui
-	pyuic5 -o src/frontend/Widgets/ui_monitor.py  src/frontend/ui/monitor.ui
-	pyuic5 -o src/frontend/Widgets/ui_taskproperty.py  src/frontend/ui/taskproperty.ui
-	pyrcc5 -o src/frontend/resource_rc.py src/frontend/ui/rc/resource.qrc
+	$(pyuic5) -o src/frontend/legacy/ui_main.py     src/frontend/ui/main.ui
+	$(pyuic5) -o src/frontend/legacy/ui_settings.py src/frontend/ui/settings.ui
+	$(pyuic5) -o src/frontend/legacy/ui_about.py    src/frontend/ui/about.ui
+	$(pyuic5) -o src/frontend/legacy/ui_scheduler.py  src/frontend/ui/scheduler.ui
+	$(pyuic5) -o src/frontend/legacy/ui_quickspeedlimit.py  src/frontend/ui/quickspeedlimit.ui
+	$(pyuic5) -o src/frontend/CrashReport/ui_crashreport.py  src/frontend/ui/crashreport.ui
+	$(pyuic5) -o src/frontend/Widgets/ui_monitor.py  src/frontend/ui/monitor.ui
+	$(pyuic5) -o src/frontend/Widgets/ui_taskproperty.py  src/frontend/ui/taskproperty.ui
+	$(pyrcc5) -o src/frontend/resource_rc.py src/frontend/ui/rc/resource.qrc
 
 pep8:
 	find src -name "*.py" -print0 | xargs -0 pep8 --exclude "ui_*.py,*_rc.py,test_*.py" --statistics --ignore "E251,E401"
@@ -99,7 +112,7 @@ install:
 
 	# regenerate .pyo files
 	find $(DESTDIR)$(PREFIX) -name "__pycache__" -print0 | xargs -0 rm -rf
-	python3 -OO -m compileall -q $(DESTDIR)$(PREFIX)
+	$(python3) -OO -m compileall -q $(DESTDIR)$(PREFIX)
 
 	# fix permissions
 	find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
