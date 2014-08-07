@@ -100,10 +100,10 @@ class FrontendPy(QObject):
     @pyqtSlot()
     def tryLogin(self):
         if app.mainWin.page.urlMatchIn(constants.LOGIN_PAGE):
-            autologin = app.settings.getbool("account", "autologin")
+            autologin = app.settings.getbool("legacy", "autologin")
             if autologin:
-                username = app.settings.get("account", "username")
-                password = app.settings.get("account", "password")
+                username = app.settings.get("adapter-legacy", "username")
+                password = app.settings.get("adapter-legacy", "password")
                 if username and password:
                     self.sigLogin.emit(username, password)
 
@@ -167,9 +167,9 @@ class FrontendPy(QObject):
 
     @pyqtSlot(str, str)
     def saveCredentials(self, username, password):
-        app.settings.set("account", "username", username)
-        app.settings.set("account", "password", password)
-        app.settings.setbool("account", "autologin", True)
+        app.settings.set("adapter-legacy", "username", username)
+        app.settings.set("adapter-legacy", "password", password)
+        app.settings.setbool("legacy", "autologin", True)
         app.settings.save()
 
     @pyqtSlot("QList<QVariant>")

@@ -33,11 +33,6 @@ _DEFAULT_PATTERN = """// packages
 """
 
 DEFAULT_SETTINGS = {
-    "account": {
-        "username": None,
-        "password": None,
-        "autologin": True,
-    },
     "frontend": {
         "enabledeveloperstools": False,
         "allowflash": True,
@@ -53,12 +48,17 @@ DEFAULT_SETTINGS = {
         "webviewminsizeoverride": None,
         "webviewzoom": None,
     },
+    "legacy": {
+        "autologin": True,
+    },
     "adapter-legacy": {
         "type": "xware",
         "connection": "~/.xware-desktop/profile/tmp/xware_xwared.socket",
         "name": "本机xwared",
         "dlspeedlimit": 512,
         "ulspeedlimit": 50,
+        "username": None,
+        "password": None,
     },
     "scheduler": {
         "poweroffcmd": "",

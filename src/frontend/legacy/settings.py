@@ -19,9 +19,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.setupUi(self)
 
-        self.lineEdit_loginUsername.setText(app.settings.get("account", "username"))
-        self.lineEdit_loginPassword.setText(app.settings.get("account", "password"))
-        self.checkBox_autoLogin.setChecked(app.settings.getbool("account", "autologin"))
+        self.lineEdit_loginUsername.setText(app.settings.get("adapter-legacy", "username"))
+        self.lineEdit_loginPassword.setText(app.settings.get("adapter-legacy", "password"))
+        self.checkBox_autoLogin.setChecked(app.settings.getbool("legacy", "autologin"))
         self.checkBox_autoStartFrontend.setChecked(app.autoStart)
 
         # Xwared Management
@@ -155,9 +155,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot()
     def accept(self):
-        app.settings.set("account", "username", self.lineEdit_loginUsername.text())
-        app.settings.set("account", "password", self.lineEdit_loginPassword.text())
-        app.settings.setbool("account", "autologin", self.checkBox_autoLogin.isChecked())
+        app.settings.set("adapter-legacy", "username", self.lineEdit_loginUsername.text())
+        app.settings.set("adapter-legacy", "password", self.lineEdit_loginPassword.text())
+        app.settings.setbool("legacy", "autologin", self.checkBox_autoLogin.isChecked())
 
         app.autoStart = self.checkBox_autoStartFrontend.isChecked()
 
