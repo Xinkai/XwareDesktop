@@ -19,7 +19,6 @@ class _PatchedThread(threading.Thread):
 
     def new_run(self):
         try:
-            # super().run()
             self._unpatched_run()
         except KeyboardInterrupt:
             pass
@@ -35,14 +34,17 @@ def __installForReal():
     def __reportCrash(etype, value, tb):
         sys.__excepthook__(etype, value, tb)
 
-        formatted = "".join(traceback.format_exception(etype, value, tb))
-
-        CrashReport(formatted)
+        if issubclass(etype, KeyboardInterrupt):
+            returnCode = os.EX_OK
+        else:
+            formatted = "".join(traceback.format_exception(etype, value, tb))
+            CrashReport(formatted)
+            returnCode = os.EX_SOFTWARE
 
         if threading.current_thread() == threading.main_thread():
-            sys.exit(os.EX_SOFTWARE)  # Make sure MainThread exceptions also causes app termination.
+            sys.exit(returnCode)  # Make sure MainThread exceptions also causes app termination.
         else:
-            os._exit(os.EX_SOFTWARE)
+            os._exit(returnCode)
 
     sys.excepthook = __reportCrash
 
