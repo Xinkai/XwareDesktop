@@ -33,7 +33,7 @@ class ToggleMonitorWinAction(QAction):
     @pyqtSlot(bool)
     def settingToggled(self, checked):
         app.settings.setbool("frontend", "showmonitorwindow", checked)
-        app.settings.applySettings.emit()
+        app.applySettings.emit()
 
 
 class ExitAppAction(QAction):

@@ -40,7 +40,7 @@ class FrontendPy(QObject):
         self._isPageOnline = None  # property wraps them, in order to fire sigFrontendStatusChanged
         self._isPageLogined = None
         self._isXdjsLoaded = None
-        app.settings.applySettings.connect(self.tryLogin)
+        app.applySettings.connect(self.tryLogin)
 
         from Tasks import TaskCreationAgent
         self.taskCreationAgent = TaskCreationAgent(self)  # just hold a reference

@@ -3,34 +3,22 @@
 import logging
 
 import configparser, pickle, binascii
+import types
+from functools import partial
 
 
-class SettingsAccessorBase(object):
-    def __init__(self, configFilePath, defaultDict, **kwargs):
-        super().__init__()
-        self.config = configparser.ConfigParser()
-        self._configFilePath = configFilePath
-        self._defaultDict = defaultDict
-        self.config.read(self._configFilePath)
-
+class ProxyAddons(object):
     def has(self, section, key):
         key = key.lower()
-        return self.config.has_option(section, key)
-
-    def get(self, section, key):
-        key = key.lower()
-        return self.config.get(section, key, fallback = self._defaultDict[section][key])
+        return self.has_option(section, key)
 
     def set(self, section, key, value):
         key = key.lower()
         try:
-            self.config.set(section, key, value)
+            super(self.__class__, self).set(section, key, value)
         except configparser.NoSectionError:
-            self.config.add_section(section)
-            self.config.set(section, key, value)
-
-    def getint(self, section, key):
-        return int(self.get(section, key))
+            self.add_section(section)
+            super(self.__class__, self).set(section, key, value)
 
     def setint(self, section, key, value):
         assert type(value) is int
@@ -54,11 +42,61 @@ class SettingsAccessorBase(object):
             return pickledStr
 
     def setobj(self, section, key, value):
-        pickled = pickle.dumps(value, 3)  # protocol 3 requires Py3.0
+        pickled = pickle.dumps(value, 4)  # protocol 4 requires Py3.4
         pickledBytes = binascii.hexlify(pickled)
         pickledStr = pickledBytes.decode("ascii")
         self.set(section, key, pickledStr)
 
+
+class SettingsAccessorBase(configparser.ConfigParser):
+    def __init__(self, configFilePath, defaults):
+        super().__init__()
+        self._loadAddons(target = self)
+        self._configFilePath = configFilePath
+        self._defaultDict = defaults
+        self.read(self._configFilePath)
+
+    def get(self, section, key, *args, **kwargs):
+        assert not args
+        assert not kwargs
+        # override this, because we use fallback map
+        key = key.lower()
+        return super().get(section, key, fallback = self._defaultDict[section][key])
+
+    def getint(self, section, key, *args, **kwargs):
+        # override this, because super() version doesn't call overridden get()
+        return int(self.get(section, key, *args, **kwargs))
+
+    def getboolean(self, *args, **kwargs):
+        raise NotImplementedError("use getbool")
+
     def save(self):
         with open(self._configFilePath, 'w', encoding = "UTF-8") as configfile:
-            self.config.write(configfile)
+            self.write(configfile)
+
+    def _loadAddons(self, target, section = None):
+        for name, func in ProxyAddons.__dict__.items():
+            if name.startswith("__"):
+                continue
+
+            assert name not in target.__dict__, "{name} already in {target}".format(name = name,
+                                                                                    target = target)
+
+            methodTyped = types.MethodType(func, self)
+            if not section:
+                assert isinstance(target, self.__class__)
+                setattr(target, name,
+                        methodTyped)
+
+            else:
+                assert isinstance(target, configparser.SectionProxy)
+                setattr(target, name,
+                        partial(methodTyped, section))
+
+        setattr(target, "addons_loaded", True)
+
+    def __getitem__(self, section):
+        result = super().__getitem__(section)
+        if not getattr(result, "addons_loaded", False):
+            self._loadAddons(target = result, section = section)
+        return result

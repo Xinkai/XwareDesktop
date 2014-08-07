@@ -17,7 +17,7 @@ class CustomWebView(QWebView):
         super().__init__(parent)
         self._customPage = CustomWebPage(self)
         self.setPage(self._customPage)
-        app.settings.applySettings.connect(self.slotApplySettings)
+        app.applySettings.connect(self.slotApplySettings)
         self.load(QUrl(constants.LOGIN_PAGE))
 
     @pyqtSlot(QDropEvent)

@@ -37,6 +37,7 @@ __all__ = ['app']
 
 class XwareDesktop(QApplication):
     sigMainWinLoaded = pyqtSignal()
+    applySettings = pyqtSignal()
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -46,10 +47,11 @@ class XwareDesktop(QApplication):
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         self.checkOneInstance()
 
-        from Settings import SettingsAccessor, DEFAULT_SETTINGS
-        self.settings = SettingsAccessor(self,
-                                         configFilePath = constants.CONFIG_FILE,
-                                         defaultDict = DEFAULT_SETTINGS)
+        from Settings import DEFAULT_SETTINGS
+        from shared.config import SettingsAccessorBase
+        self.settings = SettingsAccessorBase(constants.CONFIG_FILE,
+                                             DEFAULT_SETTINGS)
+        self.aboutToQuit.connect(lambda: self.settings.save())
 
         from models import TaskModel, AdapterManager, ProxyModel
         from libxware import XwareAdapter
@@ -74,7 +76,7 @@ class XwareDesktop(QApplication):
         self.schedulerModel = SchedulerModel(self)
         self.schedulerModel.setSourceModel(self.taskModel)
         self.monitorWin = None
-        self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
+        self.applySettings.connect(self.slotCreateCloseMonitorWindow)
 
         # Legacy parts
         from legacy import main
@@ -84,7 +86,7 @@ class XwareDesktop(QApplication):
         self.mainWin.show()
         self.sigMainWinLoaded.emit()
 
-        self.settings.applySettings.emit()
+        self.applySettings.emit()
 
         if self.settings.get("internal", "previousversion") == "0.8":
             # upgraded or fresh installed

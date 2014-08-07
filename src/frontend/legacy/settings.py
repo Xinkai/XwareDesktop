@@ -197,7 +197,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         app.settings.save()
 
         app.adapterManager[0].mountsFaker.mounts = self.newMounts
-        app.settings.applySettings.emit()
+        app.applySettings.emit()
         super().accept()
 
     @property

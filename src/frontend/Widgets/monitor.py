@@ -24,7 +24,7 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
         self.TICKS_PER_TASK = 4
         self.TICK_INTERVAL = 1000  # in milliseconds
 
-        app.settings.applySettings.connect(self._setMonitorFullSpeed)
+        app.applySettings.connect(self._setMonitorFullSpeed)
         self._setMonitorFullSpeed()
 
         self.preserveGeometry()
