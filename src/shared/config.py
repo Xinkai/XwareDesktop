@@ -96,7 +96,25 @@ class SettingsAccessorBase(configparser.ConfigParser):
         setattr(target, "addons_loaded", True)
 
     def __getitem__(self, section):
-        result = super().__getitem__(section)
+        try:
+            result = super().__getitem__(section)
+        except KeyError as e:
+            if section in self._defaultDict:
+                self.add_section(section)
+                for k, v in self._defaultDict[section].items():
+                    self[section][k] = str(v)
+                return self[section]
+            else:
+                raise e
         if not getattr(result, "addons_loaded", False):
             self._loadAddons(target = result, section = section)
         return result
+
+    def itr_sections_with_prefix(self, prefix):
+        sections = self.sections()
+        defaultSections = self._defaultDict.keys()
+
+        allSections = set(sections) | set(defaultSections)
+        for section in allSections:
+            if section.startswith(prefix):
+                yield section, self[section]
