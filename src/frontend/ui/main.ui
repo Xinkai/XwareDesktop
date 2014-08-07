@@ -104,6 +104,9 @@
    </property>
   </widget>
   <action name="action_showAbout">
+   <property name="icon">
+    <iconset theme="help-about"/>
+   </property>
    <property name="text">
     <string>关于</string>
    </property>
@@ -119,6 +122,9 @@
    </property>
   </action>
   <action name="action_createTask">
+   <property name="icon">
+    <iconset theme="document-new"/>
+   </property>
    <property name="text">
     <string>新建任务</string>
    </property>
@@ -127,6 +133,9 @@
    </property>
   </action>
   <action name="action_setting">
+   <property name="icon">
+    <iconset theme="document-properties"/>
+   </property>
    <property name="text">
     <string>设置</string>
    </property>
@@ -136,8 +145,7 @@
   </action>
   <action name="action_refreshPage">
    <property name="icon">
-    <iconset resource="rc/resource.qrc">
-     <normaloff>:/image/refresh.png</normaloff>:/image/refresh.png</iconset>
+    <iconset theme="view-refresh"/>
    </property>
    <property name="text">
     <string>刷新页面</string>

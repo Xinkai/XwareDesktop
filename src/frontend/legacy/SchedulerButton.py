@@ -13,7 +13,7 @@ from .CustomStatusBar.CStatusButton import CustomStatusBarButton
 class SchedulerButton(CustomStatusBarButton):
     def __init__(self, parent):
         super().__init__(parent)
-        self.setIcon(QIcon(":/image/clock.png"))
+        self.setIcon(QIcon.fromTheme("clock"))
         self.updateText()
         app.schedulerModel.schedulerSummaryChanged.connect(self.updateText)
         self.clicked.connect(self.slotClicked)
