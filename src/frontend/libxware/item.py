@@ -150,8 +150,8 @@ class XwareTaskItem(QObject):
         self._vipChannel = VipChannel(self)
         self._lixianChannel = LixianChannel(self)
 
-        self.moveToThread(app.thread())
-        self.setParent(app.taskModel)
+        self.moveToThread(self._adapter.thread())
+        self.setParent(self._adapter)
 
     @pyqtProperty(int, notify = initialized)
     def realid(self):
