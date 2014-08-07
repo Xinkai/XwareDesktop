@@ -25,7 +25,7 @@ class AdapterManager(QObject):
     def runningTaskCount(self):
         return sum(map(lambda a: a.runningTaskCount, self._adapters.values()))
 
-    def registerAdapter(self, adapter):
+    def _registerAdapter(self, adapter):
         ns = adapter.namespace
         assert ns not in self._adapters
         adapter.update.connect(app.taskModel.taskManager.updateMap,
@@ -39,3 +39,11 @@ class AdapterManager(QObject):
         assert item == 0
         index = list(self._adapters.keys())
         return self._adapters[index[0]]
+
+    def loadAdapter(self, adapterConfig):
+        if adapterConfig["type"] == "xware":
+            from libxware import XwareAdapter
+            adapter = XwareAdapter(adapterConfig, parent = self)
+            self._registerAdapter(adapter)
+        else:
+            raise NotImplementedError()

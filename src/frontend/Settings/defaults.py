@@ -53,6 +53,13 @@ DEFAULT_SETTINGS = {
         "webviewminsizeoverride": None,
         "webviewzoom": None,
     },
+    "adapter-legacy": {
+        "type": "xware",
+        "connection": "~/.xware-desktop/profile/tmp/xware_xwared.socket",
+        "name": "本机xwared",
+        "dlspeedlimit": 512,
+        "ulspeedlimit": 50,
+    },
     "scheduler": {
         "poweroffcmd": "",
         "hybridsleepcmd": "",
@@ -60,8 +67,6 @@ DEFAULT_SETTINGS = {
         "suspendcmd": "",
     },
     "internal": {
-        "dlspeedlimit": 512,
-        "ulspeedlimit": 50,
         "mainwindowgeometry": None,
         "monitorwindowgeometry": None,
         "previousversion": "0.8",

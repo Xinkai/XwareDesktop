@@ -6,6 +6,7 @@ import asyncio, os, sys
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
 import threading, uuid
+from urllib import parse
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
 import constants
@@ -64,9 +65,9 @@ class XwareSettings(QObject):
 
 class XwareAdapter(QObject):
     update = pyqtSignal(int, list)
-    infoUpdated = pyqtSignal()
+    infoUpdated = pyqtSignal()  # daemon infoPolled
 
-    def __init__(self, clientOptions, parent = None):
+    def __init__(self, adapterConfig, parent = None):
         super().__init__(parent)
         # Prepare XwareClient Variables
         self._mapIds = None
@@ -80,20 +81,22 @@ class XwareAdapter(QObject):
         self._xwareSettings = XwareSettings(self)
         self._uuid = uuid.uuid1().hex
 
-        import constants
-        self.xwaredSocket = constants.XWARED_SOCKET
-
-        useXwared = True  # TODO
-        if useXwared:
+        self._adapterConfig = adapterConfig
+        connection = parse.urlparse(self._adapterConfig["connection"], scheme = "file")
+        self.xwaredSocket = None
+        self.mountsFaker = None
+        self.useXwared = False
+        self.isLocal = False
+        if connection.scheme == "file":
+            self.isLocal = True
+            self.useXwared = True
+            self.xwaredSocket = os.path.expanduser(connection.path)
             app.aboutToQuit.connect(self.daemon_stopXware)
             self.daemon_startXware()
-
-        isLocal = True  # TODO
-        if isLocal:
             from .mounts import MountsFaker
             self.mountsFaker = MountsFaker()
-        else:
-            self.mountsFaker = None
+        elif connection.scheme == "http":
+            raise NotImplementedError()
 
         # Prepare XwaredClient Variables
         self._xwaredRunning = False
@@ -106,17 +109,21 @@ class XwareAdapter(QObject):
         self._loop_executor = None
         self._xwareClient = None
         self._loop_thread = threading.Thread(daemon = True,
-                                             target = self._startEventLoop,
-                                             args = (clientOptions,))
+                                             target = self._startEventLoop)
         self._loop_thread.start()
 
-    def _startEventLoop(self, clientOptions):
+    def _startEventLoop(self):
         self._loop = asyncio.new_event_loop()
         self._loop.set_debug(True)
         self._loop_executor = ThreadPoolExecutor(max_workers = 1)
         self._loop.set_default_executor(self._loop_executor)
         asyncio.events.set_event_loop(self._loop)
-        self._xwareClient = XwareClient(clientOptions)
+        if self.isLocal:
+            self._xwareClient = XwareClient({
+                "host": "127.0.0.1",
+            })
+        else:
+            raise NotImplementedError()
         asyncio.async(self.main())
         self._loop.run_forever()
 
@@ -140,7 +147,7 @@ class XwareAdapter(QObject):
     def backendSettings(self):
         return self._xwareSettings
 
-    def updateOptions(self, clientOptions):
+    def setClientOptions(self, clientOptions):
         self._xwareClient.updateOptions(clientOptions)
 
     # =========================== PUBLIC ===========================
@@ -166,7 +173,8 @@ class XwareAdapter(QObject):
             self._loop.call_soon(self.get_list, TaskClass.RECYCLED)
             self._loop.call_soon(self.get_list, TaskClass.FAILED_ON_SUBMISSION)
             self._loop.call_soon(self.get_settings)
-            self._loop.call_soon(self.daemon_infoPoll)
+            if self.useXwared:
+                self._loop.call_soon(self.daemon_infoPoll)
             yield from asyncio.sleep(_POLLING_INTERVAL)
 
     # =========================== META-PROGRAMMING MAGICS ===========================
@@ -184,6 +192,7 @@ class XwareAdapter(QObject):
             return method
         elif name.startswith("daemon_"):
             def method(*args):
+                assert self.useXwared
                 curried = partial(callXwared, self)
                 clientMethodName = name[len("daemon_"):]
                 asyncio.async(curried(clientMethodName, args))
@@ -235,9 +244,9 @@ class XwareAdapter(QObject):
         uLimit = settings.get("uploadSpeedLimit", -1)
 
         if dLimit != -1:
-            app.settings.setint("internal", "dlspeedlimit", dLimit)
+            self._adapterConfig.setint("dlspeedlimit", dLimit)
         if uLimit != -1:
-            app.settings.setint("internal", "ulspeedlimit", uLimit)
+            self._adapterConfig.setint("ulspeedlimit", uLimit)
 
         self._loop.call_soon_threadsafe(self.post_settings, settings)
 
@@ -282,6 +291,9 @@ class XwareAdapter(QObject):
             self._lcPort = 0
             self._startEtmWhen = 1
             print("infoPoll failed with error", error, file = sys.stderr)
+        self.setClientOptions({
+            "port": self._lcPort,
+        })
         self.infoUpdated.emit()
 
     def do_daemon_start(self):

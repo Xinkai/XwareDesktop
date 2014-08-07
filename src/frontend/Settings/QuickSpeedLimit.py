@@ -57,14 +57,14 @@ class QuickSpeedLimitForm(QWidget, Ui_Form_quickSpeedLimit):
 
         if settings.downloadSpeedLimit == -1:
             self.checkBox_dlSpeedLimit.setChecked(False)
-            self.spinBox_dlSpeedLimit.setValue(app.settings.getint("internal", "dlspeedlimit"))
+            self.spinBox_dlSpeedLimit.setValue(app.settings.getint("adapter-legacy", "dlspeedlimit"))
         else:
             self.checkBox_dlSpeedLimit.setChecked(True)
             self.spinBox_dlSpeedLimit.setValue(settings.downloadSpeedLimit)
 
         if settings.uploadSpeedLimit == -1:
             self.checkBox_ulSpeedLimit.setChecked(False)
-            self.spinBox_ulSpeedLimit.setValue(app.settings.getint("internal", "ulspeedlimit"))
+            self.spinBox_ulSpeedLimit.setValue(app.settings.getint("adapter-legacy", "ulspeedlimit"))
         else:
             self.checkBox_ulSpeedLimit.setChecked(True)
             self.spinBox_ulSpeedLimit.setValue(settings.uploadSpeedLimit)

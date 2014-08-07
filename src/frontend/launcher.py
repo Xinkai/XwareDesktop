@@ -54,17 +54,14 @@ class XwareDesktop(QApplication):
         self.aboutToQuit.connect(lambda: self.settings.save())
 
         from models import TaskModel, AdapterManager, ProxyModel
-        from libxware import XwareAdapter
+
         self.taskModel = TaskModel()
         self.proxyModel = ProxyModel()
         self.proxyModel.setSourceModel(self.taskModel)
 
         self.adapterManager = AdapterManager(self)
-        self.adapter = XwareAdapter({
-            "host": "127.0.0.1",
-            "port": 9000,
-        }, parent = self)
-        self.adapterManager.registerAdapter(self.adapter)
+        for name, item in self.settings.itr_sections_with_prefix("adapter"):
+            self.adapterManager.loadAdapter(item)
 
         # components
         from Widgets.systray import Systray
