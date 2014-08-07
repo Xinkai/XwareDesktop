@@ -20,7 +20,7 @@ class XwaredClient(asyncio.Protocol):
 
     @staticmethod
     def donecb(data):
-        raise NotImplementedError()
+        pass
 
 
 @asyncio.coroutine
