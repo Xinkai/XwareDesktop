@@ -23,6 +23,7 @@ if __name__ == "__main__":
     from CrashReport import CrashAwareThreading
     CrashAwareThreading.installCrashReport()
     CrashAwareThreading.installThreadExceptionHandler()
+    CrashAwareThreading.installEventLoopExceptionHandler()
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
