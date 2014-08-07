@@ -41,8 +41,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         # frontend
         self.checkBox_enableDevelopersTools.setChecked(
-            app.settings.getbool("frontend", "enabledeveloperstools"))
-        self.checkBox_allowFlash.setChecked(app.settings.getbool("frontend", "allowflash"))
+            app.settings.getbool("legacy", "enabledeveloperstools"))
+        self.checkBox_allowFlash.setChecked(app.settings.getbool("legacy", "allowflash"))
         self.checkBox_minimizeToSystray.setChecked(
             app.settings.getbool("frontend", "minimizetosystray"))
         self.checkBox_closeToMinimize.setChecked(
@@ -165,9 +165,9 @@ class SettingsDialog(QDialog, Ui_Dialog):
         app.adapterManager[0].daemonManagedByUpstart = self.radio_managedByUpstart.isChecked()
         app.adapterManager[0].daemonManagedByAutostart = self.radio_managedByAutostart.isChecked()
 
-        app.settings.setbool("frontend", "enabledeveloperstools",
+        app.settings.setbool("legacy", "enabledeveloperstools",
                              self.checkBox_enableDevelopersTools.isChecked())
-        app.settings.setbool("frontend", "allowflash",
+        app.settings.setbool("legacy", "allowflash",
                              self.checkBox_allowFlash.isChecked())
         app.settings.setbool("frontend", "minimizetosystray",
                              self.checkBox_minimizeToSystray.isChecked())

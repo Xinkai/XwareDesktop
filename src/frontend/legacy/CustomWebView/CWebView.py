@@ -27,23 +27,23 @@ class CustomWebView(QWebView):
 
     @pyqtSlot()
     def slotApplySettings(self):
-        isDevToolsAllowed = app.settings.getbool("frontend", "enabledeveloperstools")
+        isDevToolsAllowed = app.settings.getbool("legacy", "enabledeveloperstools")
         self.settings().setAttribute(QWebSettings.DeveloperExtrasEnabled, isDevToolsAllowed)
         if isDevToolsAllowed:
             self.setContextMenuPolicy(Qt.DefaultContextMenu)
         else:
             self.setContextMenuPolicy(Qt.NoContextMenu)
 
-        pluginsAllowed = app.settings.getbool("frontend", "allowflash")
+        pluginsAllowed = app.settings.getbool("legacy", "allowflash")
         self.settings().setAttribute(QWebSettings.PluginsEnabled, pluginsAllowed)
         app.frontendpy.sigToggleFlashAvailability.emit(pluginsAllowed)
 
-        zoom = app.settings.get("frontend", "webviewzoom")
+        zoom = app.settings.get("legacy", "webviewzoom")
         if zoom:
             zoom = float(zoom)
             self.setZoomFactor(zoom)
 
-        minimumSizeOverride = app.settings.get("frontend", "webviewminsizeoverride")
+        minimumSizeOverride = app.settings.get("legacy", "webviewminsizeoverride")
         if minimumSizeOverride:
             w, h = minimumSizeOverride.split(",")
             w, h = int(w), int(h)

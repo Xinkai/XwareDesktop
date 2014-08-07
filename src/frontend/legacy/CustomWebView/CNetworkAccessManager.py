@@ -29,7 +29,7 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
         super().__init__(parent)
         # set cache
         self._cachePath = QNetworkDiskCache(self)
-        cacheLocation = app.settings.get("frontend", "cachelocation")
+        cacheLocation = app.settings.get("legacy", "cachelocation")
         self._cachePath.setCacheDirectory(cacheLocation)
         self._cachePath.setMaximumCacheSize(20 * 1024 * 1024)  # 20M
         self.setCache(self._cachePath)

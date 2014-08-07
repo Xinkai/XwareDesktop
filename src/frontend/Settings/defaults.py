@@ -34,22 +34,22 @@ _DEFAULT_PATTERN = """// packages
 
 DEFAULT_SETTINGS = {
     "frontend": {
-        "enabledeveloperstools": False,
-        "allowflash": True,
         "minimizetosystray": True,
         "closetominimize": False,
         "popnotifications": True,
         "notifybysound": True,
-        "cachelocation": os.path.expanduser("~/.xware-desktop/cache/webkit"),
         "showmonitorwindow": True,
         "monitorfullspeed": 512,
         "watchclipboard": True,
         "watchpattern": _DEFAULT_PATTERN,
-        "webviewminsizeoverride": None,
-        "webviewzoom": None,
     },
     "legacy": {
         "autologin": True,
+        "allowflash": True,
+        "cachelocation": os.path.expanduser("~/.xware-desktop/cache/webkit"),
+        "enabledeveloperstools": False,
+        "webviewminsizeoverride": None,
+        "webviewzoom": None,
     },
     "adapter-legacy": {
         "type": "xware",
