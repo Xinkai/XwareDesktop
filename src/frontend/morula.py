@@ -32,13 +32,12 @@ class DummyApp(QGuiApplication):
     def __init__(self, *args):
         super().__init__(*args)
 
-        from Settings import SettingsAccessor, DEFAULT_SETTINGS
-        self.settings = SettingsAccessor(self,
-                                         configFilePath = constants.CONFIG_FILE,
-                                         defaultDict = DEFAULT_SETTINGS)
+        from shared.config import SettingsAccessorBase
+        from Settings import DEFAULT_SETTINGS
+        self.settings = SettingsAccessorBase(constants.CONFIG_FILE,
+                                             DEFAULT_SETTINGS)
 
         from models import TaskModel, AdapterManager, ProxyModel
-        from libxware import XwareAdapter
         from Schedule.model import SchedulerModel
 
         self.taskModel = TaskModel()
@@ -48,11 +47,8 @@ class DummyApp(QGuiApplication):
         self.schedulerModel.setSourceModel(self.taskModel)
 
         self.adapterManager = AdapterManager()
-        self.adapter = XwareAdapter({
-            "host": "127.0.0.1",
-            "port": 9000,
-        }, parent = self)
-        self.adapterManager.registerAdapter(self.adapter)
+        for name, item in self.settings.itr_sections_with_prefix("adapter"):
+            self.adapterManager.loadAdapter(item)
 
         self.qmlWin = QmlMain(None)
         self.qmlWin.show()
