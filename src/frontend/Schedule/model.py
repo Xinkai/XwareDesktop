@@ -18,6 +18,7 @@ class TaskSelectionModel(QItemSelectionModel):
 
 class SchedulerModel(QSortFilterProxyModel):
     schedulerSummaryChanged = pyqtSignal()
+    countdownConfirmed = pyqtSignal(bool)
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -25,6 +26,8 @@ class SchedulerModel(QSortFilterProxyModel):
         self.sort(0, Qt.DescendingOrder)
         self.setFilterCaseSensitivity(False)
         self._taskClassFilter = TaskClass.RUNNING
+
+        self.countdownConfirmed[bool].connect(self.confirmed)
 
         self._action = None
         self._actWhen = None
@@ -97,19 +100,21 @@ class SchedulerModel(QSortFilterProxyModel):
             return
 
         if not self.blockingTaskCount:
-            self._confirmDlg = CountdownMessageBox(self.action)
+            self._confirmDlg = CountdownMessageBox(self.action, self)
             self._confirmDlg.show()
             self._confirmDlg.activateWindow()
             self._confirmDlg.raise_()
 
     # ======================== Confirm Dialog ========================
     # Maybe move out of the model in the future?
-    @pyqtSlot()
-    def confirmed(self):
-        self.powerActionManager.act(self.action)
-        self.reset()
+    @pyqtSlot(bool)
+    def confirmed(self, accepted):
+        if accepted:
+            self.powerActionManager.act(self.action)
+            self.reset()
+        else:
+            self.reset()
 
-    @pyqtSlot()
     def reset(self):
         self.set(ActWhen.ALL_TASKS_COMPLETED, Action.Null)
         if self._confirmDlg:

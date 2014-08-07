@@ -11,9 +11,9 @@ class ActWhen(enum.IntEnum):
 
     def __str__(self):
         if self == self.__class__.ALL_TASKS_COMPLETED:
-            return "所有的任务完成时"
+            return "所有的"
         elif self == self.__class__.SELECTED_TASKS_COMPLETED:
-            return "选中的任务完成时"
+            return "选中的"
         else:
             raise ValueError()
 
