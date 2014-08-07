@@ -15,7 +15,7 @@ class SchedulerButton(CustomStatusBarButton):
         super().__init__(parent)
         self.setIcon(QIcon(":/image/clock.png"))
         self.updateText()
-        app.scheduler.sigSchedulerSummaryUpdated.connect(self.updateText)
+        app.schedulerModel.schedulerSummaryChanged.connect(self.updateText)
         self.clicked.connect(self.slotClicked)
 
     @pyqtSlot()
@@ -24,9 +24,14 @@ class SchedulerButton(CustomStatusBarButton):
         app.mainWin.schedulerWin.show()
 
     def updateText(self):
-        summary = app.scheduler.getSummary()
-        if type(summary) is str:
-            self.setText(summary)
+        blockingCount = app.schedulerModel.blockingTaskCount
+        action = app.schedulerModel.action
+        if not action:
+            self.setText("计划任务")
+            return
+        if blockingCount:
+            self.setText("{count}个任务结束后{action}"
+                         .format(count = blockingCount,
+                                 action = str(action)))
         else:
-            # True / False
             self.setText("计划任务")

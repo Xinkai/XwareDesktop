@@ -1,13 +1,23 @@
 # -*- coding: utf-8 -*-
 
 
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QModelIndex, QSortFilterProxyModel, Qt, Q_ENUMS
+from PyQt5.QtCore import pyqtSlot, QModelIndex, QSortFilterProxyModel, Qt, pyqtSignal, \
+    pyqtProperty, QItemSelectionModel
 
 from models.TaskModel import CreationTimeRole, TaskClass, TaskClassRole
 
+from . import Action, ActWhen
+from .PowerAction import PowerActionManager
+from .SchedulerCountdown import CountdownMessageBox
+
+
+class TaskSelectionModel(QItemSelectionModel):
+    def __init__(self, model, parent):
+        super().__init__(model, parent)
+
 
 class SchedulerModel(QSortFilterProxyModel):
-    srcDataChanged = pyqtSignal(int, int)  # row1, row2
+    schedulerSummaryChanged = pyqtSignal()
 
     def __init__(self, parent = None):
         super().__init__(parent)
@@ -16,24 +26,29 @@ class SchedulerModel(QSortFilterProxyModel):
         self.setFilterCaseSensitivity(False)
         self._taskClassFilter = TaskClass.RUNNING
 
+        self._action = None
+        self._actWhen = None
+        self._confirmDlg = None
+        self.selectionModel = TaskSelectionModel(self, self)
+        self.reset()
+
+        self.powerActionManager = PowerActionManager(self)
+        self.rowsInserted.connect(self.mayAct)
+        self.rowsRemoved.connect(self.mayAct)
+
+    @property
+    def actions(self):
+        return self.powerActionManager.actions
+
     def filterAcceptsRow(self, srcRow: int, srcParent: QModelIndex):
-        result = super().filterAcceptsRow(srcRow, srcParent)
-        if result:
-            srcModel = self.sourceModel()
-            klass = srcModel.data(srcModel.index(srcRow, 0), TaskClassRole)
-            if klass == TaskClass.RUNNING:
-                return True
-            else:
-                return False
-
-        return result
-
-    @pyqtSlot(QModelIndex, QModelIndex, "QVector<int>")
-    def _slotSrcDataChanged(self, topLeft, bottomRight, roles):
-        self.srcDataChanged.emit(topLeft.row(), bottomRight.row())
+        srcModel = self.sourceModel()
+        klass = srcModel.data(srcModel.index(srcRow, 0), TaskClassRole)
+        if klass == TaskClass.RUNNING:
+            return True
+        else:
+            return False
 
     def setSourceModel(self, model):
-        model.dataChanged.connect(self._slotSrcDataChanged)
         super().setSourceModel(model)
         self.setSortRole(CreationTimeRole)
 
@@ -53,3 +68,51 @@ class SchedulerModel(QSortFilterProxyModel):
 
     def _getSourceModelIndice(self, rowIds):
         return map(self.mapToSource, self._getModelIndice(rowIds))
+
+    @pyqtProperty(int, notify = schedulerSummaryChanged)
+    def action(self):
+        return self._action
+
+    @pyqtProperty(int, notify = schedulerSummaryChanged)
+    def actWhen(self):
+        return self._actWhen
+
+    def set(self, actWhen, action):
+        self._actWhen = actWhen
+        self._action = action
+        self.schedulerSummaryChanged.emit()
+        self.mayAct()
+
+    @pyqtProperty(int, notify = schedulerSummaryChanged)
+    def blockingTaskCount(self):
+        if self.actWhen == ActWhen.ALL_TASKS_COMPLETED:
+            return self.rowCount()
+        else:
+            result = len(self.selectionModel.selectedIndexes())
+            return result
+
+    @pyqtSlot()
+    def mayAct(self):
+        if self.action == Action.Null:
+            return
+
+        if not self.blockingTaskCount:
+            self._confirmDlg = CountdownMessageBox(self.action)
+            self._confirmDlg.show()
+            self._confirmDlg.activateWindow()
+            self._confirmDlg.raise_()
+
+    # ======================== Confirm Dialog ========================
+    # Maybe move out of the model in the future?
+    @pyqtSlot()
+    def confirmed(self):
+        self.powerActionManager.act(self.action)
+        self.reset()
+
+    @pyqtSlot()
+    def reset(self):
+        self.set(ActWhen.ALL_TASKS_COMPLETED, Action.Null)
+        if self._confirmDlg:
+            self._confirmDlg.destroy()
+            self._confirmDlg = None
+        self.selectionModel.clearSelection()

@@ -8,12 +8,8 @@ from PyQt5.QtWidgets import QMessageBox
 
 
 class CountdownMessageBox(QMessageBox):
-    _timeout = None
-    _timer = None
-    _actionStr = None
-
-    def __init__(self, actionStr):
-        self._actionStr = actionStr
+    def __init__(self, action):
+        self._actionDisplayName = str(action)
         super().__init__(QMessageBox.Question,  # icon
                          "Xware Desktop任务完成",     # title
                          "",
@@ -45,7 +41,7 @@ class CountdownMessageBox(QMessageBox):
             self.accept()
 
     def updateText(self):
-        self.setText("任务已完成。将于{}秒后{}。".format(self._timeout, self._actionStr))
+        self.setText("任务已完成。将于{}秒后{}。".format(self._timeout, self._actionDisplayName))
 
     @pyqtSlot()
     def accept(self):

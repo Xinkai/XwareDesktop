@@ -5,61 +5,20 @@ from launcher import app
 
 from PyQt5.QtCore import QObject
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface
-
 import os
+import enum
+from . import Action
 
 _DBUS_POWER_SERVICE = "org.freedesktop.login1"
 _DBUS_POWER_PATH = "/org/freedesktop/login1"
 _DBUS_POWER_INTERFACE = "org.freedesktop.login1.Manager"
 
-ACTION_NONE = 0
-ACTION_POWEROFF = 1
-ACTION_HYBRIDSLEEP = 2
-ACTION_HIBERNATE = 3
-ACTION_SUSPEND = 4
 
-
-class PowerAction(object):
-    def __init__(self, manager, actionId, displayName, internalName):
-        super().__init__()
-        # defines a power action
-        self.manager = manager
-        self.actionId = actionId
-        self.displayName = displayName
-        self.internalName = internalName
-
-        if self.actionId == ACTION_NONE:
-            # always allow doing nothing
-            availability = "yes"
-            command = None
-        else:
-            optionKey = self.internalName.lower() + "cmd"
-            if app.settings.has("scheduler", optionKey):
-                # override action with command
-                availability = "cmd"
-                command = app.settings.get("scheduler", optionKey)
-                # TODO: check if the command is bad.
-            else:
-                # use the default action, namely logind.
-                # needs to check for availability
-                msg = self.manager._interface.call("Can" + self.internalName)
-                availability = msg.arguments()[0]
-                command = None
-
-        self.availability = availability
-        self.command = command
-
-    def __repr__(self):
-        contents = [
-            "{}({})".format(self.internalName, self.actionId),
-            self.availability,
-        ]
-        if self.command is not None:
-            contents.append(self.command)
-
-        return "{cls}<{contents}>".format(
-            cls = self.__class__.__name__,
-            contents = ":".join(contents))
+@enum.unique
+class ActionType(enum.Enum):
+    Special = 0
+    Command = 1
+    DBus = 2
 
 
 class PowerActionManager(QObject):
@@ -72,34 +31,52 @@ class PowerActionManager(QObject):
                                          _DBUS_POWER_INTERFACE,
                                          self._conn)
 
-        self.actions = (
-            PowerAction(self, ACTION_NONE, "无", "None"),
-            PowerAction(self, ACTION_POWEROFF, "关机", "PowerOff"),
-            PowerAction(self, ACTION_HYBRIDSLEEP, "混合休眠", "HybridSleep"),
-            PowerAction(self, ACTION_HIBERNATE, "休眠", "Hibernate"),
-            PowerAction(self, ACTION_SUSPEND, "睡眠", "Suspend"),
-        )
-        logging.info(self.actions)
+        self._actions = {}  # {Action: ActionType}
+        self._loadActions()
 
-    def getActionById(self, actionId):
-        return self.actions[actionId]
+    def _loadActions(self):
+        for action in Action:
+            # Always allow Null action
+            if action == Action.Null:
+                self._actions[action] = ActionType.Special
+                continue
 
-    def act(self, actionId):
-        action = self.getActionById(actionId)
-        if action.command:
-            return self._cmdAct(action)
-        elif action.availability == "yes":
-            return self._dbusAct(action)
-        raise Exception("Unhandled {}".format(action))
+            # check if cmd is set
+            internalName = action.name
+            if app.settings.has("scheduler", internalName + "cmd"):
+                self._actions[action] = ActionType.Command
+                continue
 
-    def _dbusAct(self, action):
-        logging.info("scheduler is about to act: {}".format(action))
-        msg = self._interface.call(action.internalName,
-                                   False)
-        if msg.errorName():
-            logging.error(msg.errorMessage())
+            # check if logind supports it
+            msg = self._interface.call("Can" + internalName)
+            if msg.errorName():
+                logging.error(msg.errorMessage())
+            availability = msg.arguments()[0]
+            if availability == "yes":
+                self._actions[action] = ActionType.DBus
+                continue
 
-    @staticmethod
-    def _cmdAct(action):
-        logging.info("scheduler is about to execute: {}".format(action))
-        os.system(action.command)
+    @property
+    def actions(self) -> "listlike of actions":
+        return self._actions.keys()
+
+    def act(self, action: Action):
+        assert isinstance(action, Action), "{} is not an Action".format(action)
+        assert action in self._actions, "{} is not available!".format(action)
+        actionType = self._actions.get(action, None)
+        internalName = action.name
+        if actionType is None:
+            raise ValueError("{} are not supported!".format(action))
+        if actionType == ActionType.Special:
+            raise ValueError("Cannot act on {}".format(action))
+        elif actionType == ActionType.Command:
+            cmd = app.settings.get("scheduler", internalName + "cmd")
+            os.system(cmd)
+            return
+        elif actionType == ActionType.DBus:
+            msg = self._interface.call(internalName, False)
+            if msg.errorName():
+                logging.error(msg.errorMessage())
+            return
+        else:
+            raise ValueError("Unhandled {}".format(action))

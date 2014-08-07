@@ -64,18 +64,15 @@ class XwareDesktop(QApplication):
         }, parent = self)
         self.adapterManager.registerAdapter(self.adapter)
 
-        # Etmpy will be gone!
-        from etmpy import EtmPy
-        self.etmpy = EtmPy(self)
-
         # components
         from Widgets.systray import Systray
         from Notify import Notifier
-        from Schedule import Scheduler
+        from Schedule.model import SchedulerModel
 
         self.systray = Systray(self)
         self.notifier = Notifier(self)
-        self.scheduler = Scheduler(self)
+        self.schedulerModel = SchedulerModel(self)
+        self.schedulerModel.setSourceModel(self.taskModel)
         self.monitorWin = None
         self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
 
