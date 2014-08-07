@@ -32,6 +32,11 @@ class DummyApp(QGuiApplication):
     def __init__(self, *args):
         super().__init__(*args)
 
+        from Settings import SettingsAccessor, DEFAULT_SETTINGS
+        self.settings = SettingsAccessor(self,
+                                         configFilePath = constants.CONFIG_FILE,
+                                         defaultDict = DEFAULT_SETTINGS)
+
         from models import TaskModel, AdapterManager, ProxyModel
         from libxware import XwareAdapter
         from Schedule.model import SchedulerModel
