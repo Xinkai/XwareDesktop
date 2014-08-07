@@ -14,12 +14,15 @@ class SettingsAccessorBase(object):
         self.config.read(self._configFilePath)
 
     def has(self, section, key):
+        key = key.lower()
         return self.config.has_option(section, key)
 
     def get(self, section, key):
+        key = key.lower()
         return self.config.get(section, key, fallback = self._defaultDict[section][key])
 
     def set(self, section, key, value):
+        key = key.lower()
         try:
             self.config.set(section, key, value)
         except configparser.NoSectionError:
