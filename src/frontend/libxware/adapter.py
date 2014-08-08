@@ -81,6 +81,12 @@ class XwareAdapter(QObject):
         self._xwareSettings = XwareSettings(self)
         self._uuid = uuid.uuid1().hex
 
+        # Prepare XwaredClient Variables
+        self._xwaredRunning = False
+        self._etmPid = 0
+        self._lcPort = 0
+        self._peerId = ""
+
         self._adapterConfig = adapterConfig
         connection = parse.urlparse(self._adapterConfig["connection"], scheme = "file")
         self.xwaredSocket = None
@@ -98,17 +104,13 @@ class XwareAdapter(QObject):
             from .mounts import MountsFaker
             self.mountsFaker = MountsFaker()
         elif connection.scheme == "http":
+            # assume etm is always running
+            self._etmPid = 0xDEADBEEF
             host, port = connection.netloc.split(":")
             _clientInitOptions["host"] = host
             _clientInitOptions["port"] = port
         else:
             raise NotImplementedError()
-
-        # Prepare XwaredClient Variables
-        self._xwaredRunning = False
-        self._etmPid = 0
-        self._lcPort = 0
-        self._peerId = ""
 
         self._loop = None
         self._loop_thread = None
@@ -151,7 +153,6 @@ class XwareAdapter(QObject):
         return self._xwareSettings
 
     def setClientOptions(self, clientOptions: dict):
-
         host = clientOptions.get("host", None)
         if host in ("127.0.0.1", "localhost"):
             self.isLocal = True
