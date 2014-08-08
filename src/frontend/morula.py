@@ -34,7 +34,7 @@ class DummyApp(QGuiApplication):
 
         from shared.config import SettingsAccessorBase
         from Settings import DEFAULT_SETTINGS
-        self.settings = SettingsAccessorBase(constants.CONFIG_FILE,
+        self.settings = SettingsAccessorBase(constants.FRONTEND_CONFIG_FILE,
                                              DEFAULT_SETTINGS)
 
         from models import TaskModel, AdapterManager, ProxyModel

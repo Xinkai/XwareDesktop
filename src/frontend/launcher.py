@@ -48,7 +48,7 @@ class XwareDesktop(QApplication):
 
         from Settings import DEFAULT_SETTINGS
         from shared.config import SettingsAccessorBase
-        self.settings = SettingsAccessorBase(constants.CONFIG_FILE,
+        self.settings = SettingsAccessorBase(constants.FRONTEND_CONFIG_FILE,
                                              DEFAULT_SETTINGS)
         self.aboutToQuit.connect(lambda: self.settings.save())
 

@@ -7,7 +7,7 @@ from PyQt5.QtGui import QDesktopServices
 import enum
 from collections import defaultdict
 from itertools import groupby
-import os, subprocess, errno
+import os, subprocess, errno, sys
 
 from .decorators import simplecache
 
@@ -125,3 +125,18 @@ def viewOneFile(file: "str of file path"):
     else:
         # fallback
         systemOpen(os.path.dirname(file))
+
+
+def getCurrentSessionId():
+    if sys.platform == "win32":
+        import ctypes
+        from ctypes.wintypes import DWORD
+        pid = os.getpid()
+        result = DWORD()
+        ok = ctypes.windll.kernel32.ProcessIdToSessionId(pid, ctypes.byref(result))
+        if not ok:
+            error = ctypes.GetLastError()
+            raise WindowsError(error)
+        return result.value
+    else:
+        raise NotImplementedError()
