@@ -24,10 +24,12 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_autoLogin.setChecked(app.settings.getbool("legacy", "autologin"))
         self.checkBox_autoStartFrontend.setChecked(app.autoStart)
 
+        adapter = app.adapterManager[0]
+
         # Xwared Management
-        managedBySystemd = app.adapterManager[0].daemonManagedBySystemd
-        managedByUpstart = app.adapterManager[0].daemonManagedByUpstart
-        managedByAutostart = app.adapterManager[0].daemonManagedByAutostart
+        managedBySystemd = adapter.daemonManagedBySystemd
+        managedByUpstart = adapter.daemonManagedByUpstart
+        managedByAutostart = adapter.daemonManagedByAutostart
 
         self.radio_managedBySystemd.setChecked(managedBySystemd)
         self.radio_managedByUpstart.setChecked(managedByUpstart)
@@ -38,6 +40,19 @@ class SettingsDialog(QDialog, Ui_Dialog):
         initType = getInitType()
         self.radio_managedBySystemd.setEnabled(initType == InitType.SYSTEMD)
         self.radio_managedByUpstart.setEnabled(initType == InitType.UPSTART)
+
+        if not adapter.useXwared:
+            self.group_etmStartWhen.setEnabled(False)
+            self.group_initManaged.setEnabled(False)
+
+        self.btngrp_etmStartWhen = QButtonGroup()
+        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen1, 1)
+        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
+        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
+
+        if adapter.useXwared:
+            startEtmWhen = adapter.startEtmWhen
+            self.btngrp_etmStartWhen.button(startEtmWhen).setChecked(True)
 
         # frontend
         self.checkBox_enableDevelopersTools.setChecked(
@@ -62,16 +77,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.slotWatchClipboardToggled(self.checkBox_watchClipboard.checkState())
         self.plaintext_watchPattern.setPlainText(app.settings.get("frontend", "watchpattern"))
 
-        self.btngrp_etmStartWhen = QButtonGroup()
-        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen1, 1)
-        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen2, 2)
-        self.btngrp_etmStartWhen.addButton(self.radio_backendStartWhen3, 3)
-
-        startEtmWhen = app.adapterManager[0].startEtmWhen
-        if startEtmWhen:
-            self.btngrp_etmStartWhen.button(startEtmWhen).setChecked(True)
-        else:
-            self.group_etmStartWhen.setEnabled(False)
 
         self.btn_addMount.clicked.connect(self.slotAddMount)
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)
@@ -88,6 +93,10 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot()
     def setupMounts(self):
+        adapter = app.adapterManager[0]
+        if not adapter.useXwared:
+            self.tab_mount.setEnabled(False)
+            return
         self.table_mounts.setRowCount(0)
         self.table_mounts.clearContents()
 
@@ -196,7 +205,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         app.settings.save()
 
-        app.adapterManager[0].mountsFaker.mounts = self.newMounts
+        if self.tab_mount.isEnabled():
+            app.adapterManager[0].mountsFaker.mounts = self.newMounts
         app.applySettings.emit()
         super().accept()
 
