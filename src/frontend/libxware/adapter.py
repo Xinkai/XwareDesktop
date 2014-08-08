@@ -107,6 +107,7 @@ class XwareAdapter(QObject):
             # assume etm is always running
             self._etmPid = 0xDEADBEEF
             host, port = connection.netloc.split(":")
+            self._peerId = connection.query
             _clientInitOptions["host"] = host
             _clientInitOptions["port"] = port
         else:
@@ -156,6 +157,11 @@ class XwareAdapter(QObject):
         host = clientOptions.get("host", None)
         if host in ("127.0.0.1", "localhost"):
             self.isLocal = True
+
+        port = clientOptions.get("port", None)
+        if port and not self.useXwared:
+            self._lcPort = int(port)
+
         self._xwareClient.updateOptions(clientOptions)
 
     # =========================== PUBLIC ===========================
