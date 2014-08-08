@@ -4,7 +4,7 @@ import sys
 from shared.constants import *
 
 
-### Frontend
+# ## Frontend
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 FRONTEND_LOCK = os.path.join(TMP_DIR, "xware_frontend.lock")
 FRONTEND_CONFIG_FILE = os.path.join(PROFILE_DIR, "etc/frontend.ini")
@@ -17,7 +17,7 @@ else:
     raise NotImplementedError()
 
 
-### Legacy
+# ## Legacy
 LOGIN_PAGE = "http://yuancheng.xunlei.com/login.html"
 V2_PAGE = "http://yuancheng.xunlei.com/"
 V3_PAGE = "http://yuancheng.xunlei.com/3/"
@@ -26,7 +26,7 @@ XWAREJS_FILE = os.path.join(FRONTEND_DIR, "legacy/xwarejs.js")
 XWARESTYLE_FILE = os.path.join(FRONTEND_DIR, "legacy/style.css")
 
 
-### Daemon
+# ## Daemon
 SYSTEMD_SERVICE_FILE = os.path.join(FRONTEND_DIR, "xwared.service")
 SYSTEMD_SERVICE_USERFILE = os.path.join(XDG_CONFIG_HOME, "systemd/user/xwared.service")
 SYSTEMD_SERVICE_ENABLED_USERFILE = os.path.join(XDG_CONFIG_HOME,
@@ -41,6 +41,6 @@ AUTOSTART_DESKTOP_USERFILE = os.path.join(XDG_CONFIG_HOME,
                                           "autostart/xwared.desktop")
 
 
-### Autostart
+# ## Autostart
 DESKTOP_FILE = "/usr/share/applications/xware-desktop.desktop"
 DESKTOP_AUTOSTART_FILE = os.path.join(XDG_CONFIG_HOME, "autostart/xware-desktop.desktop")

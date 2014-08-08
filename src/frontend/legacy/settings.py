@@ -77,7 +77,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.slotWatchClipboardToggled(self.checkBox_watchClipboard.checkState())
         self.plaintext_watchPattern.setPlainText(app.settings.get("frontend", "watchpattern"))
 
-
         self.btn_addMount.clicked.connect(self.slotAddMount)
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)
 

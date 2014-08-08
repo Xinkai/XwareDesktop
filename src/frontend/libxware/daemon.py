@@ -31,7 +31,8 @@ def callXwared(adapter: "XwareAdapter", method: "str", arguments: "jsonfiable"):
     cb = getattr(adapter, "_donecb_daemon_" + method, None)
 
     try:
-        transport, protocol = yield from loop.create_unix_connection(XwaredClient, path = socketPath)
+        transport, protocol = yield from loop.create_unix_connection(XwaredClient,
+                                                                     path = socketPath)
         if cb:
             protocol.donecb = cb
         payload = {
