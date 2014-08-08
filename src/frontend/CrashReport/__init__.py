@@ -2,7 +2,7 @@
 
 import logging
 
-import os, threading
+import os, threading, sys
 import pickle, binascii
 from utils.system import runAsIndependentProcess
 
@@ -13,13 +13,14 @@ class CrashReport(object):
         payload = dict(traceback = tb,
                        thread = threading.current_thread().name)
 
+        interpreter = sys.executable  # crashreport app is run by the same implementation
         crappFile = os.path.join(os.path.dirname(__file__), "CrashReportApp.py")
         crappArgs = self.encodePayload(payload)
-        runAsIndependentProcess(crappFile + " " + crappArgs)
+        runAsIndependentProcess([interpreter, crappFile, crappArgs])
 
     @staticmethod
     def encodePayload(payload):
-        pickled = pickle.dumps(payload, 3)  # protocol 3 requires Py3.0
+        pickled = pickle.dumps(payload, 4)  # protocol 4 requires Py3.4
         pickledBytes = binascii.hexlify(pickled)
         pickledStr = pickledBytes.decode("ascii")
         return pickledStr

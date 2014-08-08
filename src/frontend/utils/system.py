@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
 
@@ -85,17 +86,8 @@ def runAsIndependentProcess(line: "ls -al" or "['ls', '-al']"):
     :param line: command line to run
     :return: None
     """
-    if type(line) is str:
-        cmd = line.split(" ")
-    else:
-        cmd = line
-
-    pid = os.fork()
-    if pid == 0:
-        # child
-        os.execvp(cmd[0], cmd)
-    else:
-        return
+    p = subprocess.Popen(line, stdin = None, stdout = None, stderr = None)
+    logging.info("Started {} with pid {}".format(line, p.pid))
 
 
 def systemOpen(url: str):
@@ -115,8 +107,7 @@ def viewMultipleFiles(files: "list<str of file paths>"):
 
     if fileManager == FileManagerType.Dolphin:
         for path in d:
-            # TODO: escape filenames
-            runAsIndependentProcess("dolphin --select {}".format(" ".join(d[path])))
+            runAsIndependentProcess(["dolphin", "--select"] + d[path])
     else:
         # Thunar, PCManFM, Nemo don't support select at all!
         # Nautilus doesn't support selecting multiple files.
@@ -127,11 +118,10 @@ def viewMultipleFiles(files: "list<str of file paths>"):
 
 def viewOneFile(file: "str of file path"):
     fileManager = getFileManagerType()
-    # TODO: escape filename
     if fileManager == FileManagerType.Dolphin:
-        runAsIndependentProcess("dolphin --select {}".format(file))
+        runAsIndependentProcess(["dolphin", "--select"] + [file])
     elif fileManager == FileManagerType.Nautilus:
-        runAsIndependentProcess("nautilus --select {}".format(file))
+        runAsIndependentProcess(["nautilus", "--select"] + [file])
     else:
         # fallback
         systemOpen(os.path.dirname(file))
