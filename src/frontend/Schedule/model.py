@@ -4,10 +4,15 @@
 from PyQt5.QtCore import pyqtSlot, QModelIndex, QSortFilterProxyModel, Qt, pyqtSignal, \
     pyqtProperty, QItemSelectionModel
 
+import sys
 from models.TaskModel import CreationTimeRole, TaskClass, TaskClassRole
 
 from . import Action, ActWhen
-from .PowerAction import PowerActionManager
+if sys.platform == "win32":
+    from .Win32PowerAction import Win32PowerActionManager as PowerActionManager
+elif sys.platform == "linux":
+    from .PowerAction import PowerActionManager
+
 from .SchedulerCountdown import CountdownMessageBox
 
 
