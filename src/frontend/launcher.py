@@ -28,8 +28,6 @@ if __name__ == "__main__":
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
-import fcntl
-
 from shared import __version__
 
 import constants
@@ -98,9 +96,23 @@ class XwareDesktop(QApplication):
     def checkOneInstance():
         fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT)
 
-        try:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
+        alreadyRunning = False
+        if os.name == "posix":
+            import fcntl
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                alreadyRunning = True
+        elif os.name == "nt":
+            import msvcrt
+            try:
+                msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+            except PermissionError:
+                alreadyRunning = True
+        else:
+            raise NotImplementedError("Xware Desktop doesn't support {}".format(os.name))
+
+        if alreadyRunning:
             def showStartErrorAndExit():
                 from PyQt5.QtWidgets import QMessageBox
                 QMessageBox.warning(None, "Xware Desktop 启动失败",
