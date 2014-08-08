@@ -79,17 +79,21 @@ def getFileManagerType():
     return FileManagerType.Unknown
 
 
-def runAsIndependentProcess(line: "ls -al"):
+def runAsIndependentProcess(line: "ls -al" or "['ls', '-al']"):
     """
     Useful when we don't care about input/output/return value.
     :param line: command line to run
     :return: None
     """
+    if type(line) is str:
+        cmd = line.split(" ")
+    else:
+        cmd = line
+
     pid = os.fork()
     if pid == 0:
         # child
-        parts = line.split(" ")
-        os.execvp(parts[0], parts)
+        os.execvp(cmd[0], cmd)
     else:
         return
 

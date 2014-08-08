@@ -4,6 +4,7 @@ import logging
 
 import os, threading
 import pickle, binascii
+from utils.system import runAsIndependentProcess
 
 
 class CrashReport(object):
@@ -11,14 +12,10 @@ class CrashReport(object):
         super().__init__()
         payload = dict(traceback = tb,
                        thread = threading.current_thread().name)
-        pid = os.fork()
-        if pid == 0:
-            # child
-            cmd = (os.path.join(os.path.dirname(__file__), "CrashReportApp.py"),
-                   self.encodePayload(payload))
-            os.execv(cmd[0], cmd)
-        else:
-            pass
+
+        crappFile = os.path.join(os.path.dirname(__file__), "CrashReportApp.py")
+        crappArgs = self.encodePayload(payload)
+        runAsIndependentProcess(crappFile + " " + crappArgs)
 
     @staticmethod
     def encodePayload(payload):
