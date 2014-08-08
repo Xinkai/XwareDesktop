@@ -17,37 +17,42 @@ class InitType(enum.Enum):
     SYSTEMD = 1
     UPSTART = 2
     UPSTART_WITHOUT_USER_SESSION = 3
-    UNKNOWN = 4
+    WINDOWS = 4
+    UNKNOWN = 5
 
 
 @simplecache
 def getInitType():
-    with subprocess.Popen(["init", "--version"], stdout = subprocess.PIPE) as proc:
-        initVersion = str(proc.stdout.read())
+    if sys.platform == "linux":
+        with subprocess.Popen(["init", "--version"], stdout = subprocess.PIPE) as proc:
+            initVersion = str(proc.stdout.read())
 
-    if "systemd" in initVersion:
-        return InitType.SYSTEMD
-    elif "upstart" in initVersion:
-        if "UPSTART_SESSION" in os.environ:
-            return InitType.UPSTART
-        else:
-            return InitType.UPSTART_WITHOUT_USER_SESSION
-    else:
-        # On Fedora "init --version" gives an error
-        # Use an alternative method
-        try:
-            realInitPath = os.readlink("/usr/sbin/init")
-            if realInitPath.endswith("systemd"):
-                return InitType.SYSTEMD
-        except FileNotFoundError:
-            pass
-        except OSError as e:
-            if e.errno == errno.EINVAL:
-                pass  # Not a symlink
+        if "systemd" in initVersion:
+            return InitType.SYSTEMD
+        elif "upstart" in initVersion:
+            if "UPSTART_SESSION" in os.environ:
+                return InitType.UPSTART
             else:
-                raise e  # rethrow
+                return InitType.UPSTART_WITHOUT_USER_SESSION
+        else:
+            # On Fedora "init --version" gives an error
+            # Use an alternative method
+            try:
+                realInitPath = os.readlink("/usr/sbin/init")
+                if realInitPath.endswith("systemd"):
+                    return InitType.SYSTEMD
+            except FileNotFoundError:
+                pass
+            except OSError as e:
+                if e.errno == errno.EINVAL:
+                    pass  # Not a symlink
+                else:
+                    raise e  # rethrow
 
-        return InitType.UNKNOWN
+    elif sys.platform == "win32":
+        return InitType.WINDOWS
+
+    return InitType.UNKNOWN
 
 
 @enum.unique
@@ -57,25 +62,29 @@ class FileManagerType(enum.Enum):
     PCManFM = 3
     Nemo = 4
     Nautilus = 5
-    Unknown = 6
+    Explorer = 6
+    Unknown = 7
 
 
 @simplecache
 def getFileManagerType():
-    with subprocess.Popen(["xdg-mime", "query", "default", "inode/directory"],
-                          stdout = subprocess.PIPE) as proc:
-        output = str(proc.stdout.read()).lower()
+    if sys.platform == "linux":
+        with subprocess.Popen(["xdg-mime", "query", "default", "inode/directory"],
+                              stdout = subprocess.PIPE) as proc:
+            output = str(proc.stdout.read()).lower()
 
-    if "dolphin" in output:
-        return FileManagerType.Dolphin
-    elif "nautilus" in output:
-        return FileManagerType.Nautilus
-    elif "nemo" in output:
-        return FileManagerType.Nemo
-    elif "pcmanfm" in output:
-        return FileManagerType.PCManFM
-    elif "thunar" in output:
-        return FileManagerType.Thunar
+        if "dolphin" in output:
+            return FileManagerType.Dolphin
+        elif "nautilus" in output:
+            return FileManagerType.Nautilus
+        elif "nemo" in output:
+            return FileManagerType.Nemo
+        elif "pcmanfm" in output:
+            return FileManagerType.PCManFM
+        elif "thunar" in output:
+            return FileManagerType.Thunar
+    elif sys.platform == "win32":
+        return FileManagerType.Explorer
 
     return FileManagerType.Unknown
 
@@ -122,6 +131,8 @@ def viewOneFile(file: "str of file path"):
         runAsIndependentProcess(["dolphin", "--select"] + [file])
     elif fileManager == FileManagerType.Nautilus:
         runAsIndependentProcess(["nautilus", "--select"] + [file])
+    elif fileManager == FileManagerType.Explorer:
+        runAsIndependentProcess(["explorer", "/select,{}".format(file)])
     else:
         # fallback
         systemOpen(os.path.dirname(file))
