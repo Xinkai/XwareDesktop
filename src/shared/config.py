@@ -48,10 +48,6 @@ class ProxyAddons(object):
         pickledStr = pickledBytes.decode("ascii")
         self.set(section, key, pickledStr)
 
-    def __getitem__(self, item):
-        # This is needed because FallbackSection doesn't write changes to file.
-        return self.get()
-
 
 class FallbackSectionProxy(MutableMapping):
     def __init__(self, parser, name):
