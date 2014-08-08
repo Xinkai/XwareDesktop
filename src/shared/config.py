@@ -5,6 +5,7 @@ import logging
 import configparser, pickle, binascii
 import types
 from functools import partial
+from collections import MutableMapping
 
 
 class ProxyAddons(object):
@@ -47,6 +48,38 @@ class ProxyAddons(object):
         pickledStr = pickledBytes.decode("ascii")
         self.set(section, key, pickledStr)
 
+    def __getitem__(self, item):
+        # This is needed because FallbackSection doesn't write changes to file.
+        return self.get()
+
+
+class FallbackSectionProxy(MutableMapping):
+    def __init__(self, parser, name):
+        self._parser = parser
+        self._name = name
+
+    def __getattr__(self, item):
+        parserMember = getattr(self._parser, item, None)
+        if isinstance(parserMember, types.MethodType):
+            return partial(parserMember, self._name)
+        raise AttributeError("Cannot find {}".format(item))
+
+    # Implement Abstract Members
+    def __iter__(self):
+        raise NotImplementedError()
+
+    def __setitem__(self, key, value):
+        self._parser.set(self._name, key, value)
+
+    def __getitem__(self, key):
+        return self._parser.get(self._name, key)
+
+    def __delitem__(self, key):
+        raise NotImplementedError()
+
+    def __len__(self):
+        raise NotImplementedError()
+
 
 class SettingsAccessorBase(configparser.ConfigParser):
     def __init__(self, configFilePath, defaults):
@@ -75,6 +108,11 @@ class SettingsAccessorBase(configparser.ConfigParser):
             self.write(configfile)
 
     def _loadAddons(self, target, section = None):
+        if section:
+            assert isinstance(target, configparser.SectionProxy)
+        else:
+            assert isinstance(target, self.__class__)
+
         for name, func in ProxyAddons.__dict__.items():
             if name.startswith("__"):
                 continue
@@ -84,14 +122,26 @@ class SettingsAccessorBase(configparser.ConfigParser):
 
             methodTyped = types.MethodType(func, self)
             if not section:
-                assert isinstance(target, self.__class__)
-                setattr(target, name,
-                        methodTyped)
-
+                setattr(target, name, methodTyped)
             else:
-                assert isinstance(target, configparser.SectionProxy)
-                setattr(target, name,
-                        partial(methodTyped, section))
+                setattr(target, name, partial(methodTyped, section))
+
+        if section:
+            #   If a section not in the file, FallbackSectionProxy will be used.
+            # It is implemented in self.__getitem__.
+            #   But when only part of the section is written to the file, the builtin
+            # SectionProxy is used. It has no knowledge about the fallback dict.
+            #   Here we monkey patch SectionProxy, so that it will find keys from fallback dict.
+            #   Also, should be noted that __magicmethod__ needs to patched to the __class__,
+            # not the instance.
+            targetClass = target.__class__
+
+            def _enableFallback(SELF, key):
+                return SELF._parser.get(SELF._name, key)
+
+            if not hasattr(targetClass, "FALLBACK_PATCHED"):
+                setattr(targetClass, "__getitem__", _enableFallback)
+                setattr(targetClass, "FALLBACK_PATCHED", True)
 
         setattr(target, "addons_loaded", True)
 
@@ -100,10 +150,10 @@ class SettingsAccessorBase(configparser.ConfigParser):
             result = super().__getitem__(section)
         except KeyError as e:
             if section in self._defaultDict:
-                self.add_section(section)
-                for k, v in self._defaultDict[section].items():
-                    self[section][k] = str(v)
-                return self[section]
+                assert section not in self._proxies
+                proxy = FallbackSectionProxy(self, section)
+                self._proxies[section] = proxy
+                return proxy
             else:
                 raise e
         if not getattr(result, "addons_loaded", False):
