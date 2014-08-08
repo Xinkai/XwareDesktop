@@ -110,13 +110,11 @@ class VipChannelState(IntEnum):
 
 
 class XwareClient(object):
-    def __init__(self, options):
+    def __init__(self):
         self._options = {
             "timeout": 1,
             "ua": "libxware/0.1",
         }
-        self.updateOptions(options)
-
         self._connector = aiohttp.TCPConnector(share_cookies = True)
 
     def updateOptions(self, options):

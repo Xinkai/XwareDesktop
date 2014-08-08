@@ -85,10 +85,12 @@ class XwareAdapter(QObject):
         connection = parse.urlparse(self._adapterConfig["connection"], scheme = "file")
         self.xwaredSocket = None
         self.mountsFaker = None
+
         self.useXwared = False
         self.isLocal = False
+        _clientInitOptions = dict()
         if connection.scheme == "file":
-            self.isLocal = True
+            _clientInitOptions["host"] = "127.0.0.1"
             self.useXwared = True
             self.xwaredSocket = os.path.expanduser(connection.path)
             app.aboutToQuit.connect(self.daemon_stopXware)
@@ -96,6 +98,10 @@ class XwareAdapter(QObject):
             from .mounts import MountsFaker
             self.mountsFaker = MountsFaker()
         elif connection.scheme == "http":
+            host, port = connection.netloc.split(":")
+            _clientInitOptions["host"] = host
+            _clientInitOptions["port"] = port
+        else:
             raise NotImplementedError()
 
         # Prepare XwaredClient Variables
@@ -109,21 +115,18 @@ class XwareAdapter(QObject):
         self._loop_executor = None
         self._xwareClient = None
         self._loop_thread = threading.Thread(daemon = True,
-                                             target = self._startEventLoop)
+                                             target = self._startEventLoop,
+                                             args = (_clientInitOptions,))
         self._loop_thread.start()
 
-    def _startEventLoop(self):
+    def _startEventLoop(self, clientInitOptions = None):
         self._loop = asyncio.new_event_loop()
         self._loop.set_debug(True)
         self._loop_executor = ThreadPoolExecutor(max_workers = 1)
         self._loop.set_default_executor(self._loop_executor)
         asyncio.events.set_event_loop(self._loop)
-        if self.isLocal:
-            self._xwareClient = XwareClient({
-                "host": "127.0.0.1",
-            })
-        else:
-            raise NotImplementedError()
+        self._xwareClient = XwareClient()
+        self.setClientOptions(clientInitOptions or dict())
         asyncio.async(self.main())
         self._loop.run_forever()
 
@@ -147,7 +150,11 @@ class XwareAdapter(QObject):
     def backendSettings(self):
         return self._xwareSettings
 
-    def setClientOptions(self, clientOptions):
+    def setClientOptions(self, clientOptions: dict):
+
+        host = clientOptions.get("host", None)
+        if host in ("127.0.0.1", "localhost"):
+            self.isLocal = True
         self._xwareClient.updateOptions(clientOptions)
 
     # =========================== PUBLIC ===========================
