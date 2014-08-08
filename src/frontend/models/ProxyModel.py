@@ -12,8 +12,6 @@ class ProxyModel(QSortFilterProxyModel):
     srcDataChanged = pyqtSignal(int, int)  # row1, row2
     taskClassFilterChanged = pyqtSignal()
 
-    Q_ENUMS(dropPy34Enum(TaskClass))
-
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setDynamicSortFilter(True)
@@ -111,6 +109,10 @@ class ProxyModel(QSortFilterProxyModel):
     def viewMultipleTasks(self, rowIds):
         srcIndice = list(self._getSourceModelIndice(rowIds))
         self.sourceModel().viewMultipleTasks(srcIndice)
+
+    # put this at the end of the class, to workaround a PyQt bug
+    # See # 97
+    Q_ENUMS(dropPy34Enum(TaskClass))
 
 qmlRegisterUncreatableType(ProxyModel, 'TaskModel', 1, 0, 'TaskModel',
                            "TaskModel cannot be created.")
