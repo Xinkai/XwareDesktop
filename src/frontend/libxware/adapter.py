@@ -84,7 +84,6 @@ class XwareAdapter(QObject):
         # Prepare XwaredClient Variables
         self._xwaredRunning = False
         self._etmPid = 0
-        self._lcPort = 0
         self._peerId = ""
 
         self._adapterConfig = adapterConfig
@@ -157,10 +156,6 @@ class XwareAdapter(QObject):
         host = clientOptions.get("host", None)
         if host in ("127.0.0.1", "localhost"):
             self.isLocal = True
-
-        port = clientOptions.get("port", None)
-        if port and not self.useXwared:
-            self._lcPort = int(port)
 
         self._xwareClient.updateOptions(clientOptions)
 
@@ -278,10 +273,6 @@ class XwareAdapter(QObject):
         return self._peerId
 
     @pyqtProperty(int, notify = infoUpdated)
-    def lcPort(self):
-        return self._lcPort
-
-    @pyqtProperty(int, notify = infoUpdated)
     def startEtmWhen(self):
         return self._startEtmWhen
 
@@ -296,17 +287,17 @@ class XwareAdapter(QObject):
             self._xwaredRunning = True
             self._etmPid = result.get("etmPid")
             self._peerId = result.get("peerId")
-            self._lcPort = result.get("lcPort")
+            lcPort = result.get("lcPort")
             self._startEtmWhen = result.get("startEtmWhen")
         else:
             self._xwaredRunning = False
             self._etmPid = 0
             self._peerId = ""
-            self._lcPort = 0
+            lcPort = 0
             self._startEtmWhen = 1
             print("infoPoll failed with error", error, file = sys.stderr)
         self.setClientOptions({
-            "port": self._lcPort,
+            "port": lcPort,
         })
         self.infoUpdated.emit()
 

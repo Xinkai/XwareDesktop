@@ -218,9 +218,6 @@ class SettingsDialog(QDialog, Ui_Dialog):
     @pyqtSlot()
     def setupETM(self):
         # fill values
-        lcPort = app.adapterManager[0].lcPort
-        self.lineEdit_lcport.setText(str(lcPort) if lcPort else "不可用")
-
         adapter = app.adapterManager[0]
         settings = adapter.backendSettings
         enabled = adapter.etmPid != 0

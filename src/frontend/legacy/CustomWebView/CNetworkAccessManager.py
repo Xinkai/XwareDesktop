@@ -50,8 +50,11 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
     @staticmethod
     def _redirectToLocal(request):
         qurl = request.url()
-        qurl.setHost("127.0.0.1")
-        qurl.setPort(app.adapterManager[0].lcPort)
+        adapter = app.adapterManager[0]
+        host = adapter._xwareClient._options.get("host", "127.0.0.1")
+        port = int(adapter._xwareClient._options.get("port", 9000))
+        qurl.setHost(host)
+        qurl.setPort(port)
         request.setUrl(qurl)
         return request
 
