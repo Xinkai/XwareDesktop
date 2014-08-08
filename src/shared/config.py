@@ -54,7 +54,7 @@ class SettingsAccessorBase(configparser.ConfigParser):
         self._loadAddons(target = self)
         self._configFilePath = configFilePath
         self._defaultDict = defaults
-        self.read(self._configFilePath)
+        self.read(self._configFilePath, encoding = "UTF-8")
 
     def get(self, section, key, *args, **kwargs):
         assert not args
