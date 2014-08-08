@@ -37,8 +37,15 @@ class AboutDialog(QDialog, Ui_dlg_about):
         import requests
         self.label_requestsVer.setText(requests.__version__)
 
-        import pyinotify
-        self.label_pyinotifyVer.setText(pyinotify.__version__)
+        try:
+            import pyinotify
+        except ImportError:
+            pyinotify = None
+
+        self.label_pyinotifyVer.setText(pyinotify.__version__ if pyinotify else "N/A")
 
         from PyQt5 import QtWebKit
         self.label_qtwebkitVer.setText(QtWebKit.qWebKitVersion())
+
+        import aiohttp
+        self.label_aiohttpVer.setText(aiohttp.__version__)
