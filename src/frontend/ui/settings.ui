@@ -189,6 +189,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="checkBox_autoStartFrontend">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>开机启动前端</string>
              </property>

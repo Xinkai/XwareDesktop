@@ -6,7 +6,7 @@ from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QDialog, QTableWidgetItem, QButtonGroup, QFileDialog
 from PyQt5.QtGui import QBrush
 
-import os
+import os, sys
 from utils.system import getInitType, InitType
 
 from .ui_settings import Ui_Dialog
@@ -23,6 +23,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.lineEdit_loginPassword.setText(app.settings.get("adapter-legacy", "password"))
         self.checkBox_autoLogin.setChecked(app.settings.getbool("legacy", "autologin"))
         self.checkBox_autoStartFrontend.setChecked(app.autoStart)
+        if sys.platform == "linux":
+            self.checkBox_autoStartFrontend.setEnabled(True)
 
         adapter = app.adapterManager[0]
 
