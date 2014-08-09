@@ -1,16 +1,17 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import logging
+import faulthandler, logging, os
+from logging import handlers
 
 import asyncio, json
-import sys, os, time, fcntl, signal, threading
+import sys, time, fcntl, signal, threading
 import collections
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
 
 import pyinotify
 
-from shared import constants, XWARED_API_VERSION, XwaredSocketError
+from shared import constants, XWARE_VERSION, DATE, XwaredSocketError
 from shared.misc import debounce, tryRemove, tryClose
 from shared.profile import profileBootstrap
 from settings import SettingsAccessorBase, XWARED_DEFAULTS_SETTINGS
@@ -28,33 +29,50 @@ class XwaredServer(asyncio.Protocol):
         self._data += data
 
     def eof_received(self):
-        payload = json.loads(self._data.decode("utf-8"))
-
-        error = XwaredSocketError.SERVER_UNKNOWN
-        result = None
         try:
-            try:
-                method = getattr(xwared, "interface_" + payload.get("method"))
-            except:
-                method = None
-                error = XwaredSocketError.SERVER_NO_METHOD
-
-            if method:
-                arguments = payload.get("arguments")
-                try:
-                    result = method(*arguments)
-                    error = XwaredSocketError.OK
-                except Exception as e:
-                    error = XwaredSocketError.SERVER_EVALUATION
-                    print("xwared:", e, file = sys.stderr)
+            bytesIn = self._data.decode("utf-8")
         except:
-            pass
+            return self._response({
+                "error": XwaredSocketError.SERVER_DECODE,
+            })
 
-        response = {
-            "error": error,
+        try:
+            payload = json.loads(bytesIn)
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_JSON_LOAD,
+            })
+
+        try:
+            method = getattr(xwared, "interface_" + payload.get("method"))
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_NO_METHOD,
+            })
+
+        try:
+            arguments = payload.get("arguments")
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_NO_ARGUMENTS,
+            })
+
+        try:
+            result = method(*arguments)
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_EVALUATION,
+            })
+
+        self._response({
+            "error": XwaredSocketError.SERVER_OK,
             "result": result,
-            "API": XWARED_API_VERSION,
-        }
+        })
+
+    def _response(self, response: dict):
+        if "result" not in response:
+            response["result"] = None
+
         responseBytes = json.dumps(response).encode("utf-8")
         self._transport.write(responseBytes)
         self._transport.close()
@@ -77,6 +95,19 @@ class ServerThread(threading.Thread):
         yield from loop.create_unix_server(XwaredServer, constants.XWARED_SOCKET)
 
 
+def setupLogging():
+    loggingHandler = logging.handlers.RotatingFileHandler(
+        os.path.expanduser("~/.xware-desktop/profile/xwared.log"),
+        maxBytes = 1024 * 1024 * 5,
+        backupCount = 5
+    )
+    logging.basicConfig(handlers = (loggingHandler,),
+                        format = "%(asctime)s %(levelname)s:%(name)s:%(message)s")
+
+    faultLogFd = open(os.path.expanduser('~/.xware-desktop/profile/xwared.fault.log'), 'a')
+    faulthandler.enable(faultLogFd)
+
+
 class Xwared(object):
     def __init__(self):
         super().__init__()
@@ -93,9 +124,11 @@ class Xwared(object):
 
         # requirements checking
         self.ensureNonRoot()
+        profileBootstrap(constants.PROFILE_DIR)
+        setupLogging()
+
         self.ensureOneInstance()
 
-        profileBootstrap(constants.PROFILE_DIR)
         tryRemove(constants.XWARED_SOCKET)
 
         # initialize variables
@@ -230,6 +263,13 @@ class Xwared(object):
             self.settings.save()
 
     # frontend end interfaces
+    @staticmethod
+    def interface_versions():
+        return {
+            "xware": XWARE_VERSION,
+            "api": DATE,
+        }
+
     def interface_startETM(self):
         self._resetEtmLongevities()
         self.toRunETM = True
