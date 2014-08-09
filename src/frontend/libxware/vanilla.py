@@ -241,7 +241,7 @@ class XwareClient(object):
         for key, value in settings.items():
             assert key in Settings._fields
             params.append("{k}={v}".format(k = key, v = value))
-        result = yield from self.postJsonP2("settings?v=2&" + "&".join(params))
+        result = yield from self.postJson2("settings?v=2&" + "&".join(params))
         return result
 
     @asyncio.coroutine
