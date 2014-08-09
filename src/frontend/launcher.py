@@ -27,6 +27,7 @@ if __name__ == "__main__":
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QFont
 
 from shared import __version__
 
@@ -45,6 +46,10 @@ class XwareDesktop(QApplication):
         self.setApplicationVersion(__version__)
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         self.checkOneInstance()
+
+        font = QFont()
+        font.setPointSize(10)
+        self.setFont(font)
 
         from Settings import DEFAULT_SETTINGS
         from shared.config import SettingsAccessorBase
