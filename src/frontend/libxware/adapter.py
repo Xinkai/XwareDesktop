@@ -198,7 +198,7 @@ class XwareAdapter(QObject):
                 cb = getattr(self, "_donecb_" + name, None)
                 if cb:
                     cb = partial(cb, *args)
-                future.add_done_callback(cb)
+                    future.add_done_callback(cb)
             setattr(self, name, method)
             return method
         elif name.startswith("daemon_"):
