@@ -6,14 +6,14 @@ from launcher import app
 import asyncio, os, sys
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-import threading, uuid
+import threading
 from urllib import parse
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
 import constants
 from utils.misc import tryRemove, trySymlink, tryMkdir
 from utils.system import getInitType, InitType
-from .vanilla import TaskClass, XwareClient, Settings, CLIENT_NONFATAL_ERROR
+from .vanilla import TaskClass, XwareClient, Settings
 from .map import Tasks
 from .daemon import callXwared
 
@@ -80,7 +80,6 @@ class XwareAdapter(QObject):
                                    ActivateCode = "", Mount = 0, InternalVersion = "",
                                    Nickname = "", unknown2 = "", UserId = 0, unknown3 = 0)
         self._xwareSettings = XwareSettings(self)
-        self._uuid = uuid.uuid1().hex
 
         # Prepare XwaredClient Variables
         self._xwaredRunning = False
@@ -114,12 +113,12 @@ class XwareAdapter(QObject):
             raise NotImplementedError()
 
         self._loop = None
-        self._loop_thread = None
         self._loop_executor = None
         self._xwareClient = None
         self._loop_thread = threading.Thread(daemon = True,
                                              target = self._startEventLoop,
-                                             args = (_clientInitOptions,))
+                                             args = (_clientInitOptions,),
+                                             name = adapterConfig.name)
         self._loop_thread.start()
 
     def _startEventLoop(self, clientInitOptions = None):
@@ -135,7 +134,7 @@ class XwareAdapter(QObject):
 
     @property
     def namespace(self):
-        return "xware-" + self._uuid
+        return "xware-" + self._adapterConfig.name[len("adapter-"):]
 
     @property
     def ulSpeed(self):
