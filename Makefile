@@ -6,11 +6,15 @@ SHELL         = /bin/bash
 
 UNAME_O      := $(shell uname -o)
 
+.PHONY: all pyqt coffee prepareXware replacePath pep8 clean install \
+        prepareXwareFake replacePathFake binaryFake
+
 ifeq ($(UNAME_O),Cygwin)
     pyuic5   := pyuic5.bat
     pyrcc5   := pyrcc5.exe
-    python3  := python3.exe
-    all: pyqt coffee
+    python3  := python.exe
+
+    all: binaryFake pyqt coffee prepareXwareFake replacePathFake
 else
     pyuic5   := pyuic5
     pyrcc5   := pyrcc5
@@ -18,6 +22,11 @@ else
 
     all: build/etmpatch.so build/chmns pyqt coffee prepareXware replacePath
 endif
+
+binaryFake:
+	mkdir -p build
+	touch build/etmpatch.so
+	touch build/chmns
 
 build/etmpatch.so: src/etmpatch.c
 	mkdir -p build
@@ -52,6 +61,13 @@ pep8:
 coffee:
 	find src -name "*.coffee" -print0 | xargs -0 coffee -bc
 
+prepareXwareFake:
+	mkdir -p preparedXware
+	touch preparedXware/ETMDaemon
+	touch preparedXware/EmbedThunderManager
+	touch preparedXware/portal
+	touch preparedXware/vod_httpserver
+
 prepareXware:
 	mkdir -p preparedXware
 	cp xware/ETMDaemon           preparedXware/
@@ -62,6 +78,12 @@ prepareXware:
 	chrpath --delete preparedXware/EmbedThunderManager
 	chrpath --delete preparedXware/portal
 	chrpath --delete preparedXware/vod_httpserver
+
+replacePathFake:
+	mkdir -p build
+	touch build/xwared.service
+	touch build/xwared.conf
+	touch build/xwared.desktop
 
 replacePath:
 	mkdir -p build
