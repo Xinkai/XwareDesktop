@@ -79,6 +79,9 @@
     <addaction name="action_showAbout"/>
    </widget>
    <widget class="QMenu" name="menu_backend">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="title">
      <string>后端</string>
     </property>
