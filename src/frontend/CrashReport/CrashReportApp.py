@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.Qt import pyqtSlot, QDesktopServices, QUrl
+from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QDialog, QApplication
 from ui_crashreport import Ui_Dialog
 import os, sys
@@ -80,6 +81,10 @@ class CrashReportForm(QDialog, Ui_Dialog):
 class CrashReportApp(QApplication):
     def __init__(self, argv):
         super().__init__(argv)
+        font = QFont()
+        font.setPointSize(10)
+        self.setFont(font)
+
         self.form = CrashReportForm()
         if len(argv) > 1:
             payload = CrashReport.decodePayload(argv[1])
