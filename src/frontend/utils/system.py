@@ -5,7 +5,7 @@ from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
 
 import enum
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from itertools import groupby
 import os, subprocess, errno, sys
 
@@ -138,6 +138,7 @@ def viewOneFile(file: "str of file path"):
         systemOpen(os.path.dirname(file))
 
 
+@simplecache
 def getCurrentSessionId():
     if sys.platform == "win32":
         import ctypes
@@ -151,3 +152,26 @@ def getCurrentSessionId():
         return result.value
     else:
         raise NotImplementedError()
+
+Distro = namedtuple("Distro", ["id", "name", "version"])
+
+
+@simplecache
+def getDistro():
+    # Returns a (id, pretty_name, version_id) tuple
+    assert sys.platform == "linux"
+
+    try:
+        with open("/etc/os-release", encoding = "UTF-8") as f:
+            lines = f.read()
+
+        import shlex
+        parsed = shlex.split(lines)  # a list of "KEY=VALUE"
+        parsedDict = dict(map(lambda s: s.split("=", maxsplit = 1), parsed))
+        return Distro(id = parsedDict.get("ID", "Unknown"),
+                      name = parsedDict.get("PRETTY_NAME", parsedDict.get("NAME", "Unknown")),
+                      version = parsedDict.get("VERSION_ID", parsedDict.get("VERSION", "")))
+    except FileNotFoundError:
+        return Distro(id = "Unknown",
+                      name = "Unknown",
+                      version = "")
