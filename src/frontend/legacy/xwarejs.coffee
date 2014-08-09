@@ -86,9 +86,9 @@ class XwareJS
             tid = $(@).attr("data-tid")
             task = Data.task.all[tid]
 
-            $openDir = $("<li><a href='javascript:void(0)'>打开所在文件夹</a></li>")
+            $openDir = $("<li><a href='javascript:void(0)'>在文件夹中显示</a></li>")
             $openDir.on "click", () ->
-                xdpy.systemOpen(task.path)
+                xdpy.systemViewOneFile(task.path + task.name)
 
             $cmenu = $("div#cmenu.flo_wrap > ul.flo_ul")
             $cmenu.prepend($openDir)

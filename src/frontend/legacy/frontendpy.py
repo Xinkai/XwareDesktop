@@ -10,6 +10,7 @@ from PyQt5.QtGui import QKeyEvent, QDesktopServices
 import collections
 
 import constants
+from utils.system import systemOpen, viewOneFile
 
 FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logined", "online"])
 
@@ -161,9 +162,15 @@ class FrontendPy(QObject):
 
     @pyqtSlot(str)
     def systemOpen(self, url):
-        url = app.adapterManager[0].mountsFaker.convertToLocalPath(url)
-        qurl = QUrl.fromLocalFile(url)
-        QDesktopServices().openUrl(qurl)
+        adapter = app.adapterManager[0]
+        if adapter.mountsFaker:
+            systemOpen(adapter.mountsFaker.convertToLocalPath(url))
+
+    @pyqtSlot(str)
+    def systemViewOneFile(self, url):
+        adapter = app.adapterManager[0]
+        if adapter.mountsFaker:
+            viewOneFile(adapter.mountsFaker.convertToLocalPath(url))
 
     @pyqtSlot(str, str)
     def saveCredentials(self, username, password):

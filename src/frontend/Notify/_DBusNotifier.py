@@ -9,6 +9,7 @@ from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusArgument, QDBusMe
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtMultimedia import QSound
 
+from utils.system import systemOpen, viewOneFile
 
 _DBUS_NOTIFY_SERVICE = "org.freedesktop.Notifications"
 _DBUS_NOTIFY_PATH = "/org/freedesktop/Notifications"
@@ -66,7 +67,7 @@ class Notifier(QObject):
 
     def _dbus_notifyCompleted(self, task: "TaskItem"):
         if "actions" in self._capabilities:
-            actions = QDBusArgument(["open", "打开", "openDir", "打开文件夹"], QMetaType.QStringList)
+            actions = QDBusArgument(["open", "打开", "viewOneFile", "在文件夹中显示"], QMetaType.QStringList)
         else:
             actions = QDBusArgument([], QMetaType.QStringList)
 
@@ -106,16 +107,12 @@ class Notifier(QObject):
             return
 
         fullpath = taskItem.fullpath  # path + name
-        path = taskItem.path  # location
 
         if action == "open":
-            openPath = fullpath
-        elif action == "openDir":
-            openPath = path
+            return systemOpen(fullpath)
+        elif action == "viewOneFile":
+            return viewOneFile(fullpath)
         elif action == "default":  # Unity's notify osd always have a default action.
             return
         else:
             raise Exception("Unknown action from slotActionInvoked: {}.".format(action))
-
-        qUrl = QUrl.fromLocalFile(openPath)
-        QDesktopServices.openUrl(qUrl)
