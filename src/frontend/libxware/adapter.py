@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from launcher import app
 
 import asyncio, os, sys
@@ -12,7 +13,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
 import constants
 from utils.misc import tryRemove, trySymlink, tryMkdir
 from utils.system import getInitType, InitType
-from .vanilla import TaskClass, XwareClient, Settings
+from .vanilla import TaskClass, XwareClient, Settings, CLIENT_NONFATAL_ERROR
 from .map import Tasks
 from .daemon import callXwared
 
@@ -191,12 +192,13 @@ class XwareAdapter(QObject):
         if name.startswith("get_") or name.startswith("post_"):
             def method(*args):
                 clientMethod = getattr(self._xwareClient, name)
-                clientMethod = asyncio.async(clientMethod(*args))
-
-                donecb = getattr(self, "_donecb_" + name, None)
-                if donecb:
-                    curried = partial(donecb, *args)
-                    clientMethod.add_done_callback(curried)
+                coro = clientMethod(*args)
+                assert asyncio.iscoroutine(coro)
+                future = asyncio.async(coro)
+                cb = getattr(self, "_donecb_" + name, None)
+                if cb:
+                    cb = partial(cb, *args)
+                future.add_done_callback(cb)
             setattr(self, name, method)
             return method
         elif name.startswith("daemon_"):
@@ -214,23 +216,35 @@ class XwareAdapter(QObject):
         return self._sysInfo
 
     def _donecb_get_getsysinfo(self, future):
-        result = future.result()
-        self._sysInfo = result
+        exception = future.exception()
+        if not exception:
+            result = future.result()
+            self._sysInfo = result
+        else:
+            logging.error("get_getsysinfo failed.")
 
     def _donecb_get_list(self, klass, future):
-        result = future.result()
+        exception = future.exception()
+        if not exception:
+            result = future.result()
 
-        if klass == TaskClass.RUNNING:
-            self._ulSpeed = result["upSpeed"]
-            self._dlSpeed = result["dlSpeed"]
-            self._runningTaskCount = result["dlNum"]
-            app.adapterManager.summaryUpdated.emit()
-        mapId = self._mapIds[int(klass)]
-        self.update.emit(mapId, result["tasks"])
+            if klass == TaskClass.RUNNING:
+                self._ulSpeed = result["upSpeed"]
+                self._dlSpeed = result["dlSpeed"]
+                self._runningTaskCount = result["dlNum"]
+                app.adapterManager.summaryUpdated.emit()
+            mapId = self._mapIds[int(klass)]
+            self.update.emit(mapId, result["tasks"])
+        else:
+            logging.error("get_list failed.")
 
     def _donecb_get_settings(self, future):
-        result = future.result()
-        self._xwareSettings.update(result)
+        exception = future.exception()
+        if not exception:
+            result = future.result()
+            self._xwareSettings.update(result)
+        else:
+            logging.error("get_settings failed.")
 
     def do_pauseTasks(self, tasks, options):
         taskIds = map(lambda t: t.realid, tasks)
