@@ -40,7 +40,7 @@ pyqt:
 	$(pyuic5) -o src/frontend/legacy/ui_settings.py src/frontend/ui/settings.ui
 	$(pyuic5) -o src/frontend/legacy/ui_about.py    src/frontend/ui/about.ui
 	$(pyuic5) -o src/frontend/legacy/ui_scheduler.py  src/frontend/ui/scheduler.ui
-	$(pyuic5) -o src/frontend/legacy/ui_quickspeedlimit.py  src/frontend/ui/quickspeedlimit.ui
+	$(pyuic5) -o src/frontend/Settings/ui_quickspeedlimit.py  src/frontend/ui/quickspeedlimit.ui
 	$(pyuic5) -o src/frontend/CrashReport/ui_crashreport.py  src/frontend/ui/crashreport.ui
 	$(pyuic5) -o src/frontend/Widgets/ui_monitor.py  src/frontend/ui/monitor.ui
 	$(pyuic5) -o src/frontend/Widgets/ui_taskproperty.py  src/frontend/ui/taskproperty.ui

@@ -7,7 +7,7 @@ from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget, QWidgetAction
 
 from legacy.CustomStatusBar.CStatusButton import CustomStatusBarToolButton
-from legacy.ui_quickspeedlimit import Ui_Form_quickSpeedLimit
+from .ui_quickspeedlimit import Ui_Form_quickSpeedLimit
 from .menu import SettingMenu
 
 
