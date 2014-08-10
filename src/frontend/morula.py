@@ -9,7 +9,7 @@ from PyQt5.QtCore import QUrl, QSize
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtGui import QGuiApplication
 
-from Widgets import CustomQuickView
+from Widgets.QuickView import CustomQuickView
 
 import constants
 
