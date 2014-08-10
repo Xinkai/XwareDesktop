@@ -200,7 +200,7 @@ class FrontendPy(QObject):
 
     @pyqtSlot()
     def consumeAction(self, reason):
-        print("Try to consume, because {}.".format(reason))
+        logging.info("Try to consume, because {}.".format(reason))
         if not self.isPageOnline:
             return
 
