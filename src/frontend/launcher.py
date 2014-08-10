@@ -29,7 +29,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont
 
-from shared import __version__
+from shared import __version__, DATE
 
 import constants
 __all__ = ['app']
@@ -89,13 +89,22 @@ class XwareDesktop(QApplication):
 
         self.applySettings.emit()
 
+        upgradeGuide = None
         if self.settings.get("internal", "previousversion") == "0.8":
             # upgraded or fresh installed
+            upgradeGuide = "https://github.com/Xinkai/XwareDesktop/wiki/使用说明"
+        else:
+            previousdate = self.settings.getfloat("internal", "previousdate")
+            if previousdate == 0:  # upgrade from pre-0.12
+                upgradeGuide = "https://github.com/Xinkai/XwareDesktop/wiki/升级到0.12"
+
+        if upgradeGuide:
             from PyQt5.QtCore import QUrl
             from PyQt5.QtGui import QDesktopServices
-            QDesktopServices.openUrl(QUrl("https://github.com/Xinkai/XwareDesktop/wiki/使用说明"))
+            QDesktopServices.openUrl(QUrl(upgradeGuide))
 
         self.settings.set("internal", "previousversion", __version__)
+        self.settings.setfloat("internal", "previousdate", DATE)
 
     @staticmethod
     def checkOneInstance():

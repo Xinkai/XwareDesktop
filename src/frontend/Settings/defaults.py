@@ -70,5 +70,6 @@ DEFAULT_SETTINGS = {
         "mainwindowgeometry": None,
         "monitorwindowgeometry": None,
         "previousversion": "0.8",
+        "previousdate": 0,
     },
 }

@@ -25,6 +25,10 @@ class ProxyAddons(object):
         assert type(value) is int
         self.set(section, key, str(value))
 
+    def setfloat(self, section, key, value):
+        assert type(value) in (int, float)
+        self.set(section, key, str(value))
+
     def getbool(self, section, key):
         return True if self.get(section, key) in ("1", True) else False
 
@@ -95,6 +99,9 @@ class SettingsAccessorBase(configparser.ConfigParser):
     def getint(self, section, key, *args, **kwargs):
         # override this, because super() version doesn't call overridden get()
         return int(self.get(section, key, *args, **kwargs))
+
+    def getfloat(self, section, key, *args, **kwargs):
+        return float(self.get(section, key, *args, **kwargs))
 
     def getboolean(self, *args, **kwargs):
         raise NotImplementedError("use getbool")
