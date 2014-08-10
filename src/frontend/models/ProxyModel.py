@@ -2,7 +2,11 @@
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QModelIndex, QSortFilterProxyModel, Qt, Q_ENUMS, \
     pyqtProperty
-from PyQt5.QtQml import qmlRegisterUncreatableType
+
+try:  # TODO: when QML ships ,remove this!
+    from PyQt5.QtQml import qmlRegisterUncreatableType
+except ImportError:
+    qmlRegisterUncreatableType = None
 
 from utils.misc import dropPy34Enum
 from .TaskModel import CreationTimeRole, TaskClass, TaskClassRole
@@ -114,5 +118,6 @@ class ProxyModel(QSortFilterProxyModel):
     # See # 97
     Q_ENUMS(dropPy34Enum(TaskClass))
 
-qmlRegisterUncreatableType(ProxyModel, 'TaskModel', 1, 0, 'TaskModel',
-                           "TaskModel cannot be created.")
+if qmlRegisterUncreatableType:
+    qmlRegisterUncreatableType(ProxyModel, 'TaskModel', 1, 0, 'TaskModel',
+                               "TaskModel cannot be created.")
