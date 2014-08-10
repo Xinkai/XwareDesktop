@@ -4,8 +4,8 @@ import logging
 from launcher import app
 
 from PyQt5.QtWidgets import QMessageBox
-from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QUrl, QVariant, QEvent
-from PyQt5.QtGui import QKeyEvent, QDesktopServices
+from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QVariant, QEvent
+from PyQt5.QtGui import QKeyEvent
 
 import collections
 
