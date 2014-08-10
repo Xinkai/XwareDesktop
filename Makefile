@@ -1,7 +1,7 @@
 CC            = gcc
 FLAGS         = -Wall -O3
 PREFIX        = /opt/xware-desktop
-GITHASH       = "`git rev-parse master 2>/dev/null`"
+GITHASH       = "`git rev-parse HEAD 2>/dev/null`"
 SHELL         = /bin/bash
 
 UNAME_O      := $(shell uname -o)
