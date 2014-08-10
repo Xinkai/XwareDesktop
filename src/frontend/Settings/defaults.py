@@ -69,6 +69,7 @@ DEFAULT_SETTINGS = {
     "internal": {
         "mainwindowgeometry": None,
         "monitorwindowgeometry": None,
+        "schedulerdialoggeometry": None,
         "previousversion": "0.8",
         "previousdate": 0,
     },

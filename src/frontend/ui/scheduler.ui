@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
+ <class>SchedulerDialog</class>
+ <widget class="QDialog" name="SchedulerDialog">
   <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
@@ -127,7 +127,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>SchedulerDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -143,7 +143,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>Dialog</receiver>
+   <receiver>SchedulerDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

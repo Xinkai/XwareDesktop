@@ -6,15 +6,17 @@ from launcher import app
 from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtWidgets import QDialog
 
-from legacy.ui_scheduler import Ui_Dialog
+from PersistentGeometry import PersistentGeometry
+from .ui_scheduler import Ui_SchedulerDialog
 from Schedule import ActWhen, Action
 
 
-class SchedulerWindow(QDialog, Ui_Dialog):
+class SchedulerWindow(QDialog, Ui_SchedulerDialog, PersistentGeometry):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setupUi(self)
         self.setAttribute(Qt.WA_DeleteOnClose)
+        self.preserveGeometry()
 
         # actWhen ComboBox
         for row, actWhen in enumerate(ActWhen.__members__.values()):
