@@ -64,6 +64,10 @@ class FallbackSectionProxy(MutableMapping):
             return partial(parserMember, self._name)
         raise AttributeError("Cannot find {}".format(item))
 
+    @property
+    def name(self):
+        return self._name
+
     # Implement Abstract Members
     def __iter__(self):
         raise NotImplementedError()
