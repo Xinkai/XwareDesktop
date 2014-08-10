@@ -3,6 +3,7 @@
 
 import os, sys
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../shared/thirdparty"))
 
 from PyQt5.QtCore import QUrl, QSize
 from PyQt5.QtQuick import QQuickView
