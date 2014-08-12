@@ -97,11 +97,22 @@ ZeroDivisionError: division by zero""",
             }
         self.form.setPayload(payload)
         self.form.show()
+        self.aboutToQuit.connect(self.cleanUp)
+
+    @pyqtSlot()
+    def cleanUp(self):
+        del self.form
 
 if __name__ == "__main__":
     app = CrashReportApp(sys.argv)
-    code = app.exec()
-    for w in QApplication.topLevelWindows():
-        del w
-    del app
-    sys.exit(code)
+
+    def safeExec(app_):
+        code = app_.exec()
+        windows = app_.topLevelWindows()
+        if windows:
+            raise RuntimeError("Windows left: {}"
+                               .format(list(map(lambda win: win.objectName(),
+                                                windows))))
+        del app_
+        sys.exit(code)
+    safeExec(app)

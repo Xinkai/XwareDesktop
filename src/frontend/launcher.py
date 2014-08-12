@@ -236,10 +236,16 @@ if __name__ == "__main__":
     from shared.profile import profileBootstrap
     profileBootstrap(constants.PROFILE_DIR)
     app = XwareDesktop(sys.argv)
-    code = app.exec()
-    for w in QApplication.topLevelWindows():
-        del w
-    del app
-    sys.exit(code)
+
+    def safeExec(app_):
+        code = app_.exec()
+        windows = app_.topLevelWindows()
+        if windows:
+            raise RuntimeError("Windows left: {}"
+                               .format(list(map(lambda win: win.objectName(),
+                                                windows))))
+        del app_
+        sys.exit(code)
+    safeExec(app)
 else:
     app = QApplication.instance()
