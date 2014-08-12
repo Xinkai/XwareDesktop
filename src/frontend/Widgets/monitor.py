@@ -71,4 +71,5 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
 
     @pyqtSlot()
     def teardown(self):
-        self.destroy()
+        self._contextMenu.deleteLater()
+        self.deleteLater()
