@@ -7,7 +7,7 @@ from PyQt5.QtGui import QDesktopServices
 import enum
 from collections import defaultdict, namedtuple
 from itertools import groupby
-import os, subprocess, errno, sys
+import os, subprocess, sys
 
 from .decorators import simplecache
 
