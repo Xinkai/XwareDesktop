@@ -100,4 +100,8 @@ ZeroDivisionError: division by zero""",
 
 if __name__ == "__main__":
     app = CrashReportApp(sys.argv)
-    sys.exit(app.exec())
+    code = app.exec()
+    for w in QApplication.topLevelWindows():
+        del w
+    del app
+    sys.exit(code)

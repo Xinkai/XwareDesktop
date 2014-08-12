@@ -80,4 +80,8 @@ if __name__ == "__main__":
     from PyQt5.QtCore import qInstallMessageHandler
     qInstallMessageHandler(installQtMsgHandler)
     app = DummyApp(sys.argv)
-    sys.exit(app.exec())
+    code = app.exec()
+    for w in QGuiApplication.topLevelWindows():
+        del w
+    del app
+    sys.exit(code)
