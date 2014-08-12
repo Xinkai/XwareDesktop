@@ -24,30 +24,39 @@ class InitType(enum.Enum):
 @simplecache
 def getInitType():
     if sys.platform == "linux":
-        with subprocess.Popen(["init", "--version"], stdout = subprocess.PIPE) as proc:
-            initVersion = str(proc.stdout.read())
+        # try read /proc/1/stat
+        with open("/proc/1/stat") as f:
+            pid1Name = f.read().split(" ")[1]  # 2nd item
+            if pid1Name == "(systemd)":
+                return InitType.SYSTEMD
 
-        if "systemd" in initVersion:
-            return InitType.SYSTEMD
-        elif "upstart" in initVersion:
-            if "UPSTART_SESSION" in os.environ:
-                return InitType.UPSTART
-            else:
-                return InitType.UPSTART_WITHOUT_USER_SESSION
-        else:
-            # On Fedora "init --version" gives an error
-            # Use an alternative method
-            try:
-                realInitPath = os.readlink("/usr/sbin/init")
-                if realInitPath.endswith("systemd"):
-                    return InitType.SYSTEMD
-            except FileNotFoundError:
-                pass
-            except OSError as e:
-                if e.errno == errno.EINVAL:
-                    pass  # Not a symlink
+        # try read keyword in "init --version"
+        try:
+            with subprocess.Popen(["init", "--version"], stdout = subprocess.PIPE) as proc:
+                initVersion = str(proc.stdout.read())
+        except FileNotFoundError:
+            initVersion = None
+        if initVersion:
+            if "systemd" in initVersion:
+                return InitType.SYSTEMD
+            elif "upstart" in initVersion:
+                if "UPSTART_SESSION" in os.environ:
+                    return InitType.UPSTART
                 else:
-                    raise e  # rethrow
+                    return InitType.UPSTART_WITHOUT_USER_SESSION
+
+        # try resolve symlink
+        for path in ("/usr/sbin/init", "/sbin/init"):
+            try:
+                realInitPath = os.readlink(path)
+            except FileNotFoundError:
+                realInitPath = ""
+
+            if realInitPath.endswith("systemd"):
+                return InitType.SYSTEMD
+
+        # tried everything
+        return InitType.UNKNOWN
 
     elif sys.platform == "win32":
         return InitType.WINDOWS
