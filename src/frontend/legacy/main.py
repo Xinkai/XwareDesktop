@@ -23,6 +23,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.setupUi(self)
         self.connectUI()
         self.preserveGeometry()
+        app.aboutToQuit.connect(self.teardown)
 
     def connectUI(self):
         # connect UI related signal/slot
@@ -92,3 +93,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
             self.restore()
         else:
             self.minimize()
+
+    @pyqtSlot()
+    def teardown(self):
+        self.deleteLater()
