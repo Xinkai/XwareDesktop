@@ -145,6 +145,7 @@ class Aria2Adapter(QObject):
         while True:
             if not self._ready():
                 yield from asyncio.sleep(1)  # try again in 1 sec
+                continue
 
             msg = yield from self._ws.recv()
             if not msg:
