@@ -3,32 +3,28 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import pyqtSlot, QObject, pyqtSignal
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon
 
 from .contextmenu import ContextMenu
 
 
-class Systray(QObject):
+class Systray(QSystemTrayIcon):
     toggleMinimized = pyqtSignal()
 
-    def __init__(self, parent):
+    def __init__(self, parent = None):
         super().__init__(parent)
-
-        self.trayIconMenu = ContextMenu(None)
-
         icon = QIcon.fromTheme("xware-desktop")
-
-        self.trayIcon = QSystemTrayIcon(self)
-        self.trayIcon.setIcon(icon)
-        self.trayIcon.setContextMenu(self.trayIconMenu)
-        self.trayIcon.setVisible(True)
-
-        self.trayIcon.activated.connect(self.slotSystrayActivated)
+        self.setIcon(icon)
+        self.trayIconMenu = ContextMenu(None)
+        self.setContextMenu(self.trayIconMenu)
+        self.setVisible(True)
+        self.activated.connect(self.slotActivated)
+        app.aboutToQuit.connect(self.teardown)
 
     @pyqtSlot(QSystemTrayIcon.ActivationReason)
-    def slotSystrayActivated(self, reason):
+    def slotActivated(self, reason):
         if reason == QSystemTrayIcon.Context:  # right
             pass
         elif reason == QSystemTrayIcon.MiddleClick:  # middle
@@ -37,3 +33,7 @@ class Systray(QObject):
             pass
         elif reason == QSystemTrayIcon.Trigger:  # left
             self.toggleMinimized.emit()
+
+    @pyqtSlot()
+    def teardown(self):
+        self.deleteLater()
