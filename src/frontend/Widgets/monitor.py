@@ -36,6 +36,7 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
         self._timer.timeout.connect(self.advance)
         self._timer.start(self.TICK_INTERVAL)
         self._taskIterator = self._runningTasksIterator()
+        app.aboutToQuit.connect(self.teardown)
 
     @pyqtSlot()
     def advance(self):
@@ -63,3 +64,11 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
     @pyqtSlot(QPoint)
     def showContextMenu(self, qPoint):
         self._contextMenu.exec(self.mapToGlobal(qPoint))
+
+    def closeEvent(self, QCloseEvent):
+        app.aboutToQuit.disconnect(self.teardown)
+        self.teardown()
+
+    @pyqtSlot()
+    def teardown(self):
+        self.destroy()
