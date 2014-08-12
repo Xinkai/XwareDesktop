@@ -43,6 +43,7 @@ class XwareDesktop(QApplication):
     def __init__(self, *args):
         super().__init__(*args)
         logging.info("XWARE DESKTOP STARTS")
+        self.ensureNonRoot()
         self.setApplicationName("XwareDesktop")
         self.setApplicationVersion(__version__)
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -106,6 +107,12 @@ class XwareDesktop(QApplication):
 
         self.settings.set("internal", "previousversion", __version__)
         self.settings.setfloat("internal", "previousdate", DATE)
+
+    @staticmethod
+    def ensureNonRoot():
+        if sys.platform == "linux":
+            if os.getuid() == 0:
+                print("拒绝以root执行。", file = sys.stderr)
 
     @staticmethod
     def checkOneInstance():
