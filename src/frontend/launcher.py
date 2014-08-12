@@ -244,6 +244,11 @@ if __name__ == "__main__":
             raise RuntimeError("Windows left: {}"
                                .format(list(map(lambda win: win.objectName(),
                                                 windows))))
+        widgets = app_.topLevelWidgets()
+        if widgets:
+            raise RuntimeError("Widgets left: {}"
+                               .format(list(map(lambda wid: wid.objectName(),
+                                                widgets))))
         del app_
         sys.exit(code)
     safeExec(app)

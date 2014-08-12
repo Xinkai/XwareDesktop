@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.Qt import pyqtSlot, QDesktopServices, QUrl
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QDialog, QApplication
 from ui_crashreport import Ui_Dialog
@@ -23,6 +24,7 @@ class CrashReportForm(QDialog, Ui_Dialog):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.setupUi(self)
+        self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.pushButton_github.clicked.connect(self.reportToGithub)
         self.pushButton_close.clicked.connect(self.reportToNone)
@@ -97,11 +99,7 @@ ZeroDivisionError: division by zero""",
             }
         self.form.setPayload(payload)
         self.form.show()
-        self.aboutToQuit.connect(self.cleanUp)
 
-    @pyqtSlot()
-    def cleanUp(self):
-        del self.form
 
 if __name__ == "__main__":
     app = CrashReportApp(sys.argv)
@@ -113,6 +111,11 @@ if __name__ == "__main__":
             raise RuntimeError("Windows left: {}"
                                .format(list(map(lambda win: win.objectName(),
                                                 windows))))
+        widgets = app_.topLevelWidgets()
+        if widgets:
+            raise RuntimeError("Widgets left: {}"
+                               .format(list(map(lambda wid: wid.objectName(),
+                                                widgets))))
         del app_
         sys.exit(code)
     safeExec(app)
