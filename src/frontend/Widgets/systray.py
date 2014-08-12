@@ -36,4 +36,5 @@ class Systray(QSystemTrayIcon):
 
     @pyqtSlot()
     def teardown(self):
+        self.trayIconMenu.deleteLater()
         self.deleteLater()
