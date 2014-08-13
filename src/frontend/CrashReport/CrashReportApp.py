@@ -3,7 +3,7 @@
 
 from PyQt5.Qt import pyqtSlot, QDesktopServices, QUrl
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QDialog, QApplication
 from ui_crashreport import Ui_Dialog
 import os, sys
@@ -87,6 +87,7 @@ class CrashReportApp(QApplication):
         font.setPointSize(10)
         self.setFont(font)
 
+        QIcon.setThemeName("")  # fix #102
         self.form = CrashReportForm()
         if len(argv) > 1:
             payload = CrashReport.decodePayload(argv[1])
