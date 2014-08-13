@@ -98,7 +98,10 @@ class SettingsAccessorBase(configparser.ConfigParser):
         assert not kwargs
         # override this, because we use fallback map
         key = key.lower()
-        return super().get(section, key, fallback = self._defaultDict[section][key])
+        try:
+            return super().get(section, key)
+        except (configparser.NoOptionError, configparser.NoSectionError):
+            return self._defaultDict[section][key]
 
     def getint(self, section, key, *args, **kwargs):
         # override this, because super() version doesn't call overridden get()
