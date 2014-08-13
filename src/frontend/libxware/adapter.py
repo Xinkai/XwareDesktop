@@ -25,6 +25,7 @@ class XwareSettings(QObject):
 
     def __init__(self, parent):
         super().__init__(parent)
+        self.initialized = False
         self._settings = None
 
     @pyqtProperty(int, notify = updated)
@@ -61,10 +62,12 @@ class XwareSettings(QObject):
 
     def update(self, settings: Settings):
         self._settings = settings
+        self.initialized = True
         self.updated.emit()
 
 
 class XwareAdapter(QObject):
+    initialized = pyqtSignal()
     update = pyqtSignal(int, list)
     infoUpdated = pyqtSignal()  # daemon infoPolled
 
@@ -132,7 +135,7 @@ class XwareAdapter(QObject):
         asyncio.async(self.main())
         self._loop.run_forever()
 
-    @property
+    @pyqtProperty(str, notify = initialized)
     def namespace(self):
         return "xware-" + self._adapterConfig.name[len("adapter-"):]
 
@@ -181,7 +184,8 @@ class XwareAdapter(QObject):
             self._loop.call_soon(self.get_list, TaskClass.COMPLETED)
             self._loop.call_soon(self.get_list, TaskClass.RECYCLED)
             self._loop.call_soon(self.get_list, TaskClass.FAILED_ON_SUBMISSION)
-            self._loop.call_soon(self.get_settings)
+            if not self._xwareSettings.initialized:
+                self._loop.call_soon(self.get_settings)
             if self.useXwared:
                 self._loop.call_soon(self.daemon_infoPoll)
             yield from asyncio.sleep(_POLLING_INTERVAL)
@@ -243,7 +247,10 @@ class XwareAdapter(QObject):
             result = future.result()
             self._xwareSettings.update(result)
         else:
-            logging.error("get_settings failed.")
+            logging.error("get/post settings failed.")
+
+    def _donecb_post_settings(self, _: "new settings", future):
+        return self._donecb_get_settings(future)
 
     def do_pauseTasks(self, tasks, options):
         taskIds = map(lambda t: t.realid, tasks)
