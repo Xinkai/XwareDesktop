@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 #  -*- coding: utf-8 -*-
 
+import logging
 import asyncio
 import json
 from shared import XwaredSocketError
@@ -15,7 +16,30 @@ class XwaredClient(asyncio.Protocol):
         self._data += data
 
     def eof_received(self):
-        data = json.loads(self._data.decode("utf-8"))
+        try:
+            decoded = self._data.decode("utf-8")
+        except UnicodeDecodeError:
+            logging.error("XwaredClient cannot decode {}".format(self._data))
+            return self.donecb({
+                "error": XwaredSocketError.CLIENT_DECODE,
+                "result": None,
+            })
+
+        try:
+            data = json.loads(decoded)
+        except ValueError:
+            logging.error("XwaredClient cannot load {} as a json object".format(decoded))
+            # seen on openSUSE 13.1 (python 3.3)
+            # Python 3.3's json module doesn't know about IntEnum yet
+            # So the incoming data contains string instead of int
+            # If you need Python 3.3, please patch daemon/xwared.py yourself
+            # XwaredServer._response, add the following line to cast IntEnum to int.
+            # `response["error"] = int(response["error"])`
+            return self.donecb({
+                "error": XwaredSocketError.CLIENT_JSON_LOAD,
+                "result": None,
+            })
+
         self.donecb(data)
 
     @staticmethod
