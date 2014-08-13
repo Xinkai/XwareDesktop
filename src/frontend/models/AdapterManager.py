@@ -28,9 +28,9 @@ class AdapterManager(QObject):
     def _registerAdapter(self, adapter):
         ns = adapter.namespace
         assert ns not in self._adapters
-        adapter.update.connect(app.taskModel.taskManager.updateMap,
-                               Qt.DirectConnection)
         self._adapters[ns] = adapter
+        for map_ in adapter.maps:
+            app.taskModel.taskManager.appendMap(map_)
 
     @pyqtSlot(str, result = "QVariant")
     def adapter(self, ns):
@@ -50,5 +50,6 @@ class AdapterManager(QObject):
             from libxware import XwareAdapter
             adapter = XwareAdapter(adapterConfig, parent = self)
             self._registerAdapter(adapter)
+            adapter.start()
         else:
             raise NotImplementedError()

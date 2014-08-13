@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# -*- coding: utf-8 -*-
-
-import asyncio
 import collections
 from functools import partial
 from itertools import islice
@@ -105,9 +102,6 @@ class TaskManager(collections.MutableMapping):
 
         self._mapNamespaces[namespace].append(mapId)
         return mapId
-
-    def updateMap(self, mapId, updating):
-        self._maps[mapId].updateData(updating)
 
     def beforeInsert(self, mapId, key) -> {False: "deferred",
                                            True: "goahead",

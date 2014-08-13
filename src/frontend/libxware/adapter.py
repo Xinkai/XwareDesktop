@@ -68,7 +68,6 @@ class XwareSettings(QObject):
 
 class XwareAdapter(QObject):
     initialized = pyqtSignal()
-    update = pyqtSignal(int, list)
     infoUpdated = pyqtSignal()  # daemon infoPolled
 
     def __init__(self, adapterConfig, parent = None):
@@ -93,15 +92,12 @@ class XwareAdapter(QObject):
         self.xwaredSocket = None
         self.mountsFaker = None
 
-        runningId = app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskClass.RUNNING))
-        completedId = app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskClass.COMPLETED))
-        recycledId = app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskClass.RECYCLED))
-        failedOnSubmissionId = app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskClass.FAILED_ON_SUBMISSION))
-        self._mapIds = (runningId, completedId, recycledId, failedOnSubmissionId)
+        self.maps = (
+            Tasks(self, TaskClass.RUNNING),
+            Tasks(self, TaskClass.COMPLETED),
+            Tasks(self, TaskClass.RECYCLED),
+            Tasks(self, TaskClass.FAILED_ON_SUBMISSION),
+        )
 
         self.useXwared = False
         self.isLocal = False
@@ -131,6 +127,8 @@ class XwareAdapter(QObject):
                                              target = self._startEventLoop,
                                              args = (_clientInitOptions,),
                                              name = adapterConfig.name)
+
+    def start(self):
         self._loop_thread.start()
 
     def _startEventLoop(self, clientInitOptions = None):
@@ -242,8 +240,7 @@ class XwareAdapter(QObject):
                 self._dlSpeed = result["dlSpeed"]
                 self._runningTaskCount = result["dlNum"]
                 app.adapterManager.summaryUpdated.emit()
-            mapId = self._mapIds[int(klass)]
-            self.update.emit(mapId, result["tasks"])
+            self.maps[klass].updateData(result["tasks"])
         else:
             logging.error("get_list failed.")
 
