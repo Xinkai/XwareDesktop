@@ -51,5 +51,10 @@ class AdapterManager(QObject):
             adapter = XwareAdapter(adapterConfig, parent = self)
             self._registerAdapter(adapter)
             adapter.start()
+        elif adapterConfig["type"] == "aria2":
+            from libaria2 import Aria2Adapter
+            adapter = Aria2Adapter(adapterConfig, parent = self)
+            self._registerAdapter(adapter)
+            adapter.start()
         else:
             raise NotImplementedError()

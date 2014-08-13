@@ -54,6 +54,7 @@ class _Callable(dict):
 
 class Aria2Adapter(QObject):
     initialized = pyqtSignal()
+    statPolled = pyqtSignal()
 
     def __init__(self, adapterConfig = None, parent = None):
         super().__init__(parent)
@@ -65,12 +66,23 @@ class Aria2Adapter(QObject):
             TaskMap(self, Aria2TaskClass.Waiting),
             TaskMap(self, Aria2TaskClass.Stopped),
         )
+
+        # Stats
+        self._ulSpeed = 0
+        self._dlSpeed = 0
+        self._activeCount = 0
+        self._waitingCount = 0
+        self._stoppedCount = 0
+        self._stoppedTotalCount = 0
+
         self._ids = {}
         self._loop = None
         self._loop_executor = None
         self._loop_thread = threading.Thread(daemon = True,
                                              target = self._startEventLoop,
                                              name = adapterConfig.name)
+
+    def start(self):
         self._loop_thread.start()
 
     def _startEventLoop(self):
@@ -94,14 +106,6 @@ class Aria2Adapter(QObject):
     def namespace(self):
         return "aria2-" + self._adapterConfig.name[len("adapter-"):]
 
-    @property
-    def dlSpeed(self):
-        return 10000000
-
-    @property
-    def ulSpeed(self):
-        return 10000000
-
     @asyncio.coroutine
     def main(self):
         asyncio.async(self._getMessage())  # It can handle reconnect
@@ -118,6 +122,7 @@ class Aria2Adapter(QObject):
                 if not self._ready():
                     break
 
+                asyncio.async(self._call(_Callable(Aria2Method.GetGlobalStat)))
                 asyncio.async(self._call(_Callable(Aria2Method.TellActive)))
                 asyncio.async(self._call(_Callable(Aria2Method.TellWaiting, 0, 100000)))
                 asyncio.async(self._call(_Callable(Aria2Method.TellStopped, 0, 100000)))
@@ -178,5 +183,41 @@ class Aria2Adapter(QObject):
         self.maps[Aria2TaskClass.Stopped].updateData(result)
 
     @asyncio.coroutine
-    def _cb_onDownloadComplete(self, result):
-        print("_cb_onDownloadComplete", result)
+    def _cb_onDownloadStart(self, event):
+        print("_cb_onDownloadComplete", event)
+
+    @asyncio.coroutine
+    def _cb_onDownloadPause(self, event):
+        print("_cb_onDownloadPause", event)
+
+    @asyncio.coroutine
+    def _cb_onDownloadStop(self, event):
+        print("_cb_onDownloadStop", event)
+
+    @asyncio.coroutine
+    def _cb_onDownloadComplete(self, event):
+        print("_cb_onDownloadComplete", event)
+
+    @asyncio.coroutine
+    def _cb_onDownloadError(self, event):
+        print("_cb_onDownloadError", event)
+
+    @asyncio.coroutine
+    def _cb_onBtDownloadComplete(self, event):
+        print("_cb_onBtDownloadComplete", event)
+
+    # Stats
+    @pyqtProperty(int, notify = statPolled)
+    def dlSpeed(self):
+        return self._dlSpeed
+
+    @pyqtProperty(int, notify = statPolled)
+    def ulSpeed(self):
+        return self._ulSpeed
+
+    @asyncio.coroutine
+    def _cb_getGlobalStat(self, result):
+        self._dlSpeed = int(result["downloadSpeed"])
+        self._ulSpeed = int(result["uploadSpeed"])
+        # TODO: waiting, stopped, stoppedtotal, active
+        self.statPolled.emit()
