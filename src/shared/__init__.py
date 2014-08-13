@@ -7,7 +7,7 @@ __version__ = "0.12"
 
 XWARE_VERSION = "1.0.27"
 
-DATE = 20140809
+DATE = 20140813
 
 
 @unique
