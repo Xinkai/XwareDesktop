@@ -27,6 +27,7 @@ class Aria2TaskItem(QObject):
         self._speeds = [0] * _SPEED_SAMPLE_COUNT
         self._path = None
         self._files = []
+        self._bittorrent = None
 
         self.moveToThread(self._adapter.thread())
         self.setParent(self._adapter)
@@ -75,6 +76,10 @@ class Aria2TaskItem(QObject):
     def completionTime(self):
         return 0  # TODO: Aria2 doesn't provide this information
 
+    @pyqtProperty(int, notify = updated)
+    def remainingTime(self):
+        return 0  # TODO
+
     @pyqtProperty(str, notify = initialized)
     def path(self):
         return self._path
@@ -90,6 +95,9 @@ class Aria2TaskItem(QObject):
     def name(self):
         if not self._files:
             return "ERROR"
+
+        if self._bittorrent:
+            return self._bittorrent["info"]["name"]
 
         if len(self._files) == 1:
             return os.path.basename(self._files[0]["path"])
@@ -108,6 +116,7 @@ class Aria2TaskItem(QObject):
         self._status = data["status"]
         self._ulsize = int(data.get("uploadLength"))
         self._dlsize = int(data.get("completedLength"))
+        self._bittorrent = data.get("bittorrent")
 
         if not self._initialized:
             self._gid = data.get("gid")

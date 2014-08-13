@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from launcher import app
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, Qt, pyqtSlot
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, Qt, pyqtSlot, QTimer
 
 from collections import OrderedDict
 
@@ -12,6 +12,9 @@ class AdapterManager(QObject):
     def __init__(self, parent = None):
         super().__init__(parent)
         self._adapters = OrderedDict()
+        self._timer = QTimer(self)
+        self._timer.timeout.connect(lambda: self.summaryUpdated.emit())
+        self._timer.start(1000)
 
     @pyqtProperty(int, notify = summaryUpdated)
     def ulSpeed(self):
@@ -42,8 +45,7 @@ class AdapterManager(QObject):
 
     def __getitem__(self, item):
         assert item == 0
-        index = list(self._adapters.keys())
-        return self._adapters[index[0]]
+        return self._adapters["xware-legacy"]
 
     def loadAdapter(self, adapterConfig):
         if adapterConfig["type"] == "xware":

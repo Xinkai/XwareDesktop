@@ -215,6 +215,10 @@ class Aria2Adapter(QObject):
     def ulSpeed(self):
         return self._ulSpeed
 
+    @pyqtProperty(int, notify = statPolled)
+    def runningTaskCount(self):
+        return 0  # TODO
+
     @asyncio.coroutine
     def _cb_getGlobalStat(self, result):
         self._dlSpeed = int(result["downloadSpeed"])
