@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QIcon
 
 from shared import __version__, DATE
 
@@ -56,6 +56,8 @@ class XwareDesktop(QApplication):
         font = QFont()
         font.setPointSize(10)
         self.setFont(font)
+
+        QIcon.setThemeName("")  # A magical fix for #102
 
         from Settings import DEFAULT_SETTINGS
         from shared.config import SettingsAccessorBase
