@@ -16,7 +16,7 @@ class UrlExtractor(QObject):
         super().__init__(parent)
 
         if app:
-            app.settings.applySettings.connect(self.slotSettingsChanged)
+            app.applySettings.connect(self.slotSettingsChanged)
         else:
             pass  # unittest
 

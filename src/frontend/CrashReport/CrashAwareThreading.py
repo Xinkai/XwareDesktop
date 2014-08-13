@@ -7,7 +7,7 @@
 # For the Main thread, just call installCrashReport()
 # For other non-running-yet threads, just call installThreadExceptionHandler()
 
-import threading, traceback, sys, os
+import threading, traceback, sys, os, asyncio
 from CrashReport import CrashReport
 
 
@@ -19,7 +19,6 @@ class _PatchedThread(threading.Thread):
 
     def new_run(self):
         try:
-            # super().run()
             self._unpatched_run()
         except KeyboardInterrupt:
             pass
@@ -35,14 +34,17 @@ def __installForReal():
     def __reportCrash(etype, value, tb):
         sys.__excepthook__(etype, value, tb)
 
-        formatted = "".join(traceback.format_exception(etype, value, tb))
-
-        CrashReport(formatted)
+        if issubclass(etype, KeyboardInterrupt):
+            returnCode = os.EX_OK
+        else:
+            formatted = "".join(traceback.format_exception(etype, value, tb))
+            CrashReport(formatted)
+            returnCode = os.EX_SOFTWARE
 
         if threading.current_thread() == threading.main_thread():
-            sys.exit(os.EX_SOFTWARE)  # Make sure MainThread exceptions also causes app termination.
+            sys.exit(returnCode)  # Make sure MainThread exceptions also causes app termination.
         else:
-            os._exit(os.EX_SOFTWARE)
+            os._exit(returnCode)
 
     sys.excepthook = __reportCrash
 
@@ -55,3 +57,23 @@ def installCrashReport():
         thread.IsCrashAware = True
     else:
         print("Already installed crash report on thread '{}'.".format(thread.name))
+
+
+def _eventLoopHandler(_: "loop", context):
+    exc = context.get("exception")
+    tb = exc.__traceback__
+    formatted = "".join(traceback.format_tb(tb))
+    CrashReport(formatted)
+    os._exit(os.EX_SOFTWARE)
+
+
+def installEventLoopExceptionHandler():
+    policy = asyncio.get_event_loop_policy()
+    factory = policy._loop_factory
+
+    class PatchedEventLoop(factory):
+        def __init__(self, selector= None):
+            super().__init__(selector)
+            self.set_exception_handler(_eventLoopHandler)
+
+    policy._loop_factory = PatchedEventLoop

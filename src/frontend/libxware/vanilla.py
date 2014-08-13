@@ -110,13 +110,11 @@ class VipChannelState(IntEnum):
 
 
 class XwareClient(object):
-    def __init__(self, options):
+    def __init__(self):
         self._options = {
             "timeout": 1,
             "ua": "libxware/0.1",
         }
-        self.updateOptions(options)
-
         self._connector = aiohttp.TCPConnector(share_cookies = True)
 
     def updateOptions(self, options):
@@ -239,9 +237,12 @@ class XwareClient(object):
     @asyncio.coroutine
     def post_settings(self, settings: dict):
         assert isinstance(settings, dict)
+        params = []
         for key, value in settings.items():
             assert key in Settings._fields
-        raise NotImplementedError()
+            params.append("{k}={v}".format(k = key, v = value))
+        result = yield from self.postJson2("settings?v=2&" + "&".join(params))
+        return result
 
     @asyncio.coroutine
     def post_pause(self, tasks: "iterable of id"):

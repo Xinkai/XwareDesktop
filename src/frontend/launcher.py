@@ -2,7 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import os, sys
+if sys.platform == "linux":
+    if os.getuid() == 0:
+        print("拒绝以root执行。", file = sys.stderr)
+        sys.exit(1)
+
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
+sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../shared/thirdparty"))
 
 if __name__ == "__main__":
     import faulthandler, logging
@@ -23,80 +29,112 @@ if __name__ == "__main__":
     from CrashReport import CrashAwareThreading
     CrashAwareThreading.installCrashReport()
     CrashAwareThreading.installThreadExceptionHandler()
+    CrashAwareThreading.installEventLoopExceptionHandler()
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
+from PyQt5.QtGui import QFont, QIcon
 
-import fcntl
-
-from shared import __version__
+from shared import __version__, DATE
 
 import constants
 __all__ = ['app']
 
 
 class XwareDesktop(QApplication):
-    mainWin = None
-    monitorWin = None
     sigMainWinLoaded = pyqtSignal()
+    applySettings = pyqtSignal()
 
     def __init__(self, *args):
         super().__init__(*args)
-
-        import main
-        from Settings import SettingsAccessor, DEFAULT_SETTINGS
-        from xwaredpy import XwaredPy
-        from etmpy import EtmPy
-        from systray import Systray
-        import mounts
-        from Notify import Notifier
-        from frontendpy import FrontendPy
-        from Schedule import Scheduler
-
         logging.info("XWARE DESKTOP STARTS")
         self.setApplicationName("XwareDesktop")
         self.setApplicationVersion(__version__)
-
         os.chdir(os.path.dirname(os.path.abspath(__file__)))
         self.checkOneInstance()
 
-        self.settings = SettingsAccessor(self,
-                                         configFilePath = constants.CONFIG_FILE,
-                                         defaultDict = DEFAULT_SETTINGS)
+        font = QFont()
+        font.setPointSize(10)
+        self.setFont(font)
+
+        QIcon.setThemeName("")  # Compat for Ubuntu 14.04: A magical fix for #102
+
+        from Settings import DEFAULT_SETTINGS
+        from shared.config import SettingsAccessorBase
+        self.settings = SettingsAccessorBase(constants.FRONTEND_CONFIG_FILE,
+                                             DEFAULT_SETTINGS)
+        self.aboutToQuit.connect(lambda: self.settings.save())
+
+        from models import TaskModel, AdapterManager, ProxyModel
+
+        self.taskModel = TaskModel()
+        self.proxyModel = ProxyModel()
+        self.proxyModel.setSourceModel(self.taskModel)
+
+        self.adapterManager = AdapterManager(self)
+        for name, item in self.settings.itr_sections_with_prefix("adapter"):
+            self.adapterManager.loadAdapter(item)
 
         # components
-        self.xwaredpy = XwaredPy(self)
-        self.etmpy = EtmPy(self)
-        self.mountsFaker = mounts.MountsFaker()
-        self.dbusNotify = Notifier(self)
+        from Widgets.systray import Systray
+        from Notify import Notifier
+        from Schedule.model import SchedulerModel
+
+        self.systray = Systray(self)
+        self.notifier = Notifier(self)
+        self.schedulerModel = SchedulerModel(self)
+        self.schedulerModel.setSourceModel(self.taskModel)
+        self.monitorWin = None
+        self.applySettings.connect(self.slotCreateCloseMonitorWindow)
+
+        # Legacy parts
+        from legacy import main
+        from legacy.frontendpy import FrontendPy
         self.frontendpy = FrontendPy(self)
-        self.scheduler = Scheduler(self)
-
-        self.settings.applySettings.connect(self.slotCreateCloseMonitorWindow)
-
         self.mainWin = main.MainWindow(None)
         self.mainWin.show()
         self.sigMainWinLoaded.emit()
 
-        self.systray = Systray(self)
+        self.applySettings.emit()
 
-        self.settings.applySettings.emit()
-
+        upgradeGuide = None
         if self.settings.get("internal", "previousversion") == "0.8":
             # upgraded or fresh installed
+            upgradeGuide = "https://github.com/Xinkai/XwareDesktop/wiki/使用说明"
+        else:
+            previousdate = self.settings.getfloat("internal", "previousdate")
+            if previousdate == 0:  # upgrade from pre-0.12
+                upgradeGuide = "https://github.com/Xinkai/XwareDesktop/wiki/升级到0.12"
+
+        if upgradeGuide:
             from PyQt5.QtCore import QUrl
             from PyQt5.QtGui import QDesktopServices
-            QDesktopServices.openUrl(QUrl("https://github.com/Xinkai/XwareDesktop/wiki/使用说明"))
+            QDesktopServices.openUrl(QUrl(upgradeGuide))
 
         self.settings.set("internal", "previousversion", __version__)
+        self.settings.setfloat("internal", "previousdate", DATE)
 
     @staticmethod
     def checkOneInstance():
         fd = os.open(constants.FRONTEND_LOCK, os.O_RDWR | os.O_CREAT)
 
-        try:
-            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
+        alreadyRunning = False
+        if os.name == "posix":
+            import fcntl
+            try:
+                fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                alreadyRunning = True
+        elif os.name == "nt":
+            import msvcrt
+            try:
+                msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+            except PermissionError:
+                alreadyRunning = True
+        else:
+            raise NotImplementedError("Xware Desktop doesn't support {}".format(os.name))
+
+        if alreadyRunning:
             def showStartErrorAndExit():
                 from PyQt5.QtWidgets import QMessageBox
                 QMessageBox.warning(None, "Xware Desktop 启动失败",
@@ -125,7 +163,7 @@ class XwareDesktop(QApplication):
     def slotCreateCloseMonitorWindow(self):
         logging.debug("slotCreateCloseMonitorWindow")
         show = self.settings.getbool("frontend", "showmonitorwindow")
-        import monitor
+        from Widgets import monitor
         if show:
             if self.monitorWin:
                 pass  # already shown, do nothing
@@ -205,6 +243,21 @@ if __name__ == "__main__":
     from shared.profile import profileBootstrap
     profileBootstrap(constants.PROFILE_DIR)
     app = XwareDesktop(sys.argv)
-    sys.exit(app.exec())
+
+    def safeExec(app_):
+        code = app_.exec()
+        windows = app_.topLevelWindows()
+        if windows:
+            raise RuntimeError("Windows left: {}"
+                               .format(list(map(lambda win: win.objectName(),
+                                                windows))))
+        widgets = app_.topLevelWidgets()
+        if widgets:
+            raise RuntimeError("Widgets left: {}"
+                               .format(list(map(lambda wid: wid.objectName(),
+                                                widgets))))
+        del app_
+        sys.exit(code)
+    safeExec(app)
 else:
     app = QApplication.instance()

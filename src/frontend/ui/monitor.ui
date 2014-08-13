@@ -70,13 +70,13 @@
   <customwidget>
    <class>MonitorWidget</class>
    <extends>QWidget</extends>
-   <header>MonitorWidget/MonitorWidget</header>
+   <header>Widgets/MonitorWidget/MonitorWidget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>MonitorGraphicsView</class>
    <extends>QGraphicsView</extends>
-   <header>MonitorWidget/MonitorGraphicsView</header>
+   <header>Widgets/MonitorWidget/MonitorGraphicsView</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -8,12 +8,9 @@ from PyQt5.QtWidgets import QMessageBox
 
 
 class CountdownMessageBox(QMessageBox):
-    _timeout = None
-    _timer = None
-    _actionStr = None
-
-    def __init__(self, actionStr):
-        self._actionStr = actionStr
+    def __init__(self, action, model):
+        self._actionDisplayName = str(action)
+        self._model = model
         super().__init__(QMessageBox.Question,  # icon
                          "Xware Desktop任务完成",     # title
                          "",
@@ -37,24 +34,20 @@ class CountdownMessageBox(QMessageBox):
 
     @pyqtSlot()
     def slotTick(self):
-        print("Scheduler countdown tick...", self._timeout)
         if self._timeout > 0:
-            self._timeout -= 1
             self.updateText()
+            self._timeout -= 1
         else:
             self.accept()
 
     def updateText(self):
-        self.setText("任务已完成。将于{}秒后{}。".format(self._timeout, self._actionStr))
+        self.setText("任务已完成。将于{}秒后{}。".format(self._timeout, self._actionDisplayName))
 
-    @pyqtSlot()
-    def accept(self):
-        print("Scheduler confirmation accepted")
-        app.scheduler.sigActionConfirmed.emit(True)  # act
-        super().accept()
-
-    @pyqtSlot()
-    def reject(self):
-        print("Scheduler confirmation rejected")
-        app.scheduler.sigActionConfirmed.emit(False)  # reset
-        super().reject()
+    def done(self, result: int):
+        if result == QMessageBox.Accepted:
+            self._model.countdownConfirmed.emit(True)
+        elif result == QMessageBox.Rejected:
+            self._model.countdownConfirmed.emit(False)
+        else:
+            raise ValueError("Unknown result: {}".format(result))
+        return super().done(result)

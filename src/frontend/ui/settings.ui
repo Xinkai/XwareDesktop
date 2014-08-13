@@ -189,6 +189,9 @@
            </item>
            <item>
             <widget class="QCheckBox" name="checkBox_autoStartFrontend">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
              <property name="text">
               <string>开机启动前端</string>
              </property>
@@ -623,47 +626,6 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="layoutWidget">
-       <property name="geometry">
-        <rect>
-         <x>730</x>
-         <y>10</y>
-         <width>164</width>
-         <height>27</height>
-        </rect>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="label_lcport">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>控制端口</string>
-          </property>
-          <property name="textFormat">
-           <enum>Qt::PlainText</enum>
-          </property>
-          <property name="buddy">
-           <cstring>lineEdit_lcport</cstring>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="lineEdit_lcport">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="maxLength">
-           <number>5</number>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
      </widget>
     </widget>
    </item>
@@ -711,7 +673,6 @@
   <tabstop>spinBox_maxRunningTasksNum</tabstop>
   <tabstop>spinBox_dSpeedLimit</tabstop>
   <tabstop>spinBox_uSpeedLimit</tabstop>
-  <tabstop>lineEdit_lcport</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources>

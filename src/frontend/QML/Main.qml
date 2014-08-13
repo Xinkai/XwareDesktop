@@ -35,6 +35,12 @@ Rectangle {
         }
 
         Tab {
+            id: scheduler
+            title: "计划任务"
+            source: "Scheduler.qml"
+        }
+
+        Tab {
             id: tabFeedback
             title: "反馈"
             source: "Feedback.qml"

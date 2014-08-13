@@ -1,56 +1,136 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-import logging
+import faulthandler, logging, os
+from logging import handlers
 
-import sys, os, time, fcntl, signal, threading
+import asyncio, json
+import sys, time, fcntl, signal, threading
 import collections
-from multiprocessing.connection import Listener
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
 
 import pyinotify
 
-from shared import constants, BackendInfo
+from shared import constants, XWARE_VERSION, DATE, XwaredSocketError
 from shared.misc import debounce, tryRemove, tryClose
 from shared.profile import profileBootstrap
 from settings import SettingsAccessorBase, XWARED_DEFAULTS_SETTINGS
 
 
-class XwaredCommunicationListener(threading.Thread):
+class XwaredServer(asyncio.Protocol):
+    def __init__(self):
+        self._transport = None
+        self._data = b''
+
+    def connection_made(self, transport):
+        self._transport = transport
+
+    def data_received(self, data):
+        self._data += data
+
+    def eof_received(self):
+        try:
+            bytesIn = self._data.decode("utf-8")
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_DECODE,
+            })
+
+        try:
+            payload = json.loads(bytesIn)
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_JSON_LOAD,
+            })
+
+        try:
+            method = getattr(xwared, "interface_" + payload.get("method"))
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_NO_METHOD,
+            })
+
+        try:
+            arguments = payload.get("arguments")
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_NO_ARGUMENTS,
+            })
+
+        try:
+            result = method(*arguments)
+        except:
+            return self._response({
+                "error": XwaredSocketError.SERVER_EVALUATION,
+            })
+
+        self._response({
+            "error": XwaredSocketError.SERVER_OK,
+            "result": result,
+        })
+
+    def _response(self, response: dict):
+        if "result" not in response:
+            response["result"] = None
+
+        response["error"] = int(response["error"])  # Compat for openSUSE 13.1 (Py3.3)
+        responseBytes = json.dumps(response).encode("utf-8")
+        self._transport.write(responseBytes)
+        self._transport.close()
+
+
+class ServerThread(threading.Thread):
     def __init__(self, _xwared):
-        super().__init__(daemon = True,
-                         name = "xwared communication listener")
+        super().__init__(name = "Server", daemon = True)
         self._xwared = _xwared
 
     def run(self):
-        with Listener(*constants.XWARED_SOCKET) as listener:
-            while True:
-                with listener.accept() as conn:
-                    func, args, kwargs = conn.recv()
-                    response = getattr(self._xwared, "interface_" + func)(*args, **kwargs)
-                    conn.send(response)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        asyncio.async(self._startEventLoop())
+        loop.run_forever()
+
+    @asyncio.coroutine
+    def _startEventLoop(self):
+        loop = asyncio.get_event_loop()
+        yield from loop.create_unix_server(XwaredServer, constants.XWARED_SOCKET)
+
+
+def setupLogging():
+    loggingHandler = logging.handlers.RotatingFileHandler(
+        os.path.expanduser("~/.xware-desktop/profile/xwared.log"),
+        maxBytes = 1024 * 1024 * 5,
+        backupCount = 5
+    )
+    logging.basicConfig(handlers = (loggingHandler,),
+                        format = "%(asctime)s %(levelname)s:%(name)s:%(message)s")
+
+    faultLogFd = open(os.path.expanduser('~/.xware-desktop/profile/xwared.fault.log'), 'a')
+    faulthandler.enable(faultLogFd)
 
 
 class Xwared(object):
-    etmPid = 0
-    fdLock = None
-    toRunETM = None
-    etmStartedAt = None
-    etmLongevities = None
-
-    # Cfg watchers
-    etmCfg = dict()
-    watchManager = None
-    cfgWatcher = None
-
     def __init__(self):
         super().__init__()
+        self.etmPid = 0
+        self.fdLock = None
+        self.toRunETM = None
+        self.etmStartedAt = None
+        self.etmLongevities = None
+
+        # Cfg watchers
+        self.etmCfg = dict()
+        self.watchManager = None
+        self.cfgWatcher = None
+
         # requirements checking
         self.ensureNonRoot()
+        profileBootstrap(constants.PROFILE_DIR)
+        setupLogging()
+
         self.ensureOneInstance()
 
-        profileBootstrap(constants.PROFILE_DIR)
-        tryRemove(constants.XWARED_SOCKET[0])
+        tryRemove(constants.XWARED_SOCKET)
 
         # initialize variables
         signal.signal(signal.SIGTERM, self.unload)
@@ -61,7 +141,7 @@ class Xwared(object):
         self._resetEtmLongevities()
 
         # ipc listener
-        self.listener = XwaredCommunicationListener(self)
+        self.listener = ServerThread(self)
         self.listener.start()
 
         # using pyinotify to monitor etm.cfg changes
@@ -184,6 +264,13 @@ class Xwared(object):
             self.settings.save()
 
     # frontend end interfaces
+    @staticmethod
+    def interface_versions():
+        return {
+            "xware": XWARE_VERSION,
+            "api": DATE,
+        }
+
     def interface_startETM(self):
         self._resetEtmLongevities()
         self.toRunETM = True
@@ -208,9 +295,6 @@ class Xwared(object):
             self.settings.setbool("xwared", "startetm", True)
             self.settings.save()
 
-    def interface_getStartEtmWhen(self):
-        return self.settings.getint("xwared", "startetmwhen")
-
     def interface_setStartEtmWhen(self, startetmwhen):
         self.settings.setint("xwared", "startetmwhen", startetmwhen)
         if startetmwhen == 1:
@@ -224,10 +308,12 @@ class Xwared(object):
         raise NotImplementedError()
 
     def interface_infoPoll(self):
-        return BackendInfo(etmPid = self.etmPid,
-                           lcPort = int(self.etmCfg.get("local_control.listen_port", 0)),
-                           userId = int(self.etmCfg.get("userid", 0)),
-                           peerId = self.etmCfg.get("rc.peerid", ""))
+        return {
+            "etmPid": self.etmPid,
+            "lcPort": int(self.etmCfg.get("local_control.listen_port", 0)),
+            "peerId": self.etmCfg.get("rc.peerid", ""),
+            "startEtmWhen": int(self.settings.getint("xwared", "startetmwhen")),
+        }
 
     def unload(self, sig, stackframe):
         print("unloading...")

@@ -8,7 +8,7 @@ from PyQt5.QtCore import QObject, pyqtSlot
 import sys
 from urllib import parse
 
-from frontendpy import FrontendAction
+from legacy.frontendpy import FrontendAction
 from utils import misc
 from .mimeparser import UrlExtractor
 from .watchers.clipboard import ClipboardWatcher
@@ -16,11 +16,9 @@ from .watchers.commandline import CommandlineWatcher
 
 
 class CreateTasksAction(FrontendAction):
-    _tasks = None  # tasks to add in the same batch
-
     def __init__(self, tasks):
         super().__init__()
-        self._tasks = tasks
+        self._tasks = tasks  # tasks to add in the same batch
 
     def __repr__(self):
         return "{} {}".format(self.__class__.__name__, self._tasks)
@@ -38,9 +36,6 @@ class CreateTask(object):
     NORMAL = 0
     LOCAL_TORRENT = 1
 
-    url = None
-    kind = None
-
     def __init__(self, url = None, kind = None):
         self.url = url
 
@@ -53,8 +48,6 @@ class CreateTask(object):
 
 
 class TaskCreationAgent(QObject):
-    _urlExtractor = None
-
     def __init__(self, parent = None):
         super().__init__(parent)
         # hold a reference to the parent, aka frontendpy.

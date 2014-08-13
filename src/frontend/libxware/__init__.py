@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from .adapter import XwareAdapterThread
+from .adapter import XwareAdapter

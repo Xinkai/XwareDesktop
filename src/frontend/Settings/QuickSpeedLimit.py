@@ -6,8 +6,7 @@ from launcher import app
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import QWidget, QWidgetAction
 
-from etmpy import EtmSetting
-from CustomStatusBar.CStatusButton import CustomStatusBarToolButton
+from legacy.CustomStatusBar.CStatusButton import CustomStatusBarToolButton
 from .ui_quickspeedlimit import Ui_Form_quickSpeedLimit
 from .menu import SettingMenu
 
@@ -22,12 +21,12 @@ class QuickSpeedLimitBtn(CustomStatusBarToolButton):
         self.setText("限速")
 
         # Should be disabled when ETM not running
-        app.xwaredpy.statusUpdated.connect(self.slotXwareStatusChanged)
+        app.adapterManager[0].infoUpdated.connect(self.slotXwareStatusChanged)
         self.slotXwareStatusChanged()
 
     @pyqtSlot()
     def slotXwareStatusChanged(self):
-        self.setEnabled(app.xwaredpy.etmStatus)
+        self.setEnabled(app.adapterManager[0].etmPid != 0)
 
 
 class SpeedLimitingWidgetAction(QWidgetAction):
@@ -50,29 +49,33 @@ class QuickSpeedLimitForm(QWidget, Ui_Form_quickSpeedLimit):
         self.spinBox_dlSpeedLimit.setEnabled(self.checkBox_dlSpeedLimit.isChecked())
 
     def loadSetting(self):
-        etmSettings = app.etmpy.getSettings()
-
-        self.setEnabled(bool(etmSettings))
+        adapter = app.adapterManager[0]
+        settings = adapter.backendSettings
+        self.setEnabled(adapter.etmPid != 0 and settings.initialized)
         if not self.isEnabled():
             return
 
-        if etmSettings.dLimit == -1:
+        if settings.downloadSpeedLimit == -1:
             self.checkBox_dlSpeedLimit.setChecked(False)
-            self.spinBox_dlSpeedLimit.setValue(app.settings.getint("internal", "dlspeedlimit"))
+            self.spinBox_dlSpeedLimit.setValue(
+                app.settings.getint("adapter-legacy", "dlspeedlimit"))
         else:
             self.checkBox_dlSpeedLimit.setChecked(True)
-            self.spinBox_dlSpeedLimit.setValue(etmSettings.dLimit)
+            self.spinBox_dlSpeedLimit.setValue(settings.downloadSpeedLimit)
 
-        if etmSettings.uLimit == -1:
+        if settings.uploadSpeedLimit == -1:
             self.checkBox_ulSpeedLimit.setChecked(False)
-            self.spinBox_ulSpeedLimit.setValue(app.settings.getint("internal", "ulspeedlimit"))
+            self.spinBox_ulSpeedLimit.setValue(
+                app.settings.getint("adapter-legacy", "ulspeedlimit"))
         else:
             self.checkBox_ulSpeedLimit.setChecked(True)
-            self.spinBox_ulSpeedLimit.setValue(etmSettings.uLimit)
+            self.spinBox_ulSpeedLimit.setValue(settings.uploadSpeedLimit)
 
     def saveSetting(self):
         if not self.isEnabled():
             return
+
+        adapter = app.adapterManager[0]
 
         # called by parent menu's saveSettings.
         if self.checkBox_ulSpeedLimit.isChecked():
@@ -85,6 +88,7 @@ class QuickSpeedLimitForm(QWidget, Ui_Form_quickSpeedLimit):
         else:
             dlSpeedLimit = -1
 
-        newEtmSetting = EtmSetting(dLimit = dlSpeedLimit, uLimit = ulSpeedLimit,
-                                   maxRunningTasksNum = None)
-        app.etmpy.saveSettings(newEtmSetting)
+        adapter.do_applySettings({
+            "downloadSpeedLimit": dlSpeedLimit,
+            "uploadSpeedLimit": ulSpeedLimit,
+        })

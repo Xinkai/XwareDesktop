@@ -11,7 +11,7 @@ class ClipboardWatcher(QObject):
         super().__init__(parent)
         self.agent = parent
         self._clipboard = QApplication.clipboard()
-        app.settings.applySettings.connect(self.slotWatchClipboardToggled)
+        app.applySettings.connect(self.slotWatchClipboardToggled)
 
     @pyqtSlot()
     def slotWatchClipboardToggled(self):
