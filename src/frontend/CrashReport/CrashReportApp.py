@@ -87,7 +87,7 @@ class CrashReportApp(QApplication):
         font.setPointSize(10)
         self.setFont(font)
 
-        QIcon.setThemeName("")  # fix #102
+        QIcon.setThemeName("")  # Compat for Ubuntu 14.04: fix #102
         self.form = CrashReportForm()
         if len(argv) > 1:
             payload = CrashReport.decodePayload(argv[1])

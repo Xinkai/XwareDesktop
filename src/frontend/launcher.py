@@ -57,7 +57,7 @@ class XwareDesktop(QApplication):
         font.setPointSize(10)
         self.setFont(font)
 
-        QIcon.setThemeName("")  # A magical fix for #102
+        QIcon.setThemeName("")  # Compat for Ubuntu 14.04: A magical fix for #102
 
         from Settings import DEFAULT_SETTINGS
         from shared.config import SettingsAccessorBase
