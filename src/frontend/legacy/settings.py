@@ -221,8 +221,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
         # fill values
         adapter = app.adapterManager[0]
         settings = adapter.backendSettings
-        enabled = adapter.etmPid != 0
-        if enabled:
+        etmRunning = adapter.etmPid != 0
+        if etmRunning and settings.initialized:
             self.spinBox_dSpeedLimit.setValue(settings.downloadSpeedLimit)
             self.spinBox_uSpeedLimit.setValue(settings.uploadSpeedLimit)
             self.spinBox_maxRunningTasksNum.setValue(settings.maxRunTaskNumber)

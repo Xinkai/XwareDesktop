@@ -51,7 +51,7 @@ class QuickSpeedLimitForm(QWidget, Ui_Form_quickSpeedLimit):
     def loadSetting(self):
         adapter = app.adapterManager[0]
         settings = adapter.backendSettings
-        self.setEnabled(adapter.etmPid != 0)
+        self.setEnabled(adapter.etmPid != 0 and settings.initialized)
         if not self.isEnabled():
             return
 
