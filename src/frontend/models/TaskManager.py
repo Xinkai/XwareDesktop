@@ -81,7 +81,6 @@ class TaskManager(collections.MutableMapping):
                 return result
         raise IndexError("Out of range: index({})".format(index))
 
-    @asyncio.coroutine
     def appendMap(self, map_):
         # All tasks from all backends live in a same chainmap, therefore id needs to be prefixed
 

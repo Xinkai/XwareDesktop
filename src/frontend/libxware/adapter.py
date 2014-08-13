@@ -74,7 +74,6 @@ class XwareAdapter(QObject):
     def __init__(self, adapterConfig, parent = None):
         super().__init__(parent)
         # Prepare XwareClient Variables
-        self._mapIds = None
         self._ulSpeed = 0
         self._dlSpeed = 0
         self._runningTaskCount = 0
@@ -93,6 +92,16 @@ class XwareAdapter(QObject):
         connection = parse.urlparse(self._adapterConfig["connection"], scheme = "file")
         self.xwaredSocket = None
         self.mountsFaker = None
+
+        runningId = app.taskModel.taskManager.appendMap(
+            Tasks(self, TaskClass.RUNNING))
+        completedId = app.taskModel.taskManager.appendMap(
+            Tasks(self, TaskClass.COMPLETED))
+        recycledId = app.taskModel.taskManager.appendMap(
+            Tasks(self, TaskClass.RECYCLED))
+        failedOnSubmissionId = app.taskModel.taskManager.appendMap(
+            Tasks(self, TaskClass.FAILED_ON_SUBMISSION))
+        self._mapIds = (runningId, completedId, recycledId, failedOnSubmissionId)
 
         self.useXwared = False
         self.isLocal = False
@@ -175,17 +184,6 @@ class XwareAdapter(QObject):
     def main(self):
         # Entry point of the thread "XwareAdapterEventLoop"
         # main() handles non-stop polling
-
-        runningId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskClass.RUNNING))
-        completedId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskClass.COMPLETED))
-        recycledId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskClass.RECYCLED))
-        failedOnSubmissionId = yield from app.taskModel.taskManager.appendMap(
-            Tasks(self, TaskClass.FAILED_ON_SUBMISSION))
-        self._mapIds = (runningId, completedId, recycledId, failedOnSubmissionId)
-
         while True:
             self._loop.call_soon(self.get_getsysinfo)
             self._loop.call_soon(self.get_list, TaskClass.RUNNING)
