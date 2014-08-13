@@ -14,7 +14,7 @@ import constants
 from utils.misc import tryRemove, trySymlink, tryMkdir
 from utils.system import getInitType, InitType
 from .vanilla import TaskClass, XwareClient, Settings
-from .map import Tasks
+from .map import TaskMap
 from .daemon import callXwared
 
 _POLLING_INTERVAL = 1
@@ -93,10 +93,10 @@ class XwareAdapter(QObject):
         self.mountsFaker = None
 
         self.maps = (
-            Tasks(self, TaskClass.RUNNING),
-            Tasks(self, TaskClass.COMPLETED),
-            Tasks(self, TaskClass.RECYCLED),
-            Tasks(self, TaskClass.FAILED_ON_SUBMISSION),
+            TaskMap(self, TaskClass.RUNNING),
+            TaskMap(self, TaskClass.COMPLETED),
+            TaskMap(self, TaskClass.RECYCLED),
+            TaskMap(self, TaskClass.FAILED_ON_SUBMISSION),
         )
 
         self.useXwared = False
