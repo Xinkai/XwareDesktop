@@ -139,6 +139,14 @@ class XwareAdapter(QObject):
     def namespace(self):
         return "xware-" + self._adapterConfig.name[len("adapter-"):]
 
+    @pyqtProperty(str, notify = initialized)
+    def name(self):
+        return self._adapterConfig["name"]
+
+    @pyqtProperty(str, notify = initialized)
+    def connection(self):
+        return self._adapterConfig["connection"]
+
     @property
     def ulSpeed(self):
         return self._ulSpeed

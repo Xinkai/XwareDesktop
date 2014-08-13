@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from launcher import app
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, Qt
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, Qt, pyqtSlot
 
 from collections import OrderedDict
 
@@ -32,8 +32,13 @@ class AdapterManager(QObject):
                                Qt.DirectConnection)
         self._adapters[ns] = adapter
 
+    @pyqtSlot(str, result = "QVariant")
     def adapter(self, ns):
         return self._adapters[ns]
+
+    @pyqtSlot(result = "QStringList")
+    def itr(self):
+        return self._adapters.keys()
 
     def __getitem__(self, item):
         assert item == 0
