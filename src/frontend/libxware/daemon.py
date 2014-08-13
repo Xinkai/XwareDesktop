@@ -29,12 +29,6 @@ class XwaredClient(asyncio.Protocol):
             data = json.loads(decoded)
         except ValueError:
             logging.error("XwaredClient cannot load {} as a json object".format(decoded))
-            # seen on openSUSE 13.1 (python 3.3)
-            # Python 3.3's json module doesn't know about IntEnum yet
-            # So the incoming data contains string instead of int
-            # If you need Python 3.3, please patch daemon/xwared.py yourself
-            # XwaredServer._response, add the following line to cast IntEnum to int.
-            # `response["error"] = int(response["error"])`
             return self.donecb({
                 "error": XwaredSocketError.CLIENT_JSON_LOAD,
                 "result": None,

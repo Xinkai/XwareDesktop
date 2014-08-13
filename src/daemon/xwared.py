@@ -73,6 +73,7 @@ class XwaredServer(asyncio.Protocol):
         if "result" not in response:
             response["result"] = None
 
+        response["error"] = int(response["error"])
         responseBytes = json.dumps(response).encode("utf-8")
         self._transport.write(responseBytes)
         self._transport.close()
