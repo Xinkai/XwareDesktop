@@ -10,7 +10,8 @@ import websockets
 
 from PyQt5.QtCore import QObject, pyqtProperty, pyqtSlot, pyqtSignal
 
-from enum import Enum, unique
+from .definitions import Aria2TaskClass, Aria2Method
+from .map import TaskMap
 
 
 def _getShortName(name: str) -> str:
@@ -25,44 +26,6 @@ def _fileEncode(f: "maybe a file-like object") -> str:
         return base64.b64encode(f.read())
     else:
         return f
-
-
-@unique
-class Aria2Method(Enum):
-    AddUri = "aria2.addUri"
-    AddTorrent = "aria2.addTorrent"
-    AddMetaLink = "aria2.addMetalink"
-    Remove = "aria2.remove"
-    ForceRemove = "aria2.forceRemove"
-    Pause = "aria2.pause"
-    PauseAll = "aria2.pauseAll"
-    ForcePause = "aria2.forcePause"
-    ForcePauseAll = "aria2.forcePauseAll"
-    Unpause = "aria2.unpause"
-    UnpauseAll = "aria2.unpauseAll"
-    TellStatus = "aria2.tellStatus"
-    GetUris = "aria2.GetUris"
-    GetFiles = "aria2.GetFiles"
-    GetPeers = "aria2.GetPeers"
-    GetServers = "aria2.GetServers"
-    TellActive = "aria2.tellActive"
-    TellWaiting = "aria2.tellWaiting"
-    TellStopped = "aria2.tellStopped"
-    ChangePosition = "aria2.changePosition"
-    ChangeUri = "aria2.changeUri"
-    GetOption = "aria2.getOption"
-    ChangeOption = "aria2.changeOption"
-    GetGlobalOption = "aria2.getGlobalOption"
-    ChangeGlobalOption = "aria2.changeGlobalOption"
-    GetGlobalStat = "aria2.getGlobalStat"
-    PurgeDownloadResult = "aria2.purgeDownloadResult"
-    RemoveDownloadResult = "aria2.removeDownloadResult"
-    GetVersion = "aria2.getVersion"
-    GetSessionInfo = "aria2.getSessionInfo"
-    Shutdown = "aria2.shutdown"
-    ForceShutdown = "aria2.forceShutdown"
-    SaveSession = "aria2.saveSession"
-    MultiCall = "system.multicall"
 
 
 class _Callable(dict):
@@ -90,11 +53,18 @@ class _Callable(dict):
 
 
 class Aria2Adapter(QObject):
+    initialized = pyqtSignal()
+
     def __init__(self, adapterConfig = None, parent = None):
         super().__init__(parent)
         self._adapterConfig = adapterConfig
         self._ws = None
 
+        self.maps = (
+            TaskMap(self, Aria2TaskClass.Active),
+            TaskMap(self, Aria2TaskClass.Waiting),
+            TaskMap(self, Aria2TaskClass.Stopped),
+        )
         self._ids = {}
         self._loop = None
         self._loop_executor = None
@@ -120,6 +90,18 @@ class Aria2Adapter(QObject):
             return False
         return self._ws.open
 
+    @pyqtProperty(str, notify = initialized)
+    def namespace(self):
+        return "aria2-" + self._adapterConfig.name[len("adapter-"):]
+
+    @property
+    def dlSpeed(self):
+        return 10000000
+
+    @property
+    def ulSpeed(self):
+        return 10000000
+
     @asyncio.coroutine
     def main(self):
         asyncio.async(self._getMessage())  # It can handle reconnect
@@ -130,6 +112,7 @@ class Aria2Adapter(QObject):
                 )
             except ConnectionRefusedError:
                 yield from asyncio.sleep(1)
+                continue
 
             while True:
                 if not self._ready():
@@ -183,27 +166,17 @@ class Aria2Adapter(QObject):
         self._loop.call_soon_threadsafe(self._callExternal, _Callable(Aria2Method.AddUri, [url]))
 
     @asyncio.coroutine
+    def _cb_tellActive(self, result):
+        self.maps[Aria2TaskClass.Active].updateData(result)
+
+    @asyncio.coroutine
+    def _cb_tellWaiting(self, result):
+        self.maps[Aria2TaskClass.Waiting].updateData(result)
+
+    @asyncio.coroutine
     def _cb_tellStopped(self, result):
-        print("_cb_tellStopped", result)
+        self.maps[Aria2TaskClass.Stopped].updateData(result)
 
     @asyncio.coroutine
     def _cb_onDownloadComplete(self, result):
         print("_cb_onDownloadComplete", result)
-
-
-class FakeAdapterConfig(dict):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.name = "adapter-Aria2Test"
-
-
-if __name__ == "__main__":
-    config = FakeAdapterConfig(
-        connection = "ws://127.0.0.1:6800/jsonrpc",
-    )
-    adapter = Aria2Adapter(config)
-    import time
-    time.sleep(1)
-    adapter.do_createTask("http://www.baidu.com/robots.txt")
-    while True:
-        time.sleep(1)
