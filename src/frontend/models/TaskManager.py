@@ -32,7 +32,11 @@ class TaskManager(collections.MutableMapping):
 
     def items(self):
         for taskId in self:
-            yield (taskId, self[taskId])
+            try:
+                item = self[taskId]
+            except KeyError:
+                continue
+            yield (taskId, item)
 
     def __getitem__(self, key):
         # faster than ChainMap's implementation
