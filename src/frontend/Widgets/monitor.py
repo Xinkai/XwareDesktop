@@ -5,7 +5,7 @@ from launcher import app
 
 from PyQt5.QtCore import pyqtSignal, pyqtSlot, Qt, QPoint, QTimer
 
-from models.TaskModel import TaskClass
+from models.TaskModel import TaskState
 from .ui_monitor import MonitorWidget, Ui_MonitorWindow
 from PersistentGeometry import PersistentGeometry
 from .contextmenu import ContextMenu
@@ -48,7 +48,7 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
         while True:
             found = False
             for id_, item in taskManager.items():
-                if item.klass == TaskClass.RUNNING:
+                if item.state == TaskState.Downloading:
                     for i in range(self.TICKS_PER_TASK):
                         found = True
                         yield item
