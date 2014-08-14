@@ -84,7 +84,6 @@ class Aria2TaskItem(QObject):
 
     @pyqtProperty(int, notify = updated)
     def klass(self):
-        print(self._status)
         result = {
             Aria2TaskState.Active.value: TaskClass.RUNNING,
             Aria2TaskState.Waiting.value: TaskClass.RUNNING,
