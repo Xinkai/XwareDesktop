@@ -4,7 +4,9 @@ from launcher import app
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 from datetime import datetime
 
+from models.TaskModel import TaskState
 from models.ProxyModel import TaskClass
+from .vanilla import TaskState as XwareTaskState
 
 _SPEED_SAMPLE_COUNT = 50
 
@@ -142,7 +144,7 @@ class XwareTaskItem(QObject):
         self._runningTime = None
         self._remainingTime = None
         self._completionTime = None
-        self._state = None
+        self._xwareState = None
         self._path = None
         self._size = None
         self._errorCode = None
@@ -208,7 +210,21 @@ class XwareTaskItem(QObject):
 
     @pyqtProperty(int, notify = updated)
     def state(self):
-        return self._state
+        result = {
+            XwareTaskState.DOWNLOADING: TaskState.Downloading,
+            XwareTaskState.WAITING: TaskState.Waiting,
+            XwareTaskState.STOPPED: TaskState.Paused,
+            XwareTaskState.PAUSED: TaskState.Paused,
+            XwareTaskState.FINISHED: TaskState.Completed,
+            XwareTaskState.FAILED: TaskState.Failed,
+            XwareTaskState.UPLOADING: TaskState.Completed,
+            XwareTaskState.SUBMITTING: TaskState.Downloading,
+            XwareTaskState.DELETED: TaskState.Removed,
+            XwareTaskState.RECYCLED: TaskState.Removed,
+            XwareTaskState.SUSPENDED: TaskState.Downloading,
+            XwareTaskState.ERROR: TaskState.Failed,
+        }.get(self._xwareState, TaskState.Unrecognized)
+        return result
 
     @pyqtProperty(int, notify = errorOccurred)
     def errorCode(self):
@@ -231,24 +247,6 @@ class XwareTaskItem(QObject):
         # _klass is xware class[0-3],
         # return Xware Desktop task class
         return self._xwareClassToClass(self._klass)
-        # Xware Local Control doesn't always return reliable state,
-        # needs to use class directly
-
-        # from .vanilla import TaskClass as XwareTaskClass
-        # return {
-        #     XwareTaskClass.DOWNLOADING: TaskClass.RUNNING,
-        #     XwareTaskClass.WAITING: TaskClass.RUNNING,
-        #     XwareTaskClass.STOPPED: TaskClass.RUNNING,
-        #     XwareTaskClass.PAUSED: TaskClass.RUNNING,
-        #     XwareTaskClass.FINISHED: TaskClass.COMPLETED,
-        #     XwareTaskClass.FAILED: TaskClass.FAILED,
-        #     XwareTaskClass.UPLOADING: TaskClass.RUNNING,
-        #     XwareTaskClass.SUBMITTING: TaskClass.RUNNING,
-        #     XwareTaskClass.DELETED: TaskClass.RECYCLED,
-        #     XwareTaskClass.RECYCLED: TaskClass.RECYCLED,
-        #     XwareTaskClass.SUSPENDED: TaskClass.RUNNING,
-        #     XwareTaskClass.ERROR: TaskClass.FAILED,
-        # }[self.state]
 
     @klass.setter
     def klass(self, value):
@@ -270,7 +268,7 @@ class XwareTaskItem(QObject):
     def update(self, data, klass):
         self.speed = data.get("speed")
         self._remainingTime = int(data.get("remainTime"))
-        self._state = data.get("state")
+        self._xwareState = data.get("state")
         self._completionTime = data.get("completeTime")
         self._progress = data.get("progress")
         self._runningTime = data.get("downTime")

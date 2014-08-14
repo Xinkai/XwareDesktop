@@ -19,12 +19,23 @@ TaskClassRole = Qt.UserRole + 102
 
 @enum.unique
 class TaskClass(enum.IntEnum):
-    RUNNING = 1
-    COMPLETED = 2
+    RUNNING = 1  # state: downloading, waiting, paused
+    COMPLETED = 2  # state: completed
     RECYCLED = 4
     FAILED = 8
     INVALID = 16
     ALL = RUNNING | COMPLETED | RECYCLED | FAILED
+
+
+@enum.unique
+class TaskState(enum.IntEnum):
+    Downloading = 0  # Downloading; seeding doesn't count
+    Waiting = 1
+    Paused = 2
+    Completed = 3  # Downloading finished; doesn't care about seeding or not
+    Removed = 4  # Deleted/moved from the file system
+    Failed = 5
+    Unrecognized = 99
 
 
 class TaskModel(QAbstractTableModel):

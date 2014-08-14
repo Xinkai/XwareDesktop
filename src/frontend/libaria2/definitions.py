@@ -46,3 +46,13 @@ class Aria2Method(enum.Enum):
     ForceShutdown = "aria2.forceShutdown"
     SaveSession = "aria2.saveSession"
     MultiCall = "system.multicall"
+
+
+@enum.unique
+class Aria2TaskState(enum.Enum):
+    Active = "active"
+    Waiting = "waiting"
+    Paused = "paused"
+    Error = "error"
+    Complete = "complete"
+    Removed = "removed"

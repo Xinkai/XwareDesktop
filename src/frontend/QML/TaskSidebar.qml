@@ -27,6 +27,31 @@ Rectangle {
 
         Text {
             text: {
+                if (taskData) {
+                    switch (taskData.state) {
+                    case 0:
+                        return "下载中"
+                    case 1:
+                        return "队列中"
+                    case 2:
+                        return "已暂停"
+                    case 3:
+                        return "已完成"
+                    case 4:
+                        return "已删除"
+                    case 5:
+                        return "发生错误"
+                    case 99:
+                        return "未知状态"
+                    }
+                } else {
+                    return "未知状态2"
+                }
+            }
+        }
+
+        Text {
+            text: {
                 if (taskData && taskData.speed) {
                     JsUtils.humanBytes(taskData.speed) + "/s"
                 } else {

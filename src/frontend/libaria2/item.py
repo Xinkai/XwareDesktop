@@ -5,7 +5,9 @@ from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 
 import os
 
-from models.TaskModel import TaskClass
+from models.TaskModel import TaskClass, TaskState
+from .definitions import Aria2TaskState
+
 _SPEED_SAMPLE_COUNT = 50
 
 
@@ -66,15 +68,31 @@ class Aria2TaskItem(QObject):
         return self._speeds
 
     @pyqtProperty(int, notify = updated)
-    def klass(self):
+    def state(self):
         result = {
-            "active": TaskClass.RUNNING,
-            "waiting": TaskClass.RUNNING,
-            "paused": TaskClass.RUNNING,
-            "error": TaskClass.FAILED,
-            "complete": TaskClass.COMPLETED,
-            "removed": TaskClass.RECYCLED,
-        }[self._status]
+            Aria2TaskState.Active.value: TaskState.Downloading,
+            Aria2TaskState.Waiting.value: TaskState.Waiting,
+            Aria2TaskState.Paused.value: TaskState.Paused,
+            Aria2TaskState.Error.value: TaskState.Failed,
+            Aria2TaskState.Complete.value: TaskState.Completed,
+            Aria2TaskState.Removed.value: TaskState.Removed,
+        }.get(self._status, TaskState.Unrecognized)
+        if result == TaskState.Downloading:
+            if self._dlsize == self._size:
+                result = TaskState.Completed
+        return result
+
+    @pyqtProperty(int, notify = updated)
+    def klass(self):
+        print(self._status)
+        result = {
+            Aria2TaskState.Active.value: TaskClass.RUNNING,
+            Aria2TaskState.Waiting.value: TaskClass.RUNNING,
+            Aria2TaskState.Paused.value: TaskClass.RUNNING,
+            Aria2TaskState.Error.value: TaskClass.FAILED,
+            Aria2TaskState.Complete.value: TaskClass.COMPLETED,
+            Aria2TaskState.Removed.value: TaskClass.RECYCLED,
+        }.get(self._status, TaskClass.INVALID)
         if result == TaskClass.RUNNING:
             if self._dlsize == self._size:
                 # Seeding
