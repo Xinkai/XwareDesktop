@@ -30,6 +30,9 @@ class Aria2TaskItem(QObject):
         self._files = []
         self._bittorrent = None
 
+        self._creationTime = 0
+        self._completionTime = 0
+
         self.moveToThread(self._adapter.thread())
         self.setParent(self._adapter)
 
@@ -80,15 +83,27 @@ class Aria2TaskItem(QObject):
 
     @pyqtProperty(int, notify = initialized)
     def creationTime(self):
-        return 0  # TODO: Aria2 doesn't provide this information
+        if self._creationTime:
+            return self._creationTime
+
+        self._creationTime = int(os.stat(self.fullpath).st_ctime)
+        return self._creationTime
 
     @pyqtProperty(int, notify = initialized)
     def completionTime(self):
-        return 0  # TODO: Aria2 doesn't provide this information
+        if self._completionTime:
+            return self._completionTime
+
+        self._completionTime = int(os.stat(self.fullpath).st_mtime)
+        return self._completionTime
 
     @pyqtProperty(int, notify = updated)
     def remainingTime(self):
-        return 0  # TODO
+        remainingSize = self._size - self._dlsize
+        try:
+            return int(remainingSize / self._speed)
+        except ZeroDivisionError:
+            return 1 << 32
 
     @pyqtProperty(str, notify = initialized)
     def path(self):
@@ -99,7 +114,7 @@ class Aria2TaskItem(QObject):
         try:
             return (self._dlsize / self._size) * 10000
         except ZeroDivisionError:
-            return 0
+            return 10000
 
     @pyqtProperty(str, notify = initialized)
     def name(self):

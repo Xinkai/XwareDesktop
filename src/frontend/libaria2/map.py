@@ -24,10 +24,11 @@ class TaskMap(TaskMapBase):
 
     def updateData(self, updatingList = None):
         # exclude only-metadata entries
-        updatingList = filter(_excludeMetadata, updatingList)
+        updatingList = list(filter(_excludeMetadata, updatingList))
 
         updating = dict(zip(
             map(lambda i: "{ns}|{id}".format(ns = self.adapter.namespace, id = i["gid"]),
                 updatingList),
             updatingList))
+
         self._updateDict(updating)
