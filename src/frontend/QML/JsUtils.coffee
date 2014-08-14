@@ -25,6 +25,8 @@ padLeft = (src, padder, len) ->
         return src
 
 humanSeconds = (seconds) ->
+    if seconds > 24 * 60 * 60 - 1
+        return "--:--:--"
     hour = (seconds / 3600) | 0
     minute = ((seconds / 60) % 60) | 0
     second = seconds % 60 | 0

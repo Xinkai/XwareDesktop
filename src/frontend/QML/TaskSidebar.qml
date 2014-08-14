@@ -30,7 +30,7 @@ Rectangle {
                 if (taskData && taskData.speed) {
                     JsUtils.humanBytes(taskData.speed) + "/s"
                 } else {
-                    "NOSPEED"
+                    JsUtils.humanBytes(0) + "/s"
                 }
             }
         }

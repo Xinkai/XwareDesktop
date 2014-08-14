@@ -269,7 +269,7 @@ class XwareTaskItem(QObject):
 
     def update(self, data, klass):
         self.speed = data.get("speed")
-        self._remainingTime = data.get("remainTime")
+        self._remainingTime = int(data.get("remainTime"))
         self._state = data.get("state")
         self._completionTime = data.get("completeTime")
         self._progress = data.get("progress")

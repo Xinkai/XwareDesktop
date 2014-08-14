@@ -60,7 +60,7 @@ Rectangle {
             color: "transparent"
             Text {
                 color: "black"
-                text: JsUtils.humanSeconds(taskData.remainTime)
+                text: JsUtils.humanSeconds(taskData.remainingTime)
             }
         }
     }
