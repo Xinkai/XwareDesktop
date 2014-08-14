@@ -17,6 +17,7 @@ class Aria2TaskItem(QObject):
         super().__init__(None)
         self._initialized = False
         self._adapter = adapter
+        self._namespace = self._adapter.namespace
 
         self._gid = None
         self._size = 0
@@ -40,6 +41,10 @@ class Aria2TaskItem(QObject):
     def id(self):
         return self.namespace + "|" + self.realid
 
+    @pyqtProperty(str, notify = initialized)
+    def namespace(self):
+        return self._namespace
+
     @pyqtProperty(int, notify = initialized)
     def size(self):
         return self._size
@@ -59,7 +64,7 @@ class Aria2TaskItem(QObject):
 
     @pyqtProperty(int, notify = updated)
     def klass(self):
-        return {
+        result = {
             "active": TaskClass.RUNNING,
             "waiting": TaskClass.RUNNING,
             "paused": TaskClass.RUNNING,
@@ -67,6 +72,11 @@ class Aria2TaskItem(QObject):
             "complete": TaskClass.COMPLETED,
             "removed": TaskClass.RECYCLED,
         }[self._status]
+        if result == TaskClass.RUNNING:
+            if self._dlsize == self._size:
+                # Seeding
+                result = TaskClass.COMPLETED
+        return result
 
     @pyqtProperty(int, notify = initialized)
     def creationTime(self):
@@ -101,15 +111,16 @@ class Aria2TaskItem(QObject):
 
         if len(self._files) == 1:
             return os.path.basename(self._files[0]["path"])
-        else:
-            raise NotImplementedError()
+
+        raise NotImplementedError()
 
     @pyqtProperty(str, notify = initialized)
     def fullpath(self):
         if len(self._files) == 1:
             return self._files[0]["path"]
         else:
-            raise NotImplementedError()
+            assert bool(self._bittorrent)
+            return os.path.join(self._path, self._bittorrent["info"]["name"])
 
     def update(self, data, klass):
         self.speed = int(data.get("downloadSpeed", 0))

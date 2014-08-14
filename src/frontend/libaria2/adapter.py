@@ -103,6 +103,14 @@ class Aria2Adapter(QObject):
         return self._ws.open
 
     @pyqtProperty(str, notify = initialized)
+    def name(self):
+        return self._adapterConfig["name"]
+
+    @pyqtProperty(str, notify = initialized)
+    def connection(self):
+        return self._adapterConfig["connection"]
+
+    @pyqtProperty(str, notify = initialized)
     def namespace(self):
         return "aria2-" + self._adapterConfig.name[len("adapter-"):]
 
@@ -161,6 +169,8 @@ class Aria2Adapter(QObject):
     @asyncio.coroutine
     def _call(self, callable_: _Callable):
         assert isinstance(callable_, _Callable)
+        if "rpc-secret" in self._adapterConfig:
+            callable_["params"].insert(0, "token:" + self._adapterConfig["rpc-secret"])
         payload = callable_.toString()
         yield from self._ws.send(payload)
 
