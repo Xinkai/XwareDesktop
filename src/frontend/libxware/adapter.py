@@ -239,7 +239,6 @@ class XwareAdapter(QObject):
                 self._ulSpeed = result["upSpeed"]
                 self._dlSpeed = result["dlSpeed"]
                 self._runningTaskCount = result["dlNum"]
-                app.adapterManager.summaryUpdated.emit()
             self.maps[klass].updateData(result["tasks"])
         else:
             logging.error("get_list failed.")
