@@ -10,7 +10,6 @@ def _excludeMetadata(item) -> bool:
     if bittorrent:
         if "info" not in bittorrent:
             assert len(item["files"]) == 1
-            assert item["files"][0]["length"] == "0"
             assert item["files"][0]["path"].startswith("[METADATA]")
             return False
     return True
