@@ -5,6 +5,17 @@ from .definitions import Aria2TaskClass
 from .item import Aria2TaskItem
 
 
+def _excludeMetadata(item) -> bool:
+    bittorrent = item.get("bittorrent")
+    if bittorrent:
+        if "info" not in bittorrent:
+            assert len(item["files"]) == 1
+            assert item["files"][0]["length"] == "0"
+            assert item["files"][0]["path"].startswith("[METADATA]")
+            return False
+    return True
+
+
 class TaskMap(TaskMapBase):
     _Item = Aria2TaskItem
 
@@ -13,6 +24,9 @@ class TaskMap(TaskMapBase):
         super().__init__(adapter, klass)
 
     def updateData(self, updatingList = None):
+        # exclude only-metadata entries
+        updatingList = filter(_excludeMetadata, updatingList)
+
         updating = dict(zip(
             map(lambda i: "{ns}|{id}".format(ns = self.adapter.namespace, id = i["gid"]),
                 updatingList),

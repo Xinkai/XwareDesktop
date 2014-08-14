@@ -193,6 +193,10 @@ class Aria2Adapter(QObject):
         self.maps[Aria2TaskClass.Stopped].updateData(result)
 
     @asyncio.coroutine
+    def _cb_getGlobalOption(self, result):
+        pass
+
+    @asyncio.coroutine
     def _cb_onDownloadStart(self, event):
         print("_cb_onDownloadComplete", event)
 

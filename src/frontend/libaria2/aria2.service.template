@@ -1,0 +1,14 @@
+[Unit]
+Description=Aria2 User Service (By Xware Desktop)
+Documentation=man:aria2c
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.xware-desktop/profile/aria2
+; Cannot pass --daemon to aria2 here, because aria2 will call chdir("/") in daemon mode
+; chdir("/") will mess up with the relative path in aria2.conf file
+ExecStart=/usr/bin/aria2c --conf-path aria2.conf
+
+[Install]
+WantedBy=default.target
