@@ -12,7 +12,7 @@ _DEFAULT_PATTERN = """// packages
 *.mp1;*.mp2;*.mp3;*.mp4;*.flac;*.ape;*.webm;*.ogg;*.wav;*.wv;*.wma;*.aac;*.m4a;*.ra
 
 // video
-*.mp4;*.mkv;*.rm;*.rmvb;*.avi;*.flv;*.3gp;*.3g2;*.wmv;*.mov;*.vob
+*.mp4;*.mkv;*.rm;*.rmvb;*.avi;*.flv;*.3gp;*.3g2;*.wmv;*.mov;*.vob;*.ogv
 
 // media-related
 *.srt;*.cue;*.m3u;*.sub
