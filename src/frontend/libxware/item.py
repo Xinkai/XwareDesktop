@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from launcher import app
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 from datetime import datetime
@@ -206,7 +207,14 @@ class XwareTaskItem(QObject):
 
     @pyqtProperty(int, notify = updated)
     def completionTime(self):
-        return self._completionTime
+        # Workaround
+        # Xware Lie! Sometimes unfinished tasks have completeTime
+        if self.progress == 10000:
+            return self._completionTime
+        else:
+            logging.info("Task {taskId} has completeTime {time}, but it is not finished yet."
+                         .format(taskId = self.id, time = self._completionTime))
+            return 0
 
     @pyqtProperty(int, notify = updated)
     def state(self):
