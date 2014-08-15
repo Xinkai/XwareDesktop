@@ -165,7 +165,7 @@ Rectangle {
                     switch (state) {
                     case TaskModel.Vip_NOTUSED:
                         return "未开启"
-                    case TaskModle.Vip_SUBMITTING:
+                    case TaskModel.Vip_SUBMITTING:
                         return "提交中"
                     case TaskModel.Vip_ACTIVATED:
                         return "已开启 " + JsUtils.humanBytes(taskData.vipChannel.speed)

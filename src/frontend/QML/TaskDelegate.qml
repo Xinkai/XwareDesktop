@@ -3,6 +3,7 @@ import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.1
 import "JsUtils.js" as JsUtils
 
+import TaskModel 1.0
 
 Rectangle {
     id: item
@@ -43,7 +44,14 @@ Rectangle {
             color: "transparent"
             Text {
                 horizontalAlignment: Text.AlignRight
-                text: JsUtils.humanBytes(taskData.speed) + "/s"
+                text: {
+                    switch (taskData.state) {
+                    case TaskModel.State_Downloading:
+                        return JsUtils.humanBytes(taskData.speed) + "/s"
+                    default:
+                        return ""
+                    }
+                }
             }
         }
         Rectangle {
@@ -60,7 +68,14 @@ Rectangle {
             color: "transparent"
             Text {
                 color: "black"
-                text: JsUtils.humanSeconds(taskData.remainingTime)
+                text: {
+                    switch (taskData.state) {
+                    case TaskModel.State_Downloading:
+                        return JsUtils.humanSeconds(taskData.remainingTime)
+                    default:
+                        return ""
+                    }
+                }
             }
         }
     }
