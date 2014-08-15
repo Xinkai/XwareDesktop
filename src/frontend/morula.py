@@ -12,6 +12,7 @@ from PyQt5.QtGui import QGuiApplication
 from Widgets.QuickView import CustomQuickView
 
 import constants
+from utils.IconProvider import IconProvider
 
 
 class QmlMain(CustomQuickView):
@@ -22,6 +23,8 @@ class QmlMain(CustomQuickView):
         self.setTitle("Xware Desktop with QML (experimental)")
         self.setResizeMode(QQuickView.SizeRootObjectToView)
         self.qmlUrl = QUrl.fromLocalFile(os.path.join(constants.FRONTEND_DIR, "QML/Main.qml"))
+        self._iconProvider = IconProvider()
+        self.engine().addImageProvider("icon", self._iconProvider)
         self.rootContext().setContextProperty("adapters", app.adapterManager)
         self.rootContext().setContextProperty("taskModel", app.proxyModel)
         self.rootContext().setContextProperty("schedulerModel", app.schedulerModel)

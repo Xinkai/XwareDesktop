@@ -33,6 +33,23 @@ Rectangle {
             width: leftWidth
             height: 30
             color: "transparent"
+            Image {
+                sourceSize.width: 24
+                sourceSize.height: 24
+                source: {
+                    switch (taskData.state) {
+                    case TaskModel.State_Downloading:
+                        return "image://icon/media-playback-start"
+                    case TaskModel.State_Paused:
+                        return "image://icon/media-playback-pause"
+                    case TaskModel.State_Completed:
+                        return "image://icon/media-playback-stop"
+                    default:
+                        return "image://icon/xware-desktop"
+                    }
+                }
+            }
+
             Text {
                 // FIXME: when flicked, this could generate an error
                 text: taskData.name ? taskData.name : "ERROR"

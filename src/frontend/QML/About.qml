@@ -4,6 +4,12 @@ import QtQuick.Controls 1.1
 Rectangle {
     anchors.fill: parent
     Column {
+        Image {
+            source: "image://icon/xware-desktop"
+            sourceSize.width: 48
+            sourceSize.height: 48
+        }
+
         Text {
             horizontalAlignment: Qt.AlignCenter
             width: parent.width
