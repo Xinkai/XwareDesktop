@@ -68,6 +68,7 @@ class CustomNetworkAccessManager(QNetworkAccessManager):
         for i, item in enumerate(queryItems):
             if item[0] == "boxName":
                 queryItems[i] = ("boxName", os.uname().nodename)
+        queryItems.append(("ct", "0"),)  # Issue #109, Xunlei bind API changed
         urlQuery.setQueryItems(queryItems)
 
         # write changes back to request
