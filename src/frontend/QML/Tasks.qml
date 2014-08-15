@@ -18,19 +18,19 @@ Item {
 
         Column {
             TaskClassSelector {
-                klass: TaskModel.RUNNING
+                klass: TaskModel.Class_RUNNING
             }
 
             TaskClassSelector {
-                klass: TaskModel.COMPLETED
+                klass: TaskModel.Class_COMPLETED
             }
 
             TaskClassSelector {
-                klass: TaskModel.RECYCLED
+                klass: TaskModel.Class_RECYCLED
             }
 
             TaskClassSelector {
-                klass: TaskModel.FAILED
+                klass: TaskModel.Class_FAILED
             }
         }
     }

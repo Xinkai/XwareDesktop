@@ -9,7 +9,8 @@ except ImportError:
     qmlRegisterUncreatableType = None
 
 from utils.misc import dropPy34Enum
-from .TaskModel import CreationTimeRole, TaskClass, TaskClassRole
+from .TaskModel import CreationTimeRole, TaskClass, TaskClassRole, TaskState
+from libxware.definitions import VipChannelState, LixianChannelState
 
 
 class ProxyModel(QSortFilterProxyModel):
@@ -116,7 +117,10 @@ class ProxyModel(QSortFilterProxyModel):
 
     # put this at the end of the class, to workaround a PyQt bug
     # See # 97
-    Q_ENUMS(dropPy34Enum(TaskClass))
+    Q_ENUMS(dropPy34Enum(TaskClass, "Class"))
+    Q_ENUMS(dropPy34Enum(TaskState, "State"))
+    Q_ENUMS(dropPy34Enum(LixianChannelState, "Lixian"))
+    Q_ENUMS(dropPy34Enum(VipChannelState, "Vip"))
 
 if qmlRegisterUncreatableType:
     qmlRegisterUncreatableType(ProxyModel, 'TaskModel', 1, 0, 'TaskModel',

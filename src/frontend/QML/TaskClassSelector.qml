@@ -14,13 +14,13 @@ Rectangle {
         verticalAlignment: Text.AlignVCenter
         text: {
             switch (klass) {
-            case TaskModel.RUNNING:
+            case TaskModel.Class_RUNNING:
                 return "正在下载"
-            case TaskModel.COMPLETED:
+            case TaskModel.Class_COMPLETED:
                 return "已完成"
-            case TaskModel.RECYCLED:
+            case TaskModel.Class_RECYCLED:
                 return "垃圾箱"
-            case TaskModel.FAILED:
+            case TaskModel.Class_FAILED:
                 return "失败的"
             default:
                 return "未知的"

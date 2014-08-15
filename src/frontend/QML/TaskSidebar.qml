@@ -3,6 +3,8 @@ import QtQuick.Controls 1.1
 import QtQuick.Layouts 1.1
 import "JsUtils.js" as JsUtils
 
+import TaskModel 1.0
+
 Rectangle {
     id: item
     ColumnLayout {
@@ -29,19 +31,19 @@ Rectangle {
             text: {
                 if (taskData) {
                     switch (taskData.state) {
-                    case 0:
+                    case TaskModel.State_Downloading:
                         return "下载中"
-                    case 1:
+                    case TaskModel.State_Waiting:
                         return "队列中"
-                    case 2:
+                    case TaskModel.State_Paused:
                         return "已暂停"
-                    case 3:
+                    case TaskModel.State_Completed:
                         return "已完成"
-                    case 4:
+                    case TaskModel.State_Removed:
                         return "已删除"
-                    case 5:
+                    case TaskModel.State_Failed:
                         return "发生错误"
-                    case 99:
+                    case TaskModel.State_Unrecognized:
                         return "未知状态"
                     }
                 } else {
@@ -127,17 +129,17 @@ Rectangle {
                 if (taskData && taskData.lixianChannel) {
                     var state = taskData.lixianChannel.state
                     switch (state) {
-                    case 0:
+                    case TaskModel.Lixian_NOTUSED:
                         return "未开启"
-                    case 1:
+                    case TaskModel.Lixian_SUBMITTING:
                         return "提交中"
-                    case 2:
+                    case TaskModel.Lixian_DOWNLOADING:
                         return "云端下载中 " + JsUtils.humanBytes(taskData.lixianChannel.serverSpeed) + "/s"
-                    case 3:
+                    case TaskModel.Lixian_ACTIVATED:
                         return "已开启 " + JsUtils.humanBytes(taskData.lixianChannel.speed) + "/s"
-                    case 4:
+                    case TaskModel.Lixian_FAILED:
                         return "失败"
-                    case 5:
+                    default:
                         return "未知"
                     }
                 } else {
@@ -161,13 +163,13 @@ Rectangle {
                     }
                     var state = taskData.vipChannel.state
                     switch (state) {
-                    case 0:
+                    case TaskModel.Vip_NOTUSED:
                         return "未开启"
-                    case 1:
+                    case TaskModle.Vip_SUBMITTING:
                         return "提交中"
-                    case 2:
+                    case TaskModel.Vip_ACTIVATED:
                         return "已开启 " + JsUtils.humanBytes(taskData.vipChannel.speed)
-                    case 3:
+                    case TaskModel.Vip_FAILED:
                         return "失败"
                     default:
                         return "未知"

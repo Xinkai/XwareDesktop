@@ -46,13 +46,18 @@ def decodePrivateLink(link):
         raise Exception("Cannot decode private link {}.".format(link))
 
 
-def dropPy34Enum(pyenum: IntEnum):
+def dropPy34Enum(pyenum: IntEnum, prefix = None):
     # convert a python 3.4 IntEnum class to a plain class that can be used with Q_ENUMS
     assert issubclass(pyenum, IntEnum)
     name = pyenum.__class__.__name__
     d = {}
     for member in pyenum.__members__:
-        d[member] = int(getattr(pyenum, member))
+        if prefix:
+            key = prefix + "_" + member
+        else:
+            key = member
+        assert key[0] == key[0].upper()
+        d[key] = int(getattr(pyenum, member))
 
     klass = type(name, (object,), d)
     return klass

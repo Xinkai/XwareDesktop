@@ -6,7 +6,7 @@ from datetime import datetime
 
 from models.TaskModel import TaskState
 from models.ProxyModel import TaskClass
-from .vanilla import TaskState as XwareTaskState
+from .definitions import TaskState as XwareTaskState
 
 _SPEED_SAMPLE_COUNT = 50
 
