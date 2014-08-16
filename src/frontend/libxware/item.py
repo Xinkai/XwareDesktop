@@ -289,7 +289,7 @@ class XwareTaskItem(QObject):
             self._name = data.get("name")
             self._creationTime = data.get("createTime")
             self._path = data.get("path")
-            self._size = data.get("size")
+            self._size = int(data.get("size"))
             self._initialized = True
             self.initialized.emit()
 

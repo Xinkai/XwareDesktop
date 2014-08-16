@@ -9,9 +9,8 @@ Rectangle {
     id: item
     anchors.fill: parent
     readonly property var taskData: styleData.value
-    property int rightWidth: 75
-    property int leftWidth: item.width - rightWidth
-
+    readonly property int stateIconWidth: 40
+    readonly property int rightMostWidth: 80
     Rectangle {
         id: progressIndicator
         color: styleData.selected ? "lightsteelblue" : "lightgreen"
@@ -22,18 +21,18 @@ Rectangle {
         width: (taskData.progress / 10000) * item.width
     }
 
-    Grid {
+    Row {
+        spacing: 0
         anchors.fill: parent
-        columns: 2
-        horizontalItemAlignment: Qt.AlignLeft
-        verticalItemAlignment: Qt.AlignVCenter
-        rowSpacing: 3
 
         Rectangle {
-            width: leftWidth
-            height: 30
+            height: parent.height
+            width: stateIconWidth
             color: "transparent"
             Image {
+                anchors.centerIn: parent.Center
+                anchors.fill: parent
+                fillMode: Image.Pad
                 sourceSize.width: 24
                 sourceSize.height: 24
                 source: {
@@ -49,48 +48,84 @@ Rectangle {
                     }
                 }
             }
-
-            Text {
-                // FIXME: when flicked, this could generate an error
-                text: taskData.name ? taskData.name : "ERROR"
-            }
         }
-        Rectangle {
-            width: rightWidth
-            height: 30
-            color: "transparent"
-            Text {
-                horizontalAlignment: Text.AlignRight
-                text: {
-                    switch (taskData.state) {
-                    case TaskModel.State_Downloading:
-                        return JsUtils.humanBytes(taskData.speed) + "/s"
-                    default:
-                        return ""
+
+        Column {
+            spacing: 0
+            width: parent.width - stateIconWidth - rightMostWidth
+            height: parent.height
+            Rectangle {
+                width: parent.width
+                height: parent.height * .7
+                color: "transparent"
+                Text {
+                    font.family: "Helvetica"
+                    font.pointSize: 12
+                    elide: Text.ElideRight
+                    anchors.fill: parent
+                    verticalAlignment: Text.AlignVCenter
+                    // FIXME: when flicked, this could generate an error
+                    text: taskData.name ? taskData.name : "ERROR"
+                }
+            }
+            Rectangle {
+                width: parent.width
+                height: parent.height * .3
+                color: "transparent"
+                Row {
+                    Text {
+                        color: "grey"
+                        text: {
+                            if (taskData) {
+                                return JsUtils.humanBytes(taskData.size)
+                            } else {
+                                return ""
+                            }
+                        }
                     }
                 }
             }
         }
-        Rectangle {
-            width: leftWidth
-            height: 20
-            color: "transparent"
-            Text {
-                text: ""
+
+        Column {
+            spacing: 0
+            width: rightMostWidth
+            height: parent.height
+            Rectangle {
+                width: parent.width
+                height: parent.height / 2
+                color: "transparent"
+                Text {
+                    font.family: "Comic Sans"
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
+                    text: {
+                        switch (taskData.state) {
+                        case TaskModel.State_Downloading:
+                            return JsUtils.humanBytes(taskData.speed) + "/s"
+                        default:
+                            return ""
+                        }
+                    }
+                }
             }
-        }
-        Rectangle {
-            width: rightWidth
-            height: 20
-            color: "transparent"
-            Text {
-                color: "black"
-                text: {
-                    switch (taskData.state) {
-                    case TaskModel.State_Downloading:
-                        return JsUtils.humanSeconds(taskData.remainingTime)
-                    default:
-                        return ""
+            Rectangle {
+                width: parent.width
+                height: parent.height / 2
+                color: "transparent"
+                Text {
+                    font.family: "Comic Sans"
+                    anchors.fill: parent
+                    horizontalAlignment: Text.AlignRight
+                    verticalAlignment: Text.AlignVCenter
+                    text: {
+                        switch (taskData.state) {
+                        case TaskModel.State_Downloading:
+                            return JsUtils.humanSeconds(taskData.remainingTime)
+                        default:
+                            return ""
+                        }
                     }
                 }
             }
