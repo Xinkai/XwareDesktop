@@ -138,7 +138,8 @@ Rectangle {
                     case TaskModel.Lixian_SUBMITTING:
                         return "提交中"
                     case TaskModel.Lixian_DOWNLOADING:
-                        return "云端下载中 " + JsUtils.humanBytes(taskData.lixianChannel.serverSpeed) + "/s"
+                        return "云端下载中 " + JsUtils.humanBytes(taskData.lixianChannel.serverSpeed) + "/s " +
+                                taskData.lixianChannel.serverProgress / 100 + "%"
                     case TaskModel.Lixian_ACTIVATED:
                         return "已开启 " + JsUtils.humanBytes(taskData.lixianChannel.speed) + "/s"
                     case TaskModel.Lixian_FAILED:

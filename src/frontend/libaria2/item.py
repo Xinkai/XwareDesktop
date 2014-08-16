@@ -20,6 +20,7 @@ class Aria2TaskItem(QObject):
         self._initialized = False
         self._adapter = adapter
         self._namespace = self._adapter.namespace
+        self._klass = None
 
         self._gid = None
         self._size = 0
@@ -103,7 +104,10 @@ class Aria2TaskItem(QObject):
         if self._creationTime:
             return self._creationTime
 
-        self._creationTime = int(os.stat(self.fullpath).st_ctime)
+        try:
+            self._creationTime = int(os.stat(self.fullpath).st_ctime)
+        except FileNotFoundError:
+            self._creationTime = 0
         return self._creationTime
 
     @pyqtProperty(int, notify = initialized)
@@ -155,13 +159,14 @@ class Aria2TaskItem(QObject):
             return os.path.join(self._path, self._bittorrent["info"]["name"])
 
     def update(self, data, klass):
+        self._klass = klass
         self.speed = int(data.get("downloadSpeed", 0))
-        self._status = data["status"]
         self._ulsize = int(data.get("uploadLength"))
         self._dlsize = int(data.get("completedLength"))
         self._bittorrent = data.get("bittorrent")
 
-        if not self._initialized:
+        if (not self._initialized) or (self._status is not data["status"]):
+            self._status = data["status"]
             self._gid = data.get("gid")
             self._path = data.get("dir")
             self._size = int(data.get("totalLength"))
