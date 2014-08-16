@@ -89,7 +89,9 @@ Rectangle {
 
         Button {
             text: "暂停"
-            visible: buddyView.selection.count === 1
+            visible: (buddyView.selection.count === 1) &&
+                     (taskData) &&
+                     (taskData.state === TaskModel.State_Downloading)
             onClicked: {
                 var rows = []
                 buddyView.selection.forEach(function(row) {
@@ -104,7 +106,9 @@ Rectangle {
 
         Button {
             text: "开始"
-            visible: buddyView.selection.count === 1
+            visible: (buddyView.selection.count === 1) &&
+                     (taskData) &&
+                     (taskData.state === TaskModel.State_Paused)
             onClicked: {
                 var rows = []
                 buddyView.selection.forEach(function(row) {

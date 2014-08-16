@@ -246,7 +246,7 @@ class XwareTaskItem(QObject):
     def lixianChannel(self):
         return self._lixianChannel
 
-    @property
+    @pyqtProperty(str, notify = initialized)
     def fullpath(self):
         return self.path + self.name
 

@@ -12,7 +12,7 @@ from PyQt5.QtGui import QGuiApplication
 from Widgets.QuickView import CustomQuickView
 
 import constants
-from utils.IconProvider import IconProvider
+from utils.IconProvider import IconProvider, MimeIconProvider
 
 
 class QmlMain(CustomQuickView):
@@ -24,7 +24,9 @@ class QmlMain(CustomQuickView):
         self.setResizeMode(QQuickView.SizeRootObjectToView)
         self.qmlUrl = QUrl.fromLocalFile(os.path.join(constants.FRONTEND_DIR, "QML/Main.qml"))
         self._iconProvider = IconProvider()
+        self._mimeIconProvider = MimeIconProvider()
         self.engine().addImageProvider("icon", self._iconProvider)
+        self.engine().addImageProvider("mimeicon", self._mimeIconProvider)
         self.rootContext().setContextProperty("adapters", app.adapterManager)
         self.rootContext().setContextProperty("taskModel", app.proxyModel)
         self.rootContext().setContextProperty("schedulerModel", app.schedulerModel)

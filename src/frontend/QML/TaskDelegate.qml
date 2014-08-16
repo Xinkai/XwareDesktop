@@ -58,14 +58,30 @@ Rectangle {
                 width: parent.width
                 height: parent.height * .7
                 color: "transparent"
-                Text {
-                    font.family: "Helvetica"
-                    font.pointSize: 12
-                    elide: Text.ElideRight
+                Row {
+                    spacing: 0
                     anchors.fill: parent
-                    verticalAlignment: Text.AlignVCenter
-                    // FIXME: when flicked, this could generate an error
-                    text: taskData.name ? taskData.name : "ERROR"
+                    Image {
+                        id: mimeIcon
+                        width: 24
+                        height: 24
+                        fillMode: Image.Pad
+                        sourceSize.width: 24
+                        sourceSize.height: 24
+                        anchors.verticalCenter: parent.verticalCenter
+                        source: "image://mimeicon/" + taskData.fullpath
+                    }
+
+                    Text {
+                        font.family: "Helvetica"
+                        font.pointSize: 12
+                        elide: Text.ElideRight
+                        width: parent.width - mimeIcon.width
+                        height: parent.height
+                        verticalAlignment: Text.AlignVCenter
+                        // FIXME: when flicked, this could generate an error
+                        text: taskData.name ? taskData.name : "ERROR"
+                    }
                 }
             }
             Rectangle {
