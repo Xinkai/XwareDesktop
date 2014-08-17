@@ -43,6 +43,8 @@ class TaskModel(QAbstractListModel):
     sigAfterInsert = pyqtSignal()
     sigBeforeRemove = pyqtSignal(int)
     sigAfterRemove = pyqtSignal()
+    sigBeforeMove = pyqtSignal(int, int)
+    sigAfterMove = pyqtSignal()
 
     taskCompleted = pyqtSignal("QObject")  # emits from TaskItem
 
@@ -56,6 +58,8 @@ class TaskModel(QAbstractListModel):
         self.sigAfterInsert.connect(self.slotAfterInsert, Qt.BlockingQueuedConnection)
         self.sigBeforeRemove.connect(self.slotBeforeRemove, Qt.BlockingQueuedConnection)
         self.sigAfterRemove.connect(self.slotAfterRemove, Qt.BlockingQueuedConnection)
+        self.sigBeforeMove.connect(self.slotBeforeMove, Qt.BlockingQueuedConnection)
+        self.sigAfterMove.connect(self.slotAfterMove, Qt.BlockingQueuedConnection)
 
     @pyqtSlot(int)
     def slotBeforeInsert(self, i):
@@ -75,6 +79,14 @@ class TaskModel(QAbstractListModel):
     @pyqtSlot()
     def slotAfterRemove(self):
         self.endRemoveRows()
+
+    @pyqtSlot(int, int)
+    def slotBeforeMove(self, src: int, dst: int):
+        self.beginMoveRows(QModelIndex(), src, src, QModelIndex(), dst)
+
+    @pyqtSlot()
+    def slotAfterMove(self):
+        self.endMoveRows()
 
     def rowCount(self, qModelIndex=None, *args, **kwargs):
         return len(self.taskManager)

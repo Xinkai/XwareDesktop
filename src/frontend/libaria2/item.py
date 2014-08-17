@@ -35,6 +35,7 @@ class Aria2TaskItem(QObject):
 
         self._creationTime = 0
         self._completionTime = 0
+        self._isDeletionPending = False
 
         self.moveToThread(self._adapter.thread())
         self.setParent(self._adapter)
@@ -162,6 +163,14 @@ class Aria2TaskItem(QObject):
         else:
             assert bool(self._bittorrent)
             return os.path.join(self._path, self._bittorrent["info"]["name"])
+
+    @pyqtProperty(bool, notify = updated)
+    def isDeletionPending(self):
+        return self._isDeletionPending
+
+    @isDeletionPending.setter
+    def isDeletionPending(self, value):
+        self._isDeletionPending = value
 
     def update(self, data, klass):
         self._klass = klass

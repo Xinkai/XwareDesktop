@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from collections import OrderedDict
+import threading
 
 
 class TaskMapBase(OrderedDict):
     """TaskModel underlying data"""
-
+    _Lock = threading.Lock()
     _Item = None  # "the class with which new task item can be created"
 
     def __init__(self,
@@ -16,44 +17,37 @@ class TaskMapBase(OrderedDict):
         self._klass = klass
 
     def _updateDict(self, updating: dict = None):
-        currentKeys = set(self.keys())
-        updatingKeys = set(updating.keys())
+        with self.__class__._Lock:
+            currentKeys = set(self.keys())
+            updatingKeys = set(updating.keys())
 
-        addedKeys = updatingKeys - currentKeys
-        modifiedKeys = updatingKeys & currentKeys  # Alter/change/modify
-        removedKeys = currentKeys - updatingKeys
+            addedKeys = updatingKeys - currentKeys
+            modifiedKeys = updatingKeys & currentKeys  # Alter/change/modify
+            removedKeys = currentKeys - updatingKeys
 
-        for k in modifiedKeys:
-            self[k].update(updating[k], self._klass)
+            for k in modifiedKeys:
+                self[k].update(updating[k], self._klass)
 
-        for k in addedKeys:
-            # Note: __setitem__ is overridden
-            self[k] = updating[k]
+            for k in addedKeys:
+                self.insert(k, updating[k])
 
-        for k in removedKeys:
-            # Note: __delitem__ is overridden
-            del self[k]
+            for k in removedKeys:
+                self.markPendingDeletion(k)
+            self.doneUpdating()
 
-    def __setitem__(self, key, value, **kwargs):
-        if key in self:
-            raise ValueError("__setitem__ is specialized for inserting.")
+    def insert(self, key, value):
         ret = self.beforeInsert(key)
-        if ret:
-            if isinstance(ret, self.__class__._Item):
-                item = ret
-                item.update(value, self._klass)
-            else:
-                item = self.__class__._Item(adapter = self.adapter)
-                item.update(value, self._klass)
-            super().__setitem__(key, item)
+        if ret is True:
+            item = self.__class__._Item(adapter = self.adapter)
+            item.update(value, self._klass)
+            self[key] = item
             self.afterInsert()
-
-    def __delitem__(self, key, **kwargs):
-        if self.beforeDelete(self.index(key)):
-            popped = self[key]
-            super().__delitem__(key)
-            self.moveToStash(popped)
-            self.afterDelete()
+        elif isinstance(ret, self.__class__._Item):
+            assert key in self
+            item = ret
+            item.update(value, self._klass)
+        elif ret is False:
+            pass
 
     def index(self, key):
         return list(self.keys()).index(key)
@@ -66,12 +60,9 @@ class TaskMapBase(OrderedDict):
     def afterInsert(self):
         raise NotImplementedError()
 
-    def beforeDelete(self, index):
+    def markPendingDeletion(self, key):
         raise NotImplementedError()
 
-    def moveToStash(self, item):
-        raise NotImplementedError()
-
-    def afterDelete(self):
+    def doneUpdating(self):
         raise NotImplementedError()
     # ======================== END OF FOREIGN DEPENDENCY ========================

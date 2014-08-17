@@ -152,6 +152,7 @@ class XwareTaskItem(QObject):
 
         self._vipChannel = VipChannel(self)
         self._lixianChannel = LixianChannel(self)
+        self._isDeletionPending = False
 
         self.moveToThread(self._adapter.thread())
         self.setParent(self._adapter)
@@ -249,6 +250,14 @@ class XwareTaskItem(QObject):
     @pyqtProperty(str, notify = initialized)
     def fullpath(self):
         return self.path + self.name
+
+    @pyqtProperty(bool, notify = updated)
+    def isDeletionPending(self):
+        return self._isDeletionPending
+
+    @isDeletionPending.setter
+    def isDeletionPending(self, value):
+        self._isDeletionPending = value
 
     @pyqtProperty(int, notify = updated)
     def klass(self):
