@@ -252,19 +252,16 @@ class XwareTaskItem(QObject):
 
     @pyqtProperty(int, notify = updated)
     def klass(self):
-        # _klass is xware class[0-3],
-        # return Xware Desktop task class
-        return self._xwareClassToClass(self._klass)
+        return self._klass
 
     @klass.setter
     def klass(self, value):
-        oldClass = self.klass
+        oldClass = self._klass
         self._klass = value
-        newClass = self._xwareClassToClass(value)
-        if oldClass == newClass:
+        if oldClass == self._klass:
             return
 
-        if newClass == TaskClass.COMPLETED:
+        if self._klass == TaskClass.COMPLETED:
             timestamp = datetime.timestamp(datetime.now())
             if 0 <= timestamp - self.completionTime <= 10:
                 app.taskModel.taskCompleted.emit(self)
@@ -273,7 +270,7 @@ class XwareTaskItem(QObject):
     def _xwareClassToClass(klass: int):
         return 1 << klass
 
-    def update(self, data, klass):
+    def update(self, data, xwareKlass):
         self.speed = data.get("speed")
         self._remainingTime = int(data.get("remainTime"))
         self._xwareState = data.get("state")
@@ -284,6 +281,7 @@ class XwareTaskItem(QObject):
         self._vipChannel.update(data.get("vipChannel"))
         self._lixianChannel.update(data.get("lixianChannel"))
 
+        self.klass = self._xwareClassToClass(xwareKlass)
         if not self._initialized:
             self._id = data.get("id")
             self._name = data.get("name")
@@ -293,5 +291,4 @@ class XwareTaskItem(QObject):
             self._initialized = True
             self.initialized.emit()
 
-        self.klass = klass
         self.updated.emit()

@@ -6,11 +6,9 @@ from .item import Aria2TaskItem
 
 
 def _excludeMetadata(item) -> bool:
-    bittorrent = item.get("bittorrent")
-    if bittorrent:
-        if "info" not in bittorrent:
-            assert len(item["files"]) == 1
-            assert item["files"][0]["path"].startswith("[METADATA]")
+    if len(item["files"]) == 1:
+        file = item["files"][0]
+        if file["path"].startswith("[METADATA]") and len(file["uris"]) == 0:
             return False
     return True
 

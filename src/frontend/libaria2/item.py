@@ -78,7 +78,7 @@ class Aria2TaskItem(QObject):
             Aria2TaskState.Complete.value: TaskState.Completed,
             Aria2TaskState.Removed.value: TaskState.Removed,
         }.get(self._status, TaskState.Unrecognized)
-        if result == TaskState.Downloading:
+        if result in (TaskState.Downloading, TaskState.Paused):
             if self._dlsize == self._size:
                 result = TaskState.Completed
         return result
@@ -112,10 +112,15 @@ class Aria2TaskItem(QObject):
 
     @pyqtProperty(int, notify = initialized)
     def completionTime(self):
+        if self._dlsize != self._size:
+            return 0
+
         if self._completionTime:
             return self._completionTime
-
-        self._completionTime = int(os.stat(self.fullpath).st_mtime)
+        try:
+            self._completionTime = int(os.stat(self.fullpath).st_mtime)
+        except FileNotFoundError:
+            self._completionTime = 0
         return self._completionTime
 
     @pyqtProperty(int, notify = updated)

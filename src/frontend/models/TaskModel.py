@@ -6,7 +6,7 @@ from collections import defaultdict
 import enum
 from itertools import groupby
 
-from PyQt5.QtCore import QAbstractTableModel, Qt, pyqtSlot, pyqtSignal, QModelIndex, QDateTime
+from PyQt5.QtCore import QAbstractListModel, Qt, pyqtSlot, pyqtSignal, QModelIndex, QDateTime
 from utils.system import systemOpen, viewOneFile, viewMultipleFiles
 
 from .TaskManager import TaskManager
@@ -38,7 +38,7 @@ class TaskState(enum.IntEnum):
     Unrecognized = 99
 
 
-class TaskModel(QAbstractTableModel):
+class TaskModel(QAbstractListModel):
     sigBeforeInsert = pyqtSignal(int)
     sigAfterInsert = pyqtSignal()
     sigBeforeRemove = pyqtSignal(int)
