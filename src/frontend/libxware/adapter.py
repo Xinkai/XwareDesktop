@@ -86,6 +86,7 @@ class XwareAdapter(QObject):
         self._xwaredRunning = False
         self._etmPid = 0
         self._peerId = ""
+        self._startEtmWhen = 1
 
         self._adapterConfig = adapterConfig
         connection = parse.urlparse(self._adapterConfig["connection"], scheme = "file")
