@@ -47,7 +47,7 @@ class ProxyAddons(object):
             return pickledStr
 
     def setobj(self, section, key, value):
-        pickled = pickle.dumps(value, 4)  # protocol 4 requires Py3.4
+        pickled = pickle.dumps(value, pickle.HIGHEST_PROTOCOL)
         pickledBytes = binascii.hexlify(pickled)
         pickledStr = pickledBytes.decode("ascii")
         self.set(section, key, pickledStr)

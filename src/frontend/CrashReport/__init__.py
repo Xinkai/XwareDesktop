@@ -20,7 +20,7 @@ class CrashReport(object):
 
     @staticmethod
     def encodePayload(payload):
-        pickled = pickle.dumps(payload, 4)  # protocol 4 requires Py3.4
+        pickled = pickle.dumps(payload, pickle.HIGHEST_PROTOCOL)
         pickledBytes = binascii.hexlify(pickled)
         pickledStr = pickledBytes.decode("ascii")
         return pickledStr
