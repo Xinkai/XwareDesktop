@@ -100,19 +100,6 @@ Item {
                     }
 
                     Connections {
-                        target: taskModel
-
-                        function handleSrcDataChanged(row1, row2) {
-                            var currentRow = tableView.currentRow
-                            if ((row1 <= currentRow) && (currentRow <= row2)) {
-                                metaSideBarLoader.setTaskData()
-                            }
-                        }
-
-                        onSrcDataChanged: handleSrcDataChanged(arguments[0], arguments[1])
-                    }
-
-                    Connections {
                         target: tableView.selection
                         onSelectionChanged: {
                             metaSideBarLoader.setTaskData()

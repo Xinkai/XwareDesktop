@@ -14,7 +14,6 @@ from libxware.definitions import VipChannelState, LixianChannelState
 
 
 class ProxyModel(QSortFilterProxyModel):
-    srcDataChanged = pyqtSignal(int, int)  # row1, row2
     taskClassFilterChanged = pyqtSignal()
 
     def __init__(self, parent = None):
@@ -47,12 +46,7 @@ class ProxyModel(QSortFilterProxyModel):
 
         return result
 
-    @pyqtSlot(QModelIndex, QModelIndex, "QVector<int>")
-    def _slotSrcDataChanged(self, topLeft, bottomRight, roles):
-        self.srcDataChanged.emit(topLeft.row(), bottomRight.row())
-
     def setSourceModel(self, model):
-        model.dataChanged.connect(self._slotSrcDataChanged)
         super().setSourceModel(model)
         self.setSortRole(CreationTimeRole)
 
