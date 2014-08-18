@@ -39,6 +39,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
             self.menu_backend.setEnabled(True)
 
         app.systray.toggleMinimized.connect(self.toggleMinimized)
+        self.action_createTask.triggered.connect(app.taskCreationAgent.createTasksAction)
 
     # shorthand
     @property

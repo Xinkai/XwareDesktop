@@ -15,14 +15,6 @@ from utils.system import systemOpen, viewOneFile
 FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logined", "online"])
 
 
-class FrontendAction(object):
-    def __repr__(self):
-        return "FrontendAction, should be subclassed."
-
-    def consume(self):
-        raise NotImplementedError()
-
-
 # Together with xwarejs.js, exchange information with the browser
 class FrontendPy(QObject):
     sigCreateTasks = pyqtSignal("QStringList")
@@ -36,15 +28,12 @@ class FrontendPy(QObject):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self._queue = collections.deque()
         self._isPageMaskOn = None
         self._isPageOnline = None  # property wraps them, in order to fire sigFrontendStatusChanged
         self._isPageLogined = None
         self._isXdjsLoaded = None
+        app.taskCreationAgent.available.connect(lambda: self.createTask("available"))
         app.applySettings.connect(self.tryLogin)
-
-        from Tasks import TaskCreationAgent
-        self.taskCreationAgent = TaskCreationAgent(self)  # just hold a reference
 
     @property
     def isPageMaskOn(self):
@@ -54,7 +43,7 @@ class FrontendPy(QObject):
     def isPageMaskOn(self, value):
         self._isPageMaskOn = value
         if self._isPageMaskOn is False:
-            self.consumeAction("mask off")
+            self.createTask("mask off")
 
     @property
     def isPageOnline(self):
@@ -67,7 +56,7 @@ class FrontendPy(QObject):
         self._isPageOnline = value
         self.sigFrontendStatusChanged.emit()
         if self._isPageOnline:
-            self.consumeAction("online")
+            self.createTask("online")
 
     @property
     def isPageLogined(self):
@@ -78,7 +67,7 @@ class FrontendPy(QObject):
         self._isPageLogined = value
         self.sigFrontendStatusChanged.emit()
         if self._isPageLogined:
-            self.consumeAction("logined")
+            self.createTask("logined")
 
     @property
     def isXdjsLoaded(self):
@@ -89,14 +78,7 @@ class FrontendPy(QObject):
         self._isXdjsLoaded = value
         self.sigFrontendStatusChanged.emit()
         if self._isXdjsLoaded:
-            self.consumeAction("xdjs loaded")
-
-    def queueAction(self, action):
-        self._queue.append(action)
-        self.consumeAction("action newly queued")
-
-    def dequeueAction(self):
-        return self._queue.popleft()
+            self.createTask("xdjs loaded")
 
     @pyqtSlot()
     def tryLogin(self):
@@ -199,7 +181,7 @@ class FrontendPy(QObject):
         self.isPageLogined = logined
 
     @pyqtSlot()
-    def consumeAction(self, reason):
+    def createTask(self, reason):
         logging.info("Try to consume, because {}.".format(reason))
         if not self.isPageOnline:
             return
@@ -214,12 +196,17 @@ class FrontendPy(QObject):
             return
 
         try:
-            action = self.dequeueAction()
+            batch = app.taskCreationAgent.dequeue()
         except IndexError:
             # no actions
             return
 
-        action.consume()
+        unpacked = batch.unpack()
+        if unpacked.isLocalBt:
+            app.mainWin.page.overrideFile = unpacked.urls[0]
+            self.sigCreateTaskFromTorrentFile.emit()
+        else:
+            self.sigCreateTasks.emit(unpacked.urls)
 
     @pyqtSlot()
     def slotClickBtButton(self):

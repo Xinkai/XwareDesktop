@@ -79,11 +79,13 @@ class XwareDesktop(QApplication):
         from Widgets.systray import Systray
         from Notify import Notifier
         from Schedule.model import SchedulerModel
+        from Tasks.action import TaskCreationAgent
 
         self.systray = Systray(self)
         self.notifier = Notifier(self)
         self.schedulerModel = SchedulerModel(self)
         self.schedulerModel.setSourceModel(self.taskModel)
+        self.taskCreationAgent = TaskCreationAgent(self)
         self.monitorWin = None
         self.applySettings.connect(self.slotCreateCloseMonitorWindow)
 
