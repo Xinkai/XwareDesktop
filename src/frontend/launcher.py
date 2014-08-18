@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -OO
 # -*- coding: utf-8 -*-
 
 import os, sys
@@ -248,16 +248,17 @@ if __name__ == "__main__":
 
     def safeExec(app_):
         code = app_.exec()
-        windows = app_.topLevelWindows()
-        if windows:
-            raise RuntimeError("Windows left: {}"
-                               .format(list(map(lambda win: win.objectName(),
-                                                windows))))
-        widgets = app_.topLevelWidgets()
-        if widgets:
-            raise RuntimeError("Widgets left: {}"
-                               .format(list(map(lambda wid: wid.objectName(),
-                                                widgets))))
+        if __debug__:
+            windows = app_.topLevelWindows()
+            if windows:
+                raise RuntimeError("Windows left: {}"
+                                   .format(list(map(lambda win: win.objectName(),
+                                                    windows))))
+            widgets = app_.topLevelWidgets()
+            if widgets:
+                raise RuntimeError("Widgets left: {}"
+                                   .format(list(map(lambda wid: wid.objectName(),
+                                                    widgets))))
         del app_
         sys.exit(code)
     safeExec(app)

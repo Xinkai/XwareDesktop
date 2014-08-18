@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -OO
 # -*- coding: utf-8 -*-
 
 import os, sys
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
 from PyQt5.QtCore import QUrl, QSize
 from PyQt5.QtQuick import QQuickView
-from PyQt5.QtGui import QGuiApplication
+from PyQt5.QtWidgets import QApplication
 
 from Widgets.QuickView import CustomQuickView
 
@@ -31,7 +31,7 @@ from utils.IconProvider import IconProvider, MimeIconProvider
 class QmlMain(CustomQuickView):
     def __init__(self, parent):
         super().__init__(parent)
-        app = QGuiApplication.instance()
+        app = QApplication.instance()
 
         self.setTitle("Xware Desktop with QML (experimental)")
         self.setResizeMode(QQuickView.SizeRootObjectToView)
@@ -47,7 +47,7 @@ class QmlMain(CustomQuickView):
         self.resize(QSize(800, 600))
 
 
-class DummyApp(QGuiApplication):
+class DummyApp(QApplication):
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -71,6 +71,7 @@ class DummyApp(QGuiApplication):
 
         self.qmlWin = QmlMain(None)
         self.qmlWin.show()
+        self.aboutToQuit.connect(lambda: self.qmlWin.deleteLater())
 
 from PyQt5.QtCore import QtMsgType, QMessageLogContext, QtDebugMsg, QtWarningMsg, QtCriticalMsg, \
     QtFatalMsg
@@ -98,8 +99,20 @@ if __name__ == "__main__":
     from PyQt5.QtCore import qInstallMessageHandler
     qInstallMessageHandler(installQtMsgHandler)
     app = DummyApp(sys.argv)
-    code = app.exec()
-    for w in QGuiApplication.topLevelWindows():
-        del w
-    del app
-    sys.exit(code)
+
+    def safeExec(app_):
+        code = app_.exec()
+        if __debug__:
+            windows = app_.topLevelWindows()
+            if windows:
+                raise RuntimeError("Windows left: {}"
+                                   .format(list(map(lambda win: win.objectName(),
+                                                    windows))))
+            widgets = app_.topLevelWidgets()
+            if widgets:
+                raise RuntimeError("Widgets left: {}"
+                                   .format(list(map(lambda wid: wid.objectName(),
+                                                    widgets))))
+        del app_
+        sys.exit(code)
+    safeExec(app)
