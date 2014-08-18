@@ -181,7 +181,7 @@ class XwareTaskItem(QObject):
     def namespace(self):
         return self._namespace
 
-    @pyqtProperty(int, notify = initialized)
+    @pyqtProperty("ulong", notify = initialized)
     def size(self):
         return self._size
 
