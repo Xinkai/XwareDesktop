@@ -180,6 +180,9 @@ class Aria2Adapter(QObject):
     def do_createTask(self, url):
         self._loop.call_soon_threadsafe(self._callExternal, _Callable(Aria2Method.AddUri, [url]))
 
+    def do_getFiles(self, gid):
+        self._loop.call_soon_threadsafe(self._callExternal, _Callable(Aria2Method.GetFiles, gid))
+
     @asyncio.coroutine
     def _cb_tellActive(self, result):
         self.maps[Aria2TaskClass.Active].updateData(result)
@@ -195,6 +198,10 @@ class Aria2Adapter(QObject):
     @asyncio.coroutine
     def _cb_getGlobalOption(self, result):
         pass
+
+    @asyncio.coroutine
+    def _cb_getFiles(self, result):
+        print("_cb_getFiles", result)
 
     @asyncio.coroutine
     def _cb_onDownloadStart(self, event):

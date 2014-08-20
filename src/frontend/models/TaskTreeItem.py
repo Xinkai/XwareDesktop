@@ -19,6 +19,7 @@ class TaskTreeItem(object):
         self._selected = False
         self._name = "UNKNOWN"
         self._size = 0
+        self._index = -1
 
     @property
     def ancestryTree(self):
@@ -58,8 +59,9 @@ class TaskTreeItem(object):
         if p:
             return p.children
 
-    def setData(self, *, size, selected):
+    def setData(self, *, size, index, selected):
         self._size = size
+        self._index = index
         self._selected = selected
 
     @property
@@ -83,20 +85,22 @@ class TaskTreeItem(object):
     def childrenCount(self):
         return len(self._children)
 
-    def addSubTask(self, task):
-        path0, path1 = self._splitPath(task["name"])
+    def addSubTask(self, *, name: str, size: int, index: int, selected: bool):
+        path0, path1 = self._splitPath(name)
         subTree, created = self.findOrCreateSubtree(path0)
 
         if created and not path1:
-            subTree.setData(size = task["size"],
-                            selected = task["selected"])
+            subTree.setData(size = size,
+                            index = index,
+                            selected = selected)
             self._children[path0] = subTree
 
         if path1:
             # recursively call addSubTask
-            subTask = task.copy()
-            subTask["name"] = path1
-            subTree.addSubTask(subTask)
+            subTree.addSubTask(name = path1,
+                               size = size,
+                               index = index,
+                               selected = selected)
 
     def findOrCreateSubtree(self, name):
         try:
