@@ -17,6 +17,9 @@
    <locale language="Chinese" country="China"/>
   </property>
   <layout class="QFormLayout" name="formLayout">
+   <property name="labelAlignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
    <item row="0" column="0">
     <widget class="QLabel" name="label_2">
      <property name="sizePolicy">

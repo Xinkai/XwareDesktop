@@ -44,7 +44,20 @@ class TaskTreeItem(object):
 
     @property
     def selected(self):
-        return Qt.Checked if self._selected else Qt.Unchecked
+        if self._children:
+            states = [node.selected for node in self._children.values()]
+            if set(states) == {Qt.Checked}:
+                return Qt.Checked
+            elif set(states) == {Qt.Unchecked}:
+                return Qt.Unchecked
+            else:
+                return Qt.PartiallyChecked
+        else:
+            return Qt.Checked if self._selected else Qt.Unchecked
+
+    @selected.setter
+    def selected(self, value: bool):
+        self._selected = value
 
     def isRoot(self) -> bool:
         return not bool(self.parent)
@@ -69,7 +82,7 @@ class TaskTreeItem(object):
         return self._children
 
     def nthChild(self, i: int):
-        return self.children[list(self.children.keys())[i]]
+        return self.children[list(self._children.keys())[i]]
 
     def siblingNumber(self):
         result = list(self.siblings.values()).index(self)

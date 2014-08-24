@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from .TaskTreeItem import TaskTreeColumn
-from PyQt5.QtCore import QAbstractItemModel, QModelIndex, Qt
+from PyQt5.QtCore import QAbstractItemModel, QModelIndex, Qt, QVariant
 
 
 class TaskTreeModel(QAbstractItemModel):
@@ -53,8 +53,39 @@ class TaskTreeModel(QAbstractItemModel):
 
         return None
 
+    def setData(self, index: QModelIndex, value: QVariant, role: int = None):
+        if role == Qt.CheckStateRole:
+            if not index.isValid():
+                return False
+
+            item = index.internalPointer()
+
+            childrenCount = item.childrenCount()
+            if childrenCount:
+                for i in range(childrenCount):
+                    self.setData(index.child(i, 0), value, role = role)
+            else:
+                item.selected = bool(value)
+            self.dataChanged.emit(index, index, [Qt.CheckStateRole])
+
+            # recalculate parents
+            p = index
+            while True:
+                p = p.parent()
+                if p.isValid():
+                    self.dataChanged.emit(p, p, [Qt.CheckStateRole])
+                else:
+                    break
+
+            # success
+            return True
+        return False
+
     def flags(self, index: QModelIndex):
-        return Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsTristate
+        if index.column() == TaskTreeColumn.FileName:
+            return Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsTristate
+        else:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def index(self, row: int, column: int, parent: QModelIndex = None):
         if not self.hasIndex(row, column, parent):
