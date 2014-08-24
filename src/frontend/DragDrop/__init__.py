@@ -19,10 +19,14 @@ class AllowDrop(object):
             raw = mimeData.data("text/uri-list")
             if type(raw) == QByteArray:
                 # Compat. Workaround #113
-                # As of Qt 5.3.1, QMimeData.urls() cannot read UTF-16 encoded QByteArray
-                # the format Chrome passes over.
-                # Use special tactic!
-                url = bytes(raw).decode("UTF-16LE")
+                # As of Qt 5.3.1, QMimeData.urls() cannot read QByteArray
+                # Firefox passes ASCII encoded escaped bytes
+                # Chrome passes UTF-16 encoded bytes.
+                raw = bytes(raw)
+                try:
+                    url = raw.decode("ASCII")
+                except UnicodeDecodeError:
+                    url = raw.decode("UTF-16LE")
                 urls = [url]
             else:
                 urls = list(map(lambda qurl: qurl.url(), mimeData.urls()))
