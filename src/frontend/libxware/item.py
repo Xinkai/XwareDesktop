@@ -200,6 +200,10 @@ class XwareTaskItem(QObject):
 
     @pyqtProperty(int, notify = updated)
     def progress(self):
+        # Workaround
+        # Xware lie about the progress of completed tasks which have size 0
+        if self._xwareState == XwareTaskState.FINISHED:
+            return 10000
         return self._progress
 
     @pyqtProperty(int, notify = updated)
