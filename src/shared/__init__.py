@@ -5,7 +5,7 @@ from enum import IntEnum, unique
 
 __version__ = "0.12"
 
-XWARE_VERSION = "1.0.30"
+XWARE_VERSION = "1.0.31"
 
 DATE = 20140813
 
