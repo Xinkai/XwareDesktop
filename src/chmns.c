@@ -102,6 +102,11 @@ void usage() {
 }
 
 int main(int argc, char** argv) {
+    if (getuid() == 0) {
+        fprintf(stderr, "错误：拒绝以root执行。\n");
+        exit(EXIT_FAILURE);
+    }
+
     // prevent execute in a nested chmns
     char* nestedMark = getenv("XWARE-DESKTOP-CHMNS");
     if (nestedMark == NULL) {
