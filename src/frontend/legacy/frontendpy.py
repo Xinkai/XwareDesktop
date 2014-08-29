@@ -10,6 +10,7 @@ from PyQt5.QtGui import QKeyEvent
 import collections
 
 import constants
+from Tasks.action import TaskCreationType
 from utils.system import systemOpen, viewOneFile
 
 FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logined", "online"])
@@ -17,7 +18,7 @@ FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logine
 
 # Together with xwarejs.js, exchange information with the browser
 class FrontendPy(QObject):
-    sigCreateTasks = pyqtSignal("QStringList")
+    sigCreateTask = pyqtSignal(str)
     sigCreateTaskFromTorrentFile = pyqtSignal()
     sigCreateTaskFromTorrentFileDone = pyqtSignal()
     sigLogin = pyqtSignal(str, str)
@@ -196,17 +197,24 @@ class FrontendPy(QObject):
             return
 
         try:
-            batch = app.taskCreationAgent.dequeue()
+            creation = app.taskCreationAgent.dequeue()
         except IndexError:
             # no actions
             return
 
-        unpacked = batch.unpack()
-        if unpacked.isLocalBt:
-            app.mainWin.page.overrideFile = unpacked.urls[0]
-            self.sigCreateTaskFromTorrentFile.emit()
-        else:
-            self.sigCreateTasks.emit(unpacked.urls)
+        if creation.kind == TaskCreationType.Empty:
+            return self.sigCreateTask.emit("")
+
+        if creation.kind in (TaskCreationType.Normal,
+                             TaskCreationType.Emule,
+                             TaskCreationType.Magnet):
+            return self.sigCreateTask.emit(creation.url)
+
+        if creation.kind == TaskCreationType.LocalTorrent:
+            app.mainWin.page.overrideFile = creation.url
+            return self.sigCreateTaskFromTorrentFile.emit()
+
+        print("Cannot process", creation)
 
     @pyqtSlot()
     def slotClickBtButton(self):

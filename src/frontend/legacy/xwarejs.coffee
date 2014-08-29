@@ -2,7 +2,7 @@
 
 class XwareJS
     constructor: () ->
-        xdpy.sigCreateTasks.connect(@, @slotCreateTasks)
+        xdpy.sigCreateTask.connect(@, @slotCreateTask)
         xdpy.sigCreateTaskFromTorrentFile.connect(@, @slotCreateTaskFromTorrentFile)
         xdpy.sigCreateTaskFromTorrentFileDone.connect(@, @slotCreateTaskFromTorrentFileDone)
         xdpy.sigLogin.connect(@, @slotLogin)
@@ -99,13 +99,11 @@ class XwareJS
                     xdpy.systemOpen(task.path + task.name)
                 $cmenu.prepend($open)
 
-    slotCreateTasks: (tasks) ->
+    slotCreateTask: (task) ->
         App.set("dialogs.createTask.show", true)
 
         $createTaskUrl = $("#d-create-task-url")
-        tasks = tasks.join("\n")
-        taskUrl = $createTaskUrl.val()
-        $createTaskUrl.val(tasks + "\n" + taskUrl)
+        $createTaskUrl.val(task)
         $createTaskUrl.keyup()
 
         $createTaskUrl.get(0).focus()

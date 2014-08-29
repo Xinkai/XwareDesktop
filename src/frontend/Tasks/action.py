@@ -5,7 +5,7 @@ from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
-from enum import IntEnum, unique
+from enum import Enum, unique
 import collections
 import sys
 from urllib import parse
@@ -16,38 +16,23 @@ from .watchers.clipboard import ClipboardWatcher
 from .watchers.commandline import CommandlineWatcher
 
 
-Batch = collections.namedtuple("UnpackedBatch", ["isLocalBt", "urls"])
-
-
 @unique
-class TaskCreationType(IntEnum):
-    Normal = 0
-    LocalTorrent = 1
+class TaskCreationType(Enum):
+    Empty = 0
+    Normal = 1
+    Emule = 2
+    LocalTorrent = 3
+    Magnet = 4
+    MetaLink = 5
 
 
 class TaskCreation(object):
-    def __init__(self, url = None, kind = None):
+    def __init__(self, *, kind, url = None):
         self.url = url
-
-        if kind is None:
-            kind = TaskCreationType.Normal
         self.kind = kind
 
     def __repr__(self):
         return "{} <{}>".format(self.__class__.__name__, self.url)
-
-
-class TaskCreationBatch(object):
-    def __init__(self, tasks: list("TaskCreation")):
-        self._tasks = tasks
-
-    def unpack(self) -> Batch:
-        taskUrls = list(map(lambda task: task.url, self._tasks))
-        if self._tasks[0].kind == TaskCreationType.LocalTorrent:
-            isLocalBt = True
-        else:
-            isLocalBt = False
-        return Batch(isLocalBt = isLocalBt, urls = taskUrls)
 
 
 class TaskCreationAgent(QObject):
@@ -75,23 +60,18 @@ class TaskCreationAgent(QObject):
     @pyqtSlot()
     @pyqtSlot(list)
     def createTasksAction(self, taskUrls = None):
+        creations = []
         if taskUrls:
-            alltasks = self._filterInvalidTasks(map(self._createTask, taskUrls))
-            combinedNormalTask = list(filter(lambda task: task.kind == TaskCreationType.Normal,
-                                             alltasks))
-            multipleLocalBtTasks = list(filter(lambda t: t.kind == TaskCreationType.LocalTorrent,
-                                               alltasks))
+            for taskUrl in taskUrls:
+                creations.append(self._createTask(taskUrl))
         else:
-            # else
-            combinedNormalTask = [self._createTask()]
-            multipleLocalBtTasks = []
+            creations.append(self._createTask())
 
-        if combinedNormalTask:
-            self._queueTaskCreation(TaskCreationBatch(combinedNormalTask))
-        for singleLocalBtTask in multipleLocalBtTasks:  # because only 1 bt-task can be added once.
-            self._queueTaskCreation(TaskCreationBatch([singleLocalBtTask]))
+        for creation in creations:
+            if creation is not None:
+                self._queueTaskCreation(creation)
 
-    def _queueTaskCreation(self, what: TaskCreationBatch):
+    def _queueTaskCreation(self, what: TaskCreation):
         self._queue.append(what)
         self.available.emit()
 
@@ -99,26 +79,34 @@ class TaskCreationAgent(QObject):
         return self._queue.popleft()
 
     @staticmethod
-    def _filterInvalidTasks(tasks) -> list("TaskCreation"):
-        # remove those urls which were not recognized by self._createTask
-        return list(filter(lambda t: t is not None, tasks))
-
-    @staticmethod
     def _createTask(taskUrl: str = None) -> TaskCreation:
         if taskUrl is None:
-            return TaskCreation()
+            return TaskCreation(kind = TaskCreationType.Empty)
 
         if taskUrl.startswith("file://"):
             taskUrl = taskUrl[len("file://"):]
 
         parsed = parse.urlparse(taskUrl)
         if parsed.scheme in ("thunder", "flashget", "qqdl"):
-            url = misc.decodePrivateLink(taskUrl)
-            return TaskCreation(url)
+            taskUrl = misc.decodePrivateLink(taskUrl)
+            parsed = parse.urlparse(taskUrl)
 
-        elif parsed.scheme == "":
-            if parsed.path.endswith(".torrent"):
-                return TaskCreation(taskUrl, kind = TaskCreationType.LocalTorrent)
+        path = parsed.path
+        scheme = parsed.scheme
 
-        elif parsed.scheme in ("http", "https", "ftp", "magnet", "ed2k"):
-            return TaskCreation(taskUrl)
+        if path.endswith(".torrent"):
+            if scheme == "":
+                return TaskCreation(kind = TaskCreationType.LocalTorrent, url = taskUrl)
+
+        elif path.endswith(".metalink") or path.endswith(".meta4"):
+            if scheme in ("http", "https", "ftp"):
+                return TaskCreation(kind = TaskCreationType.MetaLink, url = taskUrl)
+
+        elif scheme == "ed2k":
+            return TaskCreation(kind = TaskCreationType.Emule, url = taskUrl)
+
+        elif scheme == "magnet":
+            return TaskCreation(kind = TaskCreationType.Magnet, url = taskUrl)
+
+        elif scheme in ("http", "https", "ftp"):
+            return TaskCreation(kind = TaskCreationType.Normal, url = taskUrl)
