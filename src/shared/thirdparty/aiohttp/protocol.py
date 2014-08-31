@@ -11,6 +11,7 @@ import functools
 import http.server
 import itertools
 import re
+import string
 import sys
 import zlib
 from wsgiref.handlers import format_date_time
@@ -20,6 +21,7 @@ from aiohttp import errors
 from aiohttp import multidict
 from aiohttp.log import internal_log
 
+ASCIISET = set(string.printable)
 METHRE = re.compile('[A-Z0-9$-_.]+')
 VERSRE = re.compile('HTTP/(\d+).(\d+)')
 HDRRE = re.compile('[\x00-\x1F\x7F()<>@,;:\[\]={} \t\\\\\"]')
@@ -319,7 +321,7 @@ class HttpPayloadParser:
                 try:
                     size = int(line, 16)
                 except ValueError:
-                    raise errors.IncompleteRead(b'') from None
+                    raise errors.IncompleteRead(0) from None
 
                 if size == 0:  # eof marker
                     break
@@ -373,7 +375,7 @@ class DeflateBuffer:
         try:
             chunk = self.zlib.decompress(chunk)
         except Exception:
-            raise errors.IncompleteRead(b'') from None
+            raise errors.IncompleteRead(0) from None
 
         if chunk:
             self.out.feed_data(chunk)
@@ -381,7 +383,7 @@ class DeflateBuffer:
     def feed_eof(self):
         self.out.feed_data(self.zlib.flush())
         if not self.zlib.eof:
-            raise errors.IncompleteRead(b'')
+            raise errors.IncompleteRead(0)
 
         self.out.feed_eof()
 
@@ -406,8 +408,8 @@ def wrap_payload_filter(func):
     For a example to compress incoming stream with 'deflate' encoding
     and then split data and emit chunks of 8196 bytes size chunks:
 
-      >> response.add_compression_filter('deflate')
-      >> response.add_chunking_filter(8196)
+      >>> response.add_compression_filter('deflate')
+      >>> response.add_chunking_filter(8196)
 
     Filters do not alter transfer encoding.
 
@@ -479,35 +481,36 @@ class HttpMessage:
     compression and then send it with chunked transfer encoding, code may look
     like this:
 
-       >> response = aiohttp.Response(transport, 200)
+       >>> response = aiohttp.Response(transport, 200)
 
     We have to use deflate compression first:
 
-      >> response.add_compression_filter('deflate')
+      >>> response.add_compression_filter('deflate')
 
     Then we want to split output stream into chunks of 1024 bytes size:
 
-      >> response.add_chunking_filter(1024)
+      >>> response.add_chunking_filter(1024)
 
     We can add headers to response with add_headers() method. add_headers()
     does not send data to transport, send_headers() sends request/response
     line and then sends headers:
 
-      >> response.add_headers(
-      ..     ('Content-Disposition', 'attachment; filename="..."'))
-      >> response.send_headers()
+      >>> response.add_headers(
+      ...     ('Content-Disposition', 'attachment; filename="..."'))
+      >>> response.send_headers()
 
     Now we can use chunked writer to write stream to a network stream.
     First call to write() method sends response status line and headers,
     add_header() and add_headers() method unavailable at this stage:
 
-    >> with open('...', 'rb') as f:
-    ..     chunk = fp.read(8196)
-    ..     while chunk:
-    ..         response.write(chunk)
-    ..         chunk = fp.read(8196)
+    >>> with open('...', 'rb') as f:
+    ...     chunk = fp.read(8196)
+    ...     while chunk:
+    ...         response.write(chunk)
+    ...         chunk = fp.read(8196)
 
-    >> response.write_eof()
+    >>> response.write_eof()
+
     """
 
     writer = None
@@ -571,8 +574,12 @@ class HttpMessage:
         """Analyze headers. Calculate content length,
         removes hop headers, etc."""
         assert not self.headers_sent, 'headers have been sent already'
-        assert isinstance(name, str), '{!r} is not a string'.format(name)
-        assert isinstance(value, str), '{!r} is not a string'.format(value)
+        assert isinstance(name, str), \
+            'Header name should be a string, got {!r}'.format(name)
+        assert set(name).issubset(ASCIISET), \
+            'Header name should contain ASCII chars, got {!r}'.format(name)
+        assert isinstance(value, str), \
+            'Header {!r} should have string value, got {!r}'.format(name, value)
 
         name = name.strip().upper()
         value = value.strip()
@@ -663,10 +670,12 @@ class HttpMessage:
         self.headers['CONNECTION'] = connection
 
     def write(self, chunk):
-        """write() writes chunk of data to a stream by using different writers.
-        writer uses filter to modify chunk of data. write_eof() indicates
-        end of stream. writer can't be used after write_eof() method
-        being called. write() return drain future.
+        """Writes chunk of data to a stream by using different writers.
+
+        writer uses filter to modify chunk of data.
+        write_eof() indicates end of stream.
+        writer can't be used after write_eof() method being called.
+        write() return drain future.
         """
         assert (isinstance(chunk, (bytes, bytearray)) or
                 chunk is EOF_MARKER), chunk

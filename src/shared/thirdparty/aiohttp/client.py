@@ -8,7 +8,6 @@ import http.cookies
 import json
 import io
 import inspect
-import itertools
 import random
 import time
 import urllib.parse
@@ -51,30 +50,33 @@ def request(method, url, *,
             response_class=None):
     """Constructs and sends a request. Returns response object.
 
-    :param method: http method
-    :param url: request url
+    :param str method: http method
+    :param str url: request url
     :param params: (optional) Dictionary or bytes to be sent in the query
       string of the new request
     :param data: (optional) Dictionary, bytes, or file-like object to
       send in the body of the request
-    :param headers: (optional) Dictionary of HTTP Headers to send with
+    :param dict headers: (optional) Dictionary of HTTP Headers to send with
       the request
-    :param cookies: (optional) Dict object to send with the request
+    :param dict cookies: (optional) Dict object to send with the request
     :param auth: (optional) BasicAuth named tuple represent HTTP Basic Auth
-    :param allow_redirects: (optional) Boolean. Set to True if POST/PUT/DELETE
+    :type auth: aiohttp.helpers.BasicAuth
+    :param bool allow_redirects: (optional) Set to True if POST/PUT/DELETE
        redirect following is allowed.
     :param version: Request http version.
-    :param compress: Boolean. Set to True if request has to be compressed
+    :type version: aiohttp.protocol.HttpVersion
+    :param bool compress: Set to True if request has to be compressed
        with deflate encoding.
-    :param chunked: Boolean or Integer. Set to chunk size for chunked
-       transfer encoding.
-    :param expect100: Boolean. Expect 100-continue response from server.
-    :param connector: aiohttp.connector.BaseConnector instance to support
+    :param chunked: Set to chunk size for chunked transfer encoding.
+    :type chunked: bool or int
+    :param bool expect100: Expect 100-continue response from server.
+    :param connector: BaseConnector sub-class instance to support
        connection pooling and session cookies.
-    :param read_until_eof: Read response until eof if response
+    :type connector: aiohttp.connector.BaseConnector
+    :param bool read_until_eof: Read response until eof if response
        does not have Content-Length header.
-    :param request_class: Custom Request class implementation.
-    :param response_class: Custom Response class implementation.
+    :param request_class: (optional) Custom Request class implementation.
+    :param response_class: (optional) Custom Response class implementation.
     :param loop: Optional event loop.
 
     Usage::
@@ -174,20 +176,19 @@ class ClientRequest:
                  params=None, headers=None, data=None, cookies=None,
                  files=None, auth=None, encoding='utf-8',
                  version=aiohttp.HttpVersion11, compress=None,
-                 chunked=None, expect100=False, verify_ssl=True,
+                 chunked=None, expect100=False,
                  loop=None, response_class=None):
         self.url = url
         self.method = method.upper()
         self.encoding = encoding
         self.chunked = chunked
         self.compress = compress
-        self.verify_ssl = verify_ssl
         self.loop = loop
         self.response_class = response_class or ClientResponse
 
         self.update_version(version)
         self.update_host(url)
-        self.update_path(params, data)
+        self.update_path(params)
         self.update_headers(headers)
         self.update_cookies(cookies)
         self.update_content_encoding()
@@ -203,9 +204,7 @@ class ClientRequest:
                     'not supported at the same time.')
             data = files
 
-        if data:
-            self.update_body_from_data(data)
-
+        self.update_body_from_data(data)
         self.update_transfer_encoding()
         self.update_expect_continue(expect100)
 
@@ -262,7 +261,7 @@ class ClientRequest:
                     .format(version)) from None
         self.version = version
 
-    def update_path(self, params, data):
+    def update_path(self, params):
         """Build path."""
         # extract path
         scheme, netloc, path, query, fragment = urllib.parse.urlsplit(self.url)
@@ -271,12 +270,8 @@ class ClientRequest:
 
         if isinstance(params, dict):
             params = list(params.items())
-
-        # for GET request include data to query params
-        if data and self.method in self.GET_METHODS:
-            if isinstance(data, dict):
-                data = data.items()
-            params = list(itertools.chain(params or (), data))
+        elif isinstance(params, MultiDict):
+            params = list(params.items(getall=True))
 
         if params:
             params = urllib.parse.urlencode(params)
@@ -357,6 +352,9 @@ class ClientRequest:
         self.headers['AUTHORIZATION'] = auth.encode()
 
     def update_body_from_data(self, data):
+        if not data:
+            return
+
         if isinstance(data, str):
             data = data.encode(self.encoding)
 
@@ -370,11 +368,11 @@ class ClientRequest:
         elif isinstance(data, (asyncio.StreamReader, streams.DataQueue)):
             self.body = data
 
-        elif (hasattr(data, '__iter__') and not
-              isinstance(data, (tuple, list, dict, io.IOBase))):
+        elif inspect.isgenerator(data):
             self.body = data
             if 'CONTENT-LENGTH' not in self.headers and self.chunked is None:
                 self.chunked = True
+
         else:
             if not isinstance(data, helpers.FormData):
                 data = helpers.FormData(data)
@@ -483,9 +481,16 @@ class ClientRequest:
                 for chunk in self.body:
                     request.write(chunk)
         except Exception as exc:
-            reader.set_exception(exc)
+            reader.set_exception(
+                aiohttp.ClientConnectionError(
+                    'Can not write request body for %s' % self.url))
         else:
-            request.write_eof()
+            try:
+                request.write_eof()
+            except Exception as exc:
+                reader.set_exception(
+                    aiohttp.ClientConnectionError(
+                        'Can not write request body for %s' % self.url))
 
         self._writer = None
 
@@ -508,7 +513,7 @@ class ClientRequest:
             self.write_bytes(request, reader), loop=self.loop)
 
         self.response = self.response_class(
-            self.method, self.path, self.host,
+            self.method, self.url, self.host,
             writer=self._writer, continue100=self._continue)
         return self.response
 
@@ -555,8 +560,8 @@ class ClientResponse:
 
     def __repr__(self):
         out = io.StringIO()
-        print('<ClientResponse({}{}) [{} {}]>'.format(
-            self.host, self.url, self.status, self.reason), file=out)
+        print('<ClientResponse({}) [{} {}]>'.format(
+            self.url, self.status, self.reason), file=out)
         print(self.headers, file=out)
         return out.getvalue()
 
@@ -623,7 +628,7 @@ class ClientResponse:
                 except http.cookies.CookieError as exc:
                     client_log.warning(
                         'Can not load response cookies: %s', exc)
-
+            connection.share_cookies(self.cookies)
         return self
 
     def close(self, force=False):
@@ -834,6 +839,9 @@ class HttpClient:
             method = self._method
         if path is None:
             path = self._path
+
+        assert method is not None, 'request "method" is required.'
+        assert path is not None, 'request "path" is required.'
 
         # if all hosts marked as failed try first from failed
         if not self._hosts:
