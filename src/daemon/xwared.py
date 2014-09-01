@@ -7,6 +7,7 @@ from logging import handlers
 import asyncio, json
 import sys, time, fcntl, signal, threading
 import collections
+import subprocess
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../"))
 
 import pyinotify
@@ -110,8 +111,9 @@ def setupLogging():
 
 
 class Xwared(object):
-    def __init__(self):
+    def __init__(self, log_novomit):
         super().__init__()
+        self._log_novomit = log_novomit
         self.etmPid = 0
         self.fdLock = None
         self.toRunETM = None
@@ -138,6 +140,7 @@ class Xwared(object):
         self.settings = SettingsAccessorBase(constants.XWARED_CONFIG_FILE,
                                              XWARED_DEFAULTS_SETTINGS)
         self.toRunETM = self.settings.getbool("xwared", "startetm")
+        self.etmLogs = collections.deque(maxlen = 250)
         self._resetEtmLongevities()
 
         # ipc listener
@@ -207,26 +210,28 @@ class Xwared(object):
             self.settings.save()
 
         self.toRunETM = True
-        try:
-            self.etmPid = os.fork()
-        except OSError:
-            print("Fork failed", file = sys.stderr)
-            sys.exit(-1)
 
-        if self.etmPid == 0:
-            # child
-            os.putenv("CHMNS_LD_PRELOAD", constants.ETM_PATCH_FILE)
-            print("child: pid({pid}) ppid({ppid})".format(pid = os.getpid(),
-                                                          ppid = self.etmPid))
-            cmd = constants.ETM_COMMANDLINE
-            os.execv(cmd[0], cmd)
-            sys.exit(-1)
+        env = os.environ.copy()
+        env.update(CHMNS_LD_PRELOAD = constants.ETM_PATCH_FILE)
+
+        if self._log_novomit:
+            additionals = dict(
+                stdout = subprocess.PIPE,
+                stderr = subprocess.STDOUT,
+            )
         else:
-            # parent
+            additionals = dict()
+
+        proc = subprocess.Popen(constants.ETM_COMMANDLINE,
+                                env = env,
+                                **additionals)
+        self.etmPid = proc.pid
+        if self.etmPid:
             self.etmStartedAt = time.monotonic()
-            print("parent: pid({pid}) cpid({cpid})".format(pid = os.getpid(),
-                                                           cpid = self.etmPid))
-            self._watchETM()
+            self._watchETM(proc)
+        else:
+            print("Cannot start etm", file = sys.stderr)
+            sys.exit(1)
 
     def _resetEtmLongevities(self):
         sampleNumber = self.settings.getint("etm", "samplenumberoflongevity")
@@ -236,9 +241,18 @@ class Xwared(object):
         for i in range(sampleNumber):
             self.etmLongevities.append(float("inf"))
 
-    def _watchETM(self):
-        os.waitpid(self.etmPid, 0)
+    def _watchETM(self, proc):
+        if self._log_novomit:
+            for line in iter(proc.stdout.readline, b""):
+                line = line.rstrip().decode("utf-8")
+                self.etmLogs.append(line)
+
+        ret = proc.wait()
         self.etmPid = 0
+        if self._log_novomit:
+            if ret != 0:
+                print("\n".join(self.etmLogs), file = sys.stderr)
+            self.etmLogs.clear()
 
         longevity = time.monotonic() - self.etmStartedAt
         self.etmLongevities.append(longevity)
@@ -326,6 +340,7 @@ class Xwared(object):
         sys.exit(0)
 
 if __name__ == "__main__":
-    xwared = Xwared()
+    novomit = "--log-novomit" in sys.argv
+    xwared = Xwared(novomit)
     while True:
         xwared.runETM()
