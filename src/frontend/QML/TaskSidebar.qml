@@ -7,6 +7,15 @@ import TaskModel 1.0
 
 Rectangle {
     id: item
+
+    function getRows() {
+        var rows = []
+        buddyView.selection.forEach(function(row) {
+            rows.push(row)
+        })
+        return rows
+    }
+
     ColumnLayout {
         Text {
             text: {
@@ -78,12 +87,9 @@ Rectangle {
             text: ["在文件夹中查看", buddyView.selection.count, "项内容"].join(" ")
             visible: buddyView.selection.count > 1
             onClicked: {
-                var rows = []
-                buddyView.selection.forEach(function(row) {
-                    rows.push(row)
+                taskModel.viewMultipleTasks({
+                    "rows": getRows()
                 })
-
-                taskModel.viewMultipleTasks(rows)
             }
         }
 
@@ -91,15 +97,10 @@ Rectangle {
             text: "暂停"
             visible: (buddyView.selection.count === 1) &&
                      (taskData) &&
-                     (taskData.state === TaskModel.State_Downloading)
+                     (taskData.state in [TaskModel.State_Downloading, TaskModel.State_Waiting])
             onClicked: {
-                var rows = []
-                buddyView.selection.forEach(function(row) {
-                    rows.push(row)
-                })
-
                 taskModel.pauseTasks({
-                    rows: rows
+                    "rows": getRows()
                 })
             }
         }
@@ -110,13 +111,39 @@ Rectangle {
                      (taskData) &&
                      (taskData.state === TaskModel.State_Paused)
             onClicked: {
-                var rows = []
-                buddyView.selection.forEach(function(row) {
-                    rows.push(row)
-                })
-
                 taskModel.startTasks({
-                    rows: rows
+                    "rows": getRows()
+                })
+            }
+        }
+
+        Button {
+            text: "删除"
+            onClicked: {
+                taskModel.delTasks({
+                    "rows": getRows(),
+                    "recycle": true,
+                    "delete": false,
+                })
+            }
+        }
+
+        Button {
+            text: "彻底删除"
+            onClicked: {
+                taskModel.delTasks({
+                    "rows": getRows(),
+                    "recycle": false,
+                    "delete": true,
+                })
+            }
+        }
+
+        Button {
+            text: "还原"
+            onClicked: {
+                taskModel.restoreTasks({
+                    "rows": getRows()
                 })
             }
         }

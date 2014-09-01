@@ -18,7 +18,7 @@ if __name__ == "__main__":
     faulthandler.enable(faultLogFd)
 
 
-from PyQt5.QtCore import QUrl, QSize
+from PyQt5.QtCore import QUrl, QSize, pyqtSlot, pyqtSignal
 from PyQt5.QtQuick import QQuickView
 from PyQt5.QtWidgets import QApplication
 
@@ -43,11 +43,14 @@ class QmlMain(CustomQuickView):
         self.rootContext().setContextProperty("adapters", app.adapterManager)
         self.rootContext().setContextProperty("taskModel", app.proxyModel)
         self.rootContext().setContextProperty("schedulerModel", app.schedulerModel)
+        self.rootContext().setContextProperty("taskCreationAgent", app.taskCreationAgent)
         self.setSource(self.qmlUrl)
         self.resize(QSize(800, 600))
 
 
 class DummyApp(QApplication):
+    applySettings = pyqtSignal()
+
     def __init__(self, *args):
         super().__init__(*args)
 
@@ -69,9 +72,20 @@ class DummyApp(QApplication):
         for name, item in self.settings.itr_sections_with_prefix("adapter"):
             self.adapterManager.loadAdapter(item)
 
+        from Tasks.action import TaskCreationAgent
+        self.taskCreationAgent = TaskCreationAgent(self)
+        self.taskCreationAgent.available.connect(self.slotCreateTask)
+        self.taskCreationDlg = None
+
         self.qmlWin = QmlMain(None)
         self.qmlWin.show()
         self.aboutToQuit.connect(lambda: self.qmlWin.deleteLater())
+
+    @pyqtSlot()
+    def slotCreateTask(self):
+        from Widgets.TaskProperty import TaskPropertyDialog
+        self.taskCreationDlg = TaskPropertyDialog(None)
+        self.taskCreationDlg.show()
 
 from PyQt5.QtCore import QtMsgType, QMessageLogContext, QtDebugMsg, QtWarningMsg, QtCriticalMsg, \
     QtFatalMsg

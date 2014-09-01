@@ -56,7 +56,14 @@ Rectangle {
             tabBar: Rectangle {
                 color: "orange"
                 height: 180
+                Button {
+                    text: "新建任务"
+                    anchors.bottom: parent.bottom
+                    anchors.right: searchBar.left
+                    onClicked: taskCreationAgent.createTasksAction()
+                }
                 TextField {
+                    id: searchBar
                     text: ""
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right

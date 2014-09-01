@@ -9,6 +9,7 @@ from enum import Enum, unique
 import collections
 import sys
 from urllib import parse
+from urllib.parse import ParseResult
 
 from utils import misc
 from .mimeparser import UrlExtractor
@@ -26,10 +27,66 @@ class TaskCreationType(Enum):
     MetaLink = 5
 
 
+def _getFilenameFromED2K(url: (str, "netloc")):
+    assert url[:6] == "|file|"
+    url = url[6:]
+    return parse.unquote(url[:url.index("|")])
+
+
+def _getFilenameFromUrl(url: "ParseResult.path"):
+    return parse.unquote(url[url.rindex("/") + 1:])
+
+
 class TaskCreation(object):
-    def __init__(self, *, kind, url = None):
+    def __init__(self, parsed: ParseResult = None):
+        self.parsed = parsed
+        if parsed is None:
+            self.kind = TaskCreationType.Empty
+            self.url = None
+            return
+
+        path = parsed.path
+        scheme = parsed.scheme
+
+        url = parsed.geturl()
+
         self.url = url
-        self.kind = kind
+        self._name = None
+        self._name_user = None
+        self.path = None
+        self.kind = None
+        if path.endswith(".torrent"):
+            if scheme == "":
+                self.kind = TaskCreationType.LocalTorrent
+                return
+
+        if path.endswith(".metalink") or path.endswith(".meta4"):
+            if scheme in ("http", "https", "ftp"):
+                self.kind = TaskCreationType.MetaLink
+
+        elif scheme == "ed2k":
+            self.kind = TaskCreationType.Emule
+
+        elif scheme == "magnet":
+            self.kind = TaskCreationType.Magnet
+
+        elif scheme in ("http", "https", "ftp"):
+            self.kind = TaskCreationType.Normal
+
+    @property
+    def name(self):
+        if self._name_user is not None:
+            return self._name_user
+        if self._name is not None:
+            return self._name
+        if self.kind == TaskCreationType.Emule:
+            return _getFilenameFromED2K(self.parsed.netloc)
+        if self.kind == TaskCreationType.Normal:
+            return _getFilenameFromUrl(self.parsed.path)
+
+    @name.setter
+    def name(self, value):
+        self._name_user = value
 
     def __repr__(self):
         return "{} <{}>".format(self.__class__.__name__, self.url)
@@ -81,7 +138,7 @@ class TaskCreationAgent(QObject):
     @staticmethod
     def _createTask(taskUrl: str = None) -> TaskCreation:
         if taskUrl is None:
-            return TaskCreation(kind = TaskCreationType.Empty)
+            return TaskCreation()
 
         if taskUrl.startswith("file://"):
             taskUrl = taskUrl[len("file://"):]
@@ -91,22 +148,4 @@ class TaskCreationAgent(QObject):
             taskUrl = misc.decodePrivateLink(taskUrl)
             parsed = parse.urlparse(taskUrl)
 
-        path = parsed.path
-        scheme = parsed.scheme
-
-        if path.endswith(".torrent"):
-            if scheme == "":
-                return TaskCreation(kind = TaskCreationType.LocalTorrent, url = taskUrl)
-
-        elif path.endswith(".metalink") or path.endswith(".meta4"):
-            if scheme in ("http", "https", "ftp"):
-                return TaskCreation(kind = TaskCreationType.MetaLink, url = taskUrl)
-
-        elif scheme == "ed2k":
-            return TaskCreation(kind = TaskCreationType.Emule, url = taskUrl)
-
-        elif scheme == "magnet":
-            return TaskCreation(kind = TaskCreationType.Magnet, url = taskUrl)
-
-        elif scheme in ("http", "https", "ftp"):
-            return TaskCreation(kind = TaskCreationType.Normal, url = taskUrl)
+        return TaskCreation(parsed)

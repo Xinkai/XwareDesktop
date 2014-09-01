@@ -8,6 +8,28 @@ import constants
 from utils.misc import trySymlink, tryMkdir
 
 
+def _pathSplit(path):
+    return list(filter(bool, path.split("/")))
+
+
+def _mountBootstrap(localPath):
+    # local/path is the path that user sets
+    # after bootstraping, return the path to PROFILE/mnt/local\path
+
+    # the filter(bool) part is to remove the "/" at the beginning
+    backslashed = "\\".join(_pathSplit(localPath))
+
+    mntDir = os.path.join(constants.PROFILE_DIR, "mnt", backslashed)
+
+    tddownloadDir = os.path.join(mntDir, "TDDOWNLOAD")
+    thunderdbDir = os.path.join(mntDir, "ThunderDB")
+
+    tryMkdir(thunderdbDir)
+    trySymlink(localPath, tddownloadDir)
+
+    return mntDir
+
+
 class MountsFaker(object):
     # Terminologies:
     # local path: a path that the user sets
@@ -50,7 +72,7 @@ class MountsFaker(object):
     def mounts(self, paths):
         newMounts = OrderedDict()
         for localPath in paths:
-            mntPath = self._mountBootstrap(localPath)
+            mntPath = _mountBootstrap(localPath)
             newMounts[mntPath] = localPath
 
         # write mount file
@@ -89,6 +111,38 @@ class MountsFaker(object):
 
         return resolvedLocalPath
 
+    def convertToMappedPath(self, localPath):
+        # takes a path like "/home/user/Download"
+        # returns a mapped path like "X:/TDDOWNLOAD/"
+        if localPath[-1] != "/":
+            localPath += "/"
+
+        bestMatchCount = -1
+        bestMatchDriveIndex = -1
+        localParts = _pathSplit(localPath)
+        for i, path in enumerate(self.mounts):
+            # i -> 0, 1, 2...
+            # path -> "/home/user/Download"
+            parts = _pathSplit(path)
+            for m, (local, against) in enumerate(zip(localParts, parts)):
+                if local == against:
+                    if m > bestMatchCount:
+                        bestMatchCount = m
+                        bestMatchDriveIndex = i
+                else:
+                    break
+
+        path = self.mounts[bestMatchDriveIndex]  # not end with "/"
+
+        if bestMatchDriveIndex >= 0:
+            return "".join([
+                self.driveIndexToLetter(bestMatchDriveIndex),  # "C:"
+                "/TDDOWNLOAD",
+                localPath[len(path):-1]]                       # "may/be/sub/dir"
+            ) + "/"                                           # always end with a /
+        else:
+            return None
+
     def getMountsMapping(self):
         # checks when ETM really uses
         mapping = {}
@@ -105,21 +159,3 @@ class MountsFaker(object):
     def driveIndexToLetter(index):
         # 0 -> "C:", 1 -> "D:", ...
         return chr(ord('C') + index) + ":"
-
-    @staticmethod
-    def _mountBootstrap(localPath):
-        # local/path is the path that user sets
-        # after bootstraping, return the path to PROFILE/mnt/local\path
-
-        # the filter(bool) part is to remove the "/" at the beginning
-        backslashed = "\\".join(filter(bool, localPath.split("/")))
-
-        mntDir = os.path.join(constants.PROFILE_DIR, "mnt", backslashed)
-
-        tddownloadDir = os.path.join(mntDir, "TDDOWNLOAD")
-        thunderdbDir = os.path.join(mntDir, "ThunderDB")
-
-        tryMkdir(thunderdbDir)
-        trySymlink(localPath, tddownloadDir)
-
-        return mntDir

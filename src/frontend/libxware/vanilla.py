@@ -6,6 +6,7 @@
 
 
 import asyncio, aiohttp
+from collections import OrderedDict
 import json
 from json.decoder import scanner, scanstring, JSONDecoder
 from urllib.parse import unquote
@@ -51,32 +52,38 @@ class XwareClient(object):
 
     def _readyCheck(self):
         try:
-            assert "host" in self._options
-            assert 0 < int(self._options["port"]) <= 65535
-        except (AssertionError, ValueError, KeyError):
+            if "host" not in self._options:
+                raise ValueError("No host")
+            if not 0 < int(self._options["port"]) <= 65535:
+                raise ValueError("No port")
+        except (ValueError, KeyError):
             raise INVALID_OPTIONS_ERROR()
 
     @asyncio.coroutine
-    def get(self, parts):
+    def get(self, path, params = None, data = None):
         self._readyCheck()
         res = yield from aiohttp.request(
             "GET",
-            "http://{host}:{port}/{parts}".format(
-                host = self._options["host"], port = self._options["port"], parts = parts),
-            connector = self._connector)
-        assert res.status == 200
+            "http://{host}:{port}/{path}".format(
+                host = self._options["host"], port = self._options["port"], path = path),
+            connector = self._connector,
+            params = params,
+            data = data,
+        )
+        if not res.status == 200:
+            raise ValueError("response status is not 200", res.status)
         body = yield from res.read()
         return body
 
     @asyncio.coroutine
-    def getJson(self, parts):
-        content = yield from self.get(parts)
+    def getJson(self, *args, **kwargs):
+        content = yield from self.get(*args, **kwargs)
         res = content.decode("utf-8")
         return json.loads(res, cls = UnquotingJsonDecoder)
 
     @asyncio.coroutine
-    def getJson2(self, parts):
-        result = yield from self.getJson(parts)
+    def getJson2(self, *args, **kwargs):
+        result = yield from self.getJson(*args, **kwargs)
         assert result["rtn"] == 0
         del result["rtn"]
 
@@ -95,28 +102,37 @@ class XwareClient(object):
 
     def get_list(self, klass, starting = 0, count = 999999, abs_path = True, fixed_id = False):
         assert isinstance(klass, TaskClass)
-        result = self.getJson2("list?v=2&type={klass}&pos={starting}&number={count}&needUrl=1"
-                               "&abs_path={abs_path}&fixed_id={fixed_id}"
-                               .format(klass = int(klass),
-                                       starting = starting,
-                                       count = count,
-                                       abs_path = int(abs_path),
-                                       fixed_id = int(fixed_id)))
-
+        result = self.getJson2(
+            "list",
+            params = OrderedDict([
+                ("v", 2),
+                ("type", int(klass)),
+                ("pos", starting),
+                ("number", count),
+                ("needUrl", int(True)),
+                ("abs_path", int(abs_path)),
+                ("fixed_id", int(fixed_id)),
+            ]),
+        )
         return result
 
     def get_settings(self):
-        result = self.getJson2("settings?v=2")
+        result = self.getJson2(
+            "settings",
+            params = OrderedDict([
+                ("v", 2)
+            ]),
+        )
         return result
 
     @asyncio.coroutine
-    def post(self, parts, *args, data = None):
-        assert not args, args
+    def post(self, path, params = None, data = None):
         self._readyCheck()
         res = yield from aiohttp.request(
             "POST",
-            "http://{host}:{port}/{parts}".format(
-                host = self._options["host"], port = self._options["port"], parts = parts),
+            "http://{host}:{port}/{path}".format(
+                host = self._options["host"], port = self._options["port"], path = path),
+            params = params,
             data = data,
             connector = self._connector)
         assert res.status == 200
@@ -124,80 +140,93 @@ class XwareClient(object):
         return body
 
     @asyncio.coroutine
-    def postJson(self, parts, **kwargs):
-        content = yield from self.post(parts, **kwargs)
+    def postJson(self, *args, **kwargs):
+        content = yield from self.post(*args, **kwargs)
         res = content.decode("utf-8")
         return json.loads(res, cls = UnquotingJsonDecoder)
 
     @asyncio.coroutine
-    def postJsonP(self, parts, **kwargs):
-        content = yield from self.post(parts, **kwargs)
-        res = content.decode("utf-8")
-        l = res.index("(") + 1
-        r = res.rindex(")")
-        res = res[l:r]  # get rid of jsonp
-        return json.loads(res, cls = UnquotingJsonDecoder)
-
-    @asyncio.coroutine
-    def postJson2(self, parts, **kwargs):
-        result = yield from self.postJson(parts, **kwargs)
+    def postJson2(self, *args, **kwargs):
+        result = yield from self.postJson(*args, **kwargs)
         rtn = result["rtn"]
-        assert rtn == 0, rtn
-        del result["rtn"]
-        return result
-
-    @asyncio.coroutine
-    def postJsonP2(self, parts, **kwargs):
-        result = yield from self.postJsonP(parts, **kwargs)
-        rtn = result["rtn"]
-        assert rtn == 0, rtn
+        if not rtn == 0:
+            raise ValueError("rtn is not 0, but {}".format(rtn))
         del result["rtn"]
         return result
 
     @asyncio.coroutine
     def post_del(self, tasks: "iterable of id", recycle: bool, delete: bool):
-        result = yield from self.postJson2("del?v=2&pid=ignore&tasks={tasks}&recycleTask={recycle}"
-                                           "&deleteFile={delete}&callback=ignore&_=ignore"
-                                           .format(tasks = ",".join(map(str(tasks))),
-                                                   recycle = int(recycle),
-                                                   delete = int(delete)))
+        result = yield from self.postJson2(
+            "del",
+            params = {
+                "v": 2,
+                "tasks": ",".join(map(str, tasks)),
+                "recycleTask": int(recycle),
+                "deleteFile": int(delete),
+                "callback": "",
+            },
+        )
         return result
 
     @asyncio.coroutine
     def post_settings(self, settings: dict):
         assert isinstance(settings, dict)
-        params = []
         for key, value in settings.items():
             assert key in Settings._fields
-            params.append("{k}={v}".format(k = key, v = value))
-        result = yield from self.postJson2("settings?v=2&" + "&".join(params))
+
+        settings["v"] = 2
+        result = yield from self.postJson2(
+            "settings",
+            params = settings,
+        )
         return result
 
     @asyncio.coroutine
     def post_pause(self, tasks: "iterable of id"):
-        result = yield from self.postJsonP2("pause?v=2&pid=ignore&tasks={tasks}&callback=ignore"
-                                            .format(tasks = ",".join(map(str, tasks))))
+        result = yield from self.postJson2(
+            "pause",
+            params = OrderedDict([
+                ("v", 2),
+                ("tasks", ",".join(map(str, tasks))),
+                ("callback", ""),
+            ]),
+        )
         return result
 
     @asyncio.coroutine
     def post_start(self, tasks: "iterable of id"):
-        result = yield from self.postJsonP2("start?v=2&pid=ignore&tasks={tasks}&callback=ignore"
-                                            .format(tasks = ",".join(map(str, tasks))))
+        result = yield from self.postJson2(
+            "start",
+            params = OrderedDict([
+                ("v", 2),
+                ("tasks", ",".join(map(str, tasks))),
+                ("callback", ""),
+            ]),
+        )
         return result
 
     @asyncio.coroutine
     def post_openLixianChannel(self, taskId: int, enable: bool):
-        result = yield from self.postJsonP2("openLixianChannel?v=2&pid=ignore&taskid={taskId}&"
-                                            "open={enable}&callback=ignore"
-                                            .format(taskId = taskId,
-                                                    enable = "true" if enable else "false"))
+        result = yield from self.postJson2(
+            "openLixianChannel",
+            params = OrderedDict([
+                ("v", 2),
+                ("taskid", taskId),
+                ("open", "true" if enable else "false"),
+            ]),
+        )
         return result
 
     @asyncio.coroutine
     def post_openVipChannel(self, taskId: int):
-        result = yield from self.postJsonP2("openVipChannel?v=2&pid=ignore&taskid={taskId}&"
-                                            "callback=ignore"
-                                            .format(taskId = taskId))
+        result = yield from self.postJson2(
+            "openVipChannel",
+            params = OrderedDict([
+                ("v", 2),
+                ("taskid", taskId),
+                ("callback", ""),
+            ]),
+        )
         return result
 
     @asyncio.coroutine
@@ -211,11 +240,50 @@ class XwareClient(object):
         files = {
             "file": open(filepath, 'rb'),
         }
-        result = yield from self.postJsonP2(
-            "urlCheck?v=2&pid=ignore&callback=ignore&type={urlCheckType}&upload=1".format(
-                urlCheckType = int(UrlCheckType.BitTorrentFile)),
-            data = files)
+        result = yield from self.postJson2(
+            "urlCheck",
+            params = OrderedDict([
+                ("v", 2),
+                ("type", int(UrlCheckType.BitTorrentFile)),
+                ("upload", int(True)),
+                ("callback", ""),
+            ]),
+            data = files,
+        )
 
+        return result
+
+    @asyncio.coroutine
+    def post_createTask(self, path, url, name):
+        result = yield from self.postJson2(
+            "createOne",
+            params = OrderedDict([
+                ("v", 2),
+                ("type", int(UrlCheckType.Url)),
+                ("path", path),
+                ("url", url),
+                ("name", name),
+                ("fixed_id", int(True)),
+                ("callback", ""),
+            ]),
+        )
+        return result
+
+    @asyncio.coroutine
+    def post_createBtTask(self, path, url, name, sub):
+        result = yield from self.postJson2(
+            "createOne",
+            params = OrderedDict([
+                ("v", 2),
+                ("type", int(UrlCheckType.BitTorrentFile)),
+                ("path", path),
+                ("url", url),
+                ("name", name),
+                ("fixed_id", int(True)),
+                ("btSub", sub),
+                ("callback", ""),
+            ]),
+        )
         return result
 
     @asyncio.coroutine

@@ -142,6 +142,14 @@ class TaskModel(QAbstractListModel):
         for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
             app.adapterManager.adapter(ns).do_startTasks(taskDatas, options)
 
+    def delTasks(self, tasks: "list<QModelIndex>", options):
+        for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
+            app.adapterManager.adapter(ns).do_delTasks(taskDatas, options)
+
+    def restoreTasks(self, tasks: "list<QModelIndex>", options):
+        for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
+            app.adapterManager.adapter(ns).do_restoreTasks(taskDatas, options)
+
     # =============== The following methods hand taskData directly to the adapter ===============
     def openLixianChannel(self, task: QModelIndex, enable: bool):
         taskItem = self.get(task)

@@ -11,6 +11,7 @@ from urllib import parse
 
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
 import constants
+from Tasks.action import TaskCreation, TaskCreationType
 from utils.misc import tryRemove, trySymlink, tryMkdir
 from utils.system import getInitType, InitType
 from .vanilla import TaskClass, XwareClient, Settings
@@ -262,6 +263,32 @@ class XwareAdapter(QObject):
     def do_startTasks(self, tasks, options):
         taskIds = map(lambda t: t.realid, tasks)
         self._loop.call_soon_threadsafe(self.post_start, taskIds)
+
+    def do_createTask(self, taskCreation: TaskCreation):
+        supported = [TaskCreationType.Normal, TaskCreationType.Emule, TaskCreationType.Magnet]
+        if taskCreation.kind in supported:
+            path = self.mountsFaker.convertToMappedPath(taskCreation.path)
+            if not path:
+                return False
+            taskCreation.path = path
+            self._loop.call_soon_threadsafe(self.post_createTask,
+                                            taskCreation.path,
+                                            taskCreation.url,
+                                            taskCreation.name)
+            return True
+        return False
+
+    def do_delTasks(self, tasks, options):
+        taskIds = map(lambda t: t.realid, tasks)
+        self._loop.call_soon_threadsafe(self.post_del,
+                                        taskIds,
+                                        options["recycle"],
+                                        options["delete"])
+
+    def do_restoreTasks(self, tasks, options):
+        taskIds = map(lambda t: t.realid, tasks)
+        self._loop.call_soon_threadsafe(self.post_restore,
+                                        taskIds)
 
     def do_openLixianChannel(self, taskItem, enable: bool):
         taskId = taskItem.realid

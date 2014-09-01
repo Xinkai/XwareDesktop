@@ -84,6 +84,16 @@ class ProxyModel(QSortFilterProxyModel):
         srcIndice = list(self._getSourceModelIndice(options["rows"]))
         self.sourceModel().startTasks(srcIndice, options)
 
+    @pyqtSlot("QVariantMap", result = "void")
+    def delTasks(self, options):
+        srcIndice = list(self._getSourceModelIndice(options["rows"]))
+        self.sourceModel().delTasks(srcIndice, options)
+
+    @pyqtSlot("QVariantMap", result = "void")
+    def restoreTasks(self, options):
+        srcIndice = list(self._getSourceModelIndice(options["rows"]))
+        self.sourceModel().restoreTasks(srcIndice, options)
+
     @pyqtSlot(int, result = "void")
     def systemOpen(self, rowId):
         srcIndex = self._getSourceModelIndex(rowId)
@@ -105,7 +115,8 @@ class ProxyModel(QSortFilterProxyModel):
         self.sourceModel().viewOneTask(srcIndex)
 
     @pyqtSlot("QList<int>", result = "void")
-    def viewMultipleTasks(self, rowIds):
+    def viewMultipleTasks(self, options):
+        rowIds = options["rows"]
         srcIndice = list(self._getSourceModelIndice(rowIds))
         self.sourceModel().viewMultipleTasks(srcIndice)
 
