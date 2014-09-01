@@ -10,6 +10,7 @@ import websockets
 
 from PyQt5.QtCore import QObject, pyqtProperty, pyqtSlot, pyqtSignal
 
+from Tasks.action import TaskCreation, TaskCreationType
 from .definitions import Aria2TaskClass, Aria2Method
 from .map import TaskMap
 
@@ -174,14 +175,28 @@ class Aria2Adapter(QObject):
         payload = callable_.toString()
         yield from self._ws.send(payload)
 
-    def _callExternal(self, callable_: _Callable):
-        asyncio.async(self._call(callable_))
+    def _callFromExternal(self, callable_: _Callable):
+        self._loop.call_soon_threadsafe(asyncio.async, self._call(callable_))
 
-    def do_createTask(self, url):
-        self._loop.call_soon_threadsafe(self._callExternal, _Callable(Aria2Method.AddUri, [url]))
+    def do_createTask(self, creation: TaskCreation):
+        if creation.kind in (TaskCreationType.Normal,):
+            url = [creation.url]
+            self._callFromExternal(
+                _Callable(
+                    Aria2Method.AddUri,
+                    url,
+                    {
+                        "dir": creation.path,
+                        "out": creation.name,
+                    },
+                )
+            )
+            return True
+
+        return False
 
     def do_getFiles(self, gid):
-        self._loop.call_soon_threadsafe(self._callExternal, _Callable(Aria2Method.GetFiles, gid))
+        self._callFromExternal(_Callable(Aria2Method.GetFiles, gid))
 
     @asyncio.coroutine
     def _cb_tellActive(self, result):
