@@ -9,7 +9,7 @@ stop on session-end
 pre-start script
 end script
 
-exec ##PREFIX##/xwared
+exec ##PREFIX##/xwared --log-novomit
 
 post-start script
 end script

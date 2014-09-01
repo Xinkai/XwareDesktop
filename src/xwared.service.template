@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=##PREFIX##/xwared
+ExecStart=##PREFIX##/xwared --log-novomit
 
 [Install]
 WantedBy=default.target
