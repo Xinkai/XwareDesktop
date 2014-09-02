@@ -158,13 +158,13 @@ class XwareClient(object):
     def post_del(self, tasks: "iterable of id", recycle: bool, delete: bool):
         result = yield from self.postJson2(
             "del",
-            params = {
-                "v": 2,
-                "tasks": ",".join(map(str, tasks)),
-                "recycleTask": int(recycle),
-                "deleteFile": int(delete),
-                "callback": "",
-            },
+            params = OrderedDict([
+                ("v", 2),
+                ("tasks", ",".join(map(str, tasks))),
+                ("recycleTask", int(recycle)),
+                ("deleteFile", int(delete)),
+                ("callback", ""),
+            ]),
         )
         return result
 
