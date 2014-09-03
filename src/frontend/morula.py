@@ -58,6 +58,7 @@ class DummyApp(QApplication):
         from Settings import DEFAULT_SETTINGS
         self.settings = SettingsAccessorBase(constants.FRONTEND_CONFIG_FILE,
                                              DEFAULT_SETTINGS)
+        self.aboutToQuit.connect(lambda: self.settings.save())
 
         from models import TaskModel, AdapterManager, ProxyModel
         from Schedule.model import SchedulerModel
