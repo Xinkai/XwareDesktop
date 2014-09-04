@@ -37,15 +37,15 @@ class UrlCheckType(IntEnum):
 # see definitions http://g.xunlei.com/forum.php?mod=viewthread&tid=30
 GetSysInfo = namedtuple("GetSysInfo", ["Return",  # 0 -> success
                                        "Network",  # 1 -> ok
-                                       "unknown1",
+                                       "License",
                                        "Bound",  # 1 -> bound
                                        "ActivateCode",  # str if Bound is 0 else ''
                                        "Mount",  # 1 -> ok
                                        "InternalVersion",
                                        "Nickname",
-                                       "unknown2",
+                                       "Unknown",
                                        "UserId",
-                                       "unknown3"])
+                                       "VipLevel"])
 
 
 Settings = namedtuple("Settings", ['autoOpenVip',

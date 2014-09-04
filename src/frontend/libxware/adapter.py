@@ -78,9 +78,9 @@ class XwareAdapter(QObject):
         self._dlSpeed = 0
         self._runningTaskCount = 0
         from .vanilla import GetSysInfo
-        self._sysInfo = GetSysInfo(Return = 0, Network = 0, unknown1 = 0, Bound = 0,
+        self._sysInfo = GetSysInfo(Return = 0, Network = 0, License = 0, Bound = 0,
                                    ActivateCode = "", Mount = 0, InternalVersion = "",
-                                   Nickname = "", unknown2 = "", UserId = 0, unknown3 = 0)
+                                   Nickname = "", Unknown = "", UserId = 0, VipLevel = 0)
         self._xwareSettings = XwareSettings(self)
 
         # Prepare XwaredClient Variables
