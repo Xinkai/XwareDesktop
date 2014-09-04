@@ -72,6 +72,7 @@ DEFAULT_SETTINGS = {
         "schedulerdialoggeometry": None,
         "previousversion": "0.8",
         "previousdate": 0,
+        "lastadapterused": None,
         "lastlocaluploaddir": None,
         "recentsavedirs": "",
         "recentsavedirscount": 5,

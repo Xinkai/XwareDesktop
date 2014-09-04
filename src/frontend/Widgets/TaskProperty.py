@@ -11,6 +11,8 @@ from models.TaskTreeModel import TaskTreeModel, TaskTreeModelMode
 from urllib import parse
 import os
 
+_NamespaceRole = Qt.UserRole + 0x2BAD
+
 
 class TaskPropertyDialog(QDialog, Ui_Dialog):
     def __init__(self, model: TaskTreeModel, parent = None):
@@ -24,18 +26,23 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
             self.setWindowTitle("新建任务")
 
             # load adapters
-            for name in app.adapterManager.itr():
-                adapter = app.adapterManager.adapter(name)
+            for i, namespace in enumerate(app.adapterManager.itr()):
+                adapter = app.adapterManager.adapter(namespace)
                 self.combo_adapter.addItem(adapter.name, adapter)
+                self.combo_adapter.setItemData(i, namespace, _NamespaceRole)
+            lastAdapterUsed = app.settings.get("internal", "lastadapterused")
+            if lastAdapterUsed:
+                index = self.combo_adapter.findData(lastAdapterUsed, _NamespaceRole)
+                if index != -1:
+                    self.combo_adapter.setCurrentIndex(index)
 
             self.recentdirs = collections.deque(
                 filter(bool, app.settings.get("internal", "recentsavedirs").split("\t")),
                 maxlen = app.settings.getint("internal", "recentsavedirscount")
             )
-
             self.combo_dir.addItems(list(self.recentdirs))
 
-        elif self.model.mode == TaskTreeModelMode.View:
+        else:
             self.line_url.setEnabled(False)
             self.combo_adapter.setEnabled(False)
             self.combo_dir.setEnabled(False)
@@ -88,15 +95,20 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
         creation = self.model.toCreation()
         creation.path = self.combo_dir.currentText()
 
-        # remember recent save dirs
-        try:
-            self.recentdirs.remove(creation.path)
-        except ValueError:  # not found
-            pass
-        self.recentdirs.append(creation.path)
-        app.settings.set("internal", "recentsavedirs", "\t".join(self.recentdirs))
-
         if adapter.do_createTask(creation):
+            # remember recent save dirs
+            try:
+                self.recentdirs.remove(creation.path)
+            except ValueError:  # not found
+                pass
+            self.recentdirs.appendleft(creation.path)
+            app.settings.set("internal", "recentsavedirs", "\t".join(self.recentdirs))
+
+            # remember last adapter used
+            app.settings.set("internal",
+                             "lastadapterused",
+                             self.combo_adapter.currentData(_NamespaceRole))
+
             super().accept()
 
     def reject(self):
