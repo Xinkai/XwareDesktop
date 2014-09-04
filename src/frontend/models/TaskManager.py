@@ -172,7 +172,7 @@ class TaskManager(collections.MutableMapping):
         item = self._maps[mapId][key]
         if item.isDeletionPending:
             return
-        assert not key in self._pendingDeletions
+        assert key not in self._pendingDeletions
         item.isDeletionPending = True
         self._pendingDeletions[key] = PendingDeletionRecord(
             fromMap = mapId,

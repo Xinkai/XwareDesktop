@@ -189,4 +189,3 @@ class Aria2TaskItem(QObject):
             self.initialized.emit()
 
         self.updated.emit()
-
