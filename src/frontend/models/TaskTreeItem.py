@@ -5,6 +5,8 @@ from enum import IntEnum, unique
 
 from PyQt5.QtCore import Qt
 
+INVALID_INDEX = -1
+
 
 @unique
 class TaskTreeColumn(IntEnum):
@@ -18,8 +20,10 @@ class TaskTreeItem(object):
         self._children = OrderedDict()
         self._selected = False
         self._name = "UNKNOWN"
+        self.name_userset = False
         self._size = 0
-        self._index = -1
+        self._index = INVALID_INDEX
+        self._creation = None
 
     @property
     def ancestryTree(self):
@@ -33,7 +37,20 @@ class TaskTreeItem(object):
 
     @name.setter
     def name(self, value):
-        self._name = value
+        self._name = value.rstrip()
+
+    @property
+    def index(self):
+        return self._index
+
+    @index.setter
+    def index(self):
+        raise NotImplementedError("Index cannot be set after initialization.")
+
+    def setNameByUser(self, value):
+        # Override by the user
+        self.name = value
+        self.name_userset = True
 
     @property
     def size(self):
@@ -88,6 +105,11 @@ class TaskTreeItem(object):
         result = list(self.siblings.values()).index(self)
         return result
 
+    def walk(self):
+        for child in self._children.values():
+            yield from child.walk()
+        yield self
+
     def data(self, column):
         if column == TaskTreeColumn.FileName:
             return self.name
@@ -135,7 +157,8 @@ class TaskTreeItem(object):
             return src, None
 
     def __repr__(self):
-        return "{cls}<{ancestryTree}:{contents}>".format(
+        return "{cls}<{ancestryTree}({index}):{contents}>".format(
             cls = self.__class__.__name__,
             ancestryTree = self.ancestryTree,
+            index = self._index,
             contents = len(self._children))

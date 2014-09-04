@@ -181,15 +181,15 @@ class Aria2Adapter(QObject):
     def do_createTask(self, creation: TaskCreation):
         if creation.kind in (TaskCreationType.Normal,):
             url = [creation.url]
+            options = dict(dir = creation.path)
+
+            # see if need to override filename
+            fileInfo = creation.subtaskInfo[0]
+            if fileInfo.name_userset:
+                options["out"] = fileInfo.name
+
             self._callFromExternal(
-                _Callable(
-                    Aria2Method.AddUri,
-                    url,
-                    {
-                        "dir": creation.path,
-                        "out": creation.name,
-                    },
-                )
+                _Callable(Aria2Method.AddUri, url, options)
             )
             return True
 

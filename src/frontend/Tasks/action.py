@@ -27,16 +27,6 @@ class TaskCreationType(Enum):
     MetaLink = 5
 
 
-def _getFilenameFromED2K(url: (str, "netloc")):
-    assert url[:6] == "|file|"
-    url = url[6:]
-    return parse.unquote(url[:url.index("|")])
-
-
-def _getFilenameFromUrl(url: "ParseResult.path"):
-    return parse.unquote(url[url.rindex("/") + 1:])
-
-
 class TaskCreation(object):
     def __init__(self, parsed: ParseResult = None):
         self.parsed = parsed
@@ -50,9 +40,10 @@ class TaskCreation(object):
 
         url = parsed.geturl()
 
+        # subtaskInfo is set by Model
+        self.subtaskInfo = []
+
         self.url = url
-        self._name = None
-        self._name_user = None
         self.path = None
         self.kind = None
         if path.endswith(".torrent"):
@@ -74,19 +65,10 @@ class TaskCreation(object):
             self.kind = TaskCreationType.Normal
 
     @property
-    def name(self):
-        if self._name_user is not None:
-            return self._name_user
-        if self._name is not None:
-            return self._name
-        if self.kind == TaskCreationType.Emule:
-            return _getFilenameFromED2K(self.parsed.netloc)
-        if self.kind == TaskCreationType.Normal:
-            return _getFilenameFromUrl(self.parsed.path)
-
-    @name.setter
-    def name(self, value):
-        self._name_user = value
+    def isValid(self) -> bool:
+        if not self.parsed.netloc:
+            return False
+        return True
 
     def __repr__(self):
         return "{} <{}>".format(self.__class__.__name__, self.url)

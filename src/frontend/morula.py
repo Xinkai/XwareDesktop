@@ -85,7 +85,10 @@ class DummyApp(QApplication):
     @pyqtSlot()
     def slotCreateTask(self):
         from Widgets.TaskProperty import TaskPropertyDialog
-        self.taskCreationDlg = TaskPropertyDialog(None)
+        from models.TaskTreeModel import TaskTreeModel
+        creationModel = TaskTreeModel(self)
+        self.taskCreationDlg = TaskPropertyDialog(model = creationModel,
+                                                  parent = None)
         self.taskCreationDlg.show()
 
 from PyQt5.QtCore import QtMsgType, QMessageLogContext, QtDebugMsg, QtWarningMsg, QtCriticalMsg, \

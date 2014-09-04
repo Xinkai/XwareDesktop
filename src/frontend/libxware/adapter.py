@@ -264,19 +264,33 @@ class XwareAdapter(QObject):
         taskIds = map(lambda t: t.realid, tasks)
         self._loop.call_soon_threadsafe(self.post_start, taskIds)
 
-    def do_createTask(self, taskCreation: TaskCreation):
+    def do_createTask(self, creation: TaskCreation) -> bool:
         supported = [TaskCreationType.Normal, TaskCreationType.Emule, TaskCreationType.Magnet]
-        if taskCreation.kind in supported:
-            path = self.mountsFaker.convertToMappedPath(taskCreation.path)
+        if creation.kind not in supported:
+            return False
+
+        if creation.kind in (TaskCreationType.Normal, TaskCreationType.Emule):
+            fileInfo = creation.subtaskInfo[0]
+
+            # Workaround: xware doesn't acquire filename if not set.
+            filename = fileInfo.name
+
+            path = self.mountsFaker.convertToMappedPath(creation.path)
             if not path:
                 return False
-            taskCreation.path = path
+            creation.path = path
+
             self._loop.call_soon_threadsafe(self.post_createTask,
-                                            taskCreation.path,
-                                            taskCreation.url,
-                                            taskCreation.name)
+                                            creation.path,
+                                            creation.url,
+                                            filename)
             return True
-        return False
+
+        elif creation.kind == TaskCreationType.Magnet:
+            # Note:
+            # To add a magnet task, xware requires a name field, same as normal and emule tasks.
+            # But xware will ignore the name parameter and acquire the name on its own.
+            return False  # TODO
 
     def do_delTasks(self, tasks, options):
         taskIds = map(lambda t: t.realid, tasks)
