@@ -25,6 +25,9 @@ class TaskTreeModel(QAbstractItemModel):
         return 2  # filename, filesize
 
     def rowCount(self, parent: QModelIndex = None, *args, **kwargs):
+        if not self._root:
+            return 0
+
         if parent.isValid():
             parentItem = parent.internalPointer()
             return parentItem.childrenCount()
@@ -37,12 +40,12 @@ class TaskTreeModel(QAbstractItemModel):
         else:
             return index.internalPointer()
 
-    def data(self, index: QModelIndex, role = None):
+    def data(self, index: QModelIndex, role: int = None):
         if not index.isValid():
             return None
-
         item = index.internalPointer()
-        if role == Qt.DisplayRole:
+
+        if role in (Qt.DisplayRole, Qt.EditRole):
             return item.data(index.column())
         elif role == Qt.CheckStateRole and index.column() == TaskTreeColumn.FileName:
             return item.selected
@@ -54,12 +57,11 @@ class TaskTreeModel(QAbstractItemModel):
         return None
 
     def setData(self, index: QModelIndex, value: QVariant, role: int = None):
+        if not index.isValid():
+            return False
+        item = index.internalPointer()
+
         if role == Qt.CheckStateRole:
-            if not index.isValid():
-                return False
-
-            item = index.internalPointer()
-
             childrenCount = item.childrenCount()
             if childrenCount:
                 for i in range(childrenCount):
@@ -79,13 +81,23 @@ class TaskTreeModel(QAbstractItemModel):
 
             # success
             return True
+
+        if role == Qt.EditRole:
+            assert index.column() == TaskTreeColumn.FileName
+            item.name = value
+            self.dataChanged.emit(index, index, [Qt.DisplayRole])
+            return True
+
         return False
 
     def flags(self, index: QModelIndex):
+        result = Qt.ItemIsEnabled | Qt.ItemIsSelectable
         if index.column() == TaskTreeColumn.FileName:
-            return Qt.ItemIsUserCheckable | Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsTristate
-        else:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            result |= Qt.ItemIsUserCheckable | Qt.ItemIsTristate
+            if index.row() == 0:
+                result |= Qt.ItemIsEditable
+
+        return result
 
     def index(self, row: int, column: int, parent: QModelIndex = None):
         if not self.hasIndex(row, column, parent):
