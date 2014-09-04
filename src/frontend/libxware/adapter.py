@@ -278,10 +278,9 @@ class XwareAdapter(QObject):
             path = self.mountsFaker.convertToMappedPath(creation.path)
             if not path:
                 return False
-            creation.path = path
 
             self._loop.call_soon_threadsafe(self.post_createTask,
-                                            creation.path,
+                                            path,
                                             creation.url,
                                             filename)
             return True
