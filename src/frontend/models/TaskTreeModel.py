@@ -160,13 +160,13 @@ class TaskTreeModel(QAbstractItemModel):
     def fromCreation(self, creation: TaskCreation) -> bool:
         assert isinstance(creation, TaskCreation)
 
-        if not creation.isValid:
-            return False
-
         # Clear any existing data.
         self.clear()
         assert not self._root
         assert self.rowCount() == 0
+
+        if not creation.isValid:
+            return False
 
         self._creation = creation
 
