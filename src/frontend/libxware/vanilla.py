@@ -156,15 +156,29 @@ class XwareClient(object):
 
     @asyncio.coroutine
     def post_del(self, tasks: "iterable of id", recycle: bool, delete: bool):
+        # xware doesn't recognize encoded "," (%2C)
+        workaround = "?tasks=" + ",".join(map(str, tasks))
         result = yield from self.postJson2(
-            "del",
+            "del" + workaround,
             params = OrderedDict([
                 ("v", 2),
-                ("tasks", ",".join(map(str, tasks))),
                 ("recycleTask", int(recycle)),
                 ("deleteFile", int(delete)),
                 ("callback", ""),
             ]),
+        )
+        return result
+
+    @asyncio.coroutine
+    def post_restore(self, tasks: "iterable of id"):
+        # xware doesn't recognize encoded "," (%2C)
+        workaround = "?tasks=" + ",".join(map(str, tasks))
+        result = yield from self.postJson2(
+            "restore" + workaround,
+            params = OrderedDict([
+                ("v", 2),
+                ("callback", ""),
+            ])
         )
         return result
 
@@ -183,11 +197,12 @@ class XwareClient(object):
 
     @asyncio.coroutine
     def post_pause(self, tasks: "iterable of id"):
+        # xware doesn't recognize encoded "," (%2C)
+        workaround = "?tasks=" + ",".join(map(str, tasks))
         result = yield from self.postJson2(
-            "pause",
+            "pause" + workaround,
             params = OrderedDict([
                 ("v", 2),
-                ("tasks", ",".join(map(str, tasks))),
                 ("callback", ""),
             ]),
         )
@@ -195,11 +210,12 @@ class XwareClient(object):
 
     @asyncio.coroutine
     def post_start(self, tasks: "iterable of id"):
+        # xware doesn't recognize encoded "," (%2C)
+        workaround = "?tasks=" + ",".join(map(str, tasks))
         result = yield from self.postJson2(
-            "start",
+            "start" + workaround,
             params = OrderedDict([
                 ("v", 2),
-                ("tasks", ",".join(map(str, tasks))),
                 ("callback", ""),
             ]),
         )
