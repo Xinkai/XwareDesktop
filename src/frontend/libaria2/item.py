@@ -7,6 +7,7 @@ import os
 
 from models.TaskModel import TaskClass, TaskState
 from .definitions import Aria2TaskState
+from utils.misc import pathSplit
 
 _SPEED_SAMPLE_COUNT = 50
 
@@ -146,23 +147,26 @@ class Aria2TaskItem(QObject):
     @pyqtProperty(str, notify = initialized)
     def name(self):
         if not self._files:
-            return "ERROR"
-
-        if self._bittorrent:
-            return self._bittorrent["info"]["name"]
+            raise ValueError()
 
         if len(self._files) == 1:
             return os.path.basename(self._files[0]["path"])
-
-        raise NotImplementedError()
+        else:
+            if self._bittorrent:
+                return self._bittorrent["info"]["name"]
+            else:
+                # when the torrent file/aria2 control file is gone
+                # need to calculate fullpath of the base dir.
+                pathParts = pathSplit(self._path)  # "home", "user", "Downloads"
+                fileParts = pathSplit(self._files[0]["path"])  # "home", "user", "Downloads", "foo"
+                return fileParts[len(pathParts)]
 
     @pyqtProperty(str, notify = initialized)
     def fullpath(self):
         if len(self._files) == 1:
             return self._files[0]["path"]
         else:
-            assert bool(self._bittorrent)
-            return os.path.join(self._path, self._bittorrent["info"]["name"])
+            return os.path.join(self._path, self.name)
 
     @pyqtProperty(bool, notify = updated)
     def isDeletionPending(self):
