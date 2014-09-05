@@ -38,19 +38,28 @@ class _Callable(dict):
             for i, callable_ in enumerate(params):
                 assert isinstance(callable_, self.__class__)
                 assert callable_["method"] != Aria2Method.MultiCall
-                callable_["methodName"] = callable_.pop("method")
         else:
-            params = list(map(_fileEncode, params))
+            params = map(_fileEncode, params)
 
         self["method"] = method.value
-        self["params"] = params
-
-    def toString(self):
-        shortName = _getShortName(self["method"])
-        self["id"] = "{uuid}.{shortName}".format(shortName = shortName,
+        self["params"] = list(params)
+        self["id"] = "{uuid}.{shortName}".format(shortName = _getShortName(self["method"]),
                                                  uuid = uuid.uuid4().hex)
         self["jsonrpc"] = "2.0"
-        return json.dumps(self)
+
+    def toString(self, token = None):
+        if self["method"] == Aria2Method.MultiCall.value:
+            # add token to individual calls
+            if token:
+                for call in self["params"]:
+                    call["params"].insert(0, "token:" + token)
+
+            return json.dumps(self["params"])
+        else:
+            if token:
+                self["params"].insert(0, "token:" + token)
+
+            return json.dumps(self)
 
 
 class Aria2Adapter(QObject):
@@ -147,32 +156,39 @@ class Aria2Adapter(QObject):
             msg = yield from self._ws.recv()
             if not msg:
                 continue  # disconnected
-            data = json.loads(msg)
-            assert data["jsonrpc"] == "2.0"
-            if "error" in data:
-                print("Error Handling", data)  # TODO
-            else:
-                id_ = data.get("id", None)
-                if id_:
-                    # response
-                    shortName = _getShortName(id_)
-                    result = data["result"]
-                else:
-                    # notifications
-                    shortName = _getShortName(data["method"])
-                    result = data["params"]
+            datas = json.loads(msg)
 
-                cb = getattr(self, "_cb_" + shortName, None)
-                if cb:
-                    assert asyncio.iscoroutinefunction(cb)
-                    yield from cb(result)
+            # make a single call's response look like being part of a batch call
+            if not isinstance(datas, list):
+                datas = (datas,)
+
+            for data in datas:
+                assert data["jsonrpc"] == "2.0"
+                if "error" in data:
+                    print("Error Handling", data)  # TODO
+                else:
+                    id_ = data.get("id", None)
+                    if id_:
+                        # response
+                        shortName = _getShortName(id_)
+                        result = data["result"]
+                    else:
+                        # notifications
+                        shortName = _getShortName(data["method"])
+                        result = data["params"]
+
+                    cb = getattr(self, "_cb_" + shortName, None)
+                    if cb:
+                        assert asyncio.iscoroutinefunction(cb)
+                        yield from cb(result)
 
     @asyncio.coroutine
     def _call(self, callable_: _Callable):
         assert isinstance(callable_, _Callable)
+        additionals = dict()
         if "rpc-secret" in self._adapterConfig:
-            callable_["params"].insert(0, "token:" + self._adapterConfig["rpc-secret"])
-        payload = callable_.toString()
+            additionals["token"] = self._adapterConfig["rpc-secret"]
+        payload = callable_.toString(**additionals)
         yield from self._ws.send(payload)
 
     def _callFromExternal(self, callable_: _Callable):
@@ -197,6 +213,13 @@ class Aria2Adapter(QObject):
 
     def do_getFiles(self, gid):
         self._callFromExternal(_Callable(Aria2Method.GetFiles, gid))
+
+    def do_delTasks(self, tasks, options):
+        taskIds = map(lambda t: t.realid, tasks)
+        calls = map(lambda gid: _Callable(Aria2Method.RemoveDownloadResult, gid), taskIds)
+        delMultiple = _Callable(Aria2Method.MultiCall, *calls)
+        # TODO: aria2 don't remove files from filesystem.
+        self._callFromExternal(delMultiple)
 
     @asyncio.coroutine
     def _cb_tellActive(self, result):
