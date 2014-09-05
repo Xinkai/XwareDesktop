@@ -61,3 +61,7 @@ def dropPy34Enum(pyenum: IntEnum, prefix = None):
 
     klass = type(name, (object,), d)
     return klass
+
+
+def pathSplit(path: "/home/user/Downloads"):
+    return list(filter(bool, path.split("/")))

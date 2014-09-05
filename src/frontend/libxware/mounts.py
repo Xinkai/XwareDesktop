@@ -5,11 +5,7 @@ from collections import OrderedDict
 import os
 
 import constants
-from utils.misc import trySymlink, tryMkdir
-
-
-def _pathSplit(path):
-    return list(filter(bool, path.split("/")))
+from utils.misc import trySymlink, tryMkdir, pathSplit
 
 
 def _mountBootstrap(localPath):
@@ -17,7 +13,7 @@ def _mountBootstrap(localPath):
     # after bootstraping, return the path to PROFILE/mnt/local\path
 
     # the filter(bool) part is to remove the "/" at the beginning
-    backslashed = "\\".join(_pathSplit(localPath))
+    backslashed = "\\".join(pathSplit(localPath))
 
     mntDir = os.path.join(constants.PROFILE_DIR, "mnt", backslashed)
 
@@ -119,11 +115,11 @@ class MountsFaker(object):
 
         bestMatchCount = -1
         bestMatchDriveIndex = -1
-        localParts = _pathSplit(localPath)
+        localParts = pathSplit(localPath)
         for i, path in enumerate(self.mounts):
             # i -> 0, 1, 2...
             # path -> "/home/user/Download"
-            parts = _pathSplit(path)
+            parts = pathSplit(path)
             for m, (local, against) in enumerate(zip(localParts, parts)):
                 if local == against:
                     if m > bestMatchCount:
