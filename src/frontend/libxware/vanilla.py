@@ -148,10 +148,19 @@ class XwareClient(object):
     @asyncio.coroutine
     def postJson2(self, *args, **kwargs):
         result = yield from self.postJson(*args, **kwargs)
+
+        # check return value
         rtn = result["rtn"]
         if not rtn == 0:
             raise ValueError("rtn is not 0, but {}".format(rtn))
-        del result["rtn"]
+
+        # check subtasks return values
+        if "tasks" in result:
+            for taskResponse in result["tasks"]:
+                rtn_ = taskResponse["result"]
+                if rtn_ != 0:
+                    raise ValueError("return is not 0, but {}".format(rtn_))
+
         return result
 
     @asyncio.coroutine
