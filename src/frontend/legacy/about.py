@@ -34,9 +34,6 @@ class AboutDialog(QDialog, Ui_dlg_about):
         import sys
         self.label_pythonVer.setText(".".join(map(str, sys.version_info)))
 
-        import requests
-        self.label_requestsVer.setText(requests.__version__)
-
         try:
             import pyinotify
         except ImportError:

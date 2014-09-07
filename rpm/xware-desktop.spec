@@ -29,7 +29,6 @@ Requires:           zlib(x86-32)
 Requires:           python3-qt5 >= 5.2
 Requires:           qt5-qtwebkit >= 5.2
 Requires:           qt5-qtmultimedia >= 5.2
-Requires:           python3-requests
 Requires:           python3-inotify
 Requires(post):     desktop-file-utils
 Requires(post):     libcap
