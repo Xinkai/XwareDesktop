@@ -3,7 +3,7 @@
 from collections import namedtuple
 from enum import unique, Enum
 from Tasks.action import TaskCreation, TaskCreationType
-from Tasks.utils import getInfoFromED2K, getFilenameFromParsed
+from Tasks.utils import resolveEd2k, resolveNormal, resolveTorrentFile
 from models.TaskModel import TaskState
 
 from .TaskTreeItem import TaskTreeColumn, INVALID_INDEX
@@ -166,31 +166,41 @@ class TaskTreeModel(QAbstractItemModel):
         assert self.rowCount() == 0
 
         if not creation.isValid:
-            return False
+            return False, "Creation invalid."
 
         self._creation = creation
 
         try:
             if creation.kind == TaskCreationType.Emule:
-                name, size = getInfoFromED2K(creation.parsed.netloc)
-            elif creation.kind == TaskCreationType.Normal:
-                name = getFilenameFromParsed(creation.parsed)
-                size = 0
+                resolutions = resolveEd2k(creation.parsed)
+            elif creation.kind in (TaskCreationType.RemoteTorrent, TaskCreationType.Normal):
+                resolutions = resolveNormal(creation.parsed)
+            elif creation.kind == TaskCreationType.LocalTorrent:
+                with open(creation.url, "rb") as f:
+                    resolutions = resolveTorrentFile(f.read())
+                if not resolutions:
+                    return False, "Failed to resolve the torrent file."
             else:
-                return False
+                return False, "Creation type not implemented."
         except ValueError:
-            return False
+            return False, "Error resolving name and size."
 
         from .TaskTreeItem import TaskTreeItem
         root = TaskTreeItem()
-        subTree, _ = root.findOrCreateSubtree(name)
-        subTree.setData(size = size, index = 0, selected = True)
+
+        for i, resol in enumerate(resolutions):
+            root.addSubTask(
+                name = resol.name,
+                size = resol.size,
+                index = i,
+                selected = True,
+            )
 
         self.beginResetModel()
         self._root = root
         self.endResetModel()
 
-        return True
+        return True, None
 
     def toCreation(self) -> TaskCreation:
         assert self._creation

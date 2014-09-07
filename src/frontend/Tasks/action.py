@@ -25,6 +25,7 @@ class TaskCreationType(Enum):
     LocalTorrent = 3
     Magnet = 4
     MetaLink = 5
+    RemoteTorrent = 6
 
 
 class TaskCreation(object):
@@ -50,6 +51,9 @@ class TaskCreation(object):
             if scheme == "":
                 self.kind = TaskCreationType.LocalTorrent
                 return
+            elif scheme in ("http", "https", "ftp"):
+                self.kind = TaskCreationType.RemoteTorrent
+                return
 
         if path.endswith(".metalink") or path.endswith(".meta4"):
             if scheme in ("http", "https", "ftp"):
@@ -67,6 +71,9 @@ class TaskCreation(object):
     @property
     def isValid(self) -> bool:
         if not self.parsed.netloc:
+            if self.parsed.scheme == "":
+                return True
+
             return False
         return True
 

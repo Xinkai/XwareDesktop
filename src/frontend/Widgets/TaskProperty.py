@@ -82,7 +82,7 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
         parsed = parse.urlparse(url)
 
         creation = TaskCreation(parsed)
-        ok = self.model.fromCreation(creation)
+        ok, error = self.model.fromCreation(creation)
 
         if ok:
             self.buttonBox.setEnabled(True)
