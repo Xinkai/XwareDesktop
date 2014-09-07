@@ -5,6 +5,7 @@ from enum import unique, Enum
 from Tasks.action import TaskCreation, TaskCreationType
 from Tasks.utils import resolveEd2k, resolveNormal, resolveTorrentFile
 from models.TaskModel import TaskState
+from utils.misc import pathSplit
 
 from .TaskTreeItem import TaskTreeColumn, INVALID_INDEX
 
@@ -189,6 +190,14 @@ class TaskTreeModel(QAbstractItemModel):
         root = TaskTreeItem()
 
         for i, resol in enumerate(resolutions):
+            if len(resolutions) > 1 and \
+                creation.kind in (TaskCreationType.LocalTorrent,
+                                  TaskCreationType.RemoteTorrent,
+                                  TaskCreationType.Magnet):
+
+                if pathSplit(resol.name)[-1].startswith("_____padding_file_"):
+                    continue
+
             root.addSubTask(
                 name = resol.name,
                 size = resol.size,
