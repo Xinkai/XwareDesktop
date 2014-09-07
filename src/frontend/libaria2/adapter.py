@@ -22,13 +22,6 @@ def _getShortName(name: str) -> str:
     return name.split(".")[1]
 
 
-def _fileEncode(f: "maybe a file-like object") -> str:
-    if hasattr(f, "read") and hasattr(f, "write"):
-        return base64.b64encode(f.read())
-    else:
-        return f
-
-
 class _Callable(dict):
     def __init__(self, method: Aria2Method, *params):
         super().__init__()
@@ -38,8 +31,6 @@ class _Callable(dict):
             for i, callable_ in enumerate(params):
                 assert isinstance(callable_, self.__class__)
                 assert callable_["method"] != Aria2Method.MultiCall
-        else:
-            params = map(_fileEncode, params)
 
         self["method"] = method.value
         self["params"] = list(params)
