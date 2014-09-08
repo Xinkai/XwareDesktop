@@ -126,7 +126,7 @@ class XwareClient(object):
         return result
 
     @asyncio.coroutine
-    def post(self, path, params = None, data = None):
+    def post(self, path, params = None, data = None, **kwargs):
         self._readyCheck()
         res = yield from aiohttp.request(
             "POST",
@@ -134,7 +134,8 @@ class XwareClient(object):
                 host = self._options["host"], port = self._options["port"], path = path),
             params = params,
             data = data,
-            connector = self._connector)
+            connector = self._connector,
+            **kwargs)
         assert res.status == 200
         body = yield from res.read()
         return body
@@ -255,16 +256,20 @@ class XwareClient(object):
         return result
 
     @asyncio.coroutine
-    def post_urlCheck(self):
-        pass
+    def post_urlCheck(self, url):
+        result = yield from self.postJson2(
+            "urlCheck",
+            params = OrderedDict([
+                ("v", 2),
+                ("type", int(UrlCheckType.Url)),
+                ("url", url),
+                ("callback", ""),
+            ]),
+        )
+        return result
 
     @asyncio.coroutine
     def post_btCheck(self, filepath):
-        # xware doesn't seem to support chunked uploading, which aiohttp always uses.
-        # See the bug I opened: https://github.com/KeepSafe/aiohttp/issues/126
-        files = {
-            "file": open(filepath, 'rb'),
-        }
         result = yield from self.postJson2(
             "urlCheck",
             params = OrderedDict([
@@ -273,7 +278,10 @@ class XwareClient(object):
                 ("upload", int(True)),
                 ("callback", ""),
             ]),
-            data = files,
+            data = {
+                "file": open(filepath, 'rb'),
+            },
+            chunked = False,
         )
 
         return result
