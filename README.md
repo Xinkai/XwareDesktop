@@ -23,11 +23,13 @@ Xware Desktop的目标是提供与Windows平台上迅雷相当的功能。你可
 支持的发行版
 ------------
 
+主条目：[发行版支持情况]，包含发行版和桌面环境的支持情况。
+
 Archlinux： 支持。安装位于`AUR`的[xware-desktop包]。
 
 Ubuntu：支持14.04及以上版本。需自行打包，见[Ubuntu上编译安装说明]。
 
-Fedora: 支持21及以上版本。需[自行打包]。
+Fedora: 网友提供Fedora 19+、CentOS 7+的安装包。[Fedora/CentOS包]。
 
 其它发行版：暂无支持。需[手动安装编译]。
 
@@ -44,3 +46,4 @@ Fedora: 支持21及以上版本。需[自行打包]。
 [自行打包]:https://github.com/Xinkai/XwareDesktop/wiki/发行版支持情况
 [手动安装编译]:https://github.com/Xinkai/XwareDesktop/wiki/手动安装编译
 [Ubuntu上编译安装说明]:https://github.com/Xinkai/XwareDesktop/wiki/Ubuntu上编译安装说明
+[Fedora/CentOS包]:https://copr.fedoraproject.org/coprs/mosquito/myrepo/
