@@ -43,7 +43,7 @@ Fedora: 网友提供Fedora 19+、CentOS 7+的安装包。[Fedora/CentOS包]。
 [xware]:http://luyou.xunlei.com/forum-51-1.html
 [xware-desktop包]:https://aur.archlinux.org/packages/xware-desktop/
 [使用说明]:https://github.com/Xinkai/XwareDesktop/wiki/使用说明
-[自行打包]:https://github.com/Xinkai/XwareDesktop/wiki/发行版支持情况
+[发行版支持情况]:https://github.com/Xinkai/XwareDesktop/wiki/发行版支持情况
 [手动安装编译]:https://github.com/Xinkai/XwareDesktop/wiki/手动安装编译
 [Ubuntu上编译安装说明]:https://github.com/Xinkai/XwareDesktop/wiki/Ubuntu上编译安装说明
 [Fedora/CentOS包]:https://copr.fedoraproject.org/coprs/mosquito/myrepo/
