@@ -26,23 +26,29 @@ input[type='password']
     cursor: text;
 }
 
+#task-list .rw_unit {
+    width: 999999px !important;
+    overflow-x: hidden !important;
+}
+
 #task-list[data-showtype='0'] .rw_u02 {
-    width: 555px !important;
+    width: 550px !important;
 }
 #task-list[data-showtype='0'] .rw_u03 {
     width: 235px !important;
 }
 #task-list[data-showtype='0'] .rw_name {
-    width: 475px !important;
+    width: 470px !important;
 }
 #task-list[data-showtype='0'] .rw_p_name {
-    width: 380px !important;
+    width: 375px !important;
 }
 #task-list[data-showtype='0'] .rw_u_add .rw_u02 {
     display: none !important;
 }
 #task-list[data-showtype='0'] .rw_u_add .rw_u03 {
-    float: right !important;
+    float: left !important;
+    margin-left: 474px !important;
 }
 #task-list[data-showtype='0'] .rw_u_add .rw_u03 .rw_u_btn {
     line-height: inherit !important;
