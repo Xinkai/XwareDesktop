@@ -60,3 +60,16 @@ def resolveTorrentFile(contents: bytes) -> False or FileResolution:
         ]
 
     return fileRes
+
+
+def resolveMagnet(parsed: ParseResult) -> FileResolution:
+    queryParts = parsed.query.split("&")
+    query = dict()
+    for part in queryParts:
+        key, value = part.split("=")
+        query[key] = value
+
+    if "dn" in query:
+        return [FileResolution(parse.unquote_plus(query["dn"]), 0)]
+    else:
+        return [FileResolution("<磁力链接任务>", 0)]

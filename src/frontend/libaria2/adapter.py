@@ -186,10 +186,10 @@ class Aria2Adapter(QObject):
         self._loop.call_soon_threadsafe(asyncio.async, self._call(callable_))
 
     def do_createTask(self, creation: TaskCreation):
-        if creation.kind in (TaskCreationType.Normal,):
-            url = [creation.url]
-            options = dict(dir = creation.path)
+        url = [creation.url]
+        options = dict(dir = creation.path)
 
+        if creation.kind in (TaskCreationType.Normal,):
             # see if need to override filename
             fileInfo = creation.subtaskInfo[0]
             if fileInfo.name_userset:
@@ -197,6 +197,11 @@ class Aria2Adapter(QObject):
 
             self._callFromExternal(
                 _Callable(Aria2Method.AddUri, url, options)
+            )
+            return True
+        elif creation.kind == TaskCreationType.Magnet:
+            self._callFromExternal(
+                _Callable(Aria2Method.AddUri, url, dict())
             )
             return True
 

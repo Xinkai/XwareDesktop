@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import logging
 from launcher import app
 
 import collections
@@ -86,6 +87,8 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
 
         if ok:
             self.buttonBox.setEnabled(True)
+        else:
+            logging.error(error)
 
     def accept(self):
         if not self.model.mode == TaskTreeModelMode.Creation:

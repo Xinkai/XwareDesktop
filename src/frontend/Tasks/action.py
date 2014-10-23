@@ -73,7 +73,8 @@ class TaskCreation(object):
         if not self.parsed.netloc:
             if self.parsed.scheme == "":
                 return True
-
+            elif self.parsed.scheme == "magnet":
+                return True
             return False
         return True
 

@@ -3,7 +3,7 @@
 from collections import namedtuple
 from enum import unique, Enum
 from Tasks.action import TaskCreation, TaskCreationType
-from Tasks.utils import resolveEd2k, resolveNormal, resolveTorrentFile
+from Tasks.utils import resolveEd2k, resolveNormal, resolveTorrentFile, resolveMagnet
 from models.TaskModel import TaskState
 from utils.misc import pathSplit
 
@@ -181,6 +181,10 @@ class TaskTreeModel(QAbstractItemModel):
                     resolutions = resolveTorrentFile(f.read())
                 if not resolutions:
                     return False, "Failed to resolve the torrent file."
+            elif creation.kind == TaskCreationType.Magnet:
+                resolutions = resolveMagnet(creation.parsed)
+                if not resolutions:
+                    return False, "Failed to resolve magnet link."
             else:
                 return False, "Creation type not implemented."
         except ValueError:
