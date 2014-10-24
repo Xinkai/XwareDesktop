@@ -108,8 +108,8 @@ class XwareAdapter(QObject):
             _clientInitOptions["host"] = "127.0.0.1"
             self.useXwared = True
             self.xwaredSocket = os.path.expanduser(connection.path)
-            app.aboutToQuit.connect(self.daemon_stopXware)
-            self.daemon_startXware()
+            app.aboutToQuit.connect(lambda: self.do_daemon_quitFrontend())
+            self._notifyFrontendStart = True
             from .mounts import MountsFaker
             self.mountsFaker = MountsFaker()
         elif connection.scheme == "http":
@@ -184,6 +184,9 @@ class XwareAdapter(QObject):
     def main(self):
         # Entry point of the thread "XwareAdapterEventLoop"
         # main() handles non-stop polling
+        if getattr(self, "_notifyFrontendStart", False):
+            self._loop.call_soon(self.daemon_start)
+
         while True:
             self._loop.call_soon(self.get_getsysinfo)
             self._loop.call_soon(self.get_list, TaskClass.RUNNING)
@@ -381,6 +384,14 @@ class XwareAdapter(QObject):
 
     def do_daemon_stop(self):
         self._loop.call_soon_threadsafe(self.daemon_stopETM)
+
+    def do_daemon_startFrontend(self):
+        raise NotImplementedError()
+        # handled in main()
+        # self._loop.call_soon_threadsafe(self.daemon_start)
+
+    def do_daemon_quitFrontend(self):
+        self._loop.call_soon_threadsafe(self.daemon_quit)
 
     @property
     def daemonManagedBySystemd(self):
