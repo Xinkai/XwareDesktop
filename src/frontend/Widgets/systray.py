@@ -5,12 +5,14 @@ from launcher import app
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QIcon
+
+from Widgets import CompatSystemTrayIcon
 from PyQt5.QtWidgets import QSystemTrayIcon
 
 from .contextmenu import ContextMenu
 
 
-class Systray(QSystemTrayIcon):
+class Systray(CompatSystemTrayIcon):
     toggleMinimized = pyqtSignal()
 
     def __init__(self, parent = None):

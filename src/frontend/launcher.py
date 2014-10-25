@@ -76,6 +76,9 @@ class XwareDesktop(QApplication):
             self.adapterManager.loadAdapter(item)
 
         # components
+        from Services import SessionService
+        self.sessionService = SessionService(self)
+
         from Widgets.systray import Systray
         from Notify import Notifier
         from Schedule.model import SchedulerModel

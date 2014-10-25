@@ -44,3 +44,6 @@ AUTOSTART_DESKTOP_USERFILE = os.path.join(XDG_CONFIG_HOME,
 # ## Autostart
 DESKTOP_FILE = "/usr/share/applications/xware-desktop.desktop"
 DESKTOP_AUTOSTART_FILE = os.path.join(XDG_CONFIG_HOME, "autostart/xware-desktop.desktop")
+
+# Session services
+DBUS_SESSION_SERVICE = "net.cuoan.XwareDesktop"
