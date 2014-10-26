@@ -103,15 +103,17 @@ class KdeStatusNotifierAdapter(QDBusAbstractAdaptor):
 </interface>
     """)
 
-    def __init__(self, parent = None):
+    def __init__(self, *, sessionService, parent):
         super().__init__(parent)
         self._iconName = ""
+        self.__sessionService = sessionService
+        self.__systemTrayIcon = parent
 
     # methods
     @pyqtSlot(int, int)
     def Activate(self, x: int, y: int):
         # Left-click
-        pass
+        self.__systemTrayIcon.activated.emit(QSystemTrayIcon.Trigger)
 
     @pyqtSlot(int, int)
     def ContextMenu(self, x: int, y: int):
@@ -157,7 +159,13 @@ class KdeStatusNotifierAdapter(QDBusAbstractAdaptor):
 
     def setIconName(self, value):
         self._iconName = value
-        self.NewIcon.emit()
+        msg = QDBusMessage.createSignal(
+            "/StatusNotifierItem",
+            "org.kde.StatusNotifierItem",
+            "NewIcon"
+        )
+        msg.setArguments([])
+        self.__sessionService.sessionBus.send(msg)
 
     @pyqtProperty(str)
     def IconThemePath(self):
@@ -394,7 +402,10 @@ class KdeSystemTrayIcon(QObject):
             "/MenuBar", self._menubarAdapter,
         )
 
-        self._sniAdapter = KdeStatusNotifierAdapter(self)
+        self._sniAdapter = KdeStatusNotifierAdapter(
+            sessionService = self.__sessionService,
+            parent = self,
+        )
         self.__sessionService.registerObject(
             "/StatusNotifierItem", self._sniAdapter,
         )
