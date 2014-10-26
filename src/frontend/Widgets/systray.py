@@ -3,7 +3,7 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QIcon
 
 from Widgets import CompatSystemTrayIcon

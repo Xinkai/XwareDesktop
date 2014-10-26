@@ -4,8 +4,8 @@ from enum import IntEnum, unique
 import logging
 
 from PyQt5.QtCore import QObject, QMetaType, pyqtSlot, pyqtProperty, Q_CLASSINFO, pyqtSignal
-from PyQt5.QtDBus import QDBusInterface, QDBusArgument, QDBusAbstractAdaptor, \
-    QDBusObjectPath, QDBusMessage
+from PyQt5.QtDBus import QDBusInterface, QDBusArgument, QDBusAbstractAdaptor, QDBusObjectPath, \
+    QDBusMessage
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
 
@@ -266,9 +266,9 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
         self.__settings = settings
         self.__app = app
         self._revision = 0
-        self.__app.applySettings.connect(self.updateLayout)
+        self.__app.applySettings.connect(self._updateLayout)
 
-    def updateLayout(self):
+    def _updateLayout(self):
         self._revision += 1
         msg = QDBusMessage.createSignal("/MenuBar", "com.canonical.dbusmenu", "LayoutUpdated")
         msg.setArguments([
