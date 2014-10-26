@@ -4,7 +4,7 @@ from enum import IntEnum, unique
 import logging
 
 from PyQt5.QtCore import QObject, QMetaType, pyqtSlot, pyqtProperty, Q_CLASSINFO, pyqtSignal
-from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusArgument, QDBusAbstractAdaptor, \
+from PyQt5.QtDBus import QDBusInterface, QDBusArgument, QDBusAbstractAdaptor, \
     QDBusObjectPath, QDBusMessage
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
@@ -252,22 +252,26 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
 </interface>
     """)
 
-    def __init__(self, sessionService, parent = None):
+    def __init__(self, *, sessionService, settings, app, parent):
         super().__init__(parent)
-        self._sessionService = sessionService
+        self.setAutoRelaySignals(True)
+        self.__sessionService = sessionService
+        self.__settings = settings
+        self.__app = app
+        self._revision = 0
 
     # methods
     @pyqtSlot(QDBusMessage)
     def AboutToShow(self, msg) -> "needUpdate(bool)":
         reply = msg.createReply([False])
-        return self._sessionService.sessionBus.send(reply)
+        return self.__sessionService.sessionBus.send(reply)
 
     @pyqtSlot(QDBusMessage)
     def AboutToShowGroup(self, msg):
         reply = msg.createReply([
             [0], []
         ])
-        return self._sessionService.sessionBus.send(reply)
+        return self.__sessionService.sessionBus.send(reply)
 
     @pyqtSlot(QDBusMessage)
     def Event(self, msg):
@@ -281,10 +285,12 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
             return
 
         if itemId == DBusMenuAction.ToggleMonitorWindow and eventId == "clicked":
-            pass
+            show = self.__settings.getbool("frontend", "showmonitorwindow")
+            self.__settings.setbool("frontend", "showmonitorwindow", not show)
+            self.__app.applySettings.emit()
 
         if itemId == DBusMenuAction.Exit and eventId == "clicked":
-            pass
+            self.__app.quit()
 
     @pyqtSlot(QDBusMessage)
     def EventGroup(self, msg):
@@ -316,7 +322,7 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
         toggleMonitorWinItem = newDBusMenuItem(DBusMenuAction.ToggleMonitorWindow, {
             "label": "显示悬浮窗",
             "toggle-type": "checkmark",
-            "toggle-state": 0,
+            "toggle-state": int(self.__settings.getbool("frontend", "showmonitorwindow")),
         }, [])
 
         rootItem = newDBusMenuItem(DBusMenuAction.Root, {
@@ -327,10 +333,10 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
         ])
 
         reply = msg.createReply([
-            QDBusArgument(0, QMetaType.UInt),  # revision
+            QDBusArgument(self._revision, QMetaType.UInt),
             QDBusArgument(rootItem, QDBusArgument.Structure),
         ])
-        return self._sessionService.sessionBus.send(reply)
+        return self.__sessionService.sessionBus.send(reply)
 
     @pyqtSlot(QDBusMessage)
     def GetProperties(self, msg):
@@ -356,7 +362,7 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
     # signals
     ItemActivationRequested = pyqtSignal(int, "uint")
     ItemsPropertiesUpdated = pyqtSignal()  # complex
-    LayoutUpdated = pyqtSignal("uint", int)
+    LayoutUpdated = pyqtSignal(QDBusMessage)
 
 
 class KdeSystemTrayIcon(QObject):
@@ -364,15 +370,21 @@ class KdeSystemTrayIcon(QObject):
 
     def __init__(self, application):
         super().__init__(application)
-        self._sessionService = application.sessionService
+        self.__sessionService = application.sessionService
+        self.__settings = application.settings
 
-        self._menubarAdapter = CanonicalDBusMenuAdapter(self._sessionService, self)
-        self._sessionService.registerObject(
+        self._menubarAdapter = CanonicalDBusMenuAdapter(
+            sessionService = self.__sessionService,
+            settings = self.__settings,
+            app = application,
+            parent = self,
+        )
+        self.__sessionService.registerObject(
             "/MenuBar", self._menubarAdapter,
         )
 
         self._sniAdapter = KdeStatusNotifierAdapter(self)
-        self._sessionService.registerObject(
+        self.__sessionService.registerObject(
             "/StatusNotifierItem", self._sniAdapter,
         )
 
@@ -397,7 +409,7 @@ class KdeSystemTrayIcon(QObject):
         if visible:
             self._interface.call(
                 "RegisterStatusNotifierItem",
-                QDBusArgument(self._sessionService.serviceName, QMetaType.QString),
+                QDBusArgument(self.__sessionService.serviceName, QMetaType.QString),
             )
         else:
             # Maybe try unregistering the whole object?
