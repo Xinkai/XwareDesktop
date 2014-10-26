@@ -32,6 +32,8 @@ if __name__ == "__main__":
     CrashAwareThreading.installEventLoopExceptionHandler()
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from PyQt5.QtCore import QtMsgType, QMessageLogContext, QtDebugMsg, QtWarningMsg, QtCriticalMsg, \
+    QtFatalMsg, qInstallMessageHandler
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont, QIcon
 
@@ -214,7 +216,7 @@ def doQtIntegrityCheck():
                 url = "http://www.ubuntukylin.com/ukylin/forum.php?mod=viewthread&tid=9508"
                 self.mainText = ttk.Label(
                     self,
-                    font=("Sans Serif", 12),
+                    font = ("Sans Serif", 12),
                     text = """检测到系统中可能安装了115网盘。它会导致Xware Desktop和其它的基于Qt的程序无法使用。请
 
 * 卸载115网盘 或
@@ -241,9 +243,28 @@ def doQtIntegrityCheck():
         sys.exit(tkapp.mainloop())
 
 
+def QtMsgHandler(msgType: QtMsgType, context: QMessageLogContext, msg: str):
+    strType = {
+        QtDebugMsg: "DEBUG",
+        QtWarningMsg: "WARN",
+        QtCriticalMsg: "CRITICAL",
+        QtFatalMsg: "FATAL"
+    }[msgType]
+
+    print("Qt[{strType}] {category} {function} in {file}, on line {line}\n"
+          "    {msg}".format(strType = strType,
+                             category = context.category,
+                             function = context.function,
+                             file = context.file,
+                             line = context.line,
+                             msg = msg),
+          file = sys.stdout if msgType in (QtDebugMsg, QtWarningMsg) else sys.stderr)
+
+
 app = None
 if __name__ == "__main__":
     doQtIntegrityCheck()
+    qInstallMessageHandler(QtMsgHandler)
 
     from shared.profile import profileBootstrap
     profileBootstrap(constants.PROFILE_DIR)
