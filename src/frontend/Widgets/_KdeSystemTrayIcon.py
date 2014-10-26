@@ -311,7 +311,9 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
 
     @pyqtSlot(QDBusMessage)
     def GetLayout(self, msg):
-        # parentId, recursionDepth, propertyNames = msg.arguments()
+        parentId, recursionDepth, propertyNames = msg.arguments()
+        if parentId != 0:
+            raise NotImplementedError("Don't know when happens when parentId is not 0.")
 
         exitItem = newDBusMenuItem(DBusMenuAction.Exit, {
             "label": "退出",
