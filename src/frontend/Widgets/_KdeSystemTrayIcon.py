@@ -254,11 +254,20 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
 
     def __init__(self, *, sessionService, settings, app, parent):
         super().__init__(parent)
-        self.setAutoRelaySignals(True)
         self.__sessionService = sessionService
         self.__settings = settings
         self.__app = app
         self._revision = 0
+        self.__app.applySettings.connect(self.updateLayout)
+
+    def updateLayout(self):
+        self._revision += 1
+        msg = QDBusMessage.createSignal("/MenuBar", "com.canonical.dbusmenu", "LayoutUpdated")
+        msg.setArguments([
+            QDBusArgument(self._revision, QMetaType.UInt),
+            QDBusArgument(DBusMenuAction.Root.value, QMetaType.Int),
+        ])
+        self.__sessionService.sessionBus.send(msg)
 
     # methods
     @pyqtSlot(QDBusMessage)
@@ -362,7 +371,7 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
     # signals
     ItemActivationRequested = pyqtSignal(int, "uint")
     ItemsPropertiesUpdated = pyqtSignal()  # complex
-    LayoutUpdated = pyqtSignal(QDBusMessage)
+    LayoutUpdated = pyqtSignal("uint", int)
 
 
 class KdeSystemTrayIcon(QObject):
