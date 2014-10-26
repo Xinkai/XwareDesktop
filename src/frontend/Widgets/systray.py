@@ -13,8 +13,6 @@ from .contextmenu import ContextMenu
 
 
 class Systray(CompatSystemTrayIcon):
-    toggleMinimized = pyqtSignal()
-
     def __init__(self, parent = None):
         super().__init__(parent)
         icon = QIcon.fromTheme("xware-desktop")
@@ -34,7 +32,7 @@ class Systray(CompatSystemTrayIcon):
         elif reason == QSystemTrayIcon.DoubleClick:  # double click
             pass
         elif reason == QSystemTrayIcon.Trigger:  # left
-            self.toggleMinimized.emit()
+            app.toggleMinimized.emit()
 
     @pyqtSlot()
     def teardown(self):

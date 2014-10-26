@@ -38,7 +38,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
             self.action_ETMrestart.triggered.connect(adapter.do_daemon_restart)
             self.menu_backend.setEnabled(True)
 
-        app.systray.toggleMinimized.connect(self.toggleMinimized)
+        app.toggleMinimized.connect(self.toggleMinimized)
         self.action_createTask.triggered.connect(app.taskCreationAgent.createTasksAction)
 
     # shorthand

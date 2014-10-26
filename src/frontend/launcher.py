@@ -46,6 +46,7 @@ __all__ = ['app']
 class XwareDesktop(QApplication):
     sigMainWinLoaded = pyqtSignal()
     applySettings = pyqtSignal()
+    toggleMinimized = pyqtSignal()
 
     def __init__(self, *args):
         super().__init__(*args)
