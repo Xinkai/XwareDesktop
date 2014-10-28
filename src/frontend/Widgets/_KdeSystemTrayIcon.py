@@ -277,6 +277,35 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
         ])
         self.__sessionService.sessionBus.send(msg)
 
+    def _getItemProperty(self, itemId: int):
+        if itemId == DBusMenuAction.Exit:
+            return {
+                "label": "退出",
+                "icon-name": "application-exit",
+            }
+        elif itemId == DBusMenuAction.ToggleMainWindow:
+            return {
+                "label": "显示主窗口",
+                "toggle-type": "checkmark",
+                "toggle-state": int(False),
+            }
+        elif itemId == DBusMenuAction.Settings:
+            return {
+                "label": "设置",
+            }
+        elif itemId == DBusMenuAction.ToggleMonitorWindow:
+            return {
+                "label": "显示悬浮窗",
+                "toggle-type": "checkmark",
+                "toggle-state": int(self.__settings.getbool("frontend", "showmonitorwindow")),
+            }
+        elif itemId == DBusMenuAction.Root:
+            return {
+                "children-display": "submenu",
+            }
+        else:
+            raise ValueError("Unknown Menu Item Id {}".format(itemId))
+
     # methods
     @pyqtSlot(QDBusMessage)
     def AboutToShow(self, msg) -> "needUpdate(bool)":
@@ -315,7 +344,20 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
 
     @pyqtSlot(QDBusMessage)
     def GetGroupProperties(self, msg):
-        print("GetGroupProperties", msg.arguments())
+        itemIds, propertyNames = msg.arguments()
+        result = QDBusArgument()
+        result.beginArray(0)  # TODO: replace with registered custom MetaType
+        for itemId in itemIds:
+            result.beginStructure()
+            result.add(itemId, QMetaType.Int)
+            result.add(self._getItemProperty(itemId), QMetaType.QVariantMap)
+            result.endStructure()
+        result.endArray()
+
+        reply = msg.createReply([
+            result
+        ])
+        return self.__sessionService.sessionBus.send(reply)
 
     @pyqtSlot(QDBusMessage)
     def GetLayout(self, msg):
@@ -323,33 +365,35 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
         if parentId != 0:
             raise NotImplementedError("Don't know when happens when parentId is not 0.")
 
-        exitItem = newDBusMenuItem(DBusMenuAction.Exit, {
-            "label": "退出",
-            "icon-name": "application-exit",
-        }, [])
+        exitItem = newDBusMenuItem(
+            DBusMenuAction.Exit,
+            self._getItemProperty(DBusMenuAction.Exit),
+            []
+        )
 
-        # toggleMainWinItem = newDBusMenuItem(DBusMenuAction.ToggleMainWindow, {
-        #     "label": "显示主窗口",
-        #     "toggle-type": "checkmark",
-        #     "toggle-state": 0,
-        # }, [])
+        # toggleMainWinItem = newDBusMenuItem(
+        #     DBusMenuAction.ToggleMainWindow,
+        #     self._getItemProperty(DBusMenuAction.ToggleMainWindow),
+        #     []
+        # )
 
-        # settingsItem = newDBusMenuItem(DBusMenuAction.Settings, {
-        #     "label": "设置",
-        # }, [])
+        # settingsItem = newDBusMenuItem(
+        #     DBusMenuAction.Settings,
+        #     self._getItemProperty(DBusMenuAction.Settings),
+        #     []
+        # )
 
-        toggleMonitorWinItem = newDBusMenuItem(DBusMenuAction.ToggleMonitorWindow, {
-            "label": "显示悬浮窗",
-            "toggle-type": "checkmark",
-            "toggle-state": int(self.__settings.getbool("frontend", "showmonitorwindow")),
-        }, [])
+        toggleMonitorWinItem = newDBusMenuItem(
+            DBusMenuAction.ToggleMonitorWindow,
+            self._getItemProperty(DBusMenuAction.ToggleMonitorWindow),
+            []
+        )
 
-        rootItem = newDBusMenuItem(DBusMenuAction.Root, {
-            "children-display": "submenu",
-        }, [
-            toggleMonitorWinItem,
-            exitItem,
-        ])
+        rootItem = newDBusMenuItem(
+            DBusMenuAction.Root,
+            self._getItemProperty(DBusMenuAction.Root),
+            [toggleMonitorWinItem, exitItem, ],
+        )
 
         reply = msg.createReply([
             QDBusArgument(self._revision, QMetaType.UInt),
