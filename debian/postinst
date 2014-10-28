@@ -3,6 +3,7 @@ set -e
 
 if [ "$1" = "configure" ]; then
     setcap CAP_SYS_ADMIN=+ep /opt/xware-desktop/chmns
+    chrpath -r /opt/xware-desktop/frontend/Extensions /opt/xware-desktop/frontend/Extensions/DBusTypes.so
 
     echo "欢迎使用Xware Desktop。"
     echo "设置方法和注意事项见项目主页。"

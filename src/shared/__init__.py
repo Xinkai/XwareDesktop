@@ -3,7 +3,7 @@
 import logging
 from enum import IntEnum, unique
 
-__version__ = "0.12"
+__version__ = "0.13"
 
 XWARE_VERSION = "1.0.31"
 

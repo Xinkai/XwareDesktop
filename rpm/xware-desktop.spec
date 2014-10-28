@@ -6,7 +6,7 @@
 %global __python        %{__python3}
 
 Name:               xware-desktop
-Version:            0.12
+Version:            0.13
 Release:            1%{?dist}
 Summary:            An attempt to bring Xware (Xunlei on routers) to desktop Linux.
 
@@ -32,6 +32,7 @@ Requires:           qt5-qtmultimedia >= 5.2
 Requires:           python3-inotify
 Requires(post):     desktop-file-utils
 Requires(post):     libcap
+Requires(post):     chrpath
 
 %description
 An attempt to bring Xware (Xunlei on routers) to desktop Linux.
@@ -40,7 +41,7 @@ An attempt to bring Xware (Xunlei on routers) to desktop Linux.
 %autosetup -n %{reponame}-%{commit}
 
 %build
-make all
+QT_SELECT=5 make all
 
 %install
 make DESTDIR=%{buildroot} install
@@ -68,6 +69,7 @@ make DESTDIR=%{buildroot} install
     update-desktop-database -q
 
     setcap CAP_SYS_ADMIN=+ep /opt/xware-desktop/chmns
+    chrpath -r /opt/xware-desktop/frontend/Extensions /opt/xware-desktop/frontend/Extensions/DBusTypes.so
 
     echo "欢迎使用Xware Desktop。"
     echo "设置方法和注意事项见项目主页。"

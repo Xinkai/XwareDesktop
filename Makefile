@@ -7,7 +7,7 @@ SHELL         = /bin/bash
 UNAME_O      := $(shell uname -o)
 
 .PHONY: all pyqt coffee prepareXware replacePath pep8 clean install \
-        prepareXwareFake replacePathFake binaryFake
+        prepareXwareFake replacePathFake binaryFake extensions
 
 ifeq ($(UNAME_O),Cygwin)
     pyuic5   := pyuic5.bat
@@ -20,7 +20,7 @@ else
     pyrcc5   := pyrcc5
     python3  := python3
 
-    all: build/etmpatch.so build/chmns pyqt coffee prepareXware replacePath
+    all: build/etmpatch.so build/chmns pyqt coffee prepareXware replacePath extensions
 endif
 
 binaryFake:
@@ -35,6 +35,9 @@ build/etmpatch.so: src/etmpatch.c
 build/chmns: src/chmns.c
 	$(CC) $(FLAGS) -o build/chmns src/chmns.c
 
+extensions:
+	make -C src/frontend/Extensions all
+
 clean:
 	rm -rf pkg
 	rm -rf build
@@ -43,6 +46,7 @@ clean:
 	find src/frontend -name "*_rc.py" -print0 | xargs -0 rm -f
 	find src -name "__pycache__" -print0 | xargs -0 rm -rf
 	find src/frontend -name "*.js" -print0 | xargs -0 rm -f
+	make -C src/frontend/Extensions clean
 
 pyqt:
 	$(pyuic5) -o src/frontend/legacy/ui_main.py     src/frontend/ui/main.ui
@@ -116,6 +120,9 @@ install:
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/tests
 	find $(DESTDIR)$(PREFIX) -name "*.coffee" -print0 | xargs -0 rm
 	rm                 $(DESTDIR)$(PREFIX)/frontend/xware-desktop.desktop
+	rm -r              $(DESTDIR)$(PREFIX)/frontend/Extensions/src
+	rm -r              $(DESTDIR)$(PREFIX)/frontend/Extensions/sip
+	rm                 $(DESTDIR)$(PREFIX)/frontend/Extensions/Makefile
 
 	# icons
 	install -d $(DESTDIR)/usr/share/icons/hicolor

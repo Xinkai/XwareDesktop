@@ -7,6 +7,9 @@ Build-Depends:
  zlib1g [i386], zlib1g:i386 [amd64],
  coffeescript,
  pyqt5-dev-tools,
+ pyqt5-dev,
+ python3-sip-dev,
+ qtbase5-dev,
  debhelper,
  chrpath,
  sed,
@@ -27,6 +30,7 @@ Depends:
  python3-tk,
  python3-pyinotify,
  libcap2-bin,
+ chrpath,
  zlib1g [i386], zlib1g:i386 [amd64],
  libc6 [i386], libc6:i386 [amd64]
 Description: An attempt to bring Xware (Xunlei on routers) to desktop Linux.

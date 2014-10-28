@@ -1,6 +1,7 @@
 #!/usr/bin/make -f
 
 export DH_VERBOSE=1
+export QT_SELECT=5
 
 %:
 	dh $@
