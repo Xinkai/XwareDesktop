@@ -281,6 +281,23 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
         ])
         self.__sessionService.sessionBus.send(msg)
 
+    def _eventHandler(self, itemId, eventId, data, timestamp):
+        if eventId in ("opened", "closed"):
+            # Should be handled at the other end of the D-Bus, don't care.
+            return
+
+        if itemId == DBusMenuAction.Root:
+            # Has nothing to do
+            return
+
+        if itemId == DBusMenuAction.ToggleMonitorWindow and eventId == "clicked":
+            show = self.__settings.getbool("frontend", "showmonitorwindow")
+            self.__settings.setbool("frontend", "showmonitorwindow", not show)
+            self.__app.applySettings.emit()
+
+        if itemId == DBusMenuAction.Exit and eventId == "clicked":
+            self.__app.quit()
+
     def _getItemProperty(self, itemId: int):
         if itemId == DBusMenuAction.Exit:
             return {
@@ -318,33 +335,27 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
 
     @pyqtSlot(QDBusMessage)
     def AboutToShowGroup(self, msg):
-        reply = msg.createReply([
-            [0], []
-        ])
-        return self.__sessionService.sessionBus.send(reply)
+        print("AboutToShowGroup", msg.arguments())
+        # return self.__sessionService.sessionBus.send(reply)
 
     @pyqtSlot(QDBusMessage)
     def Event(self, msg):
         itemId, eventId, data, timestamp = msg.arguments()
-        if eventId in ("opened", "closed"):
-            # Should be handled at the other end of the D-Bus, don't care.
-            return
-
-        if itemId == DBusMenuAction.Root:
-            # Has nothing to do
-            return
-
-        if itemId == DBusMenuAction.ToggleMonitorWindow and eventId == "clicked":
-            show = self.__settings.getbool("frontend", "showmonitorwindow")
-            self.__settings.setbool("frontend", "showmonitorwindow", not show)
-            self.__app.applySettings.emit()
-
-        if itemId == DBusMenuAction.Exit and eventId == "clicked":
-            self.__app.quit()
+        self._eventHandler(itemId, eventId, data, timestamp)
 
     @pyqtSlot(QDBusMessage)
     def EventGroup(self, msg):
-        print("EventGroup", msg.arguments())
+        events = msg.arguments()
+        for itemId, eventId, data, timestamp in events:
+            self._eventHandler(itemId, eventId, data, timestamp)
+
+        idErrors = QDBusArgument()
+        idErrors.beginArray(QMetaType.Int)
+        idErrors.endArray()
+        reply = msg.createReply([
+            idErrors
+        ])
+        return self.__sessionService.sessionBus.send(reply)
 
     @pyqtSlot(QDBusMessage)
     def GetGroupProperties(self, msg):
