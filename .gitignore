@@ -10,6 +10,7 @@ __pycache__/
 .cproject
 .project
 .idea/
+*.pro.user
 
 # Qt Creator
 XwareDesktop.config
@@ -48,3 +49,14 @@ unused/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# Extensions
+*.so
+*.so.*
+*.exp
+*.o
+*.sbf
+sip*.cpp
+sip*.h
+src/Makefile
+sip/Makefile

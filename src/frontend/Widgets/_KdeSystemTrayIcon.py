@@ -9,6 +9,10 @@ from PyQt5.QtDBus import QDBusInterface, QDBusArgument, QDBusAbstractAdaptor, QD
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
 
+from Extensions.DBusTypes import DBusTypes
+
+GroupPropertyMetaType = DBusTypes.registerGroupProperty()
+
 
 @unique
 class DBusMenuAction(IntEnum):
@@ -346,7 +350,7 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
     def GetGroupProperties(self, msg):
         itemIds, propertyNames = msg.arguments()
         result = QDBusArgument()
-        result.beginArray(0)  # TODO: replace with registered custom MetaType
+        result.beginArray(GroupPropertyMetaType)
         for itemId in itemIds:
             result.beginStructure()
             result.add(itemId, QMetaType.Int)
