@@ -335,7 +335,8 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
 
     @pyqtSlot(QDBusMessage)
     def AboutToShowGroup(self, msg):
-        print("AboutToShowGroup", msg.arguments())
+        pass
+        # stub: Unity's implementation seems working fine without this
         # return self.__sessionService.sessionBus.send(reply)
 
     @pyqtSlot(QDBusMessage)
@@ -346,8 +347,9 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
     @pyqtSlot(QDBusMessage)
     def EventGroup(self, msg):
         events = msg.arguments()
-        for itemId, eventId, data, timestamp in events:
-            self._eventHandler(itemId, eventId, data, timestamp)
+        for event in events:
+            for itemId, eventId, data, timestamp in event:
+                self._eventHandler(itemId, eventId, data, timestamp)
 
         idErrors = QDBusArgument()
         idErrors.beginArray(QMetaType.Int)
