@@ -18,34 +18,10 @@ if __name__ == "__main__":
     faulthandler.enable(faultLogFd)
 
 
-from PyQt5.QtCore import QUrl, QSize, pyqtSlot, pyqtSignal
-from PyQt5.QtQuick import QQuickView
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
-from Widgets.QuickView import CustomQuickView
-
 import constants
-from utils.IconProvider import IconProvider, MimeIconProvider
-
-
-class QmlMain(CustomQuickView):
-    def __init__(self, parent):
-        super().__init__(parent)
-        app = QApplication.instance()
-
-        self.setTitle("Xware Desktop with QML (experimental)")
-        self.setResizeMode(QQuickView.SizeRootObjectToView)
-        self.qmlUrl = QUrl.fromLocalFile(os.path.join(constants.FRONTEND_DIR, "QML/Main.qml"))
-        self._iconProvider = IconProvider()
-        self._mimeIconProvider = MimeIconProvider()
-        self.engine().addImageProvider("icon", self._iconProvider)
-        self.engine().addImageProvider("mimeicon", self._mimeIconProvider)
-        self.rootContext().setContextProperty("adapters", app.adapterManager)
-        self.rootContext().setContextProperty("taskModel", app.proxyModel)
-        self.rootContext().setContextProperty("schedulerModel", app.schedulerModel)
-        self.rootContext().setContextProperty("taskCreationAgent", app.taskCreationAgent)
-        self.setSource(self.qmlUrl)
-        self.resize(QSize(800, 600))
 
 
 class DummyApp(QApplication):
@@ -78,6 +54,10 @@ class DummyApp(QApplication):
         self.taskCreationAgent.available.connect(self.slotCreateTask)
         self.taskCreationDlg = None
 
+        from Services import SessionService
+        self.sessionService = SessionService(self)
+
+        from Widgets.Main import QmlMain
         self.qmlWin = QmlMain(None)
         self.qmlWin.show()
         self.aboutToQuit.connect(lambda: self.qmlWin.deleteLater())
