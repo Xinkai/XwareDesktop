@@ -207,7 +207,8 @@ class FrontendPy(QObject):
 
         if creation.kind in (TaskCreationType.Normal,
                              TaskCreationType.Emule,
-                             TaskCreationType.Magnet):
+                             TaskCreationType.Magnet,
+                             TaskCreationType.RemoteTorrent):
             return self.sigCreateTask.emit(creation.url)
 
         if creation.kind == TaskCreationType.LocalTorrent:
