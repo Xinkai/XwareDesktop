@@ -23,6 +23,7 @@ V2_PAGE = "http://yuancheng.xunlei.com/"
 V3_PAGE = "http://yuancheng.xunlei.com/3/"
 
 XWAREJS_FILE = os.path.join(FRONTEND_DIR, "legacy/xwarejs.js")
+XWAREJS_LOGIN_FILE = os.path.join(FRONTEND_DIR, "legacy/loginjs.js")
 XWARESTYLE_FILE = os.path.join(FRONTEND_DIR, "legacy/style.css")
 
 

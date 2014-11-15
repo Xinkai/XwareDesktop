@@ -83,13 +83,20 @@ class CustomWebPage(QWebPage):
         if not ok:  # terminated prematurely
             return
 
-        # inject xdpy object
-        self.frame.addToJavaScriptWindowObject("xdpy", app.frontendpy)
+        for childFrame in self.frame.childFrames():
+            requestedUrl = childFrame.requestedUrl()
+            if requestedUrl.host() == "i.xunlei.com" and requestedUrl.path()[:6] == "/login":
+                targetFrame = childFrame
+                jsFile = constants.XWAREJS_LOGIN_FILE
+                break
+        else:
+            targetFrame = self.frame
+            jsFile = constants.XWAREJS_FILE
 
-        # inject xdjs script
-        with open(constants.XWAREJS_FILE, encoding = "UTF-8") as file:
+        targetFrame.addToJavaScriptWindowObject("xdpy", app.frontendpy)
+        with open(jsFile, encoding = "UTF-8") as file:
             js = file.read()
-        self.frame.evaluateJavaScript(js)
+        targetFrame.evaluateJavaScript(js)
 
     @pyqtSlot()
     def slotRefreshPage(self):

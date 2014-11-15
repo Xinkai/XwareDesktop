@@ -5,7 +5,6 @@ class XwareJS
         xdpy.sigCreateTask.connect(@, @slotCreateTask)
         xdpy.sigCreateTaskFromTorrentFile.connect(@, @slotCreateTaskFromTorrentFile)
         xdpy.sigCreateTaskFromTorrentFileDone.connect(@, @slotCreateTaskFromTorrentFileDone)
-        xdpy.sigLogin.connect(@, @slotLogin)
         xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
         xdpy.sigToggleFlashAvailability.connect(@, @slotToggleFlashAvailability)
 
@@ -14,7 +13,6 @@ class XwareJS
 
         @bindDblclick()
         @bindContextMenu()
-        @bindSaveCredentials()
         @bindMaskObserver()
         @bindTaskTabObserver()
         @fixDeviceShortName()
@@ -30,37 +28,6 @@ class XwareJS
 
     log: (items...) ->
         xdpy.log(items)
-
-    slotLogin: (username, password) ->
-        $username = $("#login-input-username")
-        $password = $("#login-input-password")
-        if $username.length > 0
-            $username.val(username).blur()
-            $password.val(password).blur()
-
-            interval_id = setInterval(
-                () ->
-                    if (Login.login.username is $username.val()) and (Login.login.verifyCode?.length > 0)
-                        $("#login-button").click()
-                        clearInterval interval_id
-                , 1000)
-
-    bindSaveCredentials: () ->
-        # shit, whoever did this spelled 'remember' wrong! if they fix it it'll break this
-        $autologin = $("#login-remenber-0")
-        if $autologin.length is 0
-            return
-
-        $username = $("#login-input-username")
-        $password = $("#login-input-password")
-
-        $("#login-button").click ->
-            autologin = $autologin.prop("checked")
-            if not autologin
-                return
-            username = $username.val()
-            password = $password.val()
-            xdpy.saveCredentials(username, password)
 
     isShowingLocalDevice: () ->
         return @boundPeerId is Data.downloader.pid
