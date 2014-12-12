@@ -111,7 +111,7 @@ class XwareAdapter(QObject):
             app.aboutToQuit.connect(lambda: self.do_daemon_quitFrontend())
             self._notifyFrontendStart = True
             from .mounts import MountsFaker
-            self.mountsFaker = MountsFaker()
+            self.mountsFaker = MountsFaker(constants.MOUNTS_FILE)
         elif connection.scheme == "http":
             # assume etm is always running
             self._etmPid = 0xDEADBEEF

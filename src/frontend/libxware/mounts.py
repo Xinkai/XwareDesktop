@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 import os
 
 import constants
@@ -24,6 +24,24 @@ def _mountBootstrap(localPath):
 
     return mntDir
 
+MountsParseResult = namedtuple("MountsParseResult", ["localPath", "mntPath"])
+
+
+def parseMountsFile(lines: "list of line") -> "list of (localPath, mntPath) pairs":
+    result = []
+    for line in lines:
+        if line.replace("\t", "").replace(" ", "").replace("\n", "") == "":
+            continue  # empty line
+
+        lstripped = line.lstrip()
+        if len(lstripped) > 0 and lstripped[0] == "#":
+            continue  # comment
+
+        parts = line.split()
+        localPath, mntPath = parts[0], parts[1]
+        result.append(MountsParseResult(localPath, mntPath))
+    return result
+
 
 class MountsFaker(object):
     # Terminologies:
@@ -31,23 +49,16 @@ class MountsFaker(object):
     # mnt path: the path which is mapped from a local path
     #           for example, PROFILE/mnt/mnt\unix
 
-    def __init__(self):
+    def __init__(self, mountsFilePath: str):
         self._mounts = OrderedDict()
+        self.__mountsFilePath = mountsFilePath
 
-        with open(constants.MOUNTS_FILE, "r", encoding = "UTF-8") as mountsFile:
+        with open(self.__mountsFilePath, "r", encoding = "UTF-8") as mountsFile:
             lines = mountsFile.readlines()
-            for line in lines:
-                if line.replace("\t", "").replace(" ", "").replace("\n", "") == "":
-                    continue  # empty line
 
-                lstripped = line.lstrip()
-                if len(lstripped) > 0 and lstripped[0] == "#":
-                    continue  # comment
-
-                parts = line.split()
-                localPath, mntPath = parts[0], parts[1]
-
-                self._mounts[mntPath] = localPath
+        parseResults = parseMountsFile(lines)
+        for one in parseResults:
+            self._mounts[one.mntPath] = one.localPath
 
     @property
     def mounts(self):
@@ -73,7 +84,7 @@ class MountsFaker(object):
 
         buffer.append("")
 
-        with open(constants.MOUNTS_FILE, "w", encoding = "UTF-8") as mountFile:
+        with open(self.__mountsFilePath, "w", encoding = "UTF-8") as mountFile:
             mountFile.writelines("\n".join(buffer))
 
         self._mounts = newMounts
@@ -132,12 +143,17 @@ class MountsFaker(object):
 
     def getMountsMapping(self):
         # checks when ETM really uses
+        # returns a dict of {mntPath: drive}: {"$PROFILE/mnt/mnt\Downloads": "C:"}
         mapping = {}
         try:
             for drive in os.listdir(constants.ETM_MOUNTS_DIR_WITHOUT_CHMNS):
                 # drive is like "C:", "D:"
-                realpath = os.path.realpath(constants.ETM_MOUNTS_DIR_WITHOUT_CHMNS + drive)
-                mapping[self._mounts[realpath]] = drive
+                mntPath = os.path.realpath(constants.ETM_MOUNTS_DIR_WITHOUT_CHMNS + drive)
+                try:
+                    localPath = self._mounts[mntPath]
+                except KeyError:
+                    raise KeyError("触发问题#131。", drive, mntPath, self._mounts)
+                mapping[localPath] = drive
         except FileNotFoundError:
             pass
         return mapping
