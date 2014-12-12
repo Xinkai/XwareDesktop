@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from launcher import app
 from collections import OrderedDict
 import os
 
@@ -49,14 +48,6 @@ class MountsFaker(object):
                 localPath, mntPath = parts[0], parts[1]
 
                 self._mounts[mntPath] = localPath
-
-        if app.settings.get("internal", "previousversion") in ("0.9", "0.10") and \
-           app.settings.getfloat("internal", "previousdate") == 0:
-
-            # This migration happens in 0.10
-            # However due to a bug, previousversion is not always set to 0.10.
-            print("migrate new mounts scheme. See #78.")
-            self.mounts = self.mounts
 
     @property
     def mounts(self):
