@@ -9,7 +9,7 @@ from utils.misc import trySymlink, tryMkdir, pathSplit
 
 def _mountBootstrap(localPath):
     # local/path is the path that user sets
-    # after bootstraping, return the path to PROFILE/mnt/local\path
+    # after bootstrapping, return the path to PROFILE/mnt/local\path
 
     # the filter(bool) part is to remove the "/" at the beginning
     backslashed = "\\".join(pathSplit(localPath))
@@ -125,8 +125,8 @@ class MountsFaker(object):
             return "".join([
                 self.driveIndexToLetter(bestMatchDriveIndex),  # "C:"
                 "/TDDOWNLOAD",
-                localPath[len(path):-1]]                       # "may/be/sub/dir"
-            ) + "/"                                           # always end with a /
+                localPath[len(path):-1]                        # "may/be/sub/dir"
+            ]) + "/"                                           # always end with a /
         else:
             return None
 
