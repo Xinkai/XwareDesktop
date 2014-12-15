@@ -3,6 +3,7 @@
 import unittest
 from unittest import mock
 from datetime import datetime
+from urllib.parse import quote
 
 from libxware.item import XwareTaskItem
 from libxware.definitions import TaskClass as XwareTaskClass
@@ -52,3 +53,15 @@ class XwareItemTest(unittest.TestCase):
         i.update(_mockPayloadFactory(completeTime = 1, progress = 10000),
                  xwareKlass = XwareTaskClass.COMPLETED)
         taskModel.taskCompleted.emit.assert_called_once_with(i)
+
+    def test_item_string_unquote(self):
+        adapter = mock.Mock()
+        adapter.namespace = "foo"
+        taskModel = mock.Mock()
+
+        # Initialize
+        i = XwareTaskItem(adapter = adapter, taskModel = taskModel)
+        i.update(_mockPayloadFactory(
+            name = quote("/tmp/文件夹", safe = ""),
+        ), xwareKlass = XwareTaskClass.RUNNING)
+        self.assertEqual(i.name, "/tmp/文件夹")
