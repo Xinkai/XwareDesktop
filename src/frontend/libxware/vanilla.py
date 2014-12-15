@@ -8,27 +8,8 @@
 import asyncio, aiohttp
 from collections import OrderedDict
 import json
-from json.decoder import scanner, scanstring, JSONDecoder
-from urllib.parse import unquote
 
 from .definitions import GetSysInfo, TaskClass, Settings, UrlCheckType
-
-
-class UnquotingJsonDecoder(JSONDecoder):
-    # This class automatically unquotes URL-quoted characters like %20
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.parse_string = self.unquote_parse_string
-        # "rebuild" scan_once
-        # scanner.c_make_scanner doesn't seem to support custom parse_string.
-        self.scan_once = scanner.py_make_scanner(self)
-
-    @staticmethod
-    def unquote_parse_string(*args, **kwargs):
-        result = scanstring(*args, **kwargs)  # => (str, end_index)
-        unquotedResult = (unquote(result[0]), result[1])
-        return unquotedResult
 
 
 class CLIENT_NONFATAL_ERROR(Exception):
@@ -79,7 +60,7 @@ class XwareClient(object):
     def getJson(self, *args, **kwargs):
         content = yield from self.get(*args, **kwargs)
         res = content.decode("utf-8")
-        return json.loads(res, cls = UnquotingJsonDecoder)
+        return json.loads(res)
 
     @asyncio.coroutine
     def getJson2(self, *args, **kwargs):
@@ -144,7 +125,7 @@ class XwareClient(object):
     def postJson(self, *args, **kwargs):
         content = yield from self.post(*args, **kwargs)
         res = content.decode("utf-8")
-        return json.loads(res, cls = UnquotingJsonDecoder)
+        return json.loads(res)
 
     @asyncio.coroutine
     def postJson2(self, *args, **kwargs):

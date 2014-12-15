@@ -3,6 +3,7 @@
 import logging
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 from datetime import datetime
+from urllib.parse import unquote
 
 from models.TaskModel import TaskState
 from models.ProxyModel import TaskClass
@@ -149,6 +150,7 @@ class XwareTaskItem(QObject):
         self._path = None
         self._size = None
         self._errorCode = None
+        self._url = None
 
         self._vipChannel = VipChannel(self)
         self._lixianChannel = LixianChannel(self)
@@ -181,6 +183,10 @@ class XwareTaskItem(QObject):
     @pyqtProperty("ulong", notify = initialized)
     def size(self):
         return self._size
+
+    @pyqtProperty(str, notify = initialized)
+    def url(self):
+        return self._url
 
     @pyqtProperty(int, notify = updated)
     def speed(self):
@@ -294,9 +300,10 @@ class XwareTaskItem(QObject):
         self.klass = self._xwareClassToClass(xwareKlass)
         if not self._initialized:
             self._id = data.get("id")
-            self._name = data.get("name")
+            self._name = unquote(data.get("name"))
             self._creationTime = data.get("createTime")
-            self._path = data.get("path")
+            self._path = unquote(data.get("path"))
+            self._url = unquote(data.get("url"))
             self._size = int(data.get("size"))
             self._initialized = True
             self.initialized.emit()
