@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from launcher import app
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 
 import os
@@ -16,11 +15,12 @@ class Aria2TaskItem(QObject):
     initialized = pyqtSignal()
     updated = pyqtSignal()
 
-    def __init__(self, *, adapter):
+    def __init__(self, *, adapter, taskModel):
         super().__init__(None)
         self._initialized = False
-        self._adapter = adapter
-        self._namespace = self._adapter.namespace
+        self.__adapter = adapter
+        self.__taskModel = taskModel
+        self._namespace = self.__adapter.namespace
         self._klass = None
 
         self._gid = None
@@ -37,9 +37,6 @@ class Aria2TaskItem(QObject):
         self._creationTime = 0
         self._completionTime = 0
         self._isDeletionPending = False
-
-        self.moveToThread(self._adapter.thread())
-        self.setParent(self._adapter)
 
     @pyqtProperty(str, notify = initialized)
     def realid(self):

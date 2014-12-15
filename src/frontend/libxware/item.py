@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from launcher import app
 from PyQt5.QtCore import pyqtProperty, pyqtSignal, QObject
 from datetime import datetime
 
@@ -129,11 +128,12 @@ class XwareTaskItem(QObject):
     updated = pyqtSignal()
     errorOccurred = pyqtSignal()
 
-    def __init__(self, *, adapter):
+    def __init__(self, *, adapter, taskModel):
         super().__init__(None)
         self._initialized = False
-        self._adapter = adapter
-        self._namespace = self._adapter.namespace
+        self.__adapter = adapter
+        self.__taskModel = taskModel
+        self._namespace = self.__adapter.namespace
         self._klass = TaskClass.INVALID
 
         self._id = None
@@ -153,9 +153,6 @@ class XwareTaskItem(QObject):
         self._vipChannel = VipChannel(self)
         self._lixianChannel = LixianChannel(self)
         self._isDeletionPending = False
-
-        self.moveToThread(self._adapter.thread())
-        self.setParent(self._adapter)
 
     @pyqtProperty(int, notify = initialized)
     def realid(self):
@@ -277,7 +274,7 @@ class XwareTaskItem(QObject):
         if self._klass == TaskClass.COMPLETED:
             timestamp = datetime.timestamp(datetime.now())
             if 0 <= timestamp - self.completionTime <= 10:
-                app.taskModel.taskCompleted.emit(self)
+                self.__taskModel.taskCompleted.emit(self)
 
     @staticmethod
     def _xwareClassToClass(klass: int):

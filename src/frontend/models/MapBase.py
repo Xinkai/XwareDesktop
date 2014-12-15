@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from PyQt5.QtCore import QCoreApplication
+
 from collections import OrderedDict
 import threading
 
@@ -15,6 +17,7 @@ class TaskMapBase(OrderedDict):
         super().__init__()
         self.adapter = adapter
         self._klass = klass
+        self._taskModel = QCoreApplication.instance().taskModel
 
     def _updateDict(self, updating: dict = None):
         with self.__class__._Lock:
@@ -38,7 +41,10 @@ class TaskMapBase(OrderedDict):
     def insert(self, key, value):
         ret = self.beforeInsert(key)
         if ret is True:
-            item = self.__class__._Item(adapter = self.adapter)
+            item = self.__class__._Item(adapter = self.adapter,
+                                        taskModel = self._taskModel)
+            item.moveToThread(self.adapter.thread())
+            item.setParent(self.adapter)
             item.update(value, self._klass)
             self[key] = item
             self.afterInsert()
