@@ -71,13 +71,13 @@ class TaskManager(collections.MutableMapping):
     def __len__(self):
         return sum(map(len, self._maps))
 
-    def __contains__(self, key):
+    def __contains__(self, key: str):
         # faster than ChainMap's implementation
         ns = key.split("|")[0]
         return any(key in nsmap for nsmap in self._mapsForNamespace(ns))
 
     # Custom implementation
-    def _mapsForNamespace(self, ns):
+    def _mapsForNamespace(self, ns: str):
         return (self._maps[mapId] for mapId in self._mapNamespaces[ns])
 
     def _baseIndexForMap(self, mapId):
