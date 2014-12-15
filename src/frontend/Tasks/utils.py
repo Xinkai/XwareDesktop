@@ -22,7 +22,7 @@ def resolveNormal(parsed: ParseResult):
     path = parsed.path
     filename = parse.unquote(path[path.rindex("/") + 1:])
     if not filename:
-        return "未命名"
+        return [FileResolution("未命名", 0)]
     return [FileResolution(filename, 0)]
 
 
