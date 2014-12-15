@@ -11,7 +11,11 @@ from collections import MutableMapping
 class ProxyAddons(object):
     def has(self, section, key):
         key = key.lower()
-        return self.has_option(section, key)
+        try:
+            self.get(section, key)
+            return True
+        except KeyError:
+            return False
 
     def set(self, section, key, value):
         key = key.lower()
@@ -95,7 +99,8 @@ class SettingsAccessorBase(configparser.ConfigParser):
 
     def get(self, section, key, *args, **kwargs):
         assert not args
-        assert not kwargs
+        # TODO: disable the next line because otherwise won't work with SectionProxy
+        # assert not kwargs
         # override this, because we use fallback map
         key = key.lower()
         try:
@@ -155,14 +160,14 @@ class SettingsAccessorBase(configparser.ConfigParser):
 
         setattr(target, "addons_loaded", True)
 
-    def __getitem__(self, section):
+    def __getitem__(self, section: str):
         try:
             result = super().__getitem__(section)
         except KeyError as e:
             if section in self._defaultDict:
-                assert section not in self._proxies
                 proxy = FallbackSectionProxy(self, section)
-                self._proxies[section] = proxy
+                if section not in self._proxies:
+                    self._proxies[section] = proxy
                 return proxy
             else:
                 raise e
