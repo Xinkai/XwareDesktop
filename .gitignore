@@ -16,6 +16,7 @@ __pycache__/
 XwareDesktop.config
 XwareDesktop.creator
 XwareDesktop.creator.user
+XwareDesktop.creator.user.*
 XwareDesktop.files
 XwareDesktop.includes
 
@@ -25,6 +26,7 @@ preparedXware/
 
 # Arch package
 *.pkg.tar.xz
+*.pkg.tar
 *.src.tar.gz
 pkg/
 
