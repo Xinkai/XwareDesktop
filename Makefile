@@ -117,7 +117,6 @@ install:
 
 	# remove unwanted files
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/ui
-	rm -r              $(DESTDIR)$(PREFIX)/frontend/tests
 	find $(DESTDIR)$(PREFIX) -name "*.coffee" -print0 | xargs -0 rm
 	rm                 $(DESTDIR)$(PREFIX)/frontend/xware-desktop.desktop
 	rm -r              $(DESTDIR)$(PREFIX)/frontend/Extensions/src
