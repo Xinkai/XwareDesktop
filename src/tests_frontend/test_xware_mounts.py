@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import sys, os
-
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../../"))
-
 import unittest
 import tempfile
 
 from libxware import mounts
-
 
 _testContent = r"""# This is a comment.
 /home/user/Download /home/user/.xware-desktop/profile/mnt/home\user\Download auto defaults,rw 0 0
