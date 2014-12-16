@@ -88,7 +88,6 @@ class SchedulerModel(QSortFilterProxyModel):
     def set(self, actWhen, action):
         self._actWhen = actWhen
         self._action = action
-        self.schedulerSummaryChanged.emit()
         self.mayAct()
 
     @pyqtProperty(int, notify = schedulerSummaryChanged)
@@ -101,6 +100,7 @@ class SchedulerModel(QSortFilterProxyModel):
 
     @pyqtSlot()
     def mayAct(self):
+        self.schedulerSummaryChanged.emit()
         if self.action == Action.Null:
             return
 
