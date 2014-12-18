@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from launcher import app
 
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QVariant, QEvent
@@ -27,14 +26,25 @@ class FrontendPy(QObject):
     sigNotifyPeerId = pyqtSignal(str)  # let xdjs knows peerid
     sigFrontendStatusChanged = pyqtSignal()  # caused by page heartbeat/changed status/refresh page
 
-    def __init__(self, parent):
+    def __init__(self, *, taskCreationAgent, legacySettings, adapterSettings, adapter, mainWin,
+                 parent):
         super().__init__(parent)
+        self.__taskCreationAgent = taskCreationAgent
+        self.__legacySettings = legacySettings
+        self.__adapterSettings = adapterSettings
+        self.__adapter = adapter
+        self.__mainWin = mainWin
+        self.__app = parent
+
         self._isPageMaskOn = None
         self._isPageOnline = None  # property wraps them, in order to fire sigFrontendStatusChanged
         self._isPageLogined = None
         self._isXdjsLoaded = None
-        app.taskCreationAgent.available.connect(lambda: self.createTask("available"))
-        app.applySettings.connect(self.tryLogin)
+        self.__taskCreationAgent.available.connect(lambda: self.createTask("available"))
+        self.__mainWin.page.sigFrameLoadStarted.connect(self.frameLoadStarted)
+        self.sigFrontendStatusChanged.connect(
+            self.__mainWin.statusBar_main.slotFrontendStatusChanged)
+        self.__app.applySettings.connect(self.tryLogin)
 
     @property
     def isPageMaskOn(self):
@@ -83,26 +93,25 @@ class FrontendPy(QObject):
 
     @pyqtSlot()
     def tryLogin(self):
-        if app.mainWin.page.urlMatchIn(constants.LOGIN_PAGE):
-            autologin = app.settings.getbool("legacy", "autologin")
+        if self.__mainWin.page.urlMatchIn(constants.LOGIN_PAGE):
+            autologin = self.__legacySettings.getbool("autologin")
             if autologin:
-                username = app.settings.get("adapter-legacy", "username")
-                password = app.settings.get("adapter-legacy", "password")
+                username = self.__adapterSettings.get("username")
+                password = self.__adapterSettings.get("password")
                 if username and password:
                     self.sigLogin.emit(username, password)
 
     def tryActivate(self, payload):
-        if not app.mainWin.page.urlMatchIn(constants.V3_PAGE):
+        if not self.__mainWin.page.urlMatchIn(constants.V3_PAGE):
             return  # not v3 page
 
         if not payload["userid"]:
             return  # not logged in
 
-        adapter = app.adapterManager[0]
-        userid = int(adapter.sysInfo.UserId)
-        status = adapter.sysInfo.Bound
-        code = adapter.sysInfo.ActivateCode
-        peerid = adapter.peerId
+        userid = int(self.__adapter.sysInfo.UserId)
+        status = self.__adapter.sysInfo.Bound
+        code = self.__adapter.sysInfo.ActivateCode
+        peerid = self.__adapter.peerId
 
         if userid == 0:
             # unbound
@@ -131,6 +140,13 @@ class FrontendPy(QObject):
 
             self.sigNotifyPeerId.emit(peerid)
 
+    @pyqtSlot()
+    def frameLoadStarted(self):
+        self.isPageMaskOn = None
+        self.isPageOnline = None
+        self.isPageLogined = None
+        self.isXdjsLoaded = None
+
     @pyqtSlot(QVariant)
     def xdjsLoaded(self, payload):
         logging.info("xdjs loaded")
@@ -140,27 +156,25 @@ class FrontendPy(QObject):
 
     @pyqtSlot()
     def requestFocus(self):
-        app.mainWin.restore()
-        app.mainWin.frame.setFocus()
+        self.__mainWin.restore()
+        self.__mainWin.frame.setFocus()
 
     @pyqtSlot(str)
     def systemOpen(self, url):
-        adapter = app.adapterManager[0]
-        if adapter.mountsFaker:
-            systemOpen(adapter.mountsFaker.convertToLocalPath(url))
+        if self.__adapter.mountsFaker:
+            systemOpen(self.__adapter.mountsFaker.convertToLocalPath(url))
 
     @pyqtSlot(str)
     def systemViewOneFile(self, url):
-        adapter = app.adapterManager[0]
-        if adapter.mountsFaker:
-            viewOneFile(adapter.mountsFaker.convertToLocalPath(url))
+        if self.__adapter.mountsFaker:
+            viewOneFile(self.__adapter.mountsFaker.convertToLocalPath(url))
 
     @pyqtSlot(str, str)
     def saveCredentials(self, username, password):
-        app.settings.set("adapter-legacy", "username", username)
-        app.settings.set("adapter-legacy", "password", password)
-        app.settings.setbool("legacy", "autologin", True)
-        app.settings.save()
+        self.__adapterSettings.set("username", username)
+        self.__adapterSettings.set("password", password)
+        self.__legacySettings.setbool("autologin", True)
+        self.__app.settings.save()
 
     @pyqtSlot("QList<QVariant>")
     def log(self, items):
@@ -197,7 +211,7 @@ class FrontendPy(QObject):
             return
 
         try:
-            creation = app.taskCreationAgent.dequeue()
+            creation = self.__taskCreationAgent.dequeue()
         except IndexError:
             # no actions
             return
@@ -212,7 +226,7 @@ class FrontendPy(QObject):
             return self.sigCreateTask.emit(creation.url)
 
         if creation.kind == TaskCreationType.LocalTorrent:
-            app.mainWin.page.overrideFile = creation.url
+            self.__mainWin.page.overrideFile = creation.url
             return self.sigCreateTaskFromTorrentFile.emit()
 
         print("Cannot process", creation)
@@ -223,7 +237,7 @@ class FrontendPy(QObject):
                                  Qt.Key_Enter,     # key
                                  Qt.NoModifier)    # modifiers
 
-        app.sendEvent(app.mainWin.webView, keydownEvent)
+        self.__app.sendEvent(self.__mainWin.webView, keydownEvent)
         self.sigCreateTaskFromTorrentFileDone.emit()
 
     def getFrontendStatus(self):

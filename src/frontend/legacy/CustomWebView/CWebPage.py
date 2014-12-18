@@ -3,7 +3,7 @@
 import logging
 from launcher import app
 
-from PyQt5.QtCore import QUrl, pyqtSlot, Qt
+from PyQt5.QtCore import QUrl, pyqtSlot, pyqtSignal, Qt
 from PyQt5.QtWebKitWidgets import QWebPage
 
 from urllib import parse
@@ -13,6 +13,8 @@ from .CNetworkAccessManager import CustomNetworkAccessManager
 
 
 class CustomWebPage(QWebPage):
+    sigFrameLoadStarted = pyqtSignal()
+
     def __init__(self, parent):
         super().__init__(parent)
         self._overrideFile = None
@@ -62,10 +64,7 @@ class CustomWebPage(QWebPage):
     @pyqtSlot()
     def slotFrameLoadStarted(self):
         self.overrideFile = None
-        app.frontendpy.isPageMaskOn = None
-        app.frontendpy.isPageOnline = None
-        app.frontendpy.isPageLogined = None
-        app.frontendpy.isXdjsLoaded = None
+        self.sigFrameLoadStarted.emit()
 
     @pyqtSlot()
     def slotUrlChanged(self):

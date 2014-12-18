@@ -43,7 +43,6 @@ class CustomStatusBar(QStatusBar):
         self.ulStatus = CustomStatusBarLabel(self)
 
         app.adapterManager[0].infoUpdated.connect(self.slotXwaredStatusUpdated)
-        app.frontendpy.sigFrontendStatusChanged.connect(self.slotFrontendStatusChanged)
         app.adapterManager.summaryUpdated.connect(self.slotTasksSummaryUpdated)
 
     @pyqtSlot()

@@ -100,9 +100,17 @@ class XwareDesktop(QApplication):
         # Legacy parts
         from legacy import main
         from legacy.frontendpy import FrontendPy
-        self.frontendpy = FrontendPy(self)
-        self.mainWin = main.MainWindow(None)
+        self.mainWin = main.MainWindow(adapter = self.adapterManager[0],
+                                       taskCreationAgent = self.taskCreationAgent,
+                                       frontendSettings = self.settings["frontend"],
+                                       app = self)
         self.mainWin.show()
+        self.frontendpy = FrontendPy(taskCreationAgent = self.taskCreationAgent,
+                                     legacySettings = self.settings["legacy"],
+                                     adapterSettings = self.settings["adapter-legacy"],
+                                     adapter = self.adapterManager[0],
+                                     mainWin = self.mainWin,
+                                     parent = self)
         self.sigMainWinLoaded.emit()
 
         self.applySettings.emit()

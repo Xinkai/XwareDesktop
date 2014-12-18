@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from launcher import app
 
 from PyQt5.QtCore import pyqtSlot, QEvent, Qt
 from PyQt5.QtWidgets import QMainWindow
@@ -14,16 +13,20 @@ from .ui_main import Ui_MainWindow
 
 
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
-    def __init__(self, parent):
-        super().__init__(parent)
+    def __init__(self, *, adapter, taskCreationAgent, frontendSettings, app):
+        super().__init__(None)
         self.settingsDialog = None
         self.aboutDialog = None
+        self.__adapter = adapter
+        self.__taskCreationAgent = taskCreationAgent
+        self.__frontendSettings = frontendSettings
+        self.__app = app
 
         # UI
         self.setupUi(self)
         self.connectUI()
         self.preserveGeometry()
-        app.aboutToQuit.connect(self.teardown)
+        self.__app.aboutToQuit.connect(self.teardown)
 
     def connectUI(self):
         # connect UI related signal/slot
@@ -31,15 +34,14 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.action_setting.triggered.connect(self.slotSetting)
         self.action_showAbout.triggered.connect(self.slotShowAbout)
 
-        adapter = app.adapterManager[0]
-        if adapter.useXwared:
-            self.action_ETMstart.triggered.connect(adapter.do_daemon_start)
-            self.action_ETMstop.triggered.connect(adapter.do_daemon_stop)
-            self.action_ETMrestart.triggered.connect(adapter.do_daemon_restart)
+        if self.__adapter.useXwared:
+            self.action_ETMstart.triggered.connect(self.__adapter.do_daemon_start)
+            self.action_ETMstop.triggered.connect(self.__adapter.do_daemon_stop)
+            self.action_ETMrestart.triggered.connect(self.__adapter.do_daemon_restart)
             self.menu_backend.setEnabled(True)
 
-        app.toggleMinimized.connect(self.toggleMinimized)
-        self.action_createTask.triggered.connect(app.taskCreationAgent.createTasksAction)
+        self.__app.toggleMinimized.connect(self.toggleMinimized)
+        self.action_createTask.triggered.connect(self.__taskCreationAgent.createTasksAction)
 
     # shorthand
     @property
@@ -53,7 +55,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
 
     @pyqtSlot()
     def slotExit(self):
-        app.quit()
+        self.__app.quit()
 
     @pyqtSlot()
     def slotSetting(self):
@@ -68,7 +70,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     def changeEvent(self, qEvent):
         if qEvent.type() == QEvent.WindowStateChange:
             if self.isMinimized():
-                if app.settings.getbool("frontend", "minimizetosystray"):
+                if self.__frontendSettings.getbool("minimizetosystray"):
                     self.setHidden(True)
         super().changeEvent(qEvent)
 
@@ -82,7 +84,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.raise_()
 
     def closeEvent(self, qCloseEvent):
-        if app.settings.getbool("frontend", "closetominimize"):
+        if self.__frontendSettings.getbool("closetominimize"):
             qCloseEvent.ignore()
             self.minimize()
         else:
