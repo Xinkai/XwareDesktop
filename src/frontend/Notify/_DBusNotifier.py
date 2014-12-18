@@ -2,11 +2,9 @@
 
 
 import logging
-from launcher import app
 
-from PyQt5.QtCore import QObject, pyqtSlot, QMetaType, QUrl, Qt
+from PyQt5.QtCore import QObject, pyqtSlot, QMetaType, Qt
 from PyQt5.QtDBus import QDBusConnection, QDBusInterface, QDBusArgument, QDBusMessage
-from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtMultimedia import QSound
 
 from utils.system import systemOpen, viewOneFile
@@ -17,8 +15,10 @@ _DBUS_NOTIFY_INTERFACE = "org.freedesktop.Notifications"
 
 
 class Notifier(QObject):
-    def __init__(self, parent):
+    def __init__(self, *, taskModel, frontendSettings, parent):
         super().__init__(parent)
+        self.__taskModel = taskModel
+        self.__frontendSettings = frontendSettings
         self._conn = QDBusConnection("Xware Desktop").sessionBus()
 
         self._interface = QDBusInterface(_DBUS_NOTIFY_SERVICE,
@@ -27,7 +27,7 @@ class Notifier(QObject):
                                          self._conn)
 
         self._notified = {}  # a dict of notifyId: taskDict
-        app.taskModel.taskCompleted.connect(self.notifyTaskCompleted, Qt.DirectConnection)
+        self.__taskModel.taskCompleted.connect(self.notifyTaskCompleted, Qt.DirectConnection)
 
         self._capabilities = self._getCapabilities()
         if "actions" in self._capabilities:
@@ -46,10 +46,10 @@ class Notifier(QObject):
 
     @pyqtSlot("QObject", result = "void")
     def notifyTaskCompleted(self, taskItem):
-        if app.settings.getbool("frontend", "notifybysound"):
+        if self.__frontendSettings.getbool("notifybysound"):
             self._qSound_complete.play()
 
-        if not app.settings.getbool("frontend", "popnotifications"):
+        if not self.__frontendSettings.getbool("popnotifications"):
             return
 
         self._dbus_notifyCompleted(taskItem)
@@ -101,7 +101,7 @@ class Notifier(QObject):
             # other applications' notifications
             return
 
-        taskItem = app.taskModel.taskManager.get(taskId, None)
+        taskItem = self.__taskModel.taskManager.get(taskId, None)
         if not taskItem:
             logging.debug("taskItem cannot be found anymore in TaskModel.")
             return

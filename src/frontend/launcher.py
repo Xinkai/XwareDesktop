@@ -88,7 +88,9 @@ class XwareDesktop(QApplication):
         from Tasks.action import TaskCreationAgent
 
         self.systray = Systray(self)
-        self.notifier = Notifier(self)
+        self.notifier = Notifier(taskModel = self.taskModel,
+                                 frontendSettings = self.settings["frontend"],
+                                 parent = self)
         self.schedulerModel = SchedulerModel(self)
         self.schedulerModel.setSourceModel(self.taskModel)
         self.taskCreationAgent = TaskCreationAgent(self)
