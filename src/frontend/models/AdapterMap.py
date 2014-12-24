@@ -82,7 +82,7 @@ class AdapterMap(MutableMapping):
 
     def beginRemoveRows(self, namespace: str, klassIndex: int):
         baseIndex = self.baseIndexForAdapter(namespace)
-        self.__model.sigBeforeRemove.emit(baseIndex + klassIndex, baseIndex + klassIndex)
+        self.__model.sigBeforeRemove.emit(baseIndex + klassIndex)
 
     def endRemoveRows(self):
         self.__model.sigAfterRemove.emit()

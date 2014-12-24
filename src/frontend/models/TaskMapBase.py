@@ -43,9 +43,11 @@ class TaskMapBase(OrderedDict):
     def insert(self, key, value) -> None:
         ret = self.__klassMap.beforeInsert(self.__klass, key)
         if ret is True:
+            assert self.namespace, "namespace must be set."
+            assert self.__taskModel, "taskModel must be set."
             item = self.__class__._Item(
                 namespace = self.namespace,
-                taskModel = self.__taskModel
+                taskModel = self.__taskModel,
             )
             from PyQt5.QtCore import QCoreApplication
             app = QCoreApplication.instance()

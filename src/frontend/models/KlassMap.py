@@ -89,6 +89,7 @@ class KlassMap(MutableMapping):
             raise RuntimeError("Already added.")
         taskMap.namespace = self.namespace
         taskMap.setKlassMap(self)
+        taskMap.setTaskModel(self.__taskModel)
         self._mapTickCount[klass] = 0
         self._taskMaps[klass] = taskMap
 

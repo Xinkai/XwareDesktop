@@ -34,8 +34,10 @@ class TaskMapTest(TestCase):
 
     def test_updateData_insert_modify(self):
         klassMap = mock.Mock()
+        taskModel = mock.Mock()
         klassMap.beforeInsert = lambda *args: True
         self.tm.setKlassMap(klassMap)
+        self.tm.setTaskModel(taskModel)
         self.tm.namespace = "foo-1"
 
         self.tm.updateData({
@@ -56,8 +58,10 @@ class TaskMapTest(TestCase):
 
     def test_keys(self):
         klassMap = mock.Mock()
+        taskModel = mock.Mock()
         klassMap.beforeInsert = lambda *args: True
         self.tm.setKlassMap(klassMap)
+        self.tm.setTaskModel(taskModel)
         self.tm.namespace = "foo-1"
 
         self.tm.updateData({
