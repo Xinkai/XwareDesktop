@@ -53,8 +53,7 @@ class TaskMapBase(OrderedDict):
             app = QCoreApplication.instance()
             if app:
                 item.moveToThread(QCoreApplication.instance().thread())
-            # if self.__adapter:  # not testing
-            #     item.setParent(self.__adapter)
+                item.setParent(self.__taskModel)
             item.update(value, self.__klass)
             self[key] = item
             return self.__klassMap.afterInsert()
