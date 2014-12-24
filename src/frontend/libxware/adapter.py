@@ -12,6 +12,7 @@ from urllib import parse
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty
 import constants
 from Tasks.action import TaskCreation, TaskCreationType
+from models.KlassMap import KlassMap
 from utils.misc import tryRemove, trySymlink, tryMkdir
 from utils.system import getInitType, InitType
 from .vanilla import TaskClass, XwareClient, Settings
@@ -71,7 +72,7 @@ class XwareAdapter(QObject):
     initialized = pyqtSignal()
     infoUpdated = pyqtSignal()  # daemon infoPolled
 
-    def __init__(self, adapterConfig, parent = None):
+    def __init__(self, *, adapterConfig, taskModel, parent = None):
         super().__init__(parent)
         # Prepare XwareClient Variables
         self._ulSpeed = 0
@@ -94,11 +95,18 @@ class XwareAdapter(QObject):
         self.xwaredSocket = None
         self.mountsFaker = None
 
-        self.maps = (
-            TaskMap(self, TaskClass.RUNNING),
-            TaskMap(self, TaskClass.COMPLETED),
-            TaskMap(self, TaskClass.RECYCLED),
-            TaskMap(self, TaskClass.FAILED_ON_SUBMISSION),
+        self.klassMap = KlassMap(adapter = self, namespace = self.namespace, taskModel = taskModel)
+        self.klassMap.addTaskMap(
+            TaskMap(klass = TaskClass.RUNNING)
+        )
+        self.klassMap.addTaskMap(
+            TaskMap(klass = TaskClass.COMPLETED)
+        )
+        self.klassMap.addTaskMap(
+            TaskMap(klass = TaskClass.RECYCLED)
+        )
+        self.klassMap.addTaskMap(
+            TaskMap(klass = TaskClass.FAILED_ON_SUBMISSION)
         )
 
         self.useXwared = False
@@ -244,7 +252,7 @@ class XwareAdapter(QObject):
                 self._ulSpeed = result["upSpeed"]
                 self._dlSpeed = result["dlSpeed"]
                 self._runningTaskCount = result["dlNum"]
-            self.maps[klass].updateData(result["tasks"])
+            self.klassMap.klass(klass).updateData(result["tasks"])
         else:
             logging.error("get_list failed.")
 

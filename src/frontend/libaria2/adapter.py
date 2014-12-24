@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import asyncio
-import base64
 from concurrent.futures import ThreadPoolExecutor
 import json
 import threading
@@ -11,6 +10,7 @@ import websockets
 from PyQt5.QtCore import QObject, pyqtProperty, pyqtSlot, pyqtSignal
 
 from Tasks.action import TaskCreation, TaskCreationType
+from models.KlassMap import KlassMap
 from .definitions import Aria2TaskClass, Aria2Method
 from .map import TaskMap
 
@@ -57,15 +57,20 @@ class Aria2Adapter(QObject):
     initialized = pyqtSignal()
     statPolled = pyqtSignal()
 
-    def __init__(self, adapterConfig = None, parent = None):
+    def __init__(self, *, adapterConfig, taskModel, parent = None):
         super().__init__(parent)
         self._adapterConfig = adapterConfig
         self._ws = None
 
-        self.maps = (
-            TaskMap(self, Aria2TaskClass.Active),
-            TaskMap(self, Aria2TaskClass.Waiting),
-            TaskMap(self, Aria2TaskClass.Stopped),
+        self.klassMap = KlassMap(adapter = self, namespace = self.namespace, taskModel = taskModel)
+        self.klassMap.addTaskMap(
+            TaskMap(klass = Aria2TaskClass.Active)
+        )
+        self.klassMap.addTaskMap(
+            TaskMap(klass = Aria2TaskClass.Waiting)
+        )
+        self.klassMap.addTaskMap(
+            TaskMap(klass = Aria2TaskClass.Stopped)
         )
 
         # Stats
@@ -219,15 +224,15 @@ class Aria2Adapter(QObject):
 
     @asyncio.coroutine
     def _cb_tellActive(self, result):
-        self.maps[Aria2TaskClass.Active].updateData(result)
+        self.klassMap.klass(Aria2TaskClass.Active).updateData(result)
 
     @asyncio.coroutine
     def _cb_tellWaiting(self, result):
-        self.maps[Aria2TaskClass.Waiting].updateData(result)
+        self.klassMap.klass(Aria2TaskClass.Waiting).updateData(result)
 
     @asyncio.coroutine
     def _cb_tellStopped(self, result):
-        self.maps[Aria2TaskClass.Stopped].updateData(result)
+        self.klassMap.klass(Aria2TaskClass.Stopped).updateData(result)
 
     @asyncio.coroutine
     def _cb_getGlobalOption(self, result):

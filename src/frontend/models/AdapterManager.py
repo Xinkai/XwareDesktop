@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from launcher import app
-from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, Qt, pyqtSlot, QTimer
+from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot, QTimer
 
 from collections import OrderedDict
 
@@ -32,8 +32,7 @@ class AdapterManager(QObject):
         ns = adapter.namespace
         assert ns not in self._adapters
         self._adapters[ns] = adapter
-        for map_ in adapter.maps:
-            app.taskModel.taskManager.appendMap(map_)
+        app.taskModel.adapterMap.addKlassMap(adapter.klassMap)
 
     @pyqtSlot(str, result = "QVariant")
     def adapter(self, ns):
@@ -50,12 +49,20 @@ class AdapterManager(QObject):
     def loadAdapter(self, adapterConfig):
         if adapterConfig["type"] == "xware":
             from libxware import XwareAdapter
-            adapter = XwareAdapter(adapterConfig, parent = self)
+            adapter = XwareAdapter(
+                adapterConfig = adapterConfig,
+                parent = self,
+                taskModel = app.taskModel
+            )
             self._registerAdapter(adapter)
             adapter.start()
         elif adapterConfig["type"] == "aria2":
             from libaria2 import Aria2Adapter
-            adapter = Aria2Adapter(adapterConfig, parent = self)
+            adapter = Aria2Adapter(
+                adapterConfig = adapterConfig,
+                parent = self,
+                taskModel = app.taskModel
+            )
             self._registerAdapter(adapter)
             adapter.start()
         else:

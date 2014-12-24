@@ -15,12 +15,11 @@ class Aria2TaskItem(QObject):
     initialized = pyqtSignal()
     updated = pyqtSignal()
 
-    def __init__(self, *, adapter, taskModel):
+    def __init__(self, *, namespace, taskModel):
         super().__init__(None)
         self._initialized = False
-        self.__adapter = adapter
+        self.__namespace = namespace
         self.__taskModel = taskModel
-        self._namespace = self.__adapter.namespace
         self._klass = None
 
         self._gid = None
@@ -48,7 +47,7 @@ class Aria2TaskItem(QObject):
 
     @pyqtProperty(str, notify = initialized)
     def namespace(self):
-        return self._namespace
+        return self.__namespace
 
     @pyqtProperty("ulong", notify = initialized)
     def size(self):

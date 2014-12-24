@@ -33,12 +33,10 @@ def _mockPayloadFactory(**kwargs):
 
 class XwareItemTest(unittest.TestCase):
     def test_item_emit_completed(self):
-        adapter = mock.Mock()
-        adapter.namespace = "foo"
         taskModel = mock.Mock()
 
         # Initialize
-        i = XwareTaskItem(adapter = adapter, taskModel = taskModel)
+        i = XwareTaskItem(namespace = "foo", taskModel = taskModel)
         i.update(_mockPayloadFactory(), xwareKlass = XwareTaskClass.RUNNING)
         self.assertRaises(AssertionError,
                           taskModel.taskCompleted.emit.assert_called_once_with, i)
@@ -55,12 +53,10 @@ class XwareItemTest(unittest.TestCase):
         taskModel.taskCompleted.emit.assert_called_once_with(i)
 
     def test_item_string_unquote(self):
-        adapter = mock.Mock()
-        adapter.namespace = "foo"
         taskModel = mock.Mock()
 
         # Initialize
-        i = XwareTaskItem(adapter = adapter, taskModel = taskModel)
+        i = XwareTaskItem(namespace = "foo", taskModel = taskModel)
         i.update(_mockPayloadFactory(
             name = quote("/tmp/文件夹", safe = ""),
         ), xwareKlass = XwareTaskClass.RUNNING)

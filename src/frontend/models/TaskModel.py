@@ -9,7 +9,7 @@ from itertools import groupby
 from PyQt5.QtCore import QAbstractListModel, Qt, pyqtSlot, pyqtSignal, QModelIndex, QDateTime
 from utils.system import systemOpen, viewOneFile, viewMultipleFiles
 
-from .TaskManager import TaskManager
+from .AdapterMap import AdapterMap
 
 
 TaskDataRole = Qt.UserRole + 100
@@ -50,7 +50,7 @@ class TaskModel(QAbstractListModel):
 
     def __init__(self, parent = None):
         super().__init__(parent)
-        self.taskManager = TaskManager(self)
+        self.adapterMap = AdapterMap(self)
 
         # TaskManager must not call {begin|end}{Insert|Remove}Rows directly, as it will result in
         # unpredictable data corruption.
@@ -89,7 +89,7 @@ class TaskModel(QAbstractListModel):
         self.endMoveRows()
 
     def rowCount(self, qModelIndex=None, *args, **kwargs):
-        return len(self.taskManager)
+        return len(self.adapterMap)
 
     def columnCount(self, *args, **kwargs):
         return len(self.roleNames())
@@ -105,7 +105,7 @@ class TaskModel(QAbstractListModel):
     def data(self, qModelIndex, role = None):
         assert qModelIndex.row() >= 0, "row = {}".format(qModelIndex.row())
         if role == TaskDataRole:
-            result = self.taskManager.at(qModelIndex.row())
+            result = self.adapterMap.at(qModelIndex.row())
             return result
         elif role == Qt.DisplayRole:
             return self.data(qModelIndex, role = TaskDataRole).name

@@ -101,7 +101,7 @@ class Notifier(QObject):
             # other applications' notifications
             return
 
-        taskItem = self.__taskModel.taskManager.get(taskId, None)
+        taskItem = self.__taskModel.adapterMap.get(taskId, None)
         if not taskItem:
             logging.debug("taskItem cannot be found anymore in TaskModel.")
             return

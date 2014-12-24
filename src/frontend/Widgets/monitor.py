@@ -44,10 +44,10 @@ class MonitorWindow(MonitorWidget, Ui_MonitorWindow, PersistentGeometry):
         self.sigTaskUpdating.emit(task)
 
     def _runningTasksIterator(self):
-        taskManager = app.taskModel.taskManager
+        adapterMap = app.taskModel.adapterMap
         while True:
             found = False
-            for id_, item in taskManager.items():
+            for id_, item in adapterMap.items():
                 if item.state == TaskState.Downloading:
                     for i in range(self.TICKS_PER_TASK):
                         found = True

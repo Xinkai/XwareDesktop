@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from models.MapBase import TaskMapBase
+from models.TaskMapBase import TaskMapBase
 from .definitions import Aria2TaskClass
 from .item import Aria2TaskItem
 
@@ -16,17 +16,17 @@ def _excludeMetadata(item) -> bool:
 class TaskMap(TaskMapBase):
     _Item = Aria2TaskItem
 
-    def __init__(self, adapter, klass):
+    def __init__(self, *, klass):
         assert isinstance(klass, Aria2TaskClass)
-        super().__init__(adapter, klass)
+        super().__init__(klass = klass)
 
     def updateData(self, updatingList = None):
         # exclude only-metadata entries
         updatingList = list(filter(_excludeMetadata, updatingList))
 
         updating = dict(zip(
-            map(lambda i: "{ns}|{id}".format(ns = self.adapter.namespace, id = i["gid"]),
+            map(lambda i: "{ns}|{id}".format(ns = self.namespace, id = i["gid"]),
                 updatingList),
             updatingList))
 
-        self._updateDict(updating)
+        super().updateData(updating)
