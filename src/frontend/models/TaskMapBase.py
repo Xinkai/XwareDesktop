@@ -13,7 +13,6 @@ class TaskMapBase(OrderedDict):
                  klass: "this map is used for this kind of map, native to the adapter"):
         super().__init__()
         self.__klass = klass
-        self.__adapter = None  # TODO: remove this?
         self.__namespace = None
         self.__klassMap = None
         self.__taskModel = None
@@ -52,7 +51,7 @@ class TaskMapBase(OrderedDict):
             from PyQt5.QtCore import QCoreApplication
             app = QCoreApplication.instance()
             if app:
-                item.moveToThread(QCoreApplication.instance().thread())
+                item.moveToThread(app.thread())
                 item.setParent(self.__taskModel)
             item.update(value, self.__klass)
             self[key] = item
@@ -86,9 +85,6 @@ class TaskMapBase(OrderedDict):
 
     def setKlassMap(self, value):
         self.__klassMap = value
-
-    def setAdapter(self, adapter: object):
-        self.__adapter = adapter
 
     def setTaskModel(self, taskModel: object):
         self.__taskModel = taskModel
