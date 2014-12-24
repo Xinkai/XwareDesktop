@@ -72,6 +72,13 @@ class XwareAdapter(QObject):
     initialized = pyqtSignal()
     infoUpdated = pyqtSignal()  # daemon infoPolled
 
+    Manifest = {
+        "SupportedTypes": [
+            TaskCreationType.Normal, TaskCreationType.Emule, TaskCreationType.Magnet,
+            TaskCreationType.RemoteTorrent, TaskCreationType.LocalTorrent,
+        ],
+    }
+
     def __init__(self, *, adapterConfig, taskModel, parent = None):
         super().__init__(parent)
         # Prepare XwareClient Variables
@@ -275,17 +282,17 @@ class XwareAdapter(QObject):
         taskIds = map(lambda t: t.realid, tasks)
         self._loop.call_soon_threadsafe(self.post_start, taskIds)
 
-    def do_createTask(self, creation: TaskCreation) -> bool:
-        supported = [TaskCreationType.Normal, TaskCreationType.Emule, TaskCreationType.Magnet]
-        if creation.kind not in supported:
-            return False
+    def do_createTask(self, creation: TaskCreation) -> (bool, str):
+        if creation.kind not in self.__class__.Manifest["SupportedTypes"]:
+            return False, "Not a supported type."
 
         # convert path
         path = self.mountsFaker.convertToMappedPath(creation.path)
         if not path:
-            return False
+            return False, "Not pre-mounted."
 
-        if creation.kind in (TaskCreationType.Normal, TaskCreationType.Emule):
+        if creation.kind in (TaskCreationType.Normal, TaskCreationType.Emule) or \
+           creation.kind == TaskCreationType.RemoteTorrent:  # TODO xware not properly support yet
             fileInfo = creation.subtaskInfo[0]
 
             # Workaround: xware doesn't acquire filename if not set.
@@ -295,7 +302,7 @@ class XwareAdapter(QObject):
                                             path,
                                             creation.url,
                                             filename)
-            return True
+            return True, None
 
         elif creation.kind == TaskCreationType.Magnet:
             # Note:
@@ -305,11 +312,11 @@ class XwareAdapter(QObject):
                                             path,
                                             creation.url,
                                             "解析中的磁力链接")
-            return True
+            return True, None
         elif creation.kind == TaskCreationType.LocalTorrent:
             self._loop.call_soon_threadsafe(self.post_createBtTask,
                                             )
-        return False
+        return False, "Not implemented."
 
     def do_delTasks(self, tasks, options):
         taskIds = map(lambda t: t.realid, tasks)

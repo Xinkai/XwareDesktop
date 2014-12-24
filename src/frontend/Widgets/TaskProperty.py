@@ -83,7 +83,11 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
         parsed = parse.urlparse(url)
 
         creation = TaskCreation(parsed)
-        ok, error = self.model.fromCreation(creation)
+        if creation.kind in adapter.__class__.Manifest["SupportedTypes"]:
+            ok, error = self.model.fromCreation(creation)
+        else:
+            ok = False
+            error = "Not supported by this adapter."
 
         if ok:
             self.buttonBox.setEnabled(True)
@@ -98,7 +102,8 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
         creation = self.model.toCreation()
         creation.path = self.combo_dir.currentText()
 
-        if adapter.do_createTask(creation):
+        ok, error = adapter.do_createTask(creation)
+        if ok:
             # remember recent save dirs
             try:
                 self.recentdirs.remove(creation.path)
@@ -113,6 +118,8 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
                              self.combo_adapter.currentData(_NamespaceRole))
 
             super().accept()
+        else:
+            logging.error(error)
 
     def reject(self):
         super().reject()

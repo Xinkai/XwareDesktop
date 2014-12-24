@@ -57,6 +57,13 @@ class Aria2Adapter(QObject):
     initialized = pyqtSignal()
     statPolled = pyqtSignal()
 
+    Manifest = {
+        "SupportedTypes": [
+            TaskCreationType.Normal, TaskCreationType.Magnet,
+            TaskCreationType.RemoteTorrent, TaskCreationType.LocalTorrent,
+        ],
+    }
+
     def __init__(self, *, adapterConfig, taskModel, parent = None):
         super().__init__(parent)
         self._adapterConfig = adapterConfig
@@ -190,7 +197,7 @@ class Aria2Adapter(QObject):
     def _callFromExternal(self, callable_: _Callable):
         self._loop.call_soon_threadsafe(asyncio.async, self._call(callable_))
 
-    def do_createTask(self, creation: TaskCreation):
+    def do_createTask(self, creation: TaskCreation) -> (bool, str):
         url = [creation.url]
         options = dict(dir = creation.path)
 
@@ -203,14 +210,14 @@ class Aria2Adapter(QObject):
             self._callFromExternal(
                 _Callable(Aria2Method.AddUri, url, options)
             )
-            return True
+            return True, None
         elif creation.kind == TaskCreationType.Magnet:
             self._callFromExternal(
                 _Callable(Aria2Method.AddUri, url, dict())
             )
-            return True
+            return True, None
 
-        return False
+        return False, "Not implemented."
 
     def do_getFiles(self, gid):
         self._callFromExternal(_Callable(Aria2Method.GetFiles, gid))
