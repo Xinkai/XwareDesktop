@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from launcher import app
 
 from PyQt5.QtCore import QObject, pyqtSlot, pyqtSignal
 
@@ -70,6 +69,18 @@ class TaskCreation(object):
 
     @property
     def isValid(self) -> bool:
+        if not self.kind:
+            # scheme is not recognized
+            return False
+
+        if not self.parsed:
+            # parsed is None
+            return False
+
+        if (not self.parsed.path) and (self.kind is not TaskCreationType.Magnet):
+            # "http://domain."
+            return False
+
         if not self.parsed.netloc:
             if self.parsed.scheme == "":
                 return True
