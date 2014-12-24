@@ -88,6 +88,8 @@ class TaskTreeItem(object):
         p = self._parent
         if p:
             return p.children
+        else:
+            return OrderedDict()
 
     def setData(self, *, size, index, selected):
         self._size = size
@@ -99,7 +101,7 @@ class TaskTreeItem(object):
         return self._children
 
     def nthChild(self, i: int):
-        return self.children[list(self._children.keys())[i]]
+        return self._children[list(self._children.keys())[i]]
 
     def siblingNumber(self):
         result = list(self.siblings.values()).index(self)
@@ -162,3 +164,11 @@ class TaskTreeItem(object):
             ancestryTree = self.ancestryTree,
             index = self._index,
             contents = len(self._children))
+
+    def __truediv__(self, relativePath: str) -> "TaskTreeItem":
+        if relativePath == "..":
+            return self._parent
+        elif relativePath == ".":
+            return self
+        else:
+            return self._children[relativePath]
