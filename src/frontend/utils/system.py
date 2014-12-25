@@ -51,6 +51,13 @@ def getInitType():
                 realInitPath = os.readlink(path)
             except FileNotFoundError:
                 realInitPath = ""
+            except OSError as osErr:
+                import errno
+                if osErr.errno == errno.EINVAL:
+                    # Not a symlink
+                    realInitPath = ""
+                else:
+                    raise
 
             if realInitPath.endswith("systemd"):
                 return InitType.SYSTEMD
