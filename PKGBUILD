@@ -51,5 +51,9 @@ package() {
         cd ../
     fi
     make DESTDIR=${pkgdir} install
-    echo -e "\n__githash__ = \"${_commit}\"\n" >> ${pkgdir}/opt/xware-desktop/shared/__init__.py
+
+    # Set git hash if nonlocal
+    if test $_nonlocal; then
+        echo -e "\n__githash__ = \"${_commit}\"\n" >> ${pkgdir}/opt/xware-desktop/shared/__init__.py
+    fi
 }
