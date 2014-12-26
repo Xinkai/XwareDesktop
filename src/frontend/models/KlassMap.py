@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from collections import MutableMapping, namedtuple, OrderedDict
+from collections import namedtuple, OrderedDict
+from collections.abc import Sized, Iterable, Container, ItemsView, ValuesView
 from .TaskMapBase import TaskMapBase
 
 PendingDeletionRecord = namedtuple(
@@ -10,7 +11,7 @@ PendingDeletionRecord = namedtuple(
 )
 
 
-class KlassMap(MutableMapping):
+class KlassMap(Sized, Iterable, Container):
     # a dict-like object that combines tasks from all classes.
     # key: rid   value: taskItem
 
@@ -70,8 +71,20 @@ class KlassMap(MutableMapping):
             taskMapTicks = list(self._mapTickCount.values()),
         )
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, rid: str, value):
         raise NotImplementedError("Must not call __setitem__ on KlassMap.")
+
+    def __contains__(self, rid) -> bool:
+        for taskMap in self._taskMaps.values():
+            if rid in taskMap:
+                return True
+        return False
+
+    def items(self):
+        return ItemsView(self)
+
+    def values(self):
+        return ValuesView(self)
 
     def findItemKlass(self, rid: str) -> "klass":
         for klass in self._taskMaps:

@@ -1,31 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from collections import MutableMapping, OrderedDict
+from collections import OrderedDict
+from collections.abc import Sized, Iterable, Container
 from itertools import islice
 
 from .KlassMap import KlassMap
 
 
-class AdapterMap(MutableMapping):
+class AdapterMap(Sized, Iterable, Container):
     def __init__(self, model):
         self._klassMaps = OrderedDict()
         self.__model = model
-
-    # Disable some methods that are expected in a dict.
-    def __setitem__(self, nsid: str, value: object):
-        raise NotImplementedError()
-
-    def __delitem__(self, nsid: str):
-        raise NotImplementedError()
-
-    def copy(self):
-        raise NotImplementedError()
-
-    def keys(self):
-        raise NotImplementedError()
-
-    def values(self):
-        raise NotImplementedError()
 
     def items(self):
         for namespace, klassMap in self._klassMaps.items():
