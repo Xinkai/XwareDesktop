@@ -74,7 +74,7 @@ class XwareDesktop(QApplication):
         self.proxyModel = ProxyModel()
         self.proxyModel.setSourceModel(self.taskModel)
 
-        self.adapterManager = AdapterManager(self)
+        self.adapterManager = AdapterManager(taskModel = self.taskModel)
         for name, item in self.settings.itr_sections_with_prefix("adapter"):
             self.adapterManager.loadAdapter(item)
 

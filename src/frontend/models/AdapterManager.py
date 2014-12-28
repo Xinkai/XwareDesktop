@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from launcher import app
 from PyQt5.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot, QTimer
 
 from collections import OrderedDict
@@ -9,8 +8,9 @@ from collections import OrderedDict
 class AdapterManager(QObject):
     summaryUpdated = pyqtSignal()
 
-    def __init__(self, parent = None):
-        super().__init__(parent)
+    def __init__(self, *, taskModel):
+        super().__init__(taskModel)
+        self.__taskModel = taskModel
         self._adapters = OrderedDict()
         self._timer = QTimer(self)
         self._timer.timeout.connect(lambda: self.summaryUpdated.emit())
@@ -32,7 +32,7 @@ class AdapterManager(QObject):
         ns = adapter.namespace
         assert ns not in self._adapters
         self._adapters[ns] = adapter
-        app.taskModel.adapterMap.addKlassMap(adapter.klassMap)
+        self.__taskModel.adapterMap.addKlassMap(adapter.klassMap)
 
     @pyqtSlot(str, result = "QVariant")
     def adapter(self, ns):
@@ -52,7 +52,7 @@ class AdapterManager(QObject):
             adapter = XwareAdapter(
                 adapterConfig = adapterConfig,
                 parent = self,
-                taskModel = app.taskModel
+                taskModel = self.__taskModel,
             )
             self._registerAdapter(adapter)
             adapter.start()
@@ -61,7 +61,7 @@ class AdapterManager(QObject):
             adapter = Aria2Adapter(
                 adapterConfig = adapterConfig,
                 parent = self,
-                taskModel = app.taskModel
+                taskModel = self.__taskModel,
             )
             self._registerAdapter(adapter)
             adapter.start()

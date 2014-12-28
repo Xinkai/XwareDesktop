@@ -45,7 +45,7 @@ class DummyApp(QApplication):
         self.schedulerModel = SchedulerModel(self)
         self.schedulerModel.setSourceModel(self.taskModel)
 
-        self.adapterManager = AdapterManager()
+        self.adapterManager = AdapterManager(taskModel = self.taskModel)
         for name, item in self.settings.itr_sections_with_prefix("adapter"):
             self.adapterManager.loadAdapter(item)
 
