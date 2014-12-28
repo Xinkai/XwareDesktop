@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from launcher import app
-
 from collections import defaultdict
 import enum
 from itertools import groupby
@@ -51,6 +49,7 @@ class TaskModel(QAbstractListModel):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.adapterMap = AdapterMap(self)
+        self.__adapterManager = None
 
         # TaskManager must not call {begin|end}{Insert|Remove}Rows directly, as it will result in
         # unpredictable data corruption.
@@ -60,6 +59,9 @@ class TaskModel(QAbstractListModel):
         self.sigAfterRemove.connect(self.slotAfterRemove, Qt.BlockingQueuedConnection)
         self.sigBeforeMove.connect(self.slotBeforeMove, Qt.BlockingQueuedConnection)
         self.sigAfterMove.connect(self.slotAfterMove, Qt.BlockingQueuedConnection)
+
+    def setAdapterManager(self, adapterManager):
+        self.__adapterManager = adapterManager
 
     @pyqtSlot(int)
     def slotBeforeInsert(self, i):
@@ -140,32 +142,32 @@ class TaskModel(QAbstractListModel):
     # ====== The following methods support bulk operation, hand tasks to the adapter ======
     def pauseTasks(self, tasks: "list<QModelIndex>", options):
         for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
-            app.adapterManager.adapter(ns).do_pauseTasks(taskDatas, options)
+            self.__adapterManager.adapter(ns).do_pauseTasks(taskDatas, options)
 
     def startTasks(self, tasks: "list<QModelIndex>", options):
         for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
-            app.adapterManager.adapter(ns).do_startTasks(taskDatas, options)
+            self.__adapterManager.adapter(ns).do_startTasks(taskDatas, options)
 
     def delTasks(self, tasks: "list<QModelIndex>", options):
         for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
-            app.adapterManager.adapter(ns).do_delTasks(taskDatas, options)
+            self.__adapterManager.adapter(ns).do_delTasks(taskDatas, options)
 
     def restoreTasks(self, tasks: "list<QModelIndex>", options):
         for ns, taskDatas in self._sortGroupByAdapter(tasks).items():
-            app.adapterManager.adapter(ns).do_restoreTasks(taskDatas, options)
+            self.__adapterManager.adapter(ns).do_restoreTasks(taskDatas, options)
 
     # =============== The following methods hand taskData directly to the adapter ===============
     def openLixianChannel(self, task: QModelIndex, enable: bool):
         taskItem = self.get(task)
         ns = taskItem.namespace
         assert ns.startswith("xware")
-        app.adapterManager.adapter(ns).do_openLixianChannel(taskItem, enable)
+        self.__adapterManager.adapter(ns).do_openLixianChannel(taskItem, enable)
 
     def openVipChannel(self, task: QModelIndex):
         taskItem = self.get(task)
         ns = taskItem.namespace
         assert ns.startswith("xware")
-        app.adapterManager.adapter(ns).do_openVipChannel(taskItem)
+        self.__adapterManager.adapter(ns).do_openVipChannel(taskItem)
 
     # ============================= Adapter-independent operations =============================
     def systemOpen(self, task: QModelIndex):

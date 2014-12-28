@@ -11,6 +11,7 @@ class AdapterManager(QObject):
     def __init__(self, *, taskModel):
         super().__init__(taskModel)
         self.__taskModel = taskModel
+        self.__taskModel.setAdapterManager(self)
         self._adapters = OrderedDict()
         self._timer = QTimer(self)
         self._timer.timeout.connect(lambda: self.summaryUpdated.emit())
