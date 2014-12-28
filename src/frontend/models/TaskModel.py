@@ -102,8 +102,10 @@ class TaskModel(QAbstractListModel):
             TaskClassRole: "taskClass",
         }
 
-    def data(self, qModelIndex, role = None):
-        assert qModelIndex.row() >= 0, "row = {}".format(qModelIndex.row())
+    def data(self, qModelIndex: QModelIndex, role = None):
+        if not qModelIndex.row() >= 0:
+            raise RuntimeError("row = {}".format(qModelIndex.row()))
+
         if role == TaskDataRole:
             result = self.adapterMap.at(qModelIndex.row())
             return result

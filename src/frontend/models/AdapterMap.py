@@ -43,7 +43,9 @@ class AdapterMap(Sized, Iterable, Container):
             result += len(self._klassMaps[a])
 
     def at(self, index: "uint"):
-        assert index >= 0, "index = {}".format(index)
+        if not index >= 0:
+            raise RuntimeError("index = {}".format(index))
+
         for namespace in self._klassMaps.keys():
             mapLIndex = self.baseIndexForAdapter(namespace)
             mapRIndex = mapLIndex + len(self._klassMaps[namespace]) - 1
