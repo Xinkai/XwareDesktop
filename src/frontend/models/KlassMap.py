@@ -182,10 +182,10 @@ class KlassMap(Sized, Iterable, Container):
                 continue
 
             relIndex = self.index(rid)
-            self.__adapterMap.beginRemoveRows(self.namespace, relIndex)
+            self.__adapterMap.beforeRemove(self.namespace, relIndex)
             del self._taskMaps[record.fromKlass][rid]
             del self._pendingDeletions[rid]
-            self.__adapterMap.endRemoveRows()
+            self.__adapterMap.afterRemove()
 
     def klass(self, klass):
         return self._taskMaps[klass]

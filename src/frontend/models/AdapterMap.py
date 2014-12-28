@@ -65,11 +65,11 @@ class AdapterMap(Sized, Iterable, Container):
         klassMap.setAdapterMap(self)
         self._klassMaps[ns] = klassMap
 
-    def beginRemoveRows(self, namespace: str, klassIndex: int):
+    def beforeRemove(self, namespace: str, klassIndex: int):
         baseIndex = self.baseIndexForAdapter(namespace)
         self.__model.sigBeforeRemove.emit(baseIndex + klassIndex)
 
-    def endRemoveRows(self):
+    def afterRemove(self):
         self.__model.sigAfterRemove.emit()
 
     def beforeInsert(self, namespace: str, relDstIndex: int):
