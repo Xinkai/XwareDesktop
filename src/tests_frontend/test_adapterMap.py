@@ -111,3 +111,8 @@ class AdapterMapTest(TestCase):
             IndexError,
             self.am.at, 4
         )
+
+        self.assertRaises(
+            RuntimeError,
+            self.am.at, -2
+        )

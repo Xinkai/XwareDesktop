@@ -82,7 +82,9 @@ class TaskModel(QAbstractListModel):
 
     @pyqtSlot(int, int)
     def slotBeforeMove(self, src: int, dst: int):
-        self.beginMoveRows(QModelIndex(), src, src, QModelIndex(), dst)
+        ok = self.beginMoveRows(QModelIndex(), src, src, QModelIndex(), dst)
+        if not ok:
+            raise RuntimeError("beginMoveRows", src, dst)
 
     @pyqtSlot()
     def slotAfterMove(self):

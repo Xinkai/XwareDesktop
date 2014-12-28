@@ -88,3 +88,6 @@ class TaskMapBase(OrderedDict):
 
     def setTaskModel(self, taskModel: object):
         self.__taskModel = taskModel
+
+    def __eq__(self, other):
+        return id(self) == id(other)
