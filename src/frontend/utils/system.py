@@ -36,6 +36,11 @@ def getInitType():
                 initVersion = str(proc.stdout.read())
         except FileNotFoundError:
             initVersion = None
+        except PermissionError:
+            # workaround #151: weird permission error on Mint 17
+            print("#151: weird permission error", file = sys.stderr)
+            initVersion = None
+
         if initVersion:
             if "systemd" in initVersion:
                 return InitType.SYSTEMD
