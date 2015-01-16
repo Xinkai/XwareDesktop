@@ -40,7 +40,10 @@ class XwareJS
             tid = $(@).attr("data-tid")
             task = Data.task.all[tid]
             if task.stateText is "已完成"
-                xdpy.systemOpen(task.path + task.name)
+                if task.path
+                    xdpy.systemOpen(task.path + task.name)
+                else
+                    console.error "No Task Path"
                 event.preventDefault()
                 event.stopImmediatePropagation()
                 event.stopPropagation()
@@ -55,15 +58,20 @@ class XwareJS
 
             $openDir = $("<li><a href='javascript:void(0)'>在文件夹中显示</a></li>")
             $openDir.on "click", () ->
-                xdpy.systemViewOneFile(task.path + task.name)
-
+                if task.path
+                    xdpy.systemViewOneFile(task.path + task.name)
+                else
+                    console.error "No Task Path"
             $cmenu = $("div#cmenu.flo_wrap > ul.flo_ul")
             $cmenu.prepend($openDir)
 
             if task.stateText is "已完成"
                 $open = $("<li><a href='javascript:void(0)'>打开</a></li>")
                 $open.on "click", () ->
-                    xdpy.systemOpen(task.path + task.name)
+                    if task.path
+                        xdpy.systemOpen(task.path + task.name)
+                    else
+                        console.error "No Task Path"
                 $cmenu.prepend($open)
 
     slotCreateTask: (task) ->
