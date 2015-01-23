@@ -7,7 +7,7 @@ from PyQt5.QtCore import QObject, QMetaType, pyqtSlot, pyqtProperty, Q_CLASSINFO
 from PyQt5.QtDBus import QDBusInterface, QDBusArgument, QDBusAbstractAdaptor, QDBusObjectPath, \
     QDBusMessage
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QSystemTrayIcon, QMenu
+from PyQt5.QtWidgets import QSystemTrayIcon, QMenu, QMessageBox
 
 from Extensions.DBusTypes import DBusTypes
 
@@ -482,7 +482,7 @@ class KdeSystemTrayIcon(QObject):
         # extract QIcon's name
         iconName = qIcon.name()
         if not iconName:
-            raise ValueError("only support theme icon.")
+            QMessageBox.warning(None, "Xware Desktop", "当前桌面环境不包含 Qt 所支持的图标集，托盘图标可能无法正常显示。")
         self._sniAdapter.setIconName(iconName)
 
     def setContextMenu(self, qMenu: QMenu):
