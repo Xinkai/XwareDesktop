@@ -87,3 +87,9 @@ class AdapterMap(Sized, Iterable, Container):
 
     def afterMove(self):
         self.__model.sigAfterMove.emit()
+
+    def get(self, key, default = None):
+        try:
+            return self[key]
+        except KeyError:
+            return default

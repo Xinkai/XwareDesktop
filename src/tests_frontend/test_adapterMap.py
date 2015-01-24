@@ -116,3 +116,10 @@ class AdapterMapTest(TestCase):
             RuntimeError,
             self.am.at, -2
         )
+
+    def test_get(self):
+        self.km1["1"] = 111
+        self.km2["2"] = 222
+        self.assertEqual(self.am.get("foo-1|1"), 111)
+        self.assertEqual(self.am.get("bar-1|2"), 222)
+        self.assertIsNone(self.am.get("foo-1|3", None))
