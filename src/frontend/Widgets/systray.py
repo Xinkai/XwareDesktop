@@ -4,9 +4,8 @@ import logging
 from launcher import app
 
 from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtGui import QIcon
 
-from Widgets import CompatSystemTrayIcon
+from Widgets import CompatSystemTrayIcon, CompatIcon
 from PyQt5.QtWidgets import QSystemTrayIcon
 
 from .contextmenu import ContextMenu
@@ -15,7 +14,7 @@ from .contextmenu import ContextMenu
 class Systray(CompatSystemTrayIcon):
     def __init__(self, parent = None):
         super().__init__(parent)
-        icon = QIcon.fromTheme("xware-desktop")
+        icon = CompatIcon.fromTheme("xware-desktop")
         self.setIcon(icon)
         self.trayIconMenu = ContextMenu(None)
         self.setContextMenu(self.trayIconMenu)
