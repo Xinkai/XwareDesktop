@@ -39,17 +39,17 @@ extensions:
 	make -C src/frontend/Extensions all
 
 clean:
-    # arch packaging
+	# arch packaging
 	rm -rf pkg
 
 	# deb packaging
 	rm -rf debian/xware-desktop
 	rm -rf debian/files
-    rm -rf debian/*.debhelper
-    rm -rf debian/*.debhelper.log
-    rm -rf debian/*.substvars
+	rm -rf debian/*.debhelper
+	rm -rf debian/*.debhelper.log
+	rm -rf debian/*.substvars
 
-    # build
+	# build
 	rm -rf build
 	rm -rf preparedXware
 
