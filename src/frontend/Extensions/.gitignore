@@ -1,0 +1,9 @@
+*.so
+*.so.*
+*.exp
+*.o
+*.sbf
+sip*.cpp
+sip*.h
+src/Makefile
+sip/Makefile
