@@ -39,13 +39,27 @@ extensions:
 	make -C src/frontend/Extensions all
 
 clean:
+    # arch packaging
 	rm -rf pkg
+
+	# deb packaging
+	rm -rf debian/xware-desktop
+	rm -rf debian/files
+    rm -rf debian/*.debhelper
+    rm -rf debian/*.debhelper.log
+    rm -rf debian/*.substvars
+
+    # build
 	rm -rf build
 	rm -rf preparedXware
+
+	# in-place
 	find src/frontend -name "ui_*.py" -print0 | xargs -0 rm -f
 	find src/frontend -name "*_rc.py" -print0 | xargs -0 rm -f
 	find src -name "__pycache__" -print0 | xargs -0 rm -rf
 	find src/frontend -name "*.js" -print0 | xargs -0 rm -f
+
+	# extensions
 	make -C src/frontend/Extensions clean
 
 pyqt:
