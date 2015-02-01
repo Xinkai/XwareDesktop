@@ -33,6 +33,7 @@ pkg/
 # Debian package
 debian/xware-desktop/
 debian/files
+debian/*.debhelper
 debian/*.debhelper.log
 debian/*.substvars
 
@@ -51,14 +52,3 @@ unused/
 Thumbs.db
 desktop.ini
 .DS_Store
-
-# Extensions
-*.so
-*.so.*
-*.exp
-*.o
-*.sbf
-sip*.cpp
-sip*.h
-src/Makefile
-sip/Makefile
