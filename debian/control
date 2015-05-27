@@ -5,6 +5,7 @@ Priority: optional
 Build-Depends:
  gcc [i386], gcc-multilib [amd64],
  zlib1g [i386], zlib1g:i386 [amd64],
+ fakeroot,
  coffeescript,
  pyqt5-dev-tools,
  pyqt5-dev,
