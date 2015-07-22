@@ -104,7 +104,6 @@ class TaskModel(QAbstractListModel):
             TaskDataRole: b"taskData",
             CreationTimeRole: b"creationTime",
             TaskClassRole: b"taskClass",
-            TaskClassRole: b"taskClass",
         }
 
     def data(self, qModelIndex: QModelIndex, role = None):
