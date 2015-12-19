@@ -22,7 +22,7 @@ class UrlExtractor(QObject):
 
     @pyqtSlot()
     def slotSettingsChanged(self):
-        patternLines = app.settings.get("frontend", "watchpattern").split("\n")
+        patternLines = app.settings.myGet("frontend", "watchpattern").split("\n")
         patternList = []
         for line in patternLines:
             if len(line) == 0 or line.startswith("//"):

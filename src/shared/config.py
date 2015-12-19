@@ -12,7 +12,7 @@ class ProxyAddons(object):
     def has(self, section, key):
         key = key.lower()
         try:
-            self.get(section, key)
+            self.myGet(section, key)
             return True
         except KeyError:
             return False
@@ -97,7 +97,7 @@ class SettingsAccessorBase(configparser.ConfigParser):
         self._defaultDict = defaults
         self.read(self._configFilePath, encoding = "UTF-8")
 
-    def get(self, section, key, *args, **kwargs):
+    def myGet(self, section, key, *args, **kwargs):
         assert not args
         # TODO: disable the next line because otherwise won't work with SectionProxy
         # assert not kwargs
@@ -110,10 +110,10 @@ class SettingsAccessorBase(configparser.ConfigParser):
 
     def getint(self, section, key, *args, **kwargs):
         # override this, because super() version doesn't call overridden get()
-        return int(self.get(section, key, *args, **kwargs))
+        return int(self.myGet(section, key, *args, **kwargs))
 
     def getfloat(self, section, key, *args, **kwargs):
-        return float(self.get(section, key, *args, **kwargs))
+        return float(self.myGet(section, key, *args, **kwargs))
 
     def getboolean(self, *args, **kwargs):
         raise NotImplementedError("use getbool")
@@ -152,7 +152,7 @@ class SettingsAccessorBase(configparser.ConfigParser):
             targetClass = target.__class__
 
             def _enableFallback(SELF, key):
-                return SELF._parser.get(SELF._name, key)
+                return SELF._parser.myGet(SELF._name, key)
 
             if not hasattr(targetClass, "FALLBACK_PATCHED"):
                 setattr(targetClass, "__getitem__", _enableFallback)
@@ -163,6 +163,7 @@ class SettingsAccessorBase(configparser.ConfigParser):
     def __getitem__(self, section: str):
         try:
             result = super().__getitem__(section)
+            result.myGet = result.get
         except KeyError as e:
             if section in self._defaultDict:
                 proxy = FallbackSectionProxy(self, section)

@@ -95,9 +95,10 @@ class FrontendPy(QObject):
     def tryLogin(self):
         if self.__mainWin.page.urlMatchIn(constants.LOGIN_PAGE):
             autologin = self.__legacySettings.getbool("autologin")
+            print(self.__adapterSettings.addons_loaded, "<-- loaded")
             if autologin:
-                username = self.__adapterSettings.get("username")
-                password = self.__adapterSettings.get("password")
+                username = self.__adapterSettings.myGet("username")
+                password = self.__adapterSettings.myGet("password")
                 if username and password:
                     self.sigLogin.emit(username, password)
 

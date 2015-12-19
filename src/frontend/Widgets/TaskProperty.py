@@ -31,14 +31,14 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
                 adapter = app.adapterManager.adapter(namespace)
                 self.combo_adapter.addItem(adapter.name, adapter)
                 self.combo_adapter.setItemData(i, namespace, _NamespaceRole)
-            lastAdapterUsed = app.settings.get("internal", "lastadapterused")
+            lastAdapterUsed = app.settings.myGet("internal", "lastadapterused")
             if lastAdapterUsed:
                 index = self.combo_adapter.findData(lastAdapterUsed, _NamespaceRole)
                 if index != -1:
                     self.combo_adapter.setCurrentIndex(index)
 
             self.recentdirs = collections.deque(
-                filter(bool, app.settings.get("internal", "recentsavedirs").split("\t")),
+                filter(bool, app.settings.myGet("internal", "recentsavedirs").split("\t")),
                 maxlen = app.settings.getint("internal", "recentsavedirscount")
             )
             self.combo_dir.addItems(list(self.recentdirs))
@@ -50,7 +50,7 @@ class TaskPropertyDialog(QDialog, Ui_Dialog):
 
     @pyqtSlot()
     def on_btn_localUpload_clicked(self):
-        folder = app.settings.get("internal", "lastlocaluploaddir")
+        folder = app.settings.myGet("internal", "lastlocaluploaddir")
         if not folder:
             folder = os.path.expanduser("~/Downloads")
 

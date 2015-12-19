@@ -70,7 +70,7 @@ class PowerActionManager(QObject):
         if actionType == ActionType.Special:
             raise ValueError("Cannot act on {}".format(action))
         elif actionType == ActionType.Command:
-            cmd = app.settings.get("scheduler", internalName + "cmd")
+            cmd = app.settings.myGet("scheduler", internalName + "cmd")
             os.system(cmd)
             return
         elif actionType == ActionType.DBus:

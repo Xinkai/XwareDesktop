@@ -19,8 +19,8 @@ class SettingsDialog(QDialog, Ui_Dialog):
 
         self.setupUi(self)
 
-        self.lineEdit_loginUsername.setText(app.settings.get("adapter-legacy", "username"))
-        self.lineEdit_loginPassword.setText(app.settings.get("adapter-legacy", "password"))
+        self.lineEdit_loginUsername.setText(app.settings.myGet("adapter-legacy", "username"))
+        self.lineEdit_loginPassword.setText(app.settings.myGet("adapter-legacy", "password"))
         self.checkBox_autoLogin.setChecked(app.settings.getbool("legacy", "autologin"))
         self.checkBox_autoStartFrontend.setChecked(app.autoStart)
         if sys.platform == "linux":
@@ -77,7 +77,7 @@ class SettingsDialog(QDialog, Ui_Dialog):
         self.checkBox_watchClipboard.stateChanged.connect(self.slotWatchClipboardToggled)
         self.checkBox_watchClipboard.setChecked(app.settings.getbool("frontend", "watchclipboard"))
         self.slotWatchClipboardToggled(self.checkBox_watchClipboard.checkState())
-        self.plaintext_watchPattern.setPlainText(app.settings.get("frontend", "watchpattern"))
+        self.plaintext_watchPattern.setPlainText(app.settings.myGet("frontend", "watchpattern"))
 
         self.btn_addMount.clicked.connect(self.slotAddMount)
         self.btn_removeMount.clicked.connect(self.slotRemoveMount)

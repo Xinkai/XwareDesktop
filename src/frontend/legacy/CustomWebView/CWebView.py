@@ -38,12 +38,12 @@ class CustomWebView(QWebView):
         self.settings().setAttribute(QWebSettings.PluginsEnabled, pluginsAllowed)
         app.frontendpy.sigToggleFlashAvailability.emit(pluginsAllowed)
 
-        zoom = app.settings.get("legacy", "webviewzoom")
+        zoom = app.settings.myGet("legacy", "webviewzoom")
         if zoom:
             zoom = float(zoom)
             self.setZoomFactor(zoom)
 
-        minimumSizeOverride = app.settings.get("legacy", "webviewminsizeoverride")
+        minimumSizeOverride = app.settings.myGet("legacy", "webviewminsizeoverride")
         if minimumSizeOverride:
             w, h = minimumSizeOverride.split(",")
             w, h = int(w), int(h)

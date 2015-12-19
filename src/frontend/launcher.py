@@ -116,7 +116,7 @@ class XwareDesktop(QApplication):
         self.applySettings.emit()
 
         upgradeGuide = None
-        if self.settings.get("internal", "previousversion") == "0.8":
+        if self.settings.myGet("internal", "previousversion") == "0.8":
             # upgraded or fresh installed
             upgradeGuide = "https://github.com/Xinkai/XwareDesktop/wiki/使用说明"
         else:
