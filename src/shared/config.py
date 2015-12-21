@@ -34,14 +34,14 @@ class ProxyAddons(object):
         self.set(section, key, str(value))
 
     def getbool(self, section, key):
-        return True if self.get(section, key) in ("1", True) else False
+        return True if self.myGet(section, key) in ("1", True) else False
 
     def setbool(self, section, key, value):
         assert type(value) is bool
         self.set(section, key, "1" if value else "0")
 
     def getobj(self, section, key):
-        pickledStr = self.get(section, key)
+        pickledStr = self.myGet(section, key)
         if type(pickledStr) is str and len(pickledStr) > 0:
             pickledBytes = pickledStr.encode("ascii")
             pickled = binascii.unhexlify(pickledBytes)
@@ -80,7 +80,7 @@ class FallbackSectionProxy(MutableMapping):
         self._parser.set(self._name, key, value)
 
     def __getitem__(self, key):
-        return self._parser.get(self._name, key)
+        return self._parser.myGet(self._name, key)
 
     def __delitem__(self, key):
         raise NotImplementedError()
