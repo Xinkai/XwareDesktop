@@ -9,6 +9,7 @@
 #include <string.h> // strcpy
 #include <errno.h> // errno
 
+
 char profileDir[PATH_MAX] = {0};
 char** cmd = NULL;
 
@@ -36,7 +37,7 @@ void prepare() {
     ret = mount("", "/", "Doesntmatter", MS_PRIVATE|MS_REC|MS_NODEV, NULL);
     if (ret) {
         perror("mount (making sure subtree '/' is private)");
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
     }
 }
 

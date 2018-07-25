@@ -36,7 +36,7 @@ from PyQt5.QtCore import QtMsgType, QMessageLogContext, QtDebugMsg, QtWarningMsg
     QtFatalMsg, qInstallMessageHandler
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtGui import QFont, QIcon
-
+from PyQt5.QtWebEngineWidgets import *
 from shared import __version__, DATE
 
 import constants
@@ -100,17 +100,20 @@ class XwareDesktop(QApplication):
         # Legacy parts
         from legacy import main
         from legacy.frontendpy import FrontendPy
-        self.mainWin = main.MainWindow(adapter = self.adapterManager[0],
-                                       taskCreationAgent = self.taskCreationAgent,
-                                       frontendSettings = self.settings["frontend"],
-                                       app = self)
+
+        self.mainWin = main.MainWindow(adapter=self.adapterManager[0],
+                                       taskCreationAgent=self.taskCreationAgent,
+                                       frontendSettings=self.settings["frontend"],
+                                       app=self)
         self.mainWin.show()
-        self.frontendpy = FrontendPy(taskCreationAgent = self.taskCreationAgent,
-                                     legacySettings = self.settings["legacy"],
-                                     adapterSettings = self.settings["adapter-legacy"],
-                                     adapter = self.adapterManager[0],
-                                     mainWin = self.mainWin,
-                                     parent = self)
+
+        self.frontendpy = FrontendPy(taskCreationAgent=self.taskCreationAgent,
+                              legacySettings=self.settings["legacy"],
+                              adapterSettings=self.settings["adapter-legacy"],
+                              adapter=self.adapterManager[0],
+                              mainWin=self.mainWin,
+                              parent=self)
+
         self.sigMainWinLoaded.emit()
 
         self.applySettings.emit()
@@ -127,7 +130,8 @@ class XwareDesktop(QApplication):
         if upgradeGuide:
             from PyQt5.QtCore import QUrl
             from PyQt5.QtGui import QDesktopServices
-            QDesktopServices.openUrl(QUrl(upgradeGuide))
+            if not __debug__:
+                QDesktopServices.openUrl(QUrl(upgradeGuide))
 
         self.settings.set("internal", "previousversion", __version__)
         self.settings.setfloat("internal", "previousdate", DATE)
@@ -200,6 +204,7 @@ class XwareDesktop(QApplication):
     @property
     def autoStart(self):
         return os.path.lexists(constants.DESKTOP_AUTOSTART_FILE)
+
 
     @autoStart.setter
     def autoStart(self, on):

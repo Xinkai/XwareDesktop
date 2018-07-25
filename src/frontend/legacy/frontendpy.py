@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
 from PyQt5.QtWidgets import QMessageBox
 from PyQt5.QtCore import Qt, QObject, pyqtSignal, pyqtSlot, QVariant, QEvent
 from PyQt5.QtGui import QKeyEvent
@@ -13,7 +12,6 @@ from Tasks.action import TaskCreationType
 from utils.system import systemOpen, viewOneFile
 
 FrontendStatus = collections.namedtuple("FrontendStatus", ["xdjsLoaded", "logined", "online"])
-
 
 # Together with xwarejs.js, exchange information with the browser
 class FrontendPy(QObject):
@@ -46,6 +44,14 @@ class FrontendPy(QObject):
             self.__mainWin.statusBar_main.slotFrontendStatusChanged)
         self.__app.applySettings.connect(self.tryLogin)
 
+    @pyqtSlot(str)
+    def test(self,message):
+        print("js call python function test: "+message)
+
+    @pyqtSlot(str)
+    def test1(self,message):
+        print("js call python function test:"+message)
+
     @property
     def isPageMaskOn(self):
         return self._isPageMaskOn
@@ -68,7 +74,6 @@ class FrontendPy(QObject):
         self.sigFrontendStatusChanged.emit()
         if self._isPageOnline:
             self.createTask("online")
-
     @property
     def isPageLogined(self):
         return self._isPageLogined
@@ -157,7 +162,7 @@ class FrontendPy(QObject):
     @pyqtSlot()
     def requestFocus(self):
         self.__mainWin.restore()
-        self.__mainWin.frame.setFocus()
+        self.__mainWin.webView.setFocus()
 
     @pyqtSlot(str)
     def systemOpen(self, url):

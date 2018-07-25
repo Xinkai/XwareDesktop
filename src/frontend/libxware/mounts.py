@@ -92,19 +92,24 @@ class MountsFaker(object):
     def convertToLocalPath(self, path):
         # takes a path like "/tmp/thunder/volumes/C:/TDDOWNLOAD/1.zip"
         # returns a local path "/home/user/Download/1.zip"
+        mountDir = constants.ETM_MOUNTS_DIR
 
-        tmp1 = path[:len(constants.ETM_MOUNTS_DIR)]
-        tmp2 = constants.ETM_MOUNTS_DIR
-        assert tmp1 == tmp2, (tmp1, tmp2)
+        if path.find(mountDir) == -1:
+            parts = path.split("/")
+            if len(parts) == 1:
+                localPath = list(self.getMountsMapping().keys())[0]+"/"+parts[0]
+        else:
+            prefix = path[:len(constants.ETM_MOUNTS_DIR)]
+            assert prefix == mountDir, (prefix, mountDir)
 
-        path = path[len(constants.ETM_MOUNTS_DIR):]  # remove "/tmp/thunder/volumes/" prefix
-        parts = path.split("/")  # ["C:", "TDDOWNLOAD", "1.zip"]
-        drive = parts[0][:-1]  # "C:" -> "C"
+            path = path[len(constants.ETM_MOUNTS_DIR):]  # remove "/tmp/thunder/volumes/" prefix
+            parts = path.split("/")  # ["C:", "TDDOWNLOAD", "1.zip"]
+            drive = parts[0][:-1]  # "C:" -> "C"
 
-        localPath = os.path.join(
-            self.mounts[ord(drive) - ord("C")],
-            *parts[2:]  # discard "C:" and "TDDOWNLOAD"
-        )
+            localPath = os.path.join(
+                self.mounts[ord(drive) - ord("C")],
+                *parts[2:]  # discard "C:" and "TDDOWNLOAD"
+            )
         resolvedLocalPath = os.path.realpath(localPath)
 
         return resolvedLocalPath

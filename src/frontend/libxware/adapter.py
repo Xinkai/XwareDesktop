@@ -2,7 +2,6 @@
 
 import logging
 from launcher import app
-
 import asyncio, os, sys
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
@@ -221,7 +220,7 @@ class XwareAdapter(QObject):
                 clientMethod = getattr(self._xwareClient, name)
                 coro = clientMethod(*args)
                 assert asyncio.iscoroutine(coro)
-                future = asyncio.async(coro)
+                future =asyncio.async(coro)
                 cb = getattr(self, "_donecb_" + name, None)
                 if cb:
                     cb = partial(cb, *args)

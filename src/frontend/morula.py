@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QApplication
-
+from PyQt5.QtWebEngineWidgets import *
 import constants
 
 

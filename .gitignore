@@ -37,12 +37,18 @@ debian/*.debhelper
 debian/*.debhelper.log
 debian/*.substvars
 
+#QT qml generated
+*.qmlc
+
 # pyqt generated
 ui_*.py
 *_rc.py
 
 # coffeescript generated
 *.js
+
+#js map file
+*.js.map
 
 # my building environment flag
 .localdev
@@ -52,3 +58,11 @@ unused/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+#qmake stash
+.qmake.stash
+#jsc
+*.jsc
+#debhelper-build-stamp
+debhelper-build-stamp
+

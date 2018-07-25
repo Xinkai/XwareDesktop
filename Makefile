@@ -33,7 +33,7 @@ build/etmpatch.so: src/etmpatch.c
 	$(CC) $(FLAGS) -m32 -o build/etmpatch.so -fPIC -shared -ldl src/etmpatch.c
 
 build/chmns: src/chmns.c
-	$(CC) $(FLAGS) -o build/chmns src/chmns.c
+	$(CC) $(FLAGS) -o build/chmns  src/chmns.c -lcap
 
 extensions:
 	make -C src/frontend/Extensions all
@@ -108,7 +108,8 @@ replacePath:
 	cat src/xwared.service.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.service
 	cat src/xwared.conf.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.conf
 	cat src/xwared.desktop.template | sed s,##PREFIX##,$(PREFIX), > build/xwared.desktop
-
+	
+#sudo is needed for install
 install:
 	install -d $(DESTDIR)$(PREFIX)
 	install -d $(DESTDIR)$(PREFIX)/xware
@@ -148,18 +149,19 @@ install:
 	install    build/xwared.service $(DESTDIR)$(PREFIX)/frontend/xwared.service
 	install    build/xwared.desktop $(DESTDIR)$(PREFIX)/frontend/xwared.desktop
 	install -d $(DESTDIR)/usr/bin
-	ln -s $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop
-	ln -s $(PREFIX)/daemon/xwared.py $(DESTDIR)$(PREFIX)/xwared
+	ln -s -f $(PREFIX)/frontend/launcher.py $(DESTDIR)/usr/bin/xware-desktop
+	ln -s -f $(PREFIX)/daemon/xwared.py $(DESTDIR)$(PREFIX)/xwared
 
 	echo -e "\n__githash__ = \"$(GITHASH)\"\n" >> $(DESTDIR)$(PREFIX)/shared/__init__.py
 
 	# regenerate .pyo files
 	find $(DESTDIR)$(PREFIX) -name "__pycache__" -print0 | xargs -0 rm -rf
 	$(python3) -OO -m compileall -q $(DESTDIR)$(PREFIX)
-
+	#fix permissions of source
+	chmod -R 777 *
 	# fix permissions
-	find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
-	find $(DESTDIR) -type d -print0 | xargs -0 chmod 755
+	#find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
+	#find $(DESTDIR) -type d -print0 | xargs -0 chmod 755
 
 	# mark executables
 	chmod +x $(DESTDIR)$(PREFIX)/frontend/launcher.py
@@ -171,3 +173,5 @@ install:
 	chmod +x $(DESTDIR)$(PREFIX)/xware/lib/vod_httpserver
 	chmod +x $(DESTDIR)$(PREFIX)/xware/portal
 	chmod +x $(DESTDIR)$(PREFIX)/chmns
+	#add cap_sys_admin for unshare(CLONE_NEWNS) 
+	setcap cap_sys_admin=eip $(DESTDIR)$(PREFIX)/chmns

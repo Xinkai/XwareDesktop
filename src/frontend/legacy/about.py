@@ -41,8 +41,8 @@ class AboutDialog(QDialog, Ui_dlg_about):
 
         self.label_pyinotifyVer.setText(pyinotify.__version__ if pyinotify else "N/A")
 
-        from PyQt5 import QtWebKit
-        self.label_qtwebkitVer.setText(QtWebKit.qWebKitVersion())
+        from PyQt5 import QtWebEngineCore
+        self.label_qtwebkitVer.setText("未使用")
 
         import aiohttp
         self.label_aiohttpVer.setText(aiohttp.__version__)

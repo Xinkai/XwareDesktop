@@ -41,7 +41,7 @@ build() {
     else
         cd ../
     fi
-    QT_SELECT=5 make all
+    make all
 }
 
 package() {

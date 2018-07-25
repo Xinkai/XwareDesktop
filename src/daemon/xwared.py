@@ -221,9 +221,13 @@ class Xwared(object):
             )
         else:
             additionals = dict()
-
-        proc = subprocess.Popen(constants.ETM_COMMANDLINE,
-                                env = env,
+        if __debug__:
+            proc = subprocess.Popen(('/opt/xware-desktop/chmns', '/opt/xware-desktop/xware/lib/EmbedThunderManager', '--verbose'),
+                                    env=env,
+                                    **additionals)
+        else:
+            proc = subprocess.Popen(constants.ETM_COMMANDLINE,
+                                env=env,
                                 **additionals)
         self.etmPid = proc.pid
         if self.etmPid:
@@ -251,7 +255,7 @@ class Xwared(object):
         self.etmPid = 0
         if self._log_novomit:
             if ret != 0:
-                print("\n".join(self.etmLogs), file = sys.stderr)
+                print("\n".join(self.etmLogs), file=sys.stderr)
             self.etmLogs.clear()
 
         longevity = time.monotonic() - self.etmStartedAt
@@ -259,9 +263,9 @@ class Xwared(object):
         threshold = self.settings.getint("etm", "shortlivedthreshold")
         if all(map(lambda l: l <= threshold, self.etmLongevities)):
             print("xwared: ETM持续时间连续{number}次不超过{threshold}秒，终止执行ETM"
-                  .format(number = self.etmLongevities.maxlen,
-                          threshold = threshold),
-                  file = sys.stderr)
+                  .format(number=self.etmLongevities.maxlen,
+                          threshold=threshold),
+                  file=sys.stderr)
             print("这极有可能是xware本身的bug引起的，更多信息请看 "
                   "https://github.com/Xinkai/XwareDesktop/wiki/故障排查和意见反馈"
                   "#etm持续时间连续3次不超过30秒终止执行etm的调试方法", file = sys.stderr)

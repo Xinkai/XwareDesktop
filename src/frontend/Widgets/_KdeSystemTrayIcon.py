@@ -294,7 +294,10 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
             show = self.__settings.getbool("frontend", "showmonitorwindow")
             self.__settings.setbool("frontend", "showmonitorwindow", not show)
             self.__app.applySettings.emit()
-
+        if itemId == DBusMenuAction.ToggleMainWindow and eventId=="clicked":
+            self.__app.mainWin.restore()
+        if itemId == DBusMenuAction.Settings and eventId=="clicked":
+            self.__app.mainWin.slotSetting()
         if itemId == DBusMenuAction.Exit and eventId == "clicked":
             self.__app.quit()
 
@@ -388,17 +391,17 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
             []
         )
 
-        # toggleMainWinItem = newDBusMenuItem(
-        #     DBusMenuAction.ToggleMainWindow,
-        #     self._getItemProperty(DBusMenuAction.ToggleMainWindow),
-        #     []
-        # )
+        toggleMainWinItem = newDBusMenuItem(
+            DBusMenuAction.ToggleMainWindow,
+            self._getItemProperty(DBusMenuAction.ToggleMainWindow),
+            []
+        )
 
-        # settingsItem = newDBusMenuItem(
-        #     DBusMenuAction.Settings,
-        #     self._getItemProperty(DBusMenuAction.Settings),
-        #     []
-        # )
+        settingsItem = newDBusMenuItem(
+            DBusMenuAction.Settings,
+            self._getItemProperty(DBusMenuAction.Settings),
+            []
+        )
 
         toggleMonitorWinItem = newDBusMenuItem(
             DBusMenuAction.ToggleMonitorWindow,
@@ -409,7 +412,7 @@ class CanonicalDBusMenuAdapter(QDBusAbstractAdaptor):
         rootItem = newDBusMenuItem(
             DBusMenuAction.Root,
             self._getItemProperty(DBusMenuAction.Root),
-            [toggleMonitorWinItem, exitItem, ],
+            [toggleMainWinItem, settingsItem, toggleMonitorWinItem, exitItem, ],
         )
 
         reply = msg.createReply([

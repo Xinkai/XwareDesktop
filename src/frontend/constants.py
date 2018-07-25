@@ -22,6 +22,10 @@ LOGIN_PAGE = "http://yuancheng.xunlei.com/login.html"
 V2_PAGE = "http://yuancheng.xunlei.com/"
 V3_PAGE = "http://yuancheng.xunlei.com/3/"
 
+QWEBENGINECACHE_PATH = os.path.expanduser("~/.xware-desktop/cache/webengine")
+
+QTWEBCHANNELJS_FILE = os.path.join(FRONTEND_DIR,"legacy/qwebchannel.js")
+XWAREJS_ACTIVE_FILE=os.path.join(FRONTEND_DIR, "legacy/activeDevice.js")
 XWAREJS_FILE = os.path.join(FRONTEND_DIR, "legacy/xwarejs.js")
 XWAREJS_LOGIN_FILE = os.path.join(FRONTEND_DIR, "legacy/loginjs.js")
 XWARESTYLE_FILE = os.path.join(FRONTEND_DIR, "legacy/style.css")

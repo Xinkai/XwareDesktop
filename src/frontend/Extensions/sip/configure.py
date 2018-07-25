@@ -5,7 +5,6 @@ import sipconfig
 import subprocess
 from PyQt5.Qt import PYQT_CONFIGURATION
 
-
 def getQtPath(name):
     result = subprocess.check_output(["qmake", "-query", name], universal_newlines = True)
     result = result.replace("\n", "")
@@ -21,7 +20,7 @@ config = sipconfig.Configuration()
 # Run SIP to generate the code.
 os.system(" ".join([
     config.sip_bin, "-c", ".", "-b", build_file,
-    "-I", "/usr/share/sip/PyQt5",
+    "-I","/usr/share/sip/PyQt5",
     PYQT_CONFIGURATION["sip_flags"],
     "DBusTypes.sip",
 ]))
@@ -42,7 +41,7 @@ makefile.extra_include_dirs = [
 # we also want current dir to be the rpath
 rpath = os.path.dirname(os.getcwd())
 makefile.extra_lflags = ["-Wl,-rpath {}".format(rpath)]
-makefile.extra_lib_dirs = ["../"]
-
+makefile.extra_lib_dirs = [getQtPath("QT_INSTALL_LIBS"),"../"]
+makefile.extra_cxxflags=["-std=c++11"]
 # Generate the Makefile itself.
 makefile.generate()

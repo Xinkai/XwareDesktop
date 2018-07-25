@@ -1,21 +1,26 @@
 "use strict"
 
 class XwareJS
+    boundPeerId = false
     constructor: () ->
-        xdpy.sigCreateTask.connect(@, @slotCreateTask)
-        xdpy.sigCreateTaskFromTorrentFile.connect(@, @slotCreateTaskFromTorrentFile)
-        xdpy.sigCreateTaskFromTorrentFileDone.connect(@, @slotCreateTaskFromTorrentFileDone)
-        xdpy.sigActivateDevice.connect(@, @slotActivateDevice)
-        xdpy.sigToggleFlashAvailability.connect(@, @slotToggleFlashAvailability)
+        xdpy.test("logined")
+        xdpy.sigCreateTask.connect(@slotCreateTask)
+        xdpy.sigCreateTaskFromTorrentFile.connect(@slotCreateTaskFromTorrentFile)
+        xdpy.sigCreateTaskFromTorrentFileDone.connect(@slotCreateTaskFromTorrentFileDone)
+        xdpy.sigActivateDevice.connect(@slotActivateDevice)
+        xdpy.sigToggleFlashAvailability.connect(@slotToggleFlashAvailability)
 
-        @boundPeerId = false
-        xdpy.sigNotifyPeerId.connect(@, @slotWaitToBindDeviceObserver)
+        #window.bindDeviceObserver=@bindDeviceObserver
+        #window.getDeviceIndex=@getDeviceIndex
+        #window.writeLog=@writeLog
 
-        @bindDblclick()
-        @bindContextMenu()
-        @bindMaskObserver()
-        @bindTaskTabObserver()
-        @fixDeviceShortName()
+        xdpy.sigNotifyPeerId.connect(@slotWaitToBindDeviceObserver)
+
+        bindDblclick()
+        bindContextMenu()
+        bindMaskObserver()
+        bindTaskTabObserver()
+        fixDeviceShortName()
 
         result = {}
         if Data?
@@ -26,16 +31,15 @@ class XwareJS
             result.userid = null
         xdpy.xdjsLoaded(result)
 
-    log: (items...) ->
+    writeLog=(items...) ->
         xdpy.log(items)
 
-    isShowingLocalDevice: () ->
-        return @boundPeerId is Data.downloader.pid
+    isShowingLocalDevice=() ->
+        return boundPeerId is Data.downloader.pid
 
-    bindDblclick: () ->
-        _this = @
+    bindDblclick=() ->
         $("#task-list").on "dblclick", "div.rw_unit", (event) ->
-            if not _this.isShowingLocalDevice()
+            if not isShowingLocalDevice()
                 return
             tid = $(@).attr("data-tid")
             task = Data.task.all[tid]
@@ -48,20 +52,18 @@ class XwareJS
                 event.stopImmediatePropagation()
                 event.stopPropagation()
 
-    bindContextMenu: () ->
-        _this = @
+    bindContextMenu=() ->
         $("#task-list").on "contextmenu", "div.rw_unit", (event) ->
-            if not _this.isShowingLocalDevice()
+            if not isShowingLocalDevice()
                 return
             tid = $(@).attr("data-tid")
             task = Data.task.all[tid]
-
             $openDir = $("<li><a href='javascript:void(0)'>在文件夹中显示</a></li>")
             $openDir.on "click", () ->
-                if task.path
+                #if task.path
                     xdpy.systemViewOneFile(task.path + task.name)
-                else
-                    console.error "No Task Path"
+                #else
+                    #console.error "No Task Path"
             $cmenu = $("div#cmenu.flo_wrap > ul.flo_ul")
             $cmenu.prepend($openDir)
 
@@ -76,7 +78,6 @@ class XwareJS
 
     slotCreateTask: (task) ->
         App.set("dialogs.createTask.show", true)
-
         $createTaskUrl = $("#d-create-task-url")
         $createTaskUrl.val(task)
         $createTaskUrl.keyup()
@@ -121,7 +122,7 @@ class XwareJS
                 location.reload(true)
             , 5000
 
-    bindMaskObserver: () ->
+    bindMaskObserver=() ->
         mask = document.getElementById("mask")
         maskon = false
         if not mask
@@ -144,28 +145,30 @@ class XwareJS
             "attributeFilter": ["class"]
         })
 
-    getDeviceIndex: (peerId) ->
+    getDeviceIndex=(peerId) ->
         for i, item of Data.downloader.list
             if item.pid is peerId
                 return i
         return NaN
 
-    bindDeviceObserver: (boundPeerId) ->
-        # prevent multiple binding
-        if @boundPeerId
-            return
-        @boundPeerId = boundPeerId
+    bindDeviceObserver=(bpid) ->
 
-        deviceIndex = @getDeviceIndex(boundPeerId)
+        # prevent multiple binding
+        if boundPeerId
+            return
+        boundPeerId = bpid
+
+        deviceIndex = getDeviceIndex(bpid)
+
         if (not isNaN(deviceIndex)) and (App.get("downloader.activedIndex") isnt deviceIndex)
             App.set("downloader.activedIndex", deviceIndex)
 
-        @log "bindDeviceObserver"
+        writeLog "bindDeviceObserver"
 
-        _online = Data.downloader.all[boundPeerId].online
-        _logined = Data.downloader.all[boundPeerId].logined
+        _online = Data.downloader.all[bpid].online
+        _logined = Data.downloader.all[bpid].logined
 
-        Object.defineProperty(Data.downloader.all[boundPeerId], "online", {
+        Object.defineProperty(Data.downloader.all[bpid], "online", {
             get: () ->
                 return _online
             set: (v) =>
@@ -175,7 +178,7 @@ class XwareJS
                 console.log("set online", v)
         })
 
-        Object.defineProperty(Data.downloader.all[boundPeerId], "logined", {
+        Object.defineProperty(Data.downloader.all[bpid], "logined", {
             get: () ->
                 return _logined
             set: (v) =>
@@ -189,20 +192,22 @@ class XwareJS
             xdpy.slotSetOnline(_online)
         if typeof _logined is "number"
             xdpy.slotSetLogined(_logined)
+        return
 
-    slotWaitToBindDeviceObserver: (boundPeerId) ->
+    slotWaitToBindDeviceObserver: (bpid) ->
         # This method exists because the peerids are loaded by an ajax request,
         # when the network is a bit slow, peerids are delayed.
         # Using a setInterval to wait for the peerids being loaded is good enough.
         if Data?.downloader?
             # the right page
             intervalId = setInterval () =>
-                if boundPeerId of Data.downloader.all
+                if bpid of Data.downloader.all
                     clearInterval(intervalId)
-                    @bindDeviceObserver(boundPeerId)
+                    bindDeviceObserver(bpid)
             , 500
+        return
 
-    bindTaskTabObserver: () ->
+    bindTaskTabObserver=() ->
         taskSidebar = document.getElementById("task-sidebar")
         if not taskSidebar
             return
@@ -221,19 +226,21 @@ class XwareJS
             "characterDataOldValue": false
             "attributeFilter": ['class']
         })
+        return
 
-    fixDeviceShortName: () ->
+    fixDeviceShortName=() ->
         if Data?.downloader?.template?
             Data.downloader.template.item = Data.downloader.template.item.replace(/\{\{shortName\}\}/g, "{{name}}")
-
-$ ->
-    window.onerror = (event, source, lineno, colno, error) ->
+        return
+window.onerror = (event, source, lineno, colno, error) ->
         xdpy.onJsError(event, source, lineno, colno, error)
         return false  # allow default handler
 
-    if (not window.MutationObserver) and window.WebKitMutationObserver
-        window.MutationObserver = window.WebKitMutationObserver
+if (not window.MutationObserver) and window.WebKitMutationObserver
+    window.MutationObserver = window.WebKitMutationObserver
+document.onreadystatechange = () ->
+    if document.readyState is "complete"
+        window.xdjs = new XwareJS()
+document.onreadystatechange()
 
-    window.xdjs = new XwareJS()
-
-null # fix issue 64, by making Qt not cast the last statement's return value into a Qt type.
+# fix issue 64, by making Qt not cast the last statement's return value into a Qt type.

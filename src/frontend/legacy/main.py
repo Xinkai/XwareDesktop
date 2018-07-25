@@ -11,7 +11,6 @@ from .about import AboutDialog
 from .settings import SettingsDialog
 from .ui_main import Ui_MainWindow
 
-
 class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     def __init__(self, *, adapter, taskCreationAgent, frontendSettings, app):
         super().__init__(None)
@@ -21,7 +20,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.__taskCreationAgent = taskCreationAgent
         self.__frontendSettings = frontendSettings
         self.__app = app
-
         # UI
         self.setupUi(self)
         self.connectUI()
@@ -47,11 +45,6 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
     @property
     def page(self):
         return self.webView.page()
-
-    @property
-    def frame(self):
-        return self.webView.page().mainFrame()
-    # shorthand ends
 
     @pyqtSlot()
     def slotExit(self):
