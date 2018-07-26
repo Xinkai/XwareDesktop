@@ -33,7 +33,7 @@ build/etmpatch.so: src/etmpatch.c
 	$(CC) $(FLAGS) -m32 -o build/etmpatch.so -fPIC -shared -ldl src/etmpatch.c
 
 build/chmns: src/chmns.c
-	$(CC) $(FLAGS) -o build/chmns  src/chmns.c -lcap
+	$(CC) $(FLAGS) -o build/chmns  src/chmns.c
 
 extensions:
 	make -C src/frontend/Extensions all
@@ -158,10 +158,10 @@ install:
 	find $(DESTDIR)$(PREFIX) -name "__pycache__" -print0 | xargs -0 rm -rf
 	$(python3) -OO -m compileall -q $(DESTDIR)$(PREFIX)
 	#fix permissions of source
-	chmod -R 777 *
+	#chmod -R 777 *
 	# fix permissions
-	#find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
-	#find $(DESTDIR) -type d -print0 | xargs -0 chmod 755
+	find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
+	find $(DESTDIR) -type d -print0 | xargs -0 chmod 755
 
 	# mark executables
 	chmod +x $(DESTDIR)$(PREFIX)/frontend/launcher.py

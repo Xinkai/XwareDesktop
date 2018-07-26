@@ -27,8 +27,9 @@ Requires:           python3 >= 3.4
 Requires:           glibc(x86-32)
 Requires:           zlib(x86-32)
 Requires:           python3-qt5 >= 5.2
-Requires:           qt5-qtwebkit >= 5.2
-Requires:           qt5-qtmultimedia >= 5.2
+Requires:           qt5-qtwebengine >= 5.6
+Requires:           qt5-qtwebchannel >= 5.6
+Requires:           qt5-qtmultimedia >= 5.6
 Requires:           python3-inotify
 Requires(post):     desktop-file-utils
 Requires(post):     libcap
