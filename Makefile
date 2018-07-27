@@ -157,7 +157,9 @@ install:
 	# regenerate .pyo files
 	find $(DESTDIR)$(PREFIX) -name "__pycache__" -print0 | xargs -0 rm -rf
 	$(python3) -OO -m compileall -q $(DESTDIR)$(PREFIX)
-	#fix permissions of source
+	#fix permissions of source code
+	#works just find without -print0 in newer linux system
+	find -type f -name configure.py -print0 | xargs -0 chmod +x
 	#chmod -R 777 *
 	# fix permissions
 	find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
