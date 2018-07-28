@@ -1,4 +1,4 @@
-xware-desktop (1:0.13.20180727) trusty; urgency=low
+xware-desktop (1:0.13.20180728) bionic; urgency=low
 
   * Fixed Notifer actionsInvoke
 

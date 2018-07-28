@@ -38,6 +38,16 @@ build/chmns: src/chmns.c
 extensions:
 	make -C src/frontend/Extensions all
 
+fix:
+	#fix permissions of source code
+	#works just find without -print0 in newer linux system
+	find -type f -name configure.py -print0 | xargs -0 chmod +x
+	find -type d -name debian -print0 | xargs -0 chmod -R +x
+	#chmod -R 777 *
+	# fix permissions
+	find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
+	find $(DESTDIR) -type d -print0 | xargs -0 chmod 755
+
 clean:
 	# arch packaging
 	rm -rf pkg
@@ -61,7 +71,7 @@ clean:
 
 	# extensions
 	make -C src/frontend/Extensions clean
-
+		
 pyqt:
 	$(pyuic5) -o src/frontend/legacy/ui_main.py     src/frontend/ui/main.ui
 	$(pyuic5) -o src/frontend/legacy/ui_settings.py src/frontend/ui/settings.ui

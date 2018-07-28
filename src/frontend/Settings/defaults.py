@@ -34,7 +34,7 @@ _DEFAULT_PATTERN = """// packages
 
 DEFAULT_SETTINGS = {
     "frontend": {
-        "minimizetosystray": True,
+        "minimizetosystray": False,
         "closetominimize": False,
         "popnotifications": True,
         "notifybysound": True,
