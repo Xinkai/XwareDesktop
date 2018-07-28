@@ -4,7 +4,7 @@ import logging
 from launcher import app
 
 from PyQt5.QtCore import pyqtSlot, Qt
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QMessageBox
 
 from PersistentGeometry import PersistentGeometry
 from .ui_scheduler import Ui_SchedulerDialog
@@ -17,7 +17,7 @@ class SchedulerWindow(QDialog, Ui_SchedulerDialog, PersistentGeometry):
         self.setupUi(self)
         self.setAttribute(Qt.WA_DeleteOnClose)
         self.preserveGeometry()
-
+        self.taskCount = 0
         # actWhen ComboBox
         for row, actWhen in enumerate(ActWhen.__members__.values()):
             self.comboBox_actWhen.addItem(str(actWhen))
@@ -50,6 +50,9 @@ class SchedulerWindow(QDialog, Ui_SchedulerDialog, PersistentGeometry):
 
     @pyqtSlot()
     def accept(self):
+        if (self.listView_runningTasks.modelColumn() == 0):
+            QMessageBox.warning(self, "警告", "没有任务在运行,无法建立计划任务", QMessageBox.Ok, QMessageBox.Ok)
+            return
         actWhen = ActWhen(self.comboBox_actWhen.currentData())
         action = Action(self.comboBox_action.currentData())
         app.schedulerModel.set(actWhen, action)

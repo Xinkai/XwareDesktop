@@ -60,12 +60,13 @@ DEFAULT_SETTINGS = {
         "username": None,
         "password": None,
     },
-    "scheduler": {
-        "poweroffcmd": "",
-        "hybridsleepcmd": "",
-        "hibernatecmd": "",
-        "suspendcmd": "",
-    },
+    # TODO: add textBoxs in settings to add commands
+    # "scheduler": {
+    #     "poweroffcmd": "",
+    #     "hybridsleepcmd": "",
+    #     "hibernatecmd": "",
+    #     "suspendcmd": "",
+    # },
     "internal": {
         "mainwindowgeometry": None,
         "monitorwindowgeometry": None,
