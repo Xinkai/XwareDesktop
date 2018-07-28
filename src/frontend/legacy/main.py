@@ -74,6 +74,7 @@ class MainWindow(QMainWindow, Ui_MainWindow, PersistentGeometry):
         self.setWindowState(self.windowState() & ~Qt.WindowMinimized | Qt.WindowActive)
         if self.isHidden():
             self.setHidden(False)
+        self.activateWindow()
         self.raise_()
 
     def closeEvent(self, qCloseEvent):

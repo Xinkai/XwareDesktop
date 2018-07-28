@@ -49,7 +49,7 @@
       <bool>true</bool>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+         <number>3</number>
      </property>
      <widget class="QWidget" name="tab_loginAndStart">
       <attribute name="title">
@@ -287,7 +287,7 @@
          <x>12</x>
          <y>12</y>
             <width>261</width>
-            <height>201</height>
+            <height>206</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">

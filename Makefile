@@ -160,6 +160,7 @@ install:
 	#fix permissions of source code
 	#works just find without -print0 in newer linux system
 	find -type f -name configure.py -print0 | xargs -0 chmod +x
+	find -type d -name debian -print0 | xargs -0 chmod -R +x
 	#chmod -R 777 *
 	# fix permissions
 	find $(DESTDIR) -type f -print0 | xargs -0 chmod 644
@@ -176,4 +177,4 @@ install:
 	chmod +x $(DESTDIR)$(PREFIX)/xware/portal
 	chmod +x $(DESTDIR)$(PREFIX)/chmns
 	#add cap_sys_admin for unshare(CLONE_NEWNS) 
-	setcap cap_sys_admin=eip $(DESTDIR)$(PREFIX)/chmns
+	setcap cap_sys_admin=ep $(DESTDIR)$(PREFIX)/chmns

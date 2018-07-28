@@ -20,7 +20,6 @@ class Notifier(QObject):
         self.__taskModel = taskModel
         self.__frontendSettings = frontendSettings
         self._conn = QDBusConnection("Xware Desktop").sessionBus()
-
         self._interface = QDBusInterface(_DBUS_NOTIFY_SERVICE,
                                          _DBUS_NOTIFY_PATH,
                                          _DBUS_NOTIFY_INTERFACE,
@@ -28,7 +27,7 @@ class Notifier(QObject):
 
         self._notified = {}  # a dict of notifyId: taskDict
         self.__taskModel.taskCompleted.connect(self.notifyTaskCompleted, Qt.DirectConnection)
-
+        self._conn.registerObject(_DBUS_NOTIFY_PATH, self)  # you must register it before connect
         self._capabilities = self._getCapabilities()
         if "actions" in self._capabilities:
             successful = self._conn.connect(_DBUS_NOTIFY_SERVICE,

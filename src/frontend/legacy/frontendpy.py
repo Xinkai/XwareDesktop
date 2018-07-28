@@ -217,6 +217,7 @@ class FrontendPy(QObject):
 
         try:
             creation = self.__taskCreationAgent.dequeue()
+            self.__mainWin.restore()
         except IndexError:
             # no actions
             return
