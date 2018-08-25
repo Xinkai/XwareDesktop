@@ -1,5 +1,9 @@
-xware-desktop (1:0.13.20180728) xenial; urgency=low
+<<<<<<< HEAD
+xware-desktop (1:0.13.20180825) xenial; urgency=low
+=======
+xware-desktop (1:0.13.20180728) bionic; urgency=low
+>>>>>>> 3190c4219b2b78b3699f933eb23cf18f5db3633a
 
   * Fixed Notifer actionsInvoke
 
- -- yangyk <1520972296@qq.com>  Sat, 28 Jul 2018 14:00:00 -0800
+ -- yangyk <1520972296@qq.com>  Sat, 25 Aug 2018 14:00:00 -0800
